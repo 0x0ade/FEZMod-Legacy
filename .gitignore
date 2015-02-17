@@ -1,4 +1,8 @@
 FEZ.Mod.mm/bin/
-FEZ.Mod.mm/out/
+FEZ.Mod.mm/obj/
+FEZ.Mod.mm/*.sln
+FEZ.Mod.mm/*.userprefs
 FezEngine.Mod.mm/bin/
-FezEngine.Mod.mm/out/
+FezEngine.Mod.mm/obj/
+FezEngine.Mod.mm/*.sln
+FezEngine.Mod.mm/*.userprefs
