@@ -1,0 +1,17 @@
+/home/maik/monodevelop/MonoMod/MonoMod/FEZ.Mod.mm/obj/Release/.NETFramework,Version=v4.5.AssemblyAttribute.cs
+/home/maik/monodevelop/MonoMod/MonoMod/FEZ.Mod.mm/bin/Release/FEZ.Mod.mm.dll.mdb
+/home/maik/monodevelop/MonoMod/MonoMod/FEZ.Mod.mm/bin/Release/FEZ.Mod.mm.dll
+/home/maik/monodevelop/MonoMod/MonoMod/FEZ.Mod.mm/obj/Release/FEZ.Mod.mm.dll
+/home/maik/monodevelop/MonoMod/MonoMod/FEZ.Mod.mm/obj/Release/FEZ.Mod.mm.dll.mdb
+/home/maik/monodevelop/MonoMod/MonoMod/FEZ.Mod.mm/bin/Release/FEZ.exe
+/home/maik/monodevelop/MonoMod/MonoMod/FEZ.Mod.mm/bin/Release/FezEngine.orig.dll
+/home/maik/monodevelop/MonoMod/MonoMod/FEZ.Mod.mm/bin/Release/System.Xml.dll
+/home/maik/monodevelop/MonoMod/MonoMod/FEZ.Mod.mm/bin/Release/MonoGame.Framework.dll
+/home/maik/monodevelop/MonoMod/MonoMod/FEZ.Mod.mm/bin/Release/ContentSerialization.dll
+/home/maik/monodevelop/MonoMod/MonoMod/FEZ.Mod.mm/bin/Release/Common.dll
+/home/maik/monodevelop/MonoMod/MonoMod/FEZ.Mod.mm/bin/Release/SDL2#.dll
+/home/maik/monodevelop/MonoMod/MonoMod/FEZ.Mod.mm/bin/Release/XnaWordWrapCore.dll
+/home/maik/monodevelop/MonoMod/MonoMod/FEZ.Mod.mm/bin/Release/EasyStorage.dll
+/home/maik/monodevelop/MonoMod/MonoMod/FEZ.Mod.mm/bin/Release/System.Drawing.dll
+/home/maik/monodevelop/MonoMod/MonoMod/FEZ.Mod.mm/bin/Release/NVorbis.dll
+/home/maik/monodevelop/MonoMod/MonoMod/FEZ.Mod.mm/bin/Release/SimpleDefinitionLanguage.dll
