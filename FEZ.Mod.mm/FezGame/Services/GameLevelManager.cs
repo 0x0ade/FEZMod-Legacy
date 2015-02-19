@@ -6,6 +6,7 @@ using FezEngine.Structure.Scripting;
 using FezEngine.Tools;
 using FezGame.Services;
 using FezGame.Structure;
+using FezGame.Mod;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using System.Collections.Generic;
@@ -125,22 +126,12 @@ namespace FezGame.Services {
             }
 
             //Actual level content
-            XmlElement xmlSize = xmlLevel["Size"]["Vector3"];
-            levelData.Size = new Vector3(
-                float.Parse(xmlSize.GetAttribute("x")),
-                float.Parse(xmlSize.GetAttribute("y")),
-                float.Parse(xmlSize.GetAttribute("z"))
-            );
+            levelData.Size = (Vector3) XmlLevelHelper.Parse(xmlLevel["Size"]);
 
             XmlElement xmlSpawn = xmlLevel["StartingPosition"]["TrileFace"];
             levelData.StartingPosition = new TrileFace();
             levelData.StartingPosition.Face = (FaceOrientation) Enum.Parse(moduleFezEngine.GetType("FezEngine.FaceOrientation"), xmlSpawn.GetAttribute("face"));
-            XmlElement xmlSpawnTrile = xmlSpawn["TrileId"]["TrileEmplacement"];
-            levelData.StartingPosition.Id = new TrileEmplacement(
-                int.Parse(xmlSpawnTrile.GetAttribute("x")),
-                int.Parse(xmlSpawnTrile.GetAttribute("y")),
-                int.Parse(xmlSpawnTrile.GetAttribute("z"))
-            );
+            levelData.StartingPosition.Id = (TrileEmplacement) XmlLevelHelper.Parse(xmlSpawn["TrileId"]);
 
             XmlElement xmlVolumes = xmlLevel["Volumes"];
             levelData.Volumes = new Dictionary<int, Volume>();
@@ -160,19 +151,9 @@ namespace FezGame.Services {
                 }
                 volume.Orientations = orientations;
 
-                XmlElement xmlFrom = xmlVolume["From"]["Vector3"];
-                volume.From = new Vector3(
-                    float.Parse(xmlFrom.GetAttribute("x")),
-                    float.Parse(xmlFrom.GetAttribute("y")),
-                    float.Parse(xmlFrom.GetAttribute("z"))
-                );
+                volume.From = (Vector3) XmlLevelHelper.Parse(xmlVolume["From"]);
 
-                XmlElement xmlTo = xmlVolume["To"]["Vector3"];
-                volume.To = new Vector3(
-                    float.Parse(xmlTo.GetAttribute("x")),
-                    float.Parse(xmlTo.GetAttribute("y")),
-                    float.Parse(xmlTo.GetAttribute("z"))
-                );
+                volume.To = (Vector3) XmlLevelHelper.Parse(xmlVolume["To"]);
 
                 levelData.Volumes[key] = volume;
             }
@@ -258,32 +239,14 @@ namespace FezGame.Services {
             for (int i = 0; i < xmlTriles.ChildNodes.Count; i++) {
                 XmlElement xmlTrile = (XmlElement) xmlTriles.ChildNodes.Item(i);
 
-                XmlElement xmlTrileEmplacement = xmlTrile["TrileEmplacement"];
-                int trileX = int.Parse(xmlTrileEmplacement.GetAttribute("x"));
-                int trileY = int.Parse(xmlTrileEmplacement.GetAttribute("y"));
-                int trileZ = int.Parse(xmlTrileEmplacement.GetAttribute("z"));
-                TrileEmplacement trileEmplacement = new TrileEmplacement(
-                    trileX,
-                    trileY,
-                    trileZ
-                );
+                TrileEmplacement trileEmplacement = (TrileEmplacement) XmlLevelHelper.Parse(xmlTrile);
                 xmlTrile = xmlTrile["TrileInstance"];
-                //FaceOrientation trileOrientation = FaceOrientation.wrap(int.Parse(xmlTrile.GetAttribute("orientation")));
 
                 TrileInstance trile = new TrileInstance(trileEmplacement, int.Parse(xmlTrile.GetAttribute("trileId")));
 
-                XmlElement xmlTrilePosition = xmlTrile["Position"]["Vector3"];
-                trile.Position = new Vector3(
-                    float.Parse(xmlTrilePosition.GetAttribute("x")),
-                    float.Parse(xmlTrilePosition.GetAttribute("y")),
-                    float.Parse(xmlTrilePosition.GetAttribute("z"))
-                );
+                trile.Position = (Vector3) XmlLevelHelper.Parse(xmlTrile["Position"]);
 
                 trile.SetPhiLight(byte.Parse(xmlTrile.GetAttribute("orientation")));
-
-                trileEmplacement.X = trileX;
-                trileEmplacement.Y = trileY;
-                trileEmplacement.Z = trileZ;
 
                 levelData.Triles[trileEmplacement] = trile;
             }
@@ -298,28 +261,9 @@ namespace FezGame.Services {
                 ArtObjectInstance ao = new ArtObjectInstance();
 
                 ao.ArtObjectName = xmlAO.GetAttribute("name");
-
-                XmlElement xmlAOPosition = xmlAO["Position"]["Vector3"];
-                ao.Position = new Vector3(
-                    float.Parse(xmlAOPosition.GetAttribute("x")),
-                    float.Parse(xmlAOPosition.GetAttribute("y")),
-                    float.Parse(xmlAOPosition.GetAttribute("z"))
-                );
-
-                XmlElement xmlAORotation = xmlAO["Rotation"]["Quaternion"];
-                ao.Rotation = new Quaternion(
-                    float.Parse(xmlAORotation.GetAttribute("x")),
-                    float.Parse(xmlAORotation.GetAttribute("y")),
-                    float.Parse(xmlAORotation.GetAttribute("z")),
-                    float.Parse(xmlAORotation.GetAttribute("w"))
-                );
-
-                XmlElement xmlAOScale = xmlAO["Scale"]["Vector3"];
-                ao.Scale = new Vector3(
-                    float.Parse(xmlAOScale.GetAttribute("x")),
-                    float.Parse(xmlAOScale.GetAttribute("y")),
-                    float.Parse(xmlAOScale.GetAttribute("z"))
-                );
+                ao.Position = (Vector3) XmlLevelHelper.Parse(xmlAO["Position"]);
+                ao.Rotation = (Quaternion) XmlLevelHelper.Parse(xmlAO["Rotation"]);
+                ao.Scale = (Vector3) XmlLevelHelper.Parse(xmlAO["Scale"]);
 
                 XmlElement xmlAOSettings = xmlAO["ArtObjectActorSettings"];
                 ArtObjectActorSettings settings = new ArtObjectActorSettings();
@@ -337,13 +281,7 @@ namespace FezGame.Services {
                     settings.AttachedGroup = new int?();
                 }
                 settings.SpinView = (Viewpoint) Enum.Parse(moduleFezEngine.GetType("FezEngine.Viewpoint"), xmlAOSettings.GetAttribute("spinView"));
-
-                XmlElement xmlAOSettingsRotationCenter = xmlAOSettings["RotationCenter"]["Vector3"];
-                settings.RotationCenter = new Vector3(
-                    float.Parse(xmlAOSettingsRotationCenter.GetAttribute("x")),
-                    float.Parse(xmlAOSettingsRotationCenter.GetAttribute("y")),
-                    float.Parse(xmlAOSettingsRotationCenter.GetAttribute("z"))
-                );
+                settings.RotationCenter = (Vector3) XmlLevelHelper.Parse(xmlAOSettings["RotationCenter"]);
 
                 ao.ActorSettings = settings;
 
@@ -382,28 +320,9 @@ namespace FezGame.Services {
                 filter.PackedValue = Convert.ToUInt32(xmlPlane.GetAttribute("filter").Substring(1), 16);
                 plane.Filter = filter;
                 plane.ActorType = (ActorType) Enum.Parse(moduleFezEngine.GetType("FezEngine.Structure.ActorType"), xmlPlane.GetAttribute("actorType"));
-
-                XmlElement xmlPlanePosition = xmlPlane["Position"]["Vector3"];
-                plane.Position = new Vector3(
-                    float.Parse(xmlPlanePosition.GetAttribute("x")),
-                    float.Parse(xmlPlanePosition.GetAttribute("y")),
-                    float.Parse(xmlPlanePosition.GetAttribute("z"))
-                );
-
-                XmlElement xmlPlaneRotation = xmlPlane["Rotation"]["Quaternion"];
-				plane.Rotation = new Quaternion(
-                    float.Parse(xmlPlaneRotation.GetAttribute("x")),
-                    float.Parse(xmlPlaneRotation.GetAttribute("y")),
-                    float.Parse(xmlPlaneRotation.GetAttribute("z")),
-                    float.Parse(xmlPlaneRotation.GetAttribute("w"))
-                );
-
-                XmlElement xmlPlaneScale = xmlPlane["Scale"]["Vector3"];
-				plane.Scale = new Vector3(
-                    float.Parse(xmlPlaneScale.GetAttribute("x")),
-                    float.Parse(xmlPlaneScale.GetAttribute("y")),
-                    float.Parse(xmlPlaneScale.GetAttribute("z"))
-                );
+                plane.Position = (Vector3) XmlLevelHelper.Parse(xmlPlane["Position"]);
+                plane.Rotation = (Quaternion) XmlLevelHelper.Parse(xmlPlane["Rotation"]);
+                plane.Scale = (Vector3) XmlLevelHelper.Parse(xmlPlane["Scale"]);
 
                 levelData.BackgroundPlanes[key] = plane;
             }
@@ -434,12 +353,8 @@ namespace FezGame.Services {
                 XmlElement xmlGroupTriles = xmlGroup["Triles"];
                 for (int ii = 0; ii < xmlGroupTriles.ChildNodes.Count; ii++) {
                     XmlElement xmlGroupTrile = (XmlElement) xmlGroupTriles.ChildNodes.Item(ii);
-                    XmlElement xmlGroupTrilePosition = xmlGroupTrile["Position"]["Vector3"];
 
-                    TrileInstance groupTrile = new TrileInstance(new Vector3(
-                        Single.Parse(xmlGroupTrilePosition.GetAttribute("x")),
-                        Single.Parse(xmlGroupTrilePosition.GetAttribute("y")),
-                        Single.Parse(xmlGroupTrilePosition.GetAttribute("z"))),
+                    TrileInstance groupTrile = new TrileInstance((Vector3) XmlLevelHelper.Parse(xmlGroupTrile["Position"]),
                         int.Parse(xmlGroupTrile.GetAttribute("trileId")));
 
                     groupTrile.SetPhiLight(byte.Parse(xmlGroupTrile.GetAttribute("orientation")));
@@ -447,12 +362,7 @@ namespace FezGame.Services {
                     trileGroup.Triles.Add(groupTrile);
                 }
 
-                XmlElement xmlGroupSpinCenter = xmlGroup["SpinCenter"]["Vector3"];
-                trileGroup.SpinCenter = new Vector3(
-                    float.Parse(xmlGroupSpinCenter.GetAttribute("x")),
-                    float.Parse(xmlGroupSpinCenter.GetAttribute("y")),
-                    float.Parse(xmlGroupSpinCenter.GetAttribute("z"))
-                );
+                trileGroup.SpinCenter = (Vector3) XmlLevelHelper.Parse(xmlGroup["SpinCenter"]);
 
                 levelData.Groups[key] = trileGroup;
             }
@@ -479,19 +389,9 @@ namespace FezGame.Services {
 				npc.AvoidsGomez = bool.Parse(xmlNPC.GetAttribute("avoidsGomez"));
 				npc.ActorType = (ActorType) Enum.Parse(moduleFezEngine.GetType("FezEngine.Structure.ActorType"), xmlNPC.GetAttribute("actorType"));
 
-                XmlElement xmlNPCPosition = xmlNPC["Position"]["Vector3"];
-				npc.Position = new Vector3(
-                    float.Parse(xmlNPCPosition.GetAttribute("x")),
-                    float.Parse(xmlNPCPosition.GetAttribute("y")),
-                    float.Parse(xmlNPCPosition.GetAttribute("z"))
-                );
+                npc.Position = (Vector3) XmlLevelHelper.Parse(xmlNPC["Position"]);
 
-                XmlElement xmlNPCDestinationOffset = xmlNPC["DestinationOffset"]["Vector3"];
-				npc.DestinationOffset = new Vector3(
-                    float.Parse(xmlNPCDestinationOffset.GetAttribute("x")),
-                    float.Parse(xmlNPCDestinationOffset.GetAttribute("y")),
-                    float.Parse(xmlNPCDestinationOffset.GetAttribute("z"))
-                );
+                npc.DestinationOffset = (Vector3) XmlLevelHelper.Parse(xmlNPC["DestinationOffset"]);
 
                 XmlElement xmlSpeech = xmlNPC["Speech"];
                 List<SpeechLine> speech = new List<SpeechLine>();
@@ -567,20 +467,9 @@ namespace FezGame.Services {
 					segment.WaitTimeOnStart = new TimeSpan(long.Parse(xmlSegment.GetAttribute("waitTimeOnStart")));
 					segment.WaitTimeOnFinish = new TimeSpan(long.Parse(xmlSegment.GetAttribute("waitTimeOnFinish")));
 
-                    XmlElement xmlSegmentDestination = xmlSegment["Destination"]["Vector3"];
-					segment.Destination = new Vector3(
-                        float.Parse(xmlSegmentDestination.GetAttribute("x")),
-                        float.Parse(xmlSegmentDestination.GetAttribute("y")),
-                        float.Parse(xmlSegmentDestination.GetAttribute("z"))
-                    );
+                    segment.Destination = (Vector3) XmlLevelHelper.Parse(xmlSegment["Destination"]);
 
-                    XmlElement xmlSegmentOrientation = xmlSegment["Orientation"]["Quaternion"];
-					segment.Orientation = new Quaternion(
-                        float.Parse(xmlSegmentOrientation.GetAttribute("x")),
-                        float.Parse(xmlSegmentOrientation.GetAttribute("y")),
-                        float.Parse(xmlSegmentOrientation.GetAttribute("z")),
-                        float.Parse(xmlSegmentOrientation.GetAttribute("w"))
-                    );
+                    segment.Orientation = (Quaternion) XmlLevelHelper.Parse(xmlSegment["Orientation"]);
 
                     XmlElement xmlSegmentData = xmlSegment["CustomData"]["CameraNodeData"];
                     CameraNodeData segmentData = new CameraNodeData();

@@ -1,6 +1,7 @@
 ﻿using System;
 using FezGame;
 using FezEngine.Tools;
+using FezGame.Mod;
 
 namespace FezGame {
 	public class Program {
@@ -9,11 +10,7 @@ namespace FezGame {
 		}
 
 		public static void Main(String[] args) {
-			Fez.Version = "0.0.4";
-			Console.WriteLine("JustAnotherFEZMod (JAFM) "+Fez.Version);
-			Fez.Version += "(JustAnotherFEZMod)";
-
-            System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+            FEZMod.Initialize();
 
 			Console.WriteLine("Checking for custom arguments...");
 			for (int i = 0; i < args.Length; i++) {
@@ -50,6 +47,7 @@ namespace FezGame {
 					MemoryContentManager.AssetExists("JAFM_DUMPALL_WORKAROUND");
 				}
 			}
+
 			Console.WriteLine("Passing to FEZ...");
 			orig_Main(args);
 		}

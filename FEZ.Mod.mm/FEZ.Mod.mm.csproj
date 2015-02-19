@@ -30,19 +30,19 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="FEZ">
-      <HintPath>..\..\..\..\Spiele\FEZ\FEZ.exe</HintPath>
-    </Reference>
-    <Reference Include="FezEngine">
-      <HintPath>..\..\..\..\Spiele\FEZ\FezEngine.orig.dll</HintPath>
+      <HintPath>..\libs\FEZ.exe</HintPath>
     </Reference>
     <Reference Include="System.Xml">
-      <HintPath>..\..\..\..\Spiele\FEZ\System.Xml.dll</HintPath>
+      <HintPath>..\libs\System.Xml.dll</HintPath>
     </Reference>
     <Reference Include="MonoGame.Framework">
-      <HintPath>..\..\..\..\Spiele\FEZ\MonoGame.Framework.dll</HintPath>
+      <HintPath>..\libs\MonoGame.Framework.dll</HintPath>
     </Reference>
     <Reference Include="ContentSerialization">
-      <HintPath>..\..\..\..\Spiele\FEZ\ContentSerialization.dll</HintPath>
+      <HintPath>..\libs\ContentSerialization.dll</HintPath>
+    </Reference>
+    <Reference Include="FezEngine">
+      <HintPath>..\libs\FezEngine.orig.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -53,6 +53,8 @@
     <Compile Include="FezGame\Components\WorldMap.cs" />
     <Compile Include="FezGame\Components\DotHost.cs" />
     <Compile Include="FezGame\Components\MenuCube.cs" />
+    <Compile Include="FezGame\Mod\FEZMod.cs" />
+    <Compile Include="FezGame\Mod\XmlLevelHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -61,5 +63,6 @@
     <Folder Include="FezEngine\" />
     <Folder Include="FezEngine\Services\" />
     <Folder Include="FezGame\Components\" />
+    <Folder Include="FezGame\Mod\" />
   </ItemGroup>
 </Project>

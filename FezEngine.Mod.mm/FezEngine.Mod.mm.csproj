@@ -29,6 +29,18 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="FezEngine">
+      <HintPath>..\libs\FezEngine.orig.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Framework">
+      <HintPath>..\libs\MonoGame.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml">
+      <HintPath>..\libs\System.Xml.dll</HintPath>
+    </Reference>
+    <Reference Include="ContentSerialization">
+      <HintPath>..\libs\ContentSerialization.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
