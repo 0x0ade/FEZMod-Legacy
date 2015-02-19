@@ -3,7 +3,6 @@ env:
     global:
        - "BUILD_NUMBER=$TRAVIS_BUILD_NUMBER"
        - "BUILD_DIR=$TRAVIS_BUILD_DIR"
-       - secure: "Fj+4oEnBqxHq7bQ2NMN4vTqWczEHSSizpcn56G1eihPokG6c/ktY0yeSx/CSTH0h9K0dY/eeDNoPRWlwGvVqqPMQXgfLTuGMLkDHgIKP1FBOvW4qMNzED/+Feo+iyvvVS599W57gesOFJ14MkyPLnzrh+jMVRCn6+1qcwx/A0Ss="
 script:
     - ./build_engine.sh
     - ./build_main.sh
