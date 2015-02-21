@@ -10,7 +10,7 @@ namespace FezEngine.Structure {
         }
 
         public bool get_Flat() {
-            return orig_get_Flat() || !IsNoFlat;
+            return orig_get_Flat() && !IsNoFlat;
         }
 
     }
