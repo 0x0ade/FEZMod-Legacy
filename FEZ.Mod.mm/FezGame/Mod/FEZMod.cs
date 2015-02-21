@@ -88,6 +88,10 @@ namespace FezGame.Mod {
                     ModLogger.Log("JAFM", "Found -nf / --no-flat");
                     MemoryContentManager.AssetExists("JAFM_NOFLAT_WORKAROUND");
                 }
+                if (args[i] == "-nc" || args[i] == "--no-cache") {
+                    ModLogger.Log("JAFM", "Found -nc / --no-cache");
+                    MemoryContentManager.AssetExists("JAFM_NOCACHE_WORKAROUND");
+                }
             }
 
             CallInEachModule("ParseArgs", args);

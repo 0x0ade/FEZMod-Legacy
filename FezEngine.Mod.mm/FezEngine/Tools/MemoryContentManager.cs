@@ -9,11 +9,50 @@ using FezEngine.Structure;
 namespace FezEngine.Tools {
     public class MemoryContentManager {
 
+        private static IEnumerable<string> assetNames;
+        public static IEnumerable<string> get_AssetNames() {
+            if (!CacheDisabled) {
+                return MemoryContentManager.cachedAssets.Keys;
+            } else {
+                if (assetNames == null) {
+                    List<string> files = TraverseThrough("Resources");
+                    List<string> assets = new List<string>(files.Count);
+                    foreach (string file in files) {
+                        assets.Add(file.Substring(10, file.Length-14).Replace("/", "\\"));
+                    }
+                    assetNames = assets;
+                }
+                return assetNames;
+            }
+        }
+
+        private static List<string> TraverseThrough(string dir) {
+            return TraverseThrough(new List<string>(), dir);
+        }
+
+        private static List<string> TraverseThrough(List<string> list, string dir) {
+            if (!Directory.Exists(dir)) {
+                return list;
+            }
+
+            foreach (string subdir in Directory.GetDirectories(dir)) {
+                list = TraverseThrough(list, subdir);
+            }
+
+            foreach (string file in Directory.GetFiles(dir)) {
+                list.Add(file);
+            }
+
+            return list;
+        }
+
         private static Dictionary<String, byte[]> cachedAssets;
 
         public static bool DumpResources = false;
         public static bool DumpAllResources = false;
         private static int DumpAllResourcesCount = 0;
+
+        public static bool CacheDisabled = false;
 
         public void DumpAll() {
             if (cachedAssets == null) {
@@ -89,15 +128,41 @@ namespace FezEngine.Tools {
                 return true;
             }
             if (assetName == "JAFM_NOFLAT_WORKAROUND") {
-                Level.IsNoFlat = true;
+                Level.FlatDisabled = true;
                 return true;
             }
+            if (assetName == "JAFM_NOCACHE_WORKAROUND") {
+                CacheDisabled = true;
+                return true;
+            }
+
             string filePath = ("Resources\\"+(assetName.ToLower())).Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString())+".xnb";
             FileInfo file = new FileInfo(filePath);
             if (file.Exists) {
                 return true;
             }
+
             return orig_AssetExists(assetName);
+        }
+
+        public void orig_LoadEssentials() {
+        }
+
+        public void LoadEssentials() {
+            if (!CacheDisabled) {
+                orig_LoadEssentials();
+            } else {
+                cachedAssets = new Dictionary<string, byte[]>(0);
+            }
+        }
+
+        public void orig_Preload() {
+        }
+
+        public void Preload() {
+            if (!CacheDisabled) {
+                orig_Preload();
+            }
         }
 
     }
