@@ -1,4 +1,5 @@
 ﻿using System;
+using Common;
 using FezEngine;
 using FezEngine.Services;
 using FezEngine.Structure;
@@ -38,12 +39,11 @@ namespace FezGame.Services {
 			string filePath = ("Resources\\levels\\"+(levelName.ToLower())).Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString())+".xml";
             FileInfo file = new FileInfo(filePath);
             if (!file.Exists) {
-                Console.WriteLine("LEVELMOD: Failed loading " + filePath);
                 orig_Load(levelName);
                 return;
             }
 
-            Console.WriteLine("LEVELMOD: Loading level from XML: "+levelName);
+            ModLogger.Log("JAFM.LevelMod", "Loading level from XML: "+levelName);
 
             ClearArtSatellites();
 
@@ -526,7 +526,7 @@ namespace FezGame.Services {
                 return;
             }
 
-            Console.WriteLine("LEVELMOD: Saving level to XML: "+levelName);
+            ModLogger.Log("JAFM.LevelMod", "Saving level to XML: "+levelName);
 
             Module moduleFezEngine = levelData.GetType().Module;//expecting FezEngine.Structure.Level
 

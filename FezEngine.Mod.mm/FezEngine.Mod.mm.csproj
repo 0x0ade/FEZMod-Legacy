@@ -53,4 +53,10 @@
     <Folder Include="FezEngine\Tools\" />
     <Folder Include="FezEngine\Structure\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FEZ.Mod.mm\FEZ.Mod.mm.csproj">
+      <Project>{1A401409-A56A-4930-9F0C-6215AC4408B8}</Project>
+      <Name>FEZ.Mod.mm</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

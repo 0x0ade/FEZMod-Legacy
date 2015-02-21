@@ -4,10 +4,9 @@ using FezEngine.Structure;
 
 namespace FezEngine.Services {
     public class LevelManager {
+        //This class is going to be ignored by MonoMod.
 
         public Level levelData;
-
-        //SELFNOTE: This class is going to be ignored by JMonoMod, thus no orig_ methods are required.
 
         protected IContentManagerProvider orig_get_CMProvider() {
             return null;

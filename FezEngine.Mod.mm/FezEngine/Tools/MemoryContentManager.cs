@@ -1,8 +1,10 @@
 ﻿using System;
+using Common;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using FezEngine.Structure;
 
 namespace FezEngine.Tools {
     public class MemoryContentManager {
@@ -15,7 +17,7 @@ namespace FezEngine.Tools {
 
         public void DumpAll() {
             if (cachedAssets == null) {
-                Console.WriteLine("RESOURCEMOD: Cached assets do not exist; ignoring...");
+                ModLogger.Log("JAFM.ResourceMod", "Cached assets do not exist; ignoring...");
             }
 
             int dumped = 0;
@@ -25,7 +27,7 @@ namespace FezEngine.Tools {
                 return;
             }
             DumpAllResourcesCount = count;
-            Console.WriteLine("RESOURCEMOD: Dumping "+count+" assets...");
+            ModLogger.Log("JAFM.ResourceMod", "Dumping "+count+" assets...");
             String[] assetNames = new String[count];
             cachedAssets.Keys.CopyTo(assetNames, 0);
 
@@ -36,7 +38,7 @@ namespace FezEngine.Tools {
                 FileInfo file = new FileInfo(filePath);
                 if (!file.Exists) {
                     file.Directory.Create();
-                    Console.WriteLine("RESOURCEMOD: "+(i+1)+" / "+count+": "+assetName+" -> "+filePath);
+                    ModLogger.Log("JAFM.ResourceMod", (i+1)+" / "+count+": "+assetName+" -> "+filePath);
                     FileStream fos = new FileStream(filePath, FileMode.CreateNew);
                     fos.Write(bytes, 0, bytes.Length);
                     fos.Close();
@@ -44,7 +46,7 @@ namespace FezEngine.Tools {
                 }
             }
 
-            Console.WriteLine("RESOURCEMOD: Dumped: "+dumped+" / "+count);
+            ModLogger.Log("JAFM.ResourceMod", "Dumped: "+dumped+" / "+count);
         }
 
         protected Stream orig_OpenStream(String assetName) {
@@ -63,7 +65,7 @@ namespace FezEngine.Tools {
                 return fis;
             } else if (DumpResources) {
                 file.Directory.Create();
-                Console.WriteLine("RESOURCEMOD: "+assetName+" -> "+filePath);
+                ModLogger.Log("JAFM.ResourceMod", assetName+" -> "+filePath);
                 Stream ois = orig_OpenStream(assetName);
                 FileStream fos = new FileStream(filePath, FileMode.CreateNew);
                 ois.CopyTo(fos);
@@ -84,6 +86,10 @@ namespace FezEngine.Tools {
             }
             if (assetName == "JAFM_DUMPALL_WORKAROUND") {
                 DumpAllResources = true;
+                return true;
+            }
+            if (assetName == "JAFM_NOFLAT_WORKAROUND") {
+                Level.IsNoFlat = true;
                 return true;
             }
             string filePath = ("Resources\\"+(assetName.ToLower())).Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString())+".xnb";
