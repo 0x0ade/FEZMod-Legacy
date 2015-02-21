@@ -50,8 +50,6 @@ namespace FezGame.Services {
             oldLevel = levelData;
             levelData = new Level();
 
-            Module moduleFezEngine = levelData.GetType().Module;//expecting FezEngine.Structure.Level
-
 			FileStream fis = new FileStream(file.FullName, FileMode.Open);
             XmlReader xmlReader = XmlReader.Create(fis);
             XmlDocument xmlDocument = new XmlDocument();
@@ -95,17 +93,17 @@ namespace FezGame.Services {
                 ParameterInfo param = methodParams[0];
                 Type paramType = param.ParameterType;
                 if (paramType.FullName == "System.String") {
-                    method.Invoke(levelData, new Object[] {value});
+                    method.Invoke(levelData, new object[] {value});
                 } else {
-                    if (Type.GetType("System.ValueType").IsAssignableFrom(paramType) || paramType.IsSubclassOf(Type.GetType("System.ValueType"))) {
-                        MethodInfo parse = paramType.GetMethod("Parse", new Type[]{Type.GetType("System.String")});
+                    if (typeof(System.ValueType).IsAssignableFrom(paramType)) {
+                        MethodInfo parse = paramType.GetMethod("Parse", new Type[]{typeof(System.String)});
                         if (parse != null) {
-                            method.Invoke(levelData, new Object[]{parse.Invoke(null, new Object[]{value})});
+                            method.Invoke(levelData, new object[]{parse.Invoke(null, new object[]{value})});
                         }
-                    } else if (Type.GetType("System.Enum").IsAssignableFrom(paramType) || paramType.IsSubclassOf(Type.GetType("System.Enum"))) {
-                        MethodInfo parse = paramType.GetMethod("Parse", new Type[]{Type.GetType("System.Type"), Type.GetType("System.String")});
+                    } else if (typeof(System.Enum).IsAssignableFrom(paramType)) {
+                        MethodInfo parse = paramType.GetMethod("Parse", new Type[]{typeof(System.Type), typeof(System.String)});
                         if (parse != null) {
-                            method.Invoke(levelData, new Object[]{parse.Invoke(null, new Object[]{paramType, value})});
+                            method.Invoke(levelData, new object[]{parse.Invoke(null, new object[]{paramType, value})});
                         }
                     }
                 }
@@ -130,7 +128,7 @@ namespace FezGame.Services {
 
             XmlElement xmlSpawn = xmlLevel["StartingPosition"]["TrileFace"];
             levelData.StartingPosition = new TrileFace();
-            levelData.StartingPosition.Face = (FaceOrientation) Enum.Parse(moduleFezEngine.GetType("FezEngine.FaceOrientation"), xmlSpawn.GetAttribute("face"));
+            levelData.StartingPosition.Face = (FaceOrientation) Enum.Parse(typeof(FezEngine.FaceOrientation), xmlSpawn.GetAttribute("face"));
             levelData.StartingPosition.Id = (TrileEmplacement) XmlLevelHelper.Parse(xmlSpawn["TrileId"]);
 
             XmlElement xmlVolumes = xmlLevel["Volumes"];
@@ -147,7 +145,7 @@ namespace FezGame.Services {
                 XmlElement xmlOrientations = xmlVolume["Orientations"];
                 for (int ii = 0; ii < xmlOrientations.ChildNodes.Count; ii++) {
                     XmlElement xmlOrientation = (XmlElement) xmlOrientations.ChildNodes.Item(ii);
-                    orientations.Add((FaceOrientation)Enum.Parse(moduleFezEngine.GetType("FezEngine.FaceOrientation"), xmlOrientation.InnerText));
+                    orientations.Add((FaceOrientation)Enum.Parse(typeof(FezEngine.FaceOrientation), xmlOrientation.InnerText));
                 }
                 volume.Orientations = orientations;
 
@@ -273,19 +271,19 @@ namespace FezGame.Services {
                 settings.SpinOffset = float.Parse(xmlAOSettings.GetAttribute("spinOffset"));
                 settings.OffCenter = bool.Parse(xmlAOSettings.GetAttribute("offCenter"));
                 settings.TimeswitchWindBackSpeed = float.Parse(xmlAOSettings.GetAttribute("timeswitchWindBackSpeed"));
-                settings.ContainedTrile = (ActorType) Enum.Parse(moduleFezEngine.GetType("FezEngine.Structure.ActorType"), xmlAOSettings.GetAttribute("containedTrile"));
+                settings.ContainedTrile = (ActorType) Enum.Parse(typeof(FezEngine.Structure.ActorType), xmlAOSettings.GetAttribute("containedTrile"));
                 string attachedGroup = xmlAOSettings.GetAttribute("attachedGroup");
                 if (!string.IsNullOrEmpty(attachedGroup)) {
                     settings.AttachedGroup = int.Parse(attachedGroup);
                 } else {
                     settings.AttachedGroup = new int?();
                 }
-                settings.SpinView = (Viewpoint) Enum.Parse(moduleFezEngine.GetType("FezEngine.Viewpoint"), xmlAOSettings.GetAttribute("spinView"));
+                settings.SpinView = (Viewpoint) Enum.Parse(typeof(FezEngine.Viewpoint), xmlAOSettings.GetAttribute("spinView"));
                 settings.RotationCenter = (Vector3) XmlLevelHelper.Parse(xmlAOSettings["RotationCenter"]);
 
                 ao.ActorSettings = settings;
 
-                ao.ArtObject = cm.Load<ArtObject>("Art Objects/"+ao.ArtObjectName);
+                ao.ArtObject = cm.Load<ArtObject>("Art objects/"+ao.ArtObjectName);
 
                 levelData.ArtObjects[key] = ao;
             }
@@ -319,7 +317,7 @@ namespace FezGame.Services {
                 Color filter = new Color();
                 filter.PackedValue = Convert.ToUInt32(xmlPlane.GetAttribute("filter").Substring(1), 16);
                 plane.Filter = filter;
-                plane.ActorType = (ActorType) Enum.Parse(moduleFezEngine.GetType("FezEngine.Structure.ActorType"), xmlPlane.GetAttribute("actorType"));
+                plane.ActorType = (ActorType) Enum.Parse(typeof(FezEngine.Structure.ActorType), xmlPlane.GetAttribute("actorType"));
                 plane.Position = (Vector3) XmlLevelHelper.Parse(xmlPlane["Position"]);
                 plane.Rotation = (Quaternion) XmlLevelHelper.Parse(xmlPlane["Rotation"]);
                 plane.Scale = (Vector3) XmlLevelHelper.Parse(xmlPlane["Scale"]);
@@ -347,7 +345,7 @@ namespace FezGame.Services {
                 trileGroup.Spin180Degrees = bool.Parse(xmlGroup.GetAttribute("spin180Degrees"));
                 trileGroup.FallOnRotate = bool.Parse(xmlGroup.GetAttribute("fallOnRotate"));
                 trileGroup.SpinOffset = float.Parse(xmlGroup.GetAttribute("spinOffset"));
-                trileGroup.ActorType = (ActorType) Enum.Parse(moduleFezEngine.GetType("FezEngine.Structure.ActorType"), xmlGroup.GetAttribute("actorType"));
+                trileGroup.ActorType = (ActorType) Enum.Parse(typeof(FezEngine.Structure.ActorType), xmlGroup.GetAttribute("actorType"));
 
                 trileGroup.Triles = new List<TrileInstance>();
                 XmlElement xmlGroupTriles = xmlGroup["Triles"];
@@ -387,7 +385,7 @@ namespace FezGame.Services {
                     npc.SayFirstSpeechLineOnce = bool.Parse(xmlNPC.GetAttribute("sayFirstSpeechLineOnce"));
                 }
 				npc.AvoidsGomez = bool.Parse(xmlNPC.GetAttribute("avoidsGomez"));
-				npc.ActorType = (ActorType) Enum.Parse(moduleFezEngine.GetType("FezEngine.Structure.ActorType"), xmlNPC.GetAttribute("actorType"));
+				npc.ActorType = (ActorType) Enum.Parse(typeof(FezEngine.Structure.ActorType), xmlNPC.GetAttribute("actorType"));
 
                 npc.Position = (Vector3) XmlLevelHelper.Parse(xmlNPC["Position"]);
 
@@ -421,7 +419,7 @@ namespace FezGame.Services {
                 Dictionary<NpcAction, NpcActionContent> actions = new Dictionary<NpcAction, NpcActionContent>();
                 for (int ii = 0; ii < xmlActions.ChildNodes.Count; ii++) {
                     XmlElement xmlAction = (XmlElement) xmlActions.ChildNodes.Item(ii);
-                    NpcAction action = (NpcAction) Enum.Parse(moduleFezEngine.GetType("FezEngine.Structure.NpcAction"), xmlAction.GetAttribute("key"));
+                    NpcAction action = (NpcAction) Enum.Parse(typeof(FezEngine.Structure.NpcAction), xmlAction.GetAttribute("key"));
 
                     XmlElement xmlActionContent = xmlAction["NpcActionContent"];
                     NpcActionContent actionContent = new NpcActionContent();
@@ -452,7 +450,7 @@ namespace FezGame.Services {
 				path.IsSpline = bool.Parse(xmlPath.GetAttribute("isSpline"));
 				path.OffsetSeconds = float.Parse(xmlPath.GetAttribute("offsetSeconds"));
 				path.SaveTrigger = bool.Parse(xmlPath.GetAttribute("saveTrigger"));
-				path.EndBehavior = (PathEndBehavior) Enum.Parse(moduleFezEngine.GetType("FezEngine.Structure.PathEndBehavior"), xmlPath.GetAttribute("endBehavior"));
+				path.EndBehavior = (PathEndBehavior) Enum.Parse(typeof(FezEngine.Structure.PathEndBehavior), xmlPath.GetAttribute("endBehavior"));
 
                 XmlElement xmlSegments = xmlPath["Segments"];
                 List<PathSegment> segments = new List<PathSegment>();
@@ -546,15 +544,15 @@ namespace FezGame.Services {
                 Type returnType = method.ReturnType;
 
                 if (!(
-                    Type.GetType("System.ValueType").IsAssignableFrom(returnType) || returnType.IsSubclassOf(Type.GetType("System.ValueType")) ||
-                    Type.GetType("System.Enum").IsAssignableFrom(returnType) || returnType.IsSubclassOf(Type.GetType("System.Enum")) ||
-                    Type.GetType("System.String").IsAssignableFrom(returnType) || returnType.IsSubclassOf(Type.GetType("System.String"))
+                    typeof(System.ValueType).IsAssignableFrom(returnType) ||
+                    typeof(System.Enum).IsAssignableFrom(returnType) ||
+                    typeof(System.String).IsAssignableFrom(returnType)
                 )) {
                     continue;
                 }
 
                 string attributeName = methodLowerCase.Substring(4);
-                Object value = method.Invoke(levelData, new Object[0]);
+                object value = method.Invoke(levelData, new object[0]);
                 if (value != null) {
                     xmlLevel.SetAttribute(attributeName, value.ToString());
                 }

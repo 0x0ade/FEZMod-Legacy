@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Common;
 using FezGame;
 using FezEngine.Tools;
@@ -14,7 +15,6 @@ namespace FezGame.Mod {
 
         public static void Initialize(string[] args) {
             Initialize();
-            LoadExternal();
             ParseArgs(args);
         }
 
@@ -26,15 +26,31 @@ namespace FezGame.Mod {
             Fez.Version += " (JustAnotherFEZMod)";
 
             System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+
+            InitializeModules();
         }
 
-        public static void LoadExternal() {
-            ModLogger.Log("JAFM", "Loading external modules...");
-            //TODO
+        public static void InitializeModules() {
+            ModLogger.Log("JAFM", "Initializing FEZ mods...");
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies()) {
+                foreach (Type type in assembly.GetTypes()) {
+                    if (typeof(FezModule).IsAssignableFrom(type) && !type.IsAbstract) {
+                        InitializeModule(type);
+                    }
+                }
+            }
+        }
+
+        public static void InitializeModule(Type type) {
+            FezModule module = (FezModule) type.GetConstructor(new Type[0]).Invoke(new object[0]);
+            ModLogger.Log("JAFM", "Initializing "+module.Name);
+            module.Initialize();
+            Modules.Add(module);
         }
 
         public static void ParseArgs(string[] args) {
             ModLogger.Log("JAFM", "Checking for custom arguments...");
+
             for (int i = 0; i < args.Length; i++) {
                 if ((args[i] == "-l" || args[i] == "--load-level") && i+1 < args.Length) {
                     ModLogger.Log("JAFM", "Found -l / --load-level: "+args[i+1]);
@@ -72,6 +88,14 @@ namespace FezGame.Mod {
                     ModLogger.Log("JAFM", "Found -nf / --no-flat");
                     MemoryContentManager.AssetExists("JAFM_NOFLAT_WORKAROUND");
                 }
+            }
+
+            CallInEachModule("ParseArgs", args);
+        }
+
+        private static void CallInEachModule(String methodName, object[] args) {
+            foreach (FezModule module in Modules) {
+                module.GetType().GetMethod(methodName).Invoke(module, args);
             }
         }
 
