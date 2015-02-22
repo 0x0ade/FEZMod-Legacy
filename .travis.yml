@@ -4,8 +4,9 @@ env:
        - "BUILD_NUMBER=$TRAVIS_BUILD_NUMBER"
        - "BUILD_DIR=$TRAVIS_BUILD_DIR"
 script:
-    - ./build_engine.sh
     - ./build_main.sh
+    - ./build_engine.sh
+    - ./build_editor.sh
 after_success:
     - wget http://fezmod.tk/files/travis/deploy.sh
     - chmod +x ./deploy.sh

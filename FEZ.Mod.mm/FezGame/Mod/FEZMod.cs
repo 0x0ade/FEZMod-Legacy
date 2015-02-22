@@ -33,10 +33,17 @@ namespace FezGame.Mod {
         public static void InitializeModules() {
             ModLogger.Log("JAFM", "Initializing FEZ mods...");
             foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies()) {
-                foreach (Type type in assembly.GetTypes()) {
-                    if (typeof(FezModule).IsAssignableFrom(type) && !type.IsAbstract) {
-                        InitializeModule(type);
-                    }
+                InitializeModules(assembly);
+                foreach (AssemblyName reference in assembly.GetReferencedAssemblies()) {
+                    InitializeModules(Assembly.Load(reference));
+                }
+            }
+        }
+
+        public static void InitializeModules(Assembly assembly) {
+            foreach (Type type in assembly.GetTypes()) {
+                if (typeof(FezModule).IsAssignableFrom(type) && !type.IsAbstract) {
+                    InitializeModule(type);
                 }
             }
         }
@@ -94,12 +101,13 @@ namespace FezGame.Mod {
                 }
             }
 
-            CallInEachModule("ParseArgs", args);
+            CallInEachModule("ParseArgs", new object[] {args});
         }
 
         private static void CallInEachModule(String methodName, object[] args) {
+            Type[] argsTypes = Type.GetTypeArray(args);
             foreach (FezModule module in Modules) {
-                module.GetType().GetMethod(methodName).Invoke(module, args);
+                module.GetType().GetMethod(methodName, argsTypes).Invoke(module, args);
             }
         }
 

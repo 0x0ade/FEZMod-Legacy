@@ -6,3 +6,7 @@ FezEngine.Mod.mm/bin/
 FezEngine.Mod.mm/obj/
 FezEngine.Mod.mm/*.sln
 FezEngine.Mod.mm/*.userprefs
+FEZ.Editor.mm/bin/
+FEZ.Editor.mm/obj/
+FEZ.Editor.mm/*.sln
+FEZ.Editor.mm/*.userprefs
