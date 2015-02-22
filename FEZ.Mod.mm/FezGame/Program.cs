@@ -15,14 +15,6 @@ namespace FezGame {
 			orig_Main(args);
 		}
 
-        private static void orig_MainInternal() {
-        }
-
-        private static void MainInternal() {
-            orig_MainInternal();
-            FEZMod.Initialize();
-        }
-
 	}
 }
 

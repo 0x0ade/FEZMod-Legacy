@@ -35,7 +35,9 @@ namespace FezGame.Editor {
         }
 
         public override void Initialize() {
-            ServiceHelper.AddComponent((IGameComponent) new LevelEditor(ServiceHelper.Game));
+            if (IsInEditor) {
+                ServiceHelper.AddComponent((IGameComponent)new LevelEditor(ServiceHelper.Game));
+            }
         }
 
     }
