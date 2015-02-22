@@ -56,7 +56,7 @@ namespace FezEngine.Tools {
 
         public void DumpAll() {
             if (cachedAssets == null) {
-                ModLogger.Log("JAFM.ResourceMod", "Cached assets do not exist; ignoring...");
+                ModLogger.Log("JAFM.Engine", "Cached assets do not exist; ignoring...");
             }
 
             int dumped = 0;
@@ -66,7 +66,7 @@ namespace FezEngine.Tools {
                 return;
             }
             DumpAllResourcesCount = count;
-            ModLogger.Log("JAFM.ResourceMod", "Dumping "+count+" assets...");
+            ModLogger.Log("JAFM.Engine", "Dumping "+count+" assets...");
             String[] assetNames = new String[count];
             cachedAssets.Keys.CopyTo(assetNames, 0);
 
@@ -77,7 +77,7 @@ namespace FezEngine.Tools {
                 FileInfo file = new FileInfo(filePath);
                 if (!file.Exists) {
                     file.Directory.Create();
-                    ModLogger.Log("JAFM.ResourceMod", (i+1)+" / "+count+": "+assetName+" -> "+filePath);
+                    ModLogger.Log("JAFM.Engine", (i+1)+" / "+count+": "+assetName+" -> "+filePath);
                     FileStream fos = new FileStream(filePath, FileMode.CreateNew);
                     fos.Write(bytes, 0, bytes.Length);
                     fos.Close();
@@ -85,7 +85,7 @@ namespace FezEngine.Tools {
                 }
             }
 
-            ModLogger.Log("JAFM.ResourceMod", "Dumped: "+dumped+" / "+count);
+            ModLogger.Log("JAFM.Engine", "Dumped: "+dumped+" / "+count);
         }
 
         protected Stream orig_OpenStream(String assetName) {
@@ -104,7 +104,7 @@ namespace FezEngine.Tools {
                 return fis;
             } else if (DumpResources) {
                 file.Directory.Create();
-                ModLogger.Log("JAFM.ResourceMod", assetName+" -> "+filePath);
+                ModLogger.Log("JAFM.Engine", assetName+" -> "+filePath);
                 Stream ois = orig_OpenStream(assetName);
                 FileStream fos = new FileStream(filePath, FileMode.CreateNew);
                 ois.CopyTo(fos);

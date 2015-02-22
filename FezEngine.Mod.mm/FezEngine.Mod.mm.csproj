@@ -46,6 +46,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FezEngine\Tools\MemoryContentManager.cs" />
     <Compile Include="FezEngine\Structure\Level.cs" />
+    <Compile Include="FezEngine\Tools\ServiceHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

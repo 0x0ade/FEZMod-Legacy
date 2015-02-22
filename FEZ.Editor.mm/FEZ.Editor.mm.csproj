@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FezGame\Editor\FezEditor.cs" />
+    <Compile Include="FezGame\Components\LevelEditor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -59,5 +60,6 @@
   <ItemGroup>
     <Folder Include="FezGame\" />
     <Folder Include="FezGame\Editor\" />
+    <Folder Include="FezGame\Components\" />
   </ItemGroup>
 </Project>

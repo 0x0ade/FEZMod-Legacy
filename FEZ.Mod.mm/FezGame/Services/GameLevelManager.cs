@@ -43,7 +43,7 @@ namespace FezGame.Services {
                 return;
             }
 
-            ModLogger.Log("JAFM.LevelMod", "Loading level from XML: "+levelName);
+            ModLogger.Log("JAFM", "Loading level from XML: "+levelName);
 
             ClearArtSatellites();
 
@@ -524,7 +524,7 @@ namespace FezGame.Services {
                 return;
             }
 
-            ModLogger.Log("JAFM.LevelMod", "Saving level to XML: "+levelName);
+            ModLogger.Log("JAFM", "Saving level to XML: "+levelName);
 
             Module moduleFezEngine = levelData.GetType().Module;//expecting FezEngine.Structure.Level
 

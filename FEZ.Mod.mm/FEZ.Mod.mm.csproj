@@ -29,9 +29,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="FEZ">
-      <HintPath>..\libs\FEZ.exe</HintPath>
-    </Reference>
     <Reference Include="System.Xml">
       <HintPath>..\libs\System.Xml.dll</HintPath>
     </Reference>
@@ -43,6 +40,9 @@
     </Reference>
     <Reference Include="FezEngine">
       <HintPath>..\libs\FezEngine.orig.dll</HintPath>
+    </Reference>
+    <Reference Include="FEZ">
+      <HintPath>..\libs\FEZ.exe</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

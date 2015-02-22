@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Common;
+using System;
 using FezGame.Services;
 using FezEngine.Components;
 using FezEngine.Structure;
@@ -59,7 +60,7 @@ namespace FezGame.Components {
             }
 
             if (get_InputManager().Jump == FezButtonState.Pressed && levelName != null) {
-                Console.WriteLine("QUICKWARP INIT: "+levelName);
+                ModLogger.Log("JAFM", "Warping to "+levelName);
                 QuickWarping = true;
                 get_GameState().Loading = true;
                 get_GameState().InMap = false;
@@ -67,20 +68,19 @@ namespace FezGame.Components {
             }
 
             if (get_InputManager().Jump == FezButtonState.Released && QuickWarping) {
-                Console.WriteLine("QUICKWARP END");
                 get_GameState().Loading = false;
                 QuickWarping = false;
             }
 
             if (get_InputManager().OpenInventory == FezButtonState.Pressed) {
-                Console.WriteLine("ISOMETRIC MODE");
+                ModLogger.Log("JAFM", "Switching to FEZometric mode");
                 get_GameState().InMap = false;
             }
 
             if (get_InputManager().ClampLook == FezButtonState.Pressed) {
                 IGameLevelManager levelManager = get_LevelManager();
                 if (levelManager is GameLevelManager) {
-                    Console.WriteLine("SAVING LEVEL");
+                    ModLogger.Log("JAFM", "Saving level");
                     ((GameLevelManager) levelManager).Save(levelManager.Name);
                 }
             }

@@ -13,12 +13,12 @@ namespace FezGame.Mod {
 
         public static bool IsAlwaysTurnable = false;
 
-        public static void Initialize(string[] args) {
-            Initialize();
+        public static void PreInitialize(string[] args) {
+            PreInitialize();
             ParseArgs(args);
         }
 
-        public static void Initialize() {
+        public static void PreInitialize() {
             ModLogger.Clear();
             ModLogger.Log("JAFM", "JustAnotherFEZMod (JAFM) "+FEZMod.Version);
 
@@ -27,31 +27,31 @@ namespace FezGame.Mod {
 
             System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 
-            InitializeModules();
+            PreInitializeModules();
         }
 
-        public static void InitializeModules() {
+        public static void PreInitializeModules() {
             ModLogger.Log("JAFM", "Initializing FEZ mods...");
             foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies()) {
-                InitializeModules(assembly);
+                PreInitializeModules(assembly);
                 foreach (AssemblyName reference in assembly.GetReferencedAssemblies()) {
-                    InitializeModules(Assembly.Load(reference));
+                    PreInitializeModules(Assembly.Load(reference));
                 }
             }
         }
 
-        public static void InitializeModules(Assembly assembly) {
+        public static void PreInitializeModules(Assembly assembly) {
             foreach (Type type in assembly.GetTypes()) {
                 if (typeof(FezModule).IsAssignableFrom(type) && !type.IsAbstract) {
-                    InitializeModule(type);
+                    PreInitializeModule(type);
                 }
             }
         }
 
-        public static void InitializeModule(Type type) {
+        public static void PreInitializeModule(Type type) {
             FezModule module = (FezModule) type.GetConstructor(new Type[0]).Invoke(new object[0]);
-            ModLogger.Log("JAFM", "Initializing "+module.Name);
-            module.Initialize();
+            ModLogger.Log("JAFM", "Pre-Initializing "+module.Name);
+            module.PreInitialize();
             Modules.Add(module);
         }
 
@@ -102,6 +102,10 @@ namespace FezGame.Mod {
             }
 
             CallInEachModule("ParseArgs", new object[] {args});
+        }
+
+        public static void Initialize() {
+            CallInEachModule("Initialize", new object[0]);
         }
 
         private static void CallInEachModule(String methodName, object[] args) {

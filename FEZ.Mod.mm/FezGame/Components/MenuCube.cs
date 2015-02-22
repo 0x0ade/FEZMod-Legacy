@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Common;
+using System;
 using FezEngine.Components;
 using FezEngine.Structure.Input;
 using FezGame.Services;
@@ -52,7 +53,7 @@ namespace FezGame.Components {
                     get_LevelManager().WaterHeight = get_LevelManager().WaterHeight-1f;
                 } else {
                     Vector3 pos = get_PlayerManager().Position;
-                    Console.WriteLine("GOMEZ: X: " + pos.X + "; Y: " + pos.Y + "; Z:" + pos.Z);
+                    ModLogger.Log("JAFM", "GOMEZ: X: " + pos.X + "; Y: " + pos.Y + "; Z:" + pos.Z);
                 }
             }
         }

@@ -1,6 +1,10 @@
 ﻿using Common;
 using System;
+using FezGame;
 using FezGame.Mod;
+using FezGame.Components;
+using FezEngine.Tools;
+using Microsoft.Xna.Framework;
 
 namespace FezGame.Editor {
     public class FezEditor : FezModule {
@@ -28,6 +32,10 @@ namespace FezGame.Editor {
                     IsInEditor = true;
                 }
             }
+        }
+
+        public override void Initialize() {
+            ServiceHelper.AddComponent((IGameComponent) new LevelEditor(ServiceHelper.Game));
         }
 
     }

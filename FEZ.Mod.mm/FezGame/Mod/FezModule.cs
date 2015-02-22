@@ -10,8 +10,9 @@ namespace FezGame.Mod {
         public FezModule() {
         }
 
-        public virtual void Initialize() {}
+        public void PreInitialize() {}
         public virtual void ParseArgs(string[] args) {}
+        public virtual void Initialize() {}
 
     }
 }
