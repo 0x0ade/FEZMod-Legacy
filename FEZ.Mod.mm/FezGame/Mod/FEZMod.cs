@@ -4,6 +4,9 @@ using System.Reflection;
 using Common;
 using FezGame;
 using FezEngine.Tools;
+using FezEngine.Services;
+using FezGame.Services;
+using FezGame.Components;
 
 namespace FezGame.Mod {
     public static class FEZMod {
@@ -12,6 +15,8 @@ namespace FezGame.Mod {
         public static List<FezModule> Modules = new List<FezModule>();
 
         public static bool IsAlwaysTurnable = false;
+        public static float OverridePixelsPerTrixel = 0f;
+        public static bool EnableDebugControls = false;
 
         public static void PreInitialize(string[] args) {
             PreInitialize();
@@ -99,12 +104,26 @@ namespace FezGame.Mod {
                     ModLogger.Log("JAFM", "Found -nc / --no-cache");
                     MemoryContentManager.AssetExists("JAFM_NOCACHE_WORKAROUND");
                 }
+                if (args[i] == "-pp" || args[i] == "--pixel-perfect") {
+                    ModLogger.Log("JAFM", "Found -pp / --pixel-perfect");
+                    OverridePixelsPerTrixel = 1f;
+                }
+                if (args[i] == "-dc" || args[i] == "--debug-controls") {
+                    ModLogger.Log("JAFM", "Found -dc / --debug-controls");
+                    EnableDebugControls = true;
+                }
             }
 
             CallInEachModule("ParseArgs", new object[] {args});
         }
 
         public static void Initialize() {
+            ServiceHelper.AddComponent(new FEZModComponent(ServiceHelper.Game));
+
+            if (EnableDebugControls) {
+                ServiceHelper.AddComponent(new DebugControls(ServiceHelper.Game));
+            }
+
             CallInEachModule("Initialize", new object[0]);
         }
 

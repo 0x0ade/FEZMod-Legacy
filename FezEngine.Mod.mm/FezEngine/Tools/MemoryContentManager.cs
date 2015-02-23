@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using FezEngine.Structure;
+using FezEngine.Services;
 
 namespace FezEngine.Tools {
     public class MemoryContentManager {
@@ -127,12 +128,12 @@ namespace FezEngine.Tools {
                 DumpAllResources = true;
                 return true;
             }
-            if (assetName == "JAFM_NOFLAT_WORKAROUND") {
-                Level.FlatDisabled = true;
-                return true;
-            }
             if (assetName == "JAFM_NOCACHE_WORKAROUND") {
                 CacheDisabled = true;
+                return true;
+            }
+            if (assetName == "JAFM_NOFLAT_WORKAROUND") {
+                Level.FlatDisabled = true;
                 return true;
             }
 

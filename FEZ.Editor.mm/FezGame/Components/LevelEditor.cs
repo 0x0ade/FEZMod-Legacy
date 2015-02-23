@@ -127,7 +127,8 @@ namespace FezGame.Components {
                 "Current View: " + CameraManager.Viewpoint,
                 "Gomez Position: (" + PlayerManager.Position.X + ", " + PlayerManager.Position.Y + ", " + PlayerManager.Position.Z + ")",
                 "Cursor Position (World): (" + cursorWorldPosition.X + ", " + cursorWorldPosition.Y + ")",
-                "Cursor Position (Screen): (" + cursorPosition.X + ", " + cursorPosition.Y + ")"
+                "Cursor Position (Screen): (" + cursorPosition.X + ", " + cursorPosition.Y + ")",
+                "Pixels per Trixel: " + CameraManager.PixelsPerTrixel
             };
 
             GraphicsDeviceExtensions.SetBlendingMode(GraphicsDevice, BlendingMode.Alphablending);

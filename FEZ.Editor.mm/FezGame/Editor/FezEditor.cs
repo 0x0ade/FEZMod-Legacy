@@ -29,6 +29,7 @@ namespace FezGame.Editor {
                     }
                     //Fez.SkipLogos = true;
                     Fez.SkipIntro = true;
+                    FEZMod.EnableDebugControls = true;
                     IsInEditor = true;
                 }
             }

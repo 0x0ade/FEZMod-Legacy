@@ -57,6 +57,7 @@
     <Compile Include="FezGame\Mod\XmlLevelHelper.cs" />
     <Compile Include="FezGame\Mod\FezModule.cs" />
     <Compile Include="Common\ModLogger.cs" />
+    <Compile Include="FezGame\Mod\FEZModComponent.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

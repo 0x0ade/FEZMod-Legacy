@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using FezGame.Mod;
+using Microsoft.Xna.Framework;
 
 namespace FezEngine.Tools {
     public class ServiceHelper {
+
+        public static Game Game { get; set; }
 
         private static readonly List<object> services = new List<object>();
 
