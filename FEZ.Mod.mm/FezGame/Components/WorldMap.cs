@@ -75,6 +75,7 @@ namespace FezGame.Components {
             if (get_InputManager().OpenInventory == FezButtonState.Pressed) {
                 ModLogger.Log("JAFM", "Switching to FEZometric mode");
                 get_GameState().InMap = false;
+                PlayerCameraControl.FEZometric = true;
             }
 
             if (get_InputManager().ClampLook == FezButtonState.Pressed) {

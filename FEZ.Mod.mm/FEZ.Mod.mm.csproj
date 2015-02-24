@@ -59,6 +59,7 @@
     <Compile Include="Common\ModLogger.cs" />
     <Compile Include="FezGame\Mod\FEZModComponent.cs" />
     <Compile Include="FezGame\Services\GameCameraManager.cs" />
+    <Compile Include="FezGame\Components\PlayerCameraControl.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

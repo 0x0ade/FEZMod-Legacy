@@ -84,8 +84,6 @@ namespace FezGame.Mod {
                         ModLogger.Log("JAFM", "Found -ls / --long-screenshot");
                     }
                     Fez.LongScreenshot = true;
-                    //Fez.SkipLogos = true;
-                    Fez.SkipIntro = true;
                 }
                 if (args[i] == "-d" || args[i] == "--dump") {
                     ModLogger.Log("JAFM", "Found -d / --dump");
