@@ -104,7 +104,7 @@ namespace FezGame.Components {
         }
 
         public override void Draw(GameTime gameTime) {
-            Viewport viewport = ServiceHelper.Game.GraphicsDevice.Viewport;
+            Viewport viewport = GraphicsDevice.Viewport;
 
             float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
 
@@ -114,10 +114,12 @@ namespace FezGame.Components {
             SpriteFont font = FontManager.Big;
             float fontScale = 1.5f * viewScale;
 
-            Vector2 cursorWorldPosition = new Vector2(
-                (cursorPosition.X - viewport.Width / 2f) / (16f * CameraManager.PixelsPerTrixel * viewScale) + CameraManager.Center.X,
-                (cursorPosition.Y - viewport.Height / 2f) / (16f * CameraManager.PixelsPerTrixel * viewScale) + CameraManager.Center.Y
-            );
+            Matrix worldMatrix = new Matrix();
+
+            Vector3 cursorNear = viewport.Unproject(new Vector3(cursorPosition.X, cursorPosition.Y, 0f), CameraManager.Projection, CameraManager.View, worldMatrix);
+            Vector3 cursorFar = viewport.Unproject(new Vector3(cursorPosition.X, cursorPosition.Y, 1f), CameraManager.Projection, CameraManager.View, worldMatrix);
+            Vector3 cursorDir = Vector3.Normalize(cursorFar - cursorNear);
+            Ray cursorRay = new Ray(cursorNear, cursorDir);
 
             string[] metadata = new string[] {
                 "Build Date " + BuildDate,
@@ -126,8 +128,6 @@ namespace FezGame.Components {
                 "Hovered Trile: " + (HoveredTrile != null ? (HoveredTrile.VisualTrile.Name + " (" + HoveredTrile.Emplacement.X + ", " + HoveredTrile.Emplacement.Y + ", " + HoveredTrile.Emplacement.Z + ")") : "(none)"),
                 "Current View: " + CameraManager.Viewpoint,
                 "Gomez Position: (" + PlayerManager.Position.X + ", " + PlayerManager.Position.Y + ", " + PlayerManager.Position.Z + ")",
-                "Cursor Position (World): (" + cursorWorldPosition.X + ", " + cursorWorldPosition.Y + ")",
-                "Cursor Position (Screen): (" + cursorPosition.X + ", " + cursorPosition.Y + ")",
                 "Pixels per Trixel: " + CameraManager.PixelsPerTrixel
             };
 

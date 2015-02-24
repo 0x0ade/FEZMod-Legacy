@@ -77,14 +77,13 @@ namespace FezGame.Mod {
                     Fez.SkipIntro = true;
                 }
                 if (args[i] == "-ls" || args[i] == "--long-screenshot") {
-                    if (i+1 < args.Length && !args[i+1].StartsWith("-")) {
-                        ModLogger.Log("JAFM", "Found -ls / --long-screenshot: "+args[i+1]);
-                        Fez.ForcedLevelName = args[i+1];
+                    if (i+1 < args.Length && args[i+1] == "double") {
+                        ModLogger.Log("JAFM", "Found -ls / --long-screenshot double");
+                        Fez.DoubleRotations = true;
                     } else {
                         ModLogger.Log("JAFM", "Found -ls / --long-screenshot");
                     }
                     Fez.LongScreenshot = true;
-                    Fez.DoubleRotations = true;
                     //Fez.SkipLogos = true;
                     Fez.SkipIntro = true;
                 }

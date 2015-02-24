@@ -34,6 +34,7 @@ namespace FezGame.Mod {
             if (FEZMod.OverridePixelsPerTrixel != 0) {
                 CameraManager.PixelsPerTrixel = FEZMod.OverridePixelsPerTrixel;
             }
+
         }
 
     }
