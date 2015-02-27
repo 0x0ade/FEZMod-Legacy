@@ -13,7 +13,7 @@ namespace FezGame.Editor {
         public override string Author { get { return "AngelDE98 & JAFM contributors"; } }
         public override string Version { get { return "0.0.0"; } }
 
-        public bool IsInEditor = false;
+        public bool InEditor = false;
 
         public FezEditor() {
         }
@@ -30,13 +30,13 @@ namespace FezGame.Editor {
                     //Fez.SkipLogos = true;
                     Fez.SkipIntro = true;
                     FEZMod.EnableDebugControls = true;
-                    IsInEditor = true;
+                    InEditor = true;
                 }
             }
         }
 
         public override void Initialize() {
-            if (IsInEditor) {
+            if (InEditor) {
                 ServiceHelper.AddComponent((IGameComponent)new LevelEditor(ServiceHelper.Game));
             }
         }

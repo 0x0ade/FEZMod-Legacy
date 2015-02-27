@@ -54,7 +54,6 @@ namespace FezGame.Components {
         private GlyphTextRenderer GTR;
 
         private float SinceMouseMoved = 3f;
-        private bool CursorSelectable = false;
         private Texture2D GrabbedCursor;
         private Texture2D CanClickCursor;
         private Texture2D ClickedCursor;
@@ -63,6 +62,9 @@ namespace FezGame.Components {
         private DateTime BuildDate;
 
         public TrileInstance HoveredTrile;
+        private KeyValuePair<TrileEmplacement, TrileInstance>[] tmpTriles;
+
+        public int TrileId = 111;//TODO let the player pick the ID manually. 111 = "Vase" in "Undefined".
 
         public LevelEditor(Game game)
             : base(game) {
@@ -77,12 +79,14 @@ namespace FezGame.Components {
             BuildDate = ReadBuildDate();
 
             SpriteBatch = new SpriteBatch(GraphicsDevice);
-            GTR = new GlyphTextRenderer(this.Game);
+            GTR = new GlyphTextRenderer(Game);
 
             PointerCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_POINTER");
             CanClickCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_CLICKER_A");
             ClickedCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_CLICKER_B");
             GrabbedCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_GRABBER");
+
+            //GameState.InEditor = true;//Causes some graphical funkyness.
         }
 
         public override void Update(GameTime gameTime) {
@@ -91,16 +95,38 @@ namespace FezGame.Components {
                 SinceMouseMoved = 0f;
             }
 
-            float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
+            HoveredTrile = null;
 
-            /*Viewport viewport = ServiceHelper.Game.GraphicsDevice.Viewport;
-            Point cursorPosition = SettingsManager.PositionInViewport(MouseState);
-            Vector2 cursorWorldPosition = new Vector2(
-                ((viewport.X + cursorPosition.X) / viewport.Width) * (16 * viewScale),
-                ((viewport.Y + cursorPosition.Y) / viewport.Height) * (16 * viewScale)
-            );*/
+            Vector3 right = CameraManager.InverseView.Right;
+            Vector3 up = CameraManager.InverseView.Up;
+            Vector3 forward = CameraManager.InverseView.Forward;
+            Ray ray = new Ray(GraphicsDevice.Viewport.Unproject(new Vector3(MouseState.Position.X, MouseState.Position.Y, 0.0f), CameraManager.Projection, CameraManager.View, Matrix.Identity), forward);
+            float intersectionMin = float.MaxValue;
 
-            //LevelManager.Triles;
+            //Ugly thread-safety workaround
+            int trilesCount = LevelManager.Triles.Count;
+            if (tmpTriles == null || tmpTriles.Length < trilesCount) {//MonoDevelop claims (/ claimed) tmpTriles is never null.
+                tmpTriles = new KeyValuePair<TrileEmplacement, TrileInstance>[trilesCount];
+            }
+            LevelManager.Triles.CopyTo(tmpTriles, 0);
+
+            for (int i = 0; i < trilesCount; i++) {
+                TrileInstance trile = tmpTriles[i].Value;
+                float? intersection = ray.Intersects(new BoundingBox(trile.Position, trile.Position + new Vector3(1f)));
+                if (intersection.HasValue && intersection < intersectionMin) {
+                    HoveredTrile = trile;
+                    intersectionMin = intersection.Value;
+                }
+            }
+
+            if (MouseState.LeftButton.State == MouseButtonStates.Clicked && HoveredTrile != null) {
+                //TODO do something.
+            }
+
+            if (MouseState.RightButton.State == MouseButtonStates.Clicked && HoveredTrile != null) {
+                LevelManager.ClearTrile(HoveredTrile);
+                HoveredTrile = null;
+            }
         }
 
         public override void Draw(GameTime gameTime) {
@@ -114,20 +140,13 @@ namespace FezGame.Components {
             SpriteFont font = FontManager.Big;
             float fontScale = 1.5f * viewScale;
 
-            Matrix worldMatrix = new Matrix();
-
-            Vector3 cursorNear = viewport.Unproject(new Vector3(cursorPosition.X, cursorPosition.Y, 0f), CameraManager.Projection, CameraManager.View, worldMatrix);
-            Vector3 cursorFar = viewport.Unproject(new Vector3(cursorPosition.X, cursorPosition.Y, 1f), CameraManager.Projection, CameraManager.View, worldMatrix);
-            Vector3 cursorDir = Vector3.Normalize(cursorFar - cursorNear);
-            Ray cursorRay = new Ray(cursorNear, cursorDir);
-
             string[] metadata = new string[] {
                 "Build Date " + BuildDate,
                 "Level: " + (LevelManager.Name ?? "(none)"),
                 "Trile Set: " + (LevelManager.TrileSet != null ? LevelManager.TrileSet.Name : "(none)"),
                 "Hovered Trile: " + (HoveredTrile != null ? (HoveredTrile.VisualTrile.Name + " (" + HoveredTrile.Emplacement.X + ", " + HoveredTrile.Emplacement.Y + ", " + HoveredTrile.Emplacement.Z + ")") : "(none)"),
+                "Hovered Trile ID: " + (HoveredTrile != null ? HoveredTrile.TrileId.ToString() : "(none)"),
                 "Current View: " + CameraManager.Viewpoint,
-                "Gomez Position: (" + PlayerManager.Position.X + ", " + PlayerManager.Position.Y + ", " + PlayerManager.Position.Z + ")",
                 "Pixels per Trixel: " + CameraManager.PixelsPerTrixel
             };
 
@@ -139,7 +158,7 @@ namespace FezGame.Components {
                 GTR.DrawShadowedText(SpriteBatch, font, metadata[i], new Vector2(0f, i * lineHeight), Color.White, fontScale);
             }
 
-            SpriteBatch.Draw(MouseState.LeftButton.State == MouseButtonStates.Dragging || MouseState.RightButton.State == MouseButtonStates.Dragging ? GrabbedCursor : (CursorSelectable ? (MouseState.LeftButton.State == MouseButtonStates.Down ? ClickedCursor : CanClickCursor) : PointerCursor), 
+            SpriteBatch.Draw(MouseState.LeftButton.State == MouseButtonStates.Dragging || MouseState.RightButton.State == MouseButtonStates.Dragging ? GrabbedCursor : (HoveredTrile != null ? (MouseState.LeftButton.State == MouseButtonStates.Down || MouseState.RightButton.State == MouseButtonStates.Down ? ClickedCursor : CanClickCursor) : PointerCursor), 
                 new Vector2(
                     (float) cursorPosition.X - cursorScale * 11.5f,
                     (float) cursorPosition.Y - cursorScale * 8.5f
