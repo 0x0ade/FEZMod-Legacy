@@ -22,7 +22,7 @@ namespace FezGame.Components {
     public class LevelEditor : DrawableGameComponent {
 
         [ServiceDependency]
-        public IMouseStateManager MouseState { protected get; set; }
+        public IMouseStateManager MouseState { get; set; }
         [ServiceDependency]
         public ISoundManager SoundManager { get; set; }
         [ServiceDependency]
@@ -42,11 +42,13 @@ namespace FezGame.Components {
         [ServiceDependency]
         public IGameLevelManager LevelManager { get; set; }
         [ServiceDependency]
+        public ILevelMaterializer LevelMaterializer { get; set; }
+        [ServiceDependency]
         public IDotManager DotManager { get; set; }
         [ServiceDependency]
         public ISpeechBubbleManager SpeechBubble { get; set; }
         [ServiceDependency]
-        public IContentManagerProvider CMProvider { private get; set; }
+        public IContentManagerProvider CMProvider { get; set; }
 
         public static LevelEditor Instance;
 
@@ -62,9 +64,13 @@ namespace FezGame.Components {
         private DateTime BuildDate;
 
         public TrileInstance HoveredTrile;
-        private KeyValuePair<TrileEmplacement, TrileInstance>[] tmpTriles;
+        private KeyValuePair<TrileEmplacement, TrileInstance>[] tmpTriles = new KeyValuePair<TrileEmplacement, TrileInstance>[8192];
 
-        public int TrileId = 111;//TODO let the player pick the ID manually. 111 = "Vase" in "Undefined".
+        /*
+         * 111: Vase in Undefined
+         * 732: Grey Small 01 in Random
+         */
+        public int TrileId = 111;//TODO let the player pick the ID manually.
 
         public LevelEditor(Game game)
             : base(game) {
@@ -105,10 +111,7 @@ namespace FezGame.Components {
 
             //Ugly thread-safety workaround
             int trilesCount = LevelManager.Triles.Count;
-            if (tmpTriles == null || tmpTriles.Length < trilesCount) {//MonoDevelop claims (/ claimed) tmpTriles is never null.
-                tmpTriles = new KeyValuePair<TrileEmplacement, TrileInstance>[trilesCount];
-            }
-            LevelManager.Triles.CopyTo(tmpTriles, 0);
+            LevelManager.Triles.CopyTo(tmpTriles.Length < trilesCount ? (tmpTriles = new KeyValuePair<TrileEmplacement, TrileInstance>[trilesCount]) : tmpTriles, 0);
 
             for (int i = 0; i < trilesCount; i++) {
                 TrileInstance trile = tmpTriles[i].Value;
@@ -120,7 +123,31 @@ namespace FezGame.Components {
             }
 
             if (MouseState.LeftButton.State == MouseButtonStates.Clicked && HoveredTrile != null) {
-                //TODO do something.
+                TrileEmplacement emplacement = new TrileEmplacement(HoveredTrile.Position - ray.Direction);
+                TrileInstance trile = new TrileInstance(emplacement, TrileId);
+                trile.Position = HoveredTrile.Position - ray.Direction;
+                LevelManager.Triles[emplacement] = trile;
+
+                TrileGroup pickupGroup = new TrileGroup();
+                pickupGroup.ActorType = trile.Trile.ActorSettings.Type;
+                pickupGroup.Triles.Add(trile);
+                LevelManager.PickupGroups[trile] = pickupGroup;
+                for (int i = 0; i < 1024; i++) {
+                    if (!LevelManager.Groups.ContainsKey(i)) {
+                        LevelManager.Groups[i] = pickupGroup;
+                        break;
+                    }
+                }
+
+                trile.PhysicsState = new InstancePhysicsState(trile);
+                trile.Enabled = true;
+
+                trile.Update();
+                LevelMaterializer.AddInstance(trile);
+                LevelMaterializer.RebuildTriles(true);
+                LevelMaterializer.RebuildInstances();
+                LevelMaterializer.UpdateInstance(trile);
+                trile.RefreshTrile();
             }
 
             if (MouseState.RightButton.State == MouseButtonStates.Clicked && HoveredTrile != null) {
@@ -144,7 +171,7 @@ namespace FezGame.Components {
                 "Build Date " + BuildDate,
                 "Level: " + (LevelManager.Name ?? "(none)"),
                 "Trile Set: " + (LevelManager.TrileSet != null ? LevelManager.TrileSet.Name : "(none)"),
-                "Hovered Trile: " + (HoveredTrile != null ? (HoveredTrile.VisualTrile.Name + " (" + HoveredTrile.Emplacement.X + ", " + HoveredTrile.Emplacement.Y + ", " + HoveredTrile.Emplacement.Z + ")") : "(none)"),
+                "Hovered Trile: " + (HoveredTrile != null ? (HoveredTrile.Trile.Name + " (" + HoveredTrile.Emplacement.X + ", " + HoveredTrile.Emplacement.Y + ", " + HoveredTrile.Emplacement.Z + ")") : "(none)"),
                 "Hovered Trile ID: " + (HoveredTrile != null ? HoveredTrile.TrileId.ToString() : "(none)"),
                 "Current View: " + CameraManager.Viewpoint,
                 "Pixels per Trixel: " + CameraManager.PixelsPerTrixel
