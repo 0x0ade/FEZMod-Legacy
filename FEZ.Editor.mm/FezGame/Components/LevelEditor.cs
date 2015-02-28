@@ -70,7 +70,7 @@ namespace FezGame.Components {
          * 111: Vase in Undefined
          * 732: Grey Small 01 in Random
          */
-        public int TrileId = 111;//TODO let the player pick the ID manually.
+        public int TrileId = 0;//TODO let the player pick the ID in a better way than scrolling.
 
         public LevelEditor(Game game)
             : base(game) {
@@ -122,22 +122,12 @@ namespace FezGame.Components {
                 }
             }
 
-            if (MouseState.LeftButton.State == MouseButtonStates.Clicked && HoveredTrile != null) {
+            if (MouseState.LeftButton.State == MouseButtonStates.Clicked && HoveredTrile != null && LevelManager.TrileSet != null && LevelManager.TrileSet.Triles.ContainsKey(TrileId)) {
                 TrileEmplacement emplacement = new TrileEmplacement(HoveredTrile.Position - ray.Direction);
                 TrileInstance trile = new TrileInstance(emplacement, TrileId);
-                trile.Position = HoveredTrile.Position - ray.Direction;
                 LevelManager.Triles[emplacement] = trile;
 
-                TrileGroup pickupGroup = new TrileGroup();
-                pickupGroup.ActorType = trile.Trile.ActorSettings.Type;
-                pickupGroup.Triles.Add(trile);
-                LevelManager.PickupGroups[trile] = pickupGroup;
-                for (int i = 0; i < 1024; i++) {
-                    if (!LevelManager.Groups.ContainsKey(i)) {
-                        LevelManager.Groups[i] = pickupGroup;
-                        break;
-                    }
-                }
+                trile.SetPhiLight(CameraManager.Viewpoint.ToPhi());
 
                 trile.PhysicsState = new InstancePhysicsState(trile);
                 trile.Enabled = true;
@@ -153,6 +143,18 @@ namespace FezGame.Components {
             if (MouseState.RightButton.State == MouseButtonStates.Clicked && HoveredTrile != null) {
                 LevelManager.ClearTrile(HoveredTrile);
                 HoveredTrile = null;
+            }
+
+            if (MouseState.MiddleButton.State == MouseButtonStates.Clicked && HoveredTrile != null) {
+                TrileId = HoveredTrile.TrileId;
+            }
+
+            if (MouseState.WheelTurnedUp == FezButtonState.Pressed) {
+                TrileId++;
+            }
+
+            if (MouseState.WheelTurnedDown == FezButtonState.Pressed) {
+                TrileId--;
             }
         }
 
@@ -171,10 +173,11 @@ namespace FezGame.Components {
                 "Build Date " + BuildDate,
                 "Level: " + (LevelManager.Name ?? "(none)"),
                 "Trile Set: " + (LevelManager.TrileSet != null ? LevelManager.TrileSet.Name : "(none)"),
-                "Hovered Trile: " + (HoveredTrile != null ? (HoveredTrile.Trile.Name + " (" + HoveredTrile.Emplacement.X + ", " + HoveredTrile.Emplacement.Y + ", " + HoveredTrile.Emplacement.Z + ")") : "(none)"),
                 "Hovered Trile ID: " + (HoveredTrile != null ? HoveredTrile.TrileId.ToString() : "(none)"),
+                "Hovered Trile: " + (HoveredTrile != null ? (HoveredTrile.Trile.Name + " (" + HoveredTrile.Emplacement.X + ", " + HoveredTrile.Emplacement.Y + ", " + HoveredTrile.Emplacement.Z + ")") : "(none)"),
+                "Current Trile ID: " + TrileId,
+                "Current Trile: " + (LevelManager.TrileSet != null && LevelManager.TrileSet.Triles.ContainsKey(TrileId) ? LevelManager.TrileSet.Triles[TrileId].Name : "(none)"),
                 "Current View: " + CameraManager.Viewpoint,
-                "Pixels per Trixel: " + CameraManager.PixelsPerTrixel
             };
 
             GraphicsDeviceExtensions.SetBlendingMode(GraphicsDevice, BlendingMode.Alphablending);
