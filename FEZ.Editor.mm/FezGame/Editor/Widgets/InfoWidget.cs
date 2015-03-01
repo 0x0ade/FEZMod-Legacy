@@ -28,14 +28,41 @@ namespace FezGame.Editor.Widgets {
             : base(game) {
         }
 
-        public override void Draw(GameTime gameTime) {
-            Viewport viewport = GraphicsDevice.Viewport;
+        public override void Update(GameTime gameTime) {
+            string[] informations = GetInformations();
+
             float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
-
             SpriteFont font = FontManager.Small;
-            float fontScale = 1.5f * viewScale;
 
-            string[] metadata = new string[] {
+            float lineHeight = font.MeasureString(informations[0]).Y * 0.5f * viewScale;
+            float lineWidthMax = 0f;
+            for (int i = 0; i < informations.Length; i++) {
+                float lineWidth = font.MeasureString(informations[i]).X;
+                if (lineWidth > lineWidthMax) {
+                    lineWidthMax = lineWidth;
+                }
+            }
+            lineWidthMax *= viewScale;
+
+            Size.X = lineWidthMax + lineHeight;
+            Size.Y = lineHeight * (informations.Length + 1f);
+        }
+
+        public override void Draw(GameTime gameTime) {
+            DrawBackground(gameTime);
+
+            string[] informations = GetInformations();
+
+            float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
+            SpriteFont font = FontManager.Small;
+            float lineHeight = font.MeasureString(informations[0]).Y * 0.5f * viewScale;
+            for (int i = 0; i < informations.Length; i++) {
+                LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, font, informations[i], new Vector2(Position.X, Position.Y + i * lineHeight), Color.White, viewScale);
+            }
+        }
+
+        public virtual string[] GetInformations() {
+            return new string[] {
                 "Build Date " + LevelEditor.BuildDate,
                 "Level: " + (LevelManager.Name ?? "(none)"),
                 "Trile Set: " + (LevelManager.TrileSet != null ? LevelManager.TrileSet.Name : "(none)"),
@@ -43,26 +70,8 @@ namespace FezGame.Editor.Widgets {
                 "Hovered Trile: " + (LevelEditor.HoveredTrile != null ? (LevelEditor.HoveredTrile.Trile.Name + " (" + LevelEditor.HoveredTrile.Emplacement.X + ", " + LevelEditor.HoveredTrile.Emplacement.Y + ", " + LevelEditor.HoveredTrile.Emplacement.Z + ")") : "(none)"),
                 "Current Trile ID: " + LevelEditor.TrileId,
                 "Current Trile: " + (LevelManager.TrileSet != null && LevelManager.TrileSet.Triles.ContainsKey(LevelEditor.TrileId) ? LevelManager.TrileSet.Triles[LevelEditor.TrileId].Name : "(none)"),
-                "Current View: " + CameraManager.Viewpoint,
+                "Current View: " + CameraManager.Viewpoint
             };
-
-            float lineHeight = font.MeasureString(metadata[0]).Y;
-            float lineWidthMax = 0f;
-            for (int i = 0; i < metadata.Length; i++) {
-                float lineWidth = font.MeasureString(metadata[i]).X;
-                if (lineWidth > lineWidthMax) {
-                    lineWidthMax = lineWidth;
-                }
-            }
-
-            Size.X = lineWidthMax * fontScale + lineHeight * 0.5f;
-            Size.Y = lineHeight * (metadata.Length + 0.5f);
-
-            DrawBackground();
-
-            for (int i = 0; i < metadata.Length; i++) {
-                LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, font, metadata[i], new Vector2(Position.X, Position.Y + i * lineHeight), Color.White, fontScale);
-            }
         }
 
     }

@@ -134,6 +134,27 @@ namespace FezGame.Components {
                 }
             }
 
+            bool cursorInMenu = false;
+
+            InfoWidget.Position.Y = TopBarWidget.Position.Y + TopBarWidget.Size.Y;
+
+            foreach (EditorWidget widget in Widgets) {
+                widget.LevelEditor = this;
+                widget.Update(gameTime);
+                if (widget.Position.X <= MouseState.Position.X && MouseState.Position.X <= widget.Position.X + widget.Size.X &&
+                    widget.Position.Y <= MouseState.Position.Y && MouseState.Position.Y <= widget.Position.Y + widget.Size.Y) {
+                    cursorInMenu = true;
+                    widget.Hover(gameTime);
+                    if (MouseState.LeftButton.State == MouseButtonStates.Clicked) {
+                        widget.Clicked(gameTime);
+                    }
+                }
+            }
+
+            if (cursorInMenu) {
+                return;
+            }
+
             if (HoveredTrile != null) {
                 HoveredFace = GetHoveredFace(HoveredBox, ray);
             }
@@ -188,8 +209,6 @@ namespace FezGame.Components {
 
             GraphicsDeviceExtensions.SetBlendingMode(GraphicsDevice, BlendingMode.Alphablending);
             GraphicsDeviceExtensions.BeginPoint(SpriteBatch);
-
-            InfoWidget.Position.Y = TopBarWidget.Position.Y + TopBarWidget.Size.Y;
 
             foreach (EditorWidget widget in Widgets) {
                 widget.LevelEditor = this;

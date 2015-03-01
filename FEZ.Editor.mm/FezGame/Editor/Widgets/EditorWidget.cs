@@ -53,7 +53,7 @@ namespace FezGame.Editor.Widgets {
         }
 
         public override void Draw(GameTime gameTime) {
-            DrawBackground();
+            DrawBackground(gameTime);
 
             foreach (EditorWidget widget in Widgets) {
                 widget.Parent = this;
@@ -61,7 +61,13 @@ namespace FezGame.Editor.Widgets {
             }
         }
 
-        public virtual void DrawBackground() {
+        public virtual void Hover(GameTime gameTime) {
+        }
+
+        public virtual void Clicked(GameTime gameTime) {
+        }
+
+        public virtual void DrawBackground(GameTime gameTime) {
             if (pixelTexture == null) {
                 pixelTexture = new Texture2D(GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
                 pixelTexture.SetData<Color>(new Color[] { Color.White });

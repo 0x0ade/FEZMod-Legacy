@@ -25,11 +25,15 @@ namespace FezGame.Editor.Widgets {
             : base(game) {
         }
 
-        public override void Draw(GameTime gameTime) {
+        public override void Initialize() {
+            //TODO Add buttons
+        }
+
+        public override void Update(GameTime gameTime) {
             Size.X = GraphicsDevice.Viewport.Width;
             Size.Y = 24;
 
-            base.Draw(gameTime);
+            //TODO Rearrange buttons
         }
 
     }
