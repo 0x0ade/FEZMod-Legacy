@@ -17,16 +17,15 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using System.IO;
+using FezGame.Editor.Widgets;
 
 namespace FezGame.Components {
-    public class LevelEditor : DrawableGameComponent {
+    public class LevelEditor : DrawableGameComponent, ILevelEditor {
 
         [ServiceDependency]
         public IMouseStateManager MouseState { get; set; }
         [ServiceDependency]
         public ISoundManager SoundManager { get; set; }
-        [ServiceDependency]
-        public ITargetRenderingManager TargetRenderingManager { get; set; }
         [ServiceDependency]
         public IInputManager InputManager { get; set; }
         [ServiceDependency]
@@ -52,30 +51,34 @@ namespace FezGame.Components {
 
         public static LevelEditor Instance;
 
-        private SpriteBatch SpriteBatch;
-        private GlyphTextRenderer GTR;
+        public SpriteBatch SpriteBatch { get; set; }
+        public GlyphTextRenderer GTR { get; set; }
 
-        private float SinceMouseMoved = 3f;
-        private Texture2D GrabbedCursor;
-        private Texture2D CanClickCursor;
-        private Texture2D ClickedCursor;
-        private Texture2D PointerCursor;
+        protected float SinceMouseMoved = 3f;
+        protected Texture2D GrabbedCursor;
+        protected Texture2D CanClickCursor;
+        protected Texture2D ClickedCursor;
+        protected Texture2D PointerCursor;
 
-        private DateTime BuildDate;
+        public DateTime BuildDate { get; protected set; }
 
-        public TrileInstance HoveredTrile;
-        private KeyValuePair<TrileEmplacement, TrileInstance>[] tmpTriles = new KeyValuePair<TrileEmplacement, TrileInstance>[8192];
+        protected KeyValuePair<TrileEmplacement, TrileInstance>[] tmpTriles = new KeyValuePair<TrileEmplacement, TrileInstance>[8192];
 
-        /*
-         * 111: Vase in Undefined
-         * 732: Grey Small 01 in Random
-         */
-        public int TrileId = 0;//TODO let the player pick the ID in a better way than scrolling.
+        public TrileInstance HoveredTrile { get; set; }
+        public BoundingBox HoveredBox { get; set; }
+        public FaceOrientation HoveredFace { get; set; }
+        public int TrileId { get; set; }//TODO let the player pick the ID in a better way than scrolling.
+
+        public List<EditorWidget> Widgets = new List<EditorWidget>();
+
+        public InfoWidget InfoWidget;
+        public TopBarWidget TopBarWidget;
 
         public LevelEditor(Game game)
             : base(game) {
             UpdateOrder = -10;
-            DrawOrder = 2000;
+            DrawOrder = 3000;
+            TrileId = 0;
             Instance = this;
         }
 
@@ -93,9 +96,16 @@ namespace FezGame.Components {
             GrabbedCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_GRABBER");
 
             //GameState.InEditor = true;//Causes some graphical funkyness.
+
+            Widgets.Add(TopBarWidget = new TopBarWidget(Game));
+            Widgets.Add(InfoWidget = new InfoWidget(Game));
         }
 
         public override void Update(GameTime gameTime) {
+            if (GameState.InMap || GameState.Loading) {
+                return;
+            }
+
             SinceMouseMoved += (float) gameTime.ElapsedGameTime.TotalSeconds;
             if (MouseState.Movement.X != 0 || MouseState.Movement.Y != 0) {
                 SinceMouseMoved = 0f;
@@ -115,15 +125,21 @@ namespace FezGame.Components {
 
             for (int i = 0; i < trilesCount; i++) {
                 TrileInstance trile = tmpTriles[i].Value;
-                float? intersection = ray.Intersects(new BoundingBox(trile.Position, trile.Position + new Vector3(1f)));
+                BoundingBox box = new BoundingBox(trile.Position, trile.Position + new Vector3(1f));
+                float? intersection = ray.Intersects(box);
                 if (intersection.HasValue && intersection < intersectionMin) {
                     HoveredTrile = trile;
+                    HoveredBox = box;
                     intersectionMin = intersection.Value;
                 }
             }
 
+            if (HoveredTrile != null) {
+                HoveredFace = GetHoveredFace(HoveredBox, ray);
+            }
+
             if (MouseState.LeftButton.State == MouseButtonStates.Clicked && HoveredTrile != null && LevelManager.TrileSet != null && LevelManager.TrileSet.Triles.ContainsKey(TrileId)) {
-                TrileEmplacement emplacement = new TrileEmplacement(HoveredTrile.Position - ray.Direction);
+                TrileEmplacement emplacement = new TrileEmplacement(HoveredTrile.Position - FezMath.AsVector(HoveredFace));
                 TrileInstance trile = new TrileInstance(emplacement, TrileId);
                 LevelManager.Triles[emplacement] = trile;
 
@@ -159,33 +175,25 @@ namespace FezGame.Components {
         }
 
         public override void Draw(GameTime gameTime) {
-            Viewport viewport = GraphicsDevice.Viewport;
+            if (GameState.InMap || GameState.Loading) {
+                return;
+            }
 
+            Viewport viewport = GraphicsDevice.Viewport;
             float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
 
             float cursorScale = viewScale * 2f;
             Point cursorPosition = SettingsManager.PositionInViewport(MouseState);
 
-            SpriteFont font = FontManager.Big;
-            float fontScale = 1.5f * viewScale;
-
-            string[] metadata = new string[] {
-                "Build Date " + BuildDate,
-                "Level: " + (LevelManager.Name ?? "(none)"),
-                "Trile Set: " + (LevelManager.TrileSet != null ? LevelManager.TrileSet.Name : "(none)"),
-                "Hovered Trile ID: " + (HoveredTrile != null ? HoveredTrile.TrileId.ToString() : "(none)"),
-                "Hovered Trile: " + (HoveredTrile != null ? (HoveredTrile.Trile.Name + " (" + HoveredTrile.Emplacement.X + ", " + HoveredTrile.Emplacement.Y + ", " + HoveredTrile.Emplacement.Z + ")") : "(none)"),
-                "Current Trile ID: " + TrileId,
-                "Current Trile: " + (LevelManager.TrileSet != null && LevelManager.TrileSet.Triles.ContainsKey(TrileId) ? LevelManager.TrileSet.Triles[TrileId].Name : "(none)"),
-                "Current View: " + CameraManager.Viewpoint,
-            };
 
             GraphicsDeviceExtensions.SetBlendingMode(GraphicsDevice, BlendingMode.Alphablending);
             GraphicsDeviceExtensions.BeginPoint(SpriteBatch);
 
-            float lineHeight = font.MeasureString(metadata[0]).Y;
-            for (int i = 0; i < metadata.Length; i++) {
-                GTR.DrawShadowedText(SpriteBatch, font, metadata[i], new Vector2(0f, i * lineHeight), Color.White, fontScale);
+            InfoWidget.Position.Y = TopBarWidget.Position.Y + TopBarWidget.Size.Y;
+
+            foreach (EditorWidget widget in Widgets) {
+                widget.LevelEditor = this;
+                widget.Draw(gameTime);
             }
 
             SpriteBatch.Draw(MouseState.LeftButton.State == MouseButtonStates.Dragging || MouseState.RightButton.State == MouseButtonStates.Dragging ? GrabbedCursor : (HoveredTrile != null ? (MouseState.LeftButton.State == MouseButtonStates.Down || MouseState.RightButton.State == MouseButtonStates.Down ? ClickedCursor : CanClickCursor) : PointerCursor), 
@@ -203,7 +211,39 @@ namespace FezGame.Components {
             SpriteBatch.End();
         }
 
-        private DateTime ReadBuildDate() {
+        protected FaceOrientation GetHoveredFace(BoundingBox box, Ray ray) {
+            float intersectionMin = float.MaxValue;
+
+            BoundingBox[] sides = new BoundingBox[6];
+            sides[0] = new BoundingBox(new Vector3(box.Min.X, box.Min.Y, box.Min.Z), new Vector3(box.Min.X, box.Max.Y, box.Max.Z));
+            sides[1] = new BoundingBox(new Vector3(box.Max.X, box.Min.Y, box.Min.Z), new Vector3(box.Max.X, box.Max.Y, box.Max.Z));
+            sides[2] = new BoundingBox(new Vector3(box.Min.X, box.Min.Y, box.Min.Z), new Vector3(box.Max.X, box.Min.Y, box.Max.Z));
+            sides[3] = new BoundingBox(new Vector3(box.Min.X, box.Max.Y, box.Min.Z), new Vector3(box.Max.X, box.Max.Y, box.Max.Z));
+            sides[4] = new BoundingBox(new Vector3(box.Min.X, box.Min.Y, box.Min.Z), new Vector3(box.Max.X, box.Max.Y, box.Min.Z));
+            sides[5] = new BoundingBox(new Vector3(box.Min.X, box.Min.Y, box.Max.Z), new Vector3(box.Max.X, box.Max.Y, box.Max.Z));
+
+            FaceOrientation[] faces = new FaceOrientation[6];
+            faces[0] = FaceOrientation.Right;
+            faces[1] = FaceOrientation.Left;
+            faces[2] = FaceOrientation.Top;
+            faces[3] = FaceOrientation.Down;
+            faces[4] = FaceOrientation.Front;
+            faces[5] = FaceOrientation.Back;
+
+            FaceOrientation face = FaceOrientation.Top;
+
+            for (int i = 0; i < 6; i++) {
+                float? intersection = ray.Intersects(sides[i]);
+                if (intersection.HasValue && intersection < intersectionMin) {
+                    intersectionMin = intersection.Value;
+                    face = faces[i];
+                }
+            }
+
+            return face;
+        }
+
+        protected DateTime ReadBuildDate() {
             string filePath = System.Reflection.Assembly.GetCallingAssembly().Location;
             const int c_PeHeaderOffset = 60;
             const int c_LinkerTimestampOffset = 8;
