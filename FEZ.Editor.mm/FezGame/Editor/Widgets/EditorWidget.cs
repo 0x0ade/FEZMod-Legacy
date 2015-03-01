@@ -43,6 +43,16 @@ namespace FezGame.Editor.Widgets {
         public Vector2 Position = new Vector2(0f);
         public Vector2 Size = new Vector2(128f);
 
+        public Vector2 Offset {
+            get {
+                Vector2 offset = new Vector2(0f);
+                for (EditorWidget parent = Parent; parent != null; parent = parent.Parent) {
+                    offset += parent.Position;
+                }
+                return offset;
+            }
+        }
+
         public Color Background = new Color(0f, 0f, 0f, 0.2f);
         private static Rectangle backgroundBounds = new Rectangle();
         private static Texture2D pixelTexture;
@@ -52,11 +62,20 @@ namespace FezGame.Editor.Widgets {
             ServiceHelper.InjectServices(this);
         }
 
+        public override void Update(GameTime gameTime) {
+            foreach (EditorWidget widget in Widgets) {
+                widget.Parent = this;
+                widget.LevelEditor = LevelEditor;
+                widget.Update(gameTime);
+            }
+        }
+
         public override void Draw(GameTime gameTime) {
             DrawBackground(gameTime);
 
             foreach (EditorWidget widget in Widgets) {
                 widget.Parent = this;
+                widget.LevelEditor = LevelEditor;
                 widget.Draw(gameTime);
             }
         }
@@ -73,8 +92,8 @@ namespace FezGame.Editor.Widgets {
                 pixelTexture.SetData<Color>(new Color[] { Color.White });
             }
 
-            backgroundBounds.X = (int) Position.X;
-            backgroundBounds.Y = (int) Position.Y;
+            backgroundBounds.X = (int) Position.X + (int) Offset.X;
+            backgroundBounds.Y = (int) Position.Y + (int) Offset.Y;
             backgroundBounds.Width = (int) Size.X;
             backgroundBounds.Height = (int) Size.Y;
 

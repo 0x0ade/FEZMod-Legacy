@@ -24,20 +24,22 @@ namespace FezGame.Editor.Widgets {
         [ServiceDependency]
         public IGameLevelManager LevelManager { get; set; }
 
+        public SpriteFont Font;
+
         public InfoWidget(Game game) 
             : base(game) {
+            Font = FontManager.Small;
         }
 
         public override void Update(GameTime gameTime) {
             string[] informations = GetInformations();
 
             float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
-            SpriteFont font = FontManager.Small;
 
-            float lineHeight = font.MeasureString(informations[0]).Y * 0.5f * viewScale;
+            float lineHeight = Font.MeasureString(informations[0]).Y * 0.5f * viewScale;
             float lineWidthMax = 0f;
             for (int i = 0; i < informations.Length; i++) {
-                float lineWidth = font.MeasureString(informations[i]).X;
+                float lineWidth = Font.MeasureString(informations[i]).X;
                 if (lineWidth > lineWidthMax) {
                     lineWidthMax = lineWidth;
                 }
@@ -54,10 +56,9 @@ namespace FezGame.Editor.Widgets {
             string[] informations = GetInformations();
 
             float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
-            SpriteFont font = FontManager.Small;
-            float lineHeight = font.MeasureString(informations[0]).Y * 0.5f * viewScale;
+            float lineHeight = Font.MeasureString(informations[0]).Y * 0.5f * viewScale;
             for (int i = 0; i < informations.Length; i++) {
-                LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, font, informations[i], new Vector2(Position.X, Position.Y + i * lineHeight), Color.White, viewScale);
+                LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, Font, informations[i], new Vector2(Position.X, Position.Y + i * lineHeight) + Offset, Color.White, viewScale);
             }
         }
 

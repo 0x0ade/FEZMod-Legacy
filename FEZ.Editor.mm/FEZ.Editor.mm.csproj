@@ -53,6 +53,7 @@
     <Compile Include="FezGame\Editor\Widgets\EditorWidget.cs" />
     <Compile Include="FezGame\Editor\Widgets\InfoWidget.cs" />
     <Compile Include="FezGame\Editor\Widgets\TopBarWidget.cs" />
+    <Compile Include="FezGame\Editor\Widgets\ButtonWidget.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
