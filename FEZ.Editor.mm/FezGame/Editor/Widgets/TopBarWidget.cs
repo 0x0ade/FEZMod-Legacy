@@ -25,13 +25,28 @@ namespace FezGame.Editor.Widgets {
             : base(game) {
             ButtonWidget button;
 
-            Widgets.Add(button = new ButtonWidget(Game, "FILE"));
-            button.Widgets.Add(new ButtonWidget(Game, "NEW"));
-            button.Widgets.Add(new ButtonWidget(Game, "OPEN"));
-            button.Widgets.Add(new ButtonWidget(Game, "SAVE"));
+            Widgets.Add(button = new ButtonWidget(Game, "File"));
+            button.Widgets.Add(new ButtonWidget(Game, "New"));
+            button.Widgets.Add(new ButtonWidget(Game, "Open"));
+            button.Widgets.Add(new ButtonWidget(Game, "Save"));
             button.Background.A = 0;
 
-            Widgets.Add(button = new ButtonWidget(Game, "TEST BUTTON"));
+            Widgets.Add(button = new ButtonWidget(Game, "View"));
+            button.Background.A = 0;
+
+            Widgets.Add(button = new ButtonWidget(Game, "Level"));
+            button.Background.A = 0;
+
+            Widgets.Add(button = new ButtonWidget(Game, "Trile Set"));
+            button.Background.A = 0;
+
+            Widgets.Add(button = new ButtonWidget(Game, "Trile"));
+            button.Background.A = 0;
+
+            Widgets.Add(button = new ButtonWidget(Game, "Strings"));
+            button.Background.A = 0;
+
+            Widgets.Add(button = new ButtonWidget(Game, "Scripting"));
             button.Background.A = 0;
         }
 

@@ -55,6 +55,7 @@ namespace FezGame.Components {
         public GlyphTextRenderer GTR { get; set; }
 
         protected float SinceMouseMoved = 3f;
+        protected bool CursorHovering = false;
         protected Texture2D GrabbedCursor;
         protected Texture2D CanClickCursor;
         protected Texture2D ClickedCursor;
@@ -111,6 +112,7 @@ namespace FezGame.Components {
                 SinceMouseMoved = 0f;
             }
 
+            CursorHovering = false;
             HoveredTrile = null;
 
             Vector3 right = CameraManager.InverseView.Right;
@@ -139,11 +141,13 @@ namespace FezGame.Components {
             bool cursorInMenu = UpdateWidgets(gameTime, Widgets, true);
 
             if (cursorInMenu) {
+                CursorHovering = true;
                 return;
             }
 
             if (HoveredTrile != null) {
                 HoveredFace = GetHoveredFace(HoveredBox, ray);
+                CursorHovering = true;
             }
 
             if (MouseState.LeftButton.State == MouseButtonStates.Clicked && HoveredTrile != null && LevelManager.TrileSet != null && LevelManager.TrileSet.Triles.ContainsKey(TrileId)) {
@@ -202,7 +206,7 @@ namespace FezGame.Components {
                 widget.Draw(gameTime);
             }
 
-            SpriteBatch.Draw(MouseState.LeftButton.State == MouseButtonStates.Dragging || MouseState.RightButton.State == MouseButtonStates.Dragging ? GrabbedCursor : (HoveredTrile != null ? (MouseState.LeftButton.State == MouseButtonStates.Down || MouseState.RightButton.State == MouseButtonStates.Down ? ClickedCursor : CanClickCursor) : PointerCursor), 
+            SpriteBatch.Draw(MouseState.LeftButton.State == MouseButtonStates.Dragging || MouseState.RightButton.State == MouseButtonStates.Dragging ? GrabbedCursor : (CursorHovering ? (MouseState.LeftButton.State == MouseButtonStates.Down || MouseState.RightButton.State == MouseButtonStates.Down ? ClickedCursor : CanClickCursor) : PointerCursor), 
                 new Vector2(
                     (float) cursorPosition.X - cursorScale * 11.5f,
                     (float) cursorPosition.Y - cursorScale * 8.5f
