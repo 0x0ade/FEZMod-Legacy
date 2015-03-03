@@ -23,8 +23,16 @@ namespace FezGame.Editor.Widgets {
 
         public TopBarWidget(Game game) 
             : base(game) {
-            Widgets.Add(new ButtonWidget(Game, "FILE"));
-            Widgets.Add(new ButtonWidget(Game, "TEST BUTTON"));
+            ButtonWidget button;
+
+            Widgets.Add(button = new ButtonWidget(Game, "FILE"));
+            button.Widgets.Add(new ButtonWidget(Game, "NEW"));
+            button.Widgets.Add(new ButtonWidget(Game, "OPEN"));
+            button.Widgets.Add(new ButtonWidget(Game, "SAVE"));
+            button.Background.A = 0;
+
+            Widgets.Add(button = new ButtonWidget(Game, "TEST BUTTON"));
+            button.Background.A = 0;
         }
 
         public override void Update(GameTime gameTime) {
@@ -40,7 +48,7 @@ namespace FezGame.Editor.Widgets {
                 Widgets[i].Position.X = offset;
                 Widgets[i].Position.Y = 0;
 
-                offset += Widgets[i].Size.X + 8f;
+                offset += Widgets[i].Size.X + 12f;
             }
         }
 

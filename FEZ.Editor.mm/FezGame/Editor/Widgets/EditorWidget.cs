@@ -53,7 +53,7 @@ namespace FezGame.Editor.Widgets {
             }
         }
 
-        public Color Background = new Color(0f, 0f, 0f, 0.2f);
+        public Color Background = new Color(0f, 0f, 0f, 0.4f);
         private static Rectangle backgroundBounds = new Rectangle();
         private static Texture2D pixelTexture;
 

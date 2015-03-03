@@ -134,22 +134,9 @@ namespace FezGame.Components {
                 }
             }
 
-            bool cursorInMenu = false;
+            InfoWidget.Position.Y = GraphicsDevice.Viewport.Height - InfoWidget.Size.Y;
 
-            InfoWidget.Position.Y = TopBarWidget.Position.Y + TopBarWidget.Size.Y;
-
-            foreach (EditorWidget widget in Widgets) {
-                widget.LevelEditor = this;
-                widget.Update(gameTime);
-                if (widget.Position.X <= MouseState.Position.X && MouseState.Position.X <= widget.Position.X + widget.Size.X &&
-                    widget.Position.Y <= MouseState.Position.Y && MouseState.Position.Y <= widget.Position.Y + widget.Size.Y) {
-                    cursorInMenu = true;
-                    widget.Hover(gameTime);
-                    if (MouseState.LeftButton.State == MouseButtonStates.Clicked) {
-                        widget.Clicked(gameTime);
-                    }
-                }
-            }
+            bool cursorInMenu = UpdateWidgets(gameTime, Widgets, true);
 
             if (cursorInMenu) {
                 return;
@@ -228,6 +215,28 @@ namespace FezGame.Components {
                 0.0f);
 
             SpriteBatch.End();
+        }
+
+        protected bool UpdateWidgets(GameTime gameTime, List<EditorWidget> widgets, Boolean update) {
+            bool cursorOnWidget = false;
+            foreach (EditorWidget widget in widgets) {
+                widget.LevelEditor = this;
+                if (update) {
+                    widget.Update(gameTime);
+                }
+                bool cursorOnChild = UpdateWidgets(gameTime, widget.Widgets, false);
+                if (!cursorOnChild &&
+                    widget.Position.X <= MouseState.Position.X && MouseState.Position.X <= widget.Position.X + widget.Size.X &&
+                    widget.Position.Y <= MouseState.Position.Y && MouseState.Position.Y <= widget.Position.Y + widget.Size.Y) {
+                    cursorOnWidget = true;
+                    widget.Hover(gameTime);
+                    if (MouseState.LeftButton.State == MouseButtonStates.Clicked) {
+                        widget.Clicked(gameTime);
+                    }
+                }
+                cursorOnWidget = cursorOnWidget || cursorOnChild;
+            }
+            return cursorOnWidget;
         }
 
         protected FaceOrientation GetHoveredFace(BoundingBox box, Ray ray) {
