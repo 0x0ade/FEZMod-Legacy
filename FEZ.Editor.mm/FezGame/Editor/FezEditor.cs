@@ -11,7 +11,7 @@ namespace FezGame.Editor {
 
         public override string Name { get { return "JAFM.FezEditor"; } }
         public override string Author { get { return "AngelDE98 & JAFM contributors"; } }
-        public override string Version { get { return "0.0.0"; } }
+        public override string Version { get { return FEZMod.Version; } }
 
         public bool InEditor = false;
 

@@ -85,22 +85,6 @@ namespace FezGame.Mod {
                     }
                     Fez.LongScreenshot = true;
                 }
-                if (args[i] == "-d" || args[i] == "--dump") {
-                    ModLogger.Log("JAFM", "Found -d / --dump");
-                    MemoryContentManager.AssetExists("JAFM_DUMP_WORKAROUND");
-                }
-                if (args[i] == "-da" || args[i] == "--dump-all") {
-                    ModLogger.Log("JAFM", "Found -da / --dump-all");
-                    MemoryContentManager.AssetExists("JAFM_DUMPALL_WORKAROUND");
-                }
-                if (args[i] == "-nf" || args[i] == "--no-flat") {
-                    ModLogger.Log("JAFM", "Found -nf / --no-flat");
-                    MemoryContentManager.AssetExists("JAFM_NOFLAT_WORKAROUND");
-                }
-                if (args[i] == "-nc" || args[i] == "--no-cache") {
-                    ModLogger.Log("JAFM", "Found -nc / --no-cache");
-                    MemoryContentManager.AssetExists("JAFM_NOCACHE_WORKAROUND");
-                }
                 if (args[i] == "-pp" || args[i] == "--pixel-perfect") {
                     ModLogger.Log("JAFM", "Found -pp / --pixel-perfect");
                     OverridePixelsPerTrixel = 1f;

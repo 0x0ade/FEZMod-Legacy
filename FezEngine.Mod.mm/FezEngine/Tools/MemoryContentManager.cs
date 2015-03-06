@@ -120,23 +120,6 @@ namespace FezEngine.Tools {
         }
 
         public static bool AssetExists(String assetName) {
-            if (assetName == "JAFM_DUMP_WORKAROUND") {
-                DumpResources = true;
-                return true;
-            }
-            if (assetName == "JAFM_DUMPALL_WORKAROUND") {
-                DumpAllResources = true;
-                return true;
-            }
-            if (assetName == "JAFM_NOCACHE_WORKAROUND") {
-                CacheDisabled = true;
-                return true;
-            }
-            if (assetName == "JAFM_NOFLAT_WORKAROUND") {
-                Level.FlatDisabled = true;
-                return true;
-            }
-
             string filePath = ("Resources\\"+(assetName.ToLower())).Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString())+".xnb";
             FileInfo file = new FileInfo(filePath);
             if (file.Exists) {

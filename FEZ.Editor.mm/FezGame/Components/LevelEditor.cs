@@ -68,7 +68,7 @@ namespace FezGame.Components {
         public TrileInstance HoveredTrile { get; set; }
         public BoundingBox HoveredBox { get; set; }
         public FaceOrientation HoveredFace { get; set; }
-        public int TrileId { get; set; }//TODO let the player pick the ID in a better way than scrolling.
+        public int TrileId { get; set; }
 
         public List<EditorWidget> Widgets = new List<EditorWidget>();
 
