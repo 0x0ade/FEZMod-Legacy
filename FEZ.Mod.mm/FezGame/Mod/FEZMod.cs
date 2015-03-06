@@ -10,7 +10,7 @@ using FezGame.Components;
 
 namespace FezGame.Mod {
     public static class FEZMod {
-        public static string Version = "0.0.5";
+        public static string Version = "0.1";
 
         public static List<FezModule> Modules = new List<FezModule>();
 

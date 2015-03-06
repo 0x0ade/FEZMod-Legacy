@@ -53,6 +53,10 @@ namespace FezGame.Editor.Widgets {
         public override void Draw(GameTime gameTime) {
             DrawBackground(gameTime);
 
+            if (!InView) {
+                return;
+            }
+
             string[] informations = GetInformations();
 
             float viewScale = SettingsManager.GetViewScale(GraphicsDevice);

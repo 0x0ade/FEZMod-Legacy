@@ -54,8 +54,14 @@ namespace FezGame.Editor.Widgets {
             }
         }
 
+        public bool InView {
+            get {
+                return GraphicsDevice.Viewport.Bounds.Intersects(backgroundBounds);
+            }
+        }
+
         public Color Background = new Color(0f, 0f, 0f, 0.75f);
-        protected static Rectangle backgroundBounds = new Rectangle();
+        protected Rectangle backgroundBounds = new Rectangle();
         protected static Texture2D pixelTexture;
 
         public EditorWidget(Game game) 
@@ -73,6 +79,10 @@ namespace FezGame.Editor.Widgets {
 
         public override void Draw(GameTime gameTime) {
             DrawBackground(gameTime);
+
+            if (!InView) {
+                return;
+            }
 
             if (!ShowChildren) {
                 return;
@@ -95,15 +105,19 @@ namespace FezGame.Editor.Widgets {
         }
 
         public virtual void DrawBackground(GameTime gameTime) {
-            if (pixelTexture == null) {
-                pixelTexture = new Texture2D(GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
-                pixelTexture.SetData<Color>(new Color[] { Color.White });
-            }
-
             backgroundBounds.X = (int) (Position.X + Offset.X);
             backgroundBounds.Y = (int) (Position.Y + Offset.Y);
             backgroundBounds.Width = (int) Size.X;
             backgroundBounds.Height = (int) Size.Y;
+
+            if (!InView) {
+                return;
+            }
+
+            if (pixelTexture == null) {
+                pixelTexture = new Texture2D(GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
+                pixelTexture.SetData<Color>(new Color[] { Color.White });
+            }
 
             LevelEditor.SpriteBatch.Draw(pixelTexture, backgroundBounds, Background);
         }

@@ -30,6 +30,8 @@ namespace FezGame.Editor.Widgets {
         public float ScrollOffset = 0f;
         public float Width = 0f;
 
+        protected Rectangle scrollIndicatorBounds = new Rectangle();
+
         public Texture2D TrileAtlas { get; set; }
 
         public TrilePickerWidget(Game game) 
@@ -70,12 +72,16 @@ namespace FezGame.Editor.Widgets {
         public override void DrawBackground(GameTime gameTime) {
             base.DrawBackground(gameTime);
 
-            backgroundBounds.X += (int) (Size.X * ScrollOffset / Width);
-            backgroundBounds.Y += (int) (Size.Y) - 4;
-            backgroundBounds.Width = 8;
-            backgroundBounds.Height = 4;
+            if (!InView) {
+                return;
+            }
 
-            LevelEditor.SpriteBatch.Draw(pixelTexture, backgroundBounds, new Color(255, 255, 255, Background.A));
+            scrollIndicatorBounds.X = backgroundBounds.X + (int) (Size.X * ScrollOffset / Width);
+            scrollIndicatorBounds.Y = backgroundBounds.Y + (int) (Size.Y) - 4;
+            scrollIndicatorBounds.Width = 8;
+            scrollIndicatorBounds.Height = 4;
+
+            LevelEditor.SpriteBatch.Draw(pixelTexture, scrollIndicatorBounds, new Color(255, 255, 255, Background.A));
         }
 
         public void UpdateWidgets() {
@@ -100,7 +106,7 @@ namespace FezGame.Editor.Widgets {
         }
 
         public override void Scroll(GameTime gameTime) {
-            ScrollMomentum += MouseState.WheelTurns * 96f;
+            ScrollMomentum -= MouseState.WheelTurns * 128f;
         }
 
     }

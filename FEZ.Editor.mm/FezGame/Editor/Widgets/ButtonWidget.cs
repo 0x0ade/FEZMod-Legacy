@@ -81,6 +81,10 @@ namespace FezGame.Editor.Widgets {
         public override void Draw(GameTime gameTime) {
             base.Draw(gameTime);
 
+            if (!InView) {
+                return;
+            }
+
             if (Label != null) {
                 float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
                 LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, Font, Label, Position + Offset, Color.White, viewScale);

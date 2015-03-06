@@ -55,21 +55,19 @@ namespace FezGame.Editor.Widgets {
         public override void Draw(GameTime gameTime) {
             base.Draw(gameTime);
 
-            if (Trile == null) {
+            if (Trile == null || !InView || TrileAtlas == null) {
                 return;
             }
 
-            if (TrileAtlas != null) {
-                LevelEditor.SpriteBatch.Draw(TrileAtlas, new Rectangle(
-                    (int) (Position.X + Offset.X),
-                    (int) (Position.Y + Offset.Y),
-                    32, 32
-                    ), new Rectangle(
-                    (int) Math.Ceiling(((double)Trile.AtlasOffset.X) * ((double)TrileAtlas.Width)) + 1,
-                    (int) Math.Ceiling(((double)Trile.AtlasOffset.Y) * ((double)TrileAtlas.Height)) + 1,
-                    16, 16
-                    ), Color.White);
-            }
+            LevelEditor.SpriteBatch.Draw(TrileAtlas, new Rectangle(
+                (int) (Position.X + Offset.X),
+                (int) (Position.Y + Offset.Y),
+                32, 32
+                ), new Rectangle(
+                (int) Math.Ceiling(((double)Trile.AtlasOffset.X) * ((double)TrileAtlas.Width)) + 1,
+                (int) Math.Ceiling(((double)Trile.AtlasOffset.Y) * ((double)TrileAtlas.Height)) + 1,
+                16, 16
+                ), Color.White);
         }
 
         public override void Clicked(GameTime gameTime) {
