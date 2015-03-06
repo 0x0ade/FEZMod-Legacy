@@ -74,6 +74,7 @@ namespace FezGame.Components {
 
         public InfoWidget InfoWidget;
         public TopBarWidget TopBarWidget;
+        public TrilePickerWidget TrilePickerWidget;
 
         public LevelEditor(Game game)
             : base(game) {
@@ -100,6 +101,7 @@ namespace FezGame.Components {
 
             Widgets.Add(TopBarWidget = new TopBarWidget(Game));
             Widgets.Add(InfoWidget = new InfoWidget(Game));
+            Widgets.Add(TrilePickerWidget = new TrilePickerWidget(Game));
         }
 
         public override void Update(GameTime gameTime) {
@@ -136,7 +138,8 @@ namespace FezGame.Components {
                 }
             }
 
-            InfoWidget.Position.Y = GraphicsDevice.Viewport.Height - InfoWidget.Size.Y;
+            TrilePickerWidget.Position.Y = GraphicsDevice.Viewport.Height - TrilePickerWidget.Size.Y;
+            InfoWidget.Position.Y = TrilePickerWidget.Position.Y - InfoWidget.Size.Y;
 
             bool cursorInMenu = UpdateWidgets(gameTime, Widgets, true);
 
@@ -228,14 +231,19 @@ namespace FezGame.Components {
                 if (update) {
                     widget.Update(gameTime);
                 }
-                bool cursorOnChild = UpdateWidgets(gameTime, widget.Widgets, false);
-                if (!cursorOnChild &&
-                    widget.Position.X <= MouseState.Position.X && MouseState.Position.X <= widget.Position.X + widget.Size.X &&
-                    widget.Position.Y <= MouseState.Position.Y && MouseState.Position.Y <= widget.Position.Y + widget.Size.Y) {
+                bool cursorOnChild = false;
+                if (widget.ShowChildren) {
+                    cursorOnChild = UpdateWidgets(gameTime, widget.Widgets, false);
+                }
+                if (widget.Position.X + widget.Offset.X <= MouseState.Position.X && MouseState.Position.X <= widget.Position.X + widget.Offset.X + widget.Size.X &&
+                    widget.Position.Y + widget.Offset.Y <= MouseState.Position.Y && MouseState.Position.Y <= widget.Position.Y + widget.Offset.Y + widget.Size.Y) {
                     cursorOnWidget = true;
                     widget.Hover(gameTime);
-                    if (MouseState.LeftButton.State == MouseButtonStates.Clicked) {
+                    if (!cursorOnChild && MouseState.LeftButton.State == MouseButtonStates.Clicked) {
                         widget.Clicked(gameTime);
+                    }
+                    if (MouseState.WheelTurns != 0) {
+                        widget.Scroll(gameTime);
                     }
                 }
                 cursorOnWidget = cursorOnWidget || cursorOnChild;

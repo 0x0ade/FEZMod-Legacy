@@ -26,18 +26,17 @@ namespace FezGame.Editor.Widgets {
 
         public SpriteFont Font;
 
-        public bool ShowMenu = false;
         public float Hovered = 0f;
 
         public ButtonWidget(Game game) 
-            : base(game) {
-            Font = FontManager.Small;
+            : this(game, null) {
         }
 
         public ButtonWidget(Game game, String label) 
             : base(game) {
             Label = label;
             Font = FontManager.Small;
+            ShowChildren = false;
         }
 
         public ButtonWidget(Game game, String label, Action action) 
@@ -45,12 +44,15 @@ namespace FezGame.Editor.Widgets {
             Label = label;
             Action = action;
             Font = FontManager.Small;
+            ShowChildren = false;
         }
 
         public override void Update(GameTime gameTime) {
-            float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
-            Size.X = Font.MeasureString(Label).X * viewScale;
-            Size.Y = 24f;
+            if (Label != null) {
+                float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
+                Size.X = Font.MeasureString(Label).X * viewScale;
+                Size.Y = 24f;
+            }
 
             float offset = Size.Y;
             float widthMax = 0f;
@@ -71,19 +73,18 @@ namespace FezGame.Editor.Widgets {
             for (int i = 0; i < Widgets.Count; i++) {
                 Widgets[i].Size.X = widthMax;
             }
+
+            Hovered -= (float) gameTime.ElapsedGameTime.TotalSeconds;
+            ShowChildren = Hovered > 0f;
         }
 
         public override void Draw(GameTime gameTime) {
-            if (ShowMenu || Hovered > 0f) {
-                base.Draw(gameTime);
-            } else {
-                DrawBackground(gameTime);
+            base.Draw(gameTime);
+
+            if (Label != null) {
+                float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
+                LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, Font, Label, Position + Offset, Color.White, viewScale);
             }
-
-            float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
-            LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, Font, Label, Position + Offset, Color.White, viewScale);
-
-            Hovered -= (float) gameTime.ElapsedGameTime.TotalSeconds;
         }
 
         public override void Clicked(GameTime gameTime) {
@@ -93,7 +94,7 @@ namespace FezGame.Editor.Widgets {
         }
 
         public override void Hover(GameTime gameTime) {
-            Hovered = 0.25f;
+            Hovered = 0.1f;
             if (Parent is ButtonWidget && ((ButtonWidget)Parent).Hovered > 0f) {
                 ((ButtonWidget)Parent).Hover(gameTime);
             }

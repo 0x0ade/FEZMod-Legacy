@@ -39,6 +39,7 @@ namespace FezGame.Editor.Widgets {
 
         public EditorWidget Parent;
         public List<EditorWidget> Widgets = new List<EditorWidget>();
+        public bool ShowChildren = true;
 
         public Vector2 Position = new Vector2(0f);
         public Vector2 Size = new Vector2(128f);
@@ -53,9 +54,9 @@ namespace FezGame.Editor.Widgets {
             }
         }
 
-        public Color Background = new Color(0f, 0f, 0f, 0.4f);
-        private static Rectangle backgroundBounds = new Rectangle();
-        private static Texture2D pixelTexture;
+        public Color Background = new Color(0f, 0f, 0f, 0.75f);
+        protected static Rectangle backgroundBounds = new Rectangle();
+        protected static Texture2D pixelTexture;
 
         public EditorWidget(Game game) 
             : base(game) {
@@ -73,6 +74,10 @@ namespace FezGame.Editor.Widgets {
         public override void Draw(GameTime gameTime) {
             DrawBackground(gameTime);
 
+            if (!ShowChildren) {
+                return;
+            }
+
             foreach (EditorWidget widget in Widgets) {
                 widget.Parent = this;
                 widget.LevelEditor = LevelEditor;
@@ -80,10 +85,13 @@ namespace FezGame.Editor.Widgets {
             }
         }
 
+        public virtual void Clicked(GameTime gameTime) {
+        }
+
         public virtual void Hover(GameTime gameTime) {
         }
 
-        public virtual void Clicked(GameTime gameTime) {
+        public virtual void Scroll(GameTime gameTime) {
         }
 
         public virtual void DrawBackground(GameTime gameTime) {
@@ -92,8 +100,8 @@ namespace FezGame.Editor.Widgets {
                 pixelTexture.SetData<Color>(new Color[] { Color.White });
             }
 
-            backgroundBounds.X = (int) Position.X + (int) Offset.X;
-            backgroundBounds.Y = (int) Position.Y + (int) Offset.Y;
+            backgroundBounds.X = (int) (Position.X + Offset.X);
+            backgroundBounds.Y = (int) (Position.Y + Offset.Y);
             backgroundBounds.Width = (int) Size.X;
             backgroundBounds.Height = (int) Size.Y;
 
