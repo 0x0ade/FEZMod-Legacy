@@ -23,36 +23,17 @@ namespace FezGame.Editor.Widgets {
 
         public TopBarWidget(Game game) 
             : base(game) {
-            ButtonWidget button;
-
-            Widgets.Add(button = new ButtonWidget(Game, "File"));
-            button.Widgets.Add(new ButtonWidget(Game, "New"));
-            button.Widgets.Add(new ButtonWidget(Game, "Open"));
-            button.Widgets.Add(new ButtonWidget(Game, "Save"));
-            button.Background.A = 0;
-
-            Widgets.Add(button = new ButtonWidget(Game, "View"));
-            button.Background.A = 0;
-
-            Widgets.Add(button = new ButtonWidget(Game, "Level"));
-            button.Background.A = 0;
-
-            Widgets.Add(button = new ButtonWidget(Game, "Trile Set"));
-            button.Background.A = 0;
-
-            Widgets.Add(button = new ButtonWidget(Game, "Trile"));
-            button.Background.A = 0;
-
-            Widgets.Add(button = new ButtonWidget(Game, "Strings"));
-            button.Background.A = 0;
-
-            Widgets.Add(button = new ButtonWidget(Game, "Scripting"));
-            button.Background.A = 0;
         }
 
         public override void Update(GameTime gameTime) {
-            Size.X = GraphicsDevice.Viewport.Width;
-            Size.Y = 24;
+            if (UpdateBounds) {
+                if (Parent != null) {
+                    Size.X = Parent.Size.X;
+                } else {
+                    Size.X = GraphicsDevice.Viewport.Width;
+                }
+                Size.Y = 24;
+            }
 
             float offset = 0f;
             for (int i = 0; i < Widgets.Count; i++) {

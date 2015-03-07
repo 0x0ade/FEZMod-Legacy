@@ -44,6 +44,8 @@ namespace FezGame.Editor.Widgets {
         public Vector2 Position = new Vector2(0f);
         public Vector2 Size = new Vector2(128f);
 
+        public bool UpdateBounds = true;
+
         public Vector2 Offset {
             get {
                 Vector2 offset = new Vector2(0f);
@@ -101,7 +103,10 @@ namespace FezGame.Editor.Widgets {
         public virtual void Hover(GameTime gameTime) {
         }
 
-        public virtual void Scroll(GameTime gameTime) {
+        public virtual void Scroll(GameTime gameTime, int turn) {
+        }
+
+        public virtual void Dragging(GameTime gameTime, MouseButtonStates state) {
         }
 
         public virtual void DrawBackground(GameTime gameTime) {

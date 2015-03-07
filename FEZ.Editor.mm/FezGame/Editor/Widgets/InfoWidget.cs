@@ -46,8 +46,10 @@ namespace FezGame.Editor.Widgets {
             }
             lineWidthMax *= viewScale;
 
-            Size.X = lineWidthMax + lineHeight;
-            Size.Y = lineHeight * (informations.Length + 1f);
+            if (UpdateBounds) {
+                Size.X = lineWidthMax + lineHeight;
+                Size.Y = lineHeight * (informations.Length + 1f);
+            }
         }
 
         public override void Draw(GameTime gameTime) {

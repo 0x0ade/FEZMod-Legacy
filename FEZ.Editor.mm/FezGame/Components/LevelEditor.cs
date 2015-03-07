@@ -70,11 +70,14 @@ namespace FezGame.Components {
         public FaceOrientation HoveredFace { get; set; }
         public int TrileId { get; set; }
 
-        public List<EditorWidget> Widgets = new List<EditorWidget>();
+        public List<EditorWidget> Widgets { get; set; }
+        public List<Action> Scheduled { get; set; }
 
         public InfoWidget InfoWidget;
         public TopBarWidget TopBarWidget;
         public TrilePickerWidget TrilePickerWidget;
+
+        protected EditorWidget DraggingWidget;
 
         public LevelEditor(Game game)
             : base(game) {
@@ -86,6 +89,8 @@ namespace FezGame.Components {
 
         public override void Initialize() {
             base.Initialize();
+
+            Scheduled = new List<Action>();
 
             BuildDate = ReadBuildDate();
 
@@ -99,12 +104,110 @@ namespace FezGame.Components {
 
             //GameState.InEditor = true;//Causes some graphical funkyness.
 
+            Widgets = new List<EditorWidget>();
+
+            ButtonWidget button;
+
+            //TOP BAR
             Widgets.Add(TopBarWidget = new TopBarWidget(Game));
+
+            TopBarWidget.Widgets.Add(button = new ButtonWidget(Game, "File"));
+            button.Background.A = 0;
+            button.Widgets.Add(new ButtonWidget(Game, "New", delegate() {
+                //TODO
+            }));
+            button.Widgets.Add(new ButtonWidget(Game, "Open", delegate() {
+                //TODO
+            }));
+            button.Widgets.Add(new ButtonWidget(Game, "Save", delegate() {
+                WindowHeaderWidget windowHeader = null;
+
+                string filePath = ("Resources\\levels\\"+(LevelManager.Name.ToLower())).Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString())+".xml";
+                FileInfo file = new FileInfo(filePath);
+
+                Action save = delegate() {
+                    if (file.Exists) {
+                        file.Delete();
+                    }
+                    ModLogger.Log("JAFM.Engine", "Saving level "+LevelManager.Name);
+                    LevelManager.Load("JAFM_WORKAROUND_SAVE:"+LevelManager.Name);
+                    if (windowHeader != null) {
+                        windowHeader.CloseButtonWidget.Action();
+                    }
+                };
+
+                if (!file.Exists) {
+                    save();
+                    return;
+                }
+
+                ContainerWidget window;
+                ButtonWidget windowButton;
+                Widgets.Add(window = new ContainerWidget(Game));
+                window.Size.X = 256f;
+                window.Size.Y = 64f;
+                window.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (window.Size.X / 2);
+                window.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (window.Size.Y / 2);
+                window.Label = "Overwrite level?";
+                window.Widgets.Add(windowHeader = new WindowHeaderWidget(Game));
+
+                window.Widgets.Add(windowButton = new ButtonWidget(Game, "Level already existing. Overwrite?"));
+                windowButton.Background.A = 0;
+                windowButton.Size.X = window.Size.X;
+                windowButton.Size.Y = 24f;
+                windowButton.UpdateBounds = false;
+                windowButton.LabelCentered = true;
+                windowButton.Position.X = 0;
+                windowButton.Position.Y = window.Size.Y / 2 - 24f;
+
+                window.Widgets.Add(windowButton = new ButtonWidget(Game, "YES", save));
+                windowButton.Size.X = 48f;
+                windowButton.Size.Y = 24f;
+                windowButton.UpdateBounds = false;
+                windowButton.LabelCentered = true;
+                windowButton.Position.X = window.Size.X / 2 - windowButton.Size.X - 4f;
+                windowButton.Position.Y = window.Size.Y / 2;
+
+                window.Widgets.Add(windowButton = new ButtonWidget(Game, "NO", windowHeader.CloseButtonWidget.Action));
+                windowButton.Size.X = 48f;
+                windowButton.Size.Y = 24f;
+                windowButton.UpdateBounds = false;
+                windowButton.LabelCentered = true;
+                windowButton.Position.X = window.Size.X / 2 + 4f;
+                windowButton.Position.Y = window.Size.Y / 2;
+            }));
+
+            TopBarWidget.Widgets.Add(button = new ButtonWidget(Game, "View"));
+            button.Background.A = 0;
+
+            TopBarWidget.Widgets.Add(button = new ButtonWidget(Game, "Level"));
+            button.Background.A = 0;
+
+            TopBarWidget.Widgets.Add(button = new ButtonWidget(Game, "Trile Set"));
+            button.Background.A = 0;
+
+            TopBarWidget.Widgets.Add(button = new ButtonWidget(Game, "Trile"));
+            button.Background.A = 0;
+
+            TopBarWidget.Widgets.Add(button = new ButtonWidget(Game, "Strings"));
+            button.Background.A = 0;
+
+            TopBarWidget.Widgets.Add(button = new ButtonWidget(Game, "Scripting"));
+            button.Background.A = 0;
+
+            //INFO
             Widgets.Add(InfoWidget = new InfoWidget(Game));
+
+            //TRILE PICKER
             Widgets.Add(TrilePickerWidget = new TrilePickerWidget(Game));
         }
 
         public override void Update(GameTime gameTime) {
+            while (Scheduled.Count > 0) {
+                Scheduled[0]();
+                Scheduled.RemoveAt(0);
+            }
+
             if (GameState.InMap || GameState.Loading) {
                 return;
             }
@@ -143,6 +246,15 @@ namespace FezGame.Components {
 
             bool cursorInMenu = UpdateWidgets(gameTime, Widgets, true);
 
+            if (DraggingWidget != null && (MouseState.LeftButton.State == MouseButtonStates.Dragging || MouseState.LeftButton.State == MouseButtonStates.DragEnded)) {
+                DraggingWidget.Dragging(gameTime, MouseState.LeftButton.State);
+                cursorInMenu = true;
+
+                if (MouseState.LeftButton.State == MouseButtonStates.DragEnded) {
+                    DraggingWidget = null;
+                }
+            }
+
             if (cursorInMenu) {
                 CursorHovering = true;
                 return;
@@ -180,13 +292,8 @@ namespace FezGame.Components {
                 TrileId = HoveredTrile.TrileId;
             }
 
-            if (MouseState.WheelTurnedUp == FezButtonState.Pressed) {
-                TrileId++;
-            }
+            CameraManager.PixelsPerTrixel = Math.Max(0.25f, CameraManager.PixelsPerTrixel + 0.25f * MouseState.WheelTurns);
 
-            if (MouseState.WheelTurnedDown == FezButtonState.Pressed) {
-                TrileId--;
-            }
         }
 
         public override void Draw(GameTime gameTime) {
@@ -242,9 +349,14 @@ namespace FezGame.Components {
                     if (!cursorOnChild && MouseState.LeftButton.State == MouseButtonStates.Clicked) {
                         widget.Clicked(gameTime);
                     }
-                    if (MouseState.WheelTurns != 0) {
-                        widget.Scroll(gameTime);
+                    if (!cursorOnChild && MouseState.LeftButton.State == MouseButtonStates.DragStarted) {
+                        if (DraggingWidget != null) {
+                            DraggingWidget.Dragging(gameTime, MouseButtonStates.DragEnded);
+                        }
+                        DraggingWidget = widget;
+                        DraggingWidget.Dragging(gameTime, MouseButtonStates.DragStarted);
                     }
+                    widget.Scroll(gameTime, MouseState.WheelTurns);
                 }
                 cursorOnWidget = cursorOnWidget || cursorOnChild;
             }

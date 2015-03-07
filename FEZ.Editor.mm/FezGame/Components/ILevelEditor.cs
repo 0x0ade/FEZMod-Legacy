@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using FezGame.Editor.Widgets;
 using FezEngine;
 using FezEngine.Structure;
 using FezEngine.Components;
@@ -17,6 +19,9 @@ namespace FezGame.Components {
         BoundingBox HoveredBox { get; set; }
         FaceOrientation HoveredFace { get; set; }
         int TrileId { get; set; }
+
+        List<EditorWidget> Widgets { get; set; }
+        List<Action> Scheduled { get; set; }
 
     }
 }

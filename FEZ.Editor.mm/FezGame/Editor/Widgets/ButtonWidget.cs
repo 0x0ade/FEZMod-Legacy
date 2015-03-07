@@ -22,9 +22,10 @@ namespace FezGame.Editor.Widgets {
     public class ButtonWidget : EditorWidget {
 
         public String Label;
-        public Action Action;
-
         public SpriteFont Font;
+        public bool LabelCentered = false;
+
+        public Action Action;
 
         public float Hovered = 0f;
 
@@ -33,10 +34,7 @@ namespace FezGame.Editor.Widgets {
         }
 
         public ButtonWidget(Game game, String label) 
-            : base(game) {
-            Label = label;
-            Font = FontManager.Small;
-            ShowChildren = false;
+            : this(game, label, null) {
         }
 
         public ButtonWidget(Game game, String label, Action action) 
@@ -48,7 +46,7 @@ namespace FezGame.Editor.Widgets {
         }
 
         public override void Update(GameTime gameTime) {
-            if (Label != null) {
+            if (UpdateBounds && Label != null) {
                 float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
                 Size.X = Font.MeasureString(Label).X * viewScale;
                 Size.Y = 24f;
@@ -81,19 +79,22 @@ namespace FezGame.Editor.Widgets {
         public override void Draw(GameTime gameTime) {
             base.Draw(gameTime);
 
-            if (!InView) {
+            if (!InView || Label == null) {
                 return;
             }
 
-            if (Label != null) {
-                float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
-                LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, Font, Label, Position + Offset, Color.White, viewScale);
+            Vector2 offset = new Vector2(0f, 0f);
+            if (LabelCentered) {
+                offset.X = Size.X / 2f - Font.MeasureString(Label).X / 2f;
             }
+
+            float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
+            LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, Font, Label, Position + Offset + offset, Color.White, viewScale);
         }
 
         public override void Clicked(GameTime gameTime) {
             if (Action != null) {
-                Action.Invoke();
+                LevelEditor.Scheduled.Add(Action);
             }
         }
 

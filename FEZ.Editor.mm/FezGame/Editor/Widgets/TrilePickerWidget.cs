@@ -53,8 +53,10 @@ namespace FezGame.Editor.Widgets {
                 ScrollOffset = Width;
             }
 
-            Size.X = GraphicsDevice.Viewport.Width;
-            Size.Y = 36f;
+            if (UpdateBounds) {
+                Size.X = GraphicsDevice.Viewport.Width;
+                Size.Y = 36f;
+            }
 
             Width = 0f;
             for (int i = 0; i < Widgets.Count; i++) {
@@ -105,8 +107,8 @@ namespace FezGame.Editor.Widgets {
             }
         }
 
-        public override void Scroll(GameTime gameTime) {
-            ScrollMomentum -= MouseState.WheelTurns * 128f;
+        public override void Scroll(GameTime gameTime, int turn) {
+            ScrollMomentum -= turn * 128f;
         }
 
     }

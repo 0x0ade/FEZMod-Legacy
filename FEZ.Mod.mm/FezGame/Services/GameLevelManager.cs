@@ -32,6 +32,11 @@ namespace FezGame.Services {
         }
 
         public void Load(string levelName) {
+            if (levelName.StartsWith("JAFM_WORKAROUND_SAVE:")) {
+                Save(levelName.Substring("JAFM_WORKAROUND_SAVE:".Length));
+                return;
+            }
+
             if (MemoryContentManager.AssetExists("Levels/"+levelName)) {
                 orig_Load(levelName);
                 return;
@@ -804,11 +809,15 @@ namespace FezGame.Services {
                     continue;
                 }
 
+                BackgroundPlane plane = levelData.BackgroundPlanes[key];
+
+                if (plane.TextureName == null) {
+                    continue;
+                }
+
                 XmlElement xmlPlaneEntry = xmlDocument.CreateElement("Entry");
                 xmlPlaneEntry.SetAttribute("key", key.ToString());
                 XmlElement xmlPlane = xmlDocument.CreateElement("BackgroundPlane");
-
-                BackgroundPlane plane = levelData.BackgroundPlanes[key];
 
                 xmlPlane.SetAttribute("textureName", plane.TextureName);
                 xmlPlane.SetAttribute("lightMap", plane.LightMap.ToString());

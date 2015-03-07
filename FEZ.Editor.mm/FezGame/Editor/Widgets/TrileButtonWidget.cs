@@ -43,8 +43,10 @@ namespace FezGame.Editor.Widgets {
                 return;
             }
 
-            Size.X = 32f;
-            Size.Y = 32f;
+            if (UpdateBounds) {
+                Size.X = 32f;
+                Size.Y = 32f;
+            }
 
             Tooltip.Label = Trile.Name;
 
