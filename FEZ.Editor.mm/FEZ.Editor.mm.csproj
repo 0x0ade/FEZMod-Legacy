@@ -58,6 +58,7 @@
     <Compile Include="FezGame\Editor\Widgets\TrileButtonWidget.cs" />
     <Compile Include="FezGame\Editor\Widgets\ContainerWidget.cs" />
     <Compile Include="FezGame\Editor\Widgets\WindowHeaderWidget.cs" />
+    <Compile Include="FezGame\Editor\Widgets\TextFieldWidget.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

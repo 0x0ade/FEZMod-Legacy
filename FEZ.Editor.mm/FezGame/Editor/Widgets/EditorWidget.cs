@@ -97,7 +97,7 @@ namespace FezGame.Editor.Widgets {
             }
         }
 
-        public virtual void Clicked(GameTime gameTime) {
+        public virtual void Click(GameTime gameTime) {
         }
 
         public virtual void Hover(GameTime gameTime) {
@@ -107,6 +107,9 @@ namespace FezGame.Editor.Widgets {
         }
 
         public virtual void Dragging(GameTime gameTime, MouseButtonStates state) {
+        }
+
+        public virtual void Unfocus(GameTime gameTime) {
         }
 
         public virtual void DrawBackground(GameTime gameTime) {

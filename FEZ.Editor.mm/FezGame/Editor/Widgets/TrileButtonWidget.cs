@@ -72,7 +72,7 @@ namespace FezGame.Editor.Widgets {
                 ), Color.White);
         }
 
-        public override void Clicked(GameTime gameTime) {
+        public override void Click(GameTime gameTime) {
             if (Trile == null) {
                 return;
             }

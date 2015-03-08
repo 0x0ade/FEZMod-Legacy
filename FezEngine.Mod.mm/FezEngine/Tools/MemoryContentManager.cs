@@ -58,6 +58,7 @@ namespace FezEngine.Tools {
         public void DumpAll() {
             if (cachedAssets == null) {
                 ModLogger.Log("JAFM.Engine", "Cached assets do not exist; ignoring...");
+                return;
             }
 
             int dumped = 0;
@@ -120,6 +121,23 @@ namespace FezEngine.Tools {
         }
 
         public static bool AssetExists(String assetName) {
+            if (assetName == "JAFM_WORKAROUND_DUMP") {
+                DumpResources = true;
+                return true;
+            }
+            if (assetName == "JAFM_WORKAROUND_DUMPALL") {
+                DumpAllResources = true;
+                return true;
+            }
+            if (assetName == "JAFM_WORKAROUND_NOCACHE") {
+                CacheDisabled = true;
+                return true;
+            }
+            if (assetName == "JAFM_WORKAROUND_NOFLAT") {
+                Level.FlatDisabled = true;
+                return true;
+            }
+
             string filePath = ("Resources\\"+(assetName.ToLower())).Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString())+".xnb";
             FileInfo file = new FileInfo(filePath);
             if (file.Exists) {

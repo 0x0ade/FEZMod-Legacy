@@ -78,6 +78,7 @@ namespace FezGame.Components {
         public TrilePickerWidget TrilePickerWidget;
 
         protected EditorWidget DraggingWidget;
+        protected EditorWidget FocusedWidget;
 
         public LevelEditor(Game game)
             : base(game) {
@@ -200,6 +201,34 @@ namespace FezGame.Components {
 
             //TRILE PICKER
             Widgets.Add(TrilePickerWidget = new TrilePickerWidget(Game));
+
+            //TEST WINDOW
+            ContainerWidget testWindow;
+            Widgets.Add(testWindow = new ContainerWidget(Game));
+            testWindow.Size.X = 256f;
+            testWindow.Size.Y = 48f;
+            testWindow.Position.X = 64f;
+            testWindow.Position.Y = 64f;
+            testWindow.Label = "Test window";
+            testWindow.Widgets.Add(new WindowHeaderWidget(Game));
+
+            ButtonWidget testButtonWidget;
+            testWindow.Widgets.Add(testButtonWidget = new ButtonWidget(Game, "Test window with text input."));
+            testButtonWidget.Background.A = 0;
+            testButtonWidget.Size.X = testWindow.Size.X;
+            testButtonWidget.Size.Y = 24f;
+            testButtonWidget.UpdateBounds = false;
+            testButtonWidget.LabelCentered = true;
+            testButtonWidget.Position.X = 0f;
+            testButtonWidget.Position.Y = 0f;
+
+            TextFieldWidget testTextField;
+            testWindow.Widgets.Add(testTextField = new TextFieldWidget(Game));
+            testTextField.Size.X = testWindow.Size.X;
+            testTextField.Size.Y = 24f;
+            testTextField.UpdateBounds = false;
+            testTextField.Position.X = 0;
+            testTextField.Position.Y = 24f;
         }
 
         public override void Update(GameTime gameTime) {
@@ -258,6 +287,13 @@ namespace FezGame.Components {
             if (cursorInMenu) {
                 CursorHovering = true;
                 return;
+            }
+
+            if (MouseState.LeftButton.State == MouseButtonStates.Clicked) {
+                if (FocusedWidget != null) {
+                    FocusedWidget.Unfocus(gameTime);
+                }
+                FocusedWidget = null;
             }
 
             if (HoveredTrile != null) {
@@ -347,7 +383,11 @@ namespace FezGame.Components {
                     cursorOnWidget = true;
                     widget.Hover(gameTime);
                     if (!cursorOnChild && MouseState.LeftButton.State == MouseButtonStates.Clicked) {
-                        widget.Clicked(gameTime);
+                        widget.Click(gameTime);
+                        if (FocusedWidget != null) {
+                            FocusedWidget.Unfocus(gameTime);
+                        }
+                        FocusedWidget = widget;
                     }
                     if (!cursorOnChild && MouseState.LeftButton.State == MouseButtonStates.DragStarted) {
                         if (DraggingWidget != null) {

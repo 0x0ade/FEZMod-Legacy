@@ -93,6 +93,30 @@ namespace FezGame.Mod {
                     ModLogger.Log("JAFM", "Found -dc / --debug-controls");
                     EnableDebugControls = true;
                 }
+                /*
+                Explaination as of why the workaround still is required:
+                A module type won't be copied to the patched DLL, which means the
+                references to MCM will not be touched at all. These references
+                will point to the patch DLL, not the patchED DLL. AssetExists on the
+                other hand is inside the patchED DLL and thus has got the correct
+                references.
+                */
+                if (args[i] == "-d" || args[i] == "--dump") {
+                    ModLogger.Log("JAFM.Engine", "Found -d / --dump");
+                    MemoryContentManager.AssetExists("JAFM_WORKAROUND_DUMP");
+                }
+                if (args[i] == "-da" || args[i] == "--dump-all") {
+                    ModLogger.Log("JAFM.Engine", "Found -da / --dump-all");
+                    MemoryContentManager.AssetExists("JAFM_WORKAROUND_DUMPALL");
+                }
+                if (args[i] == "-nf" || args[i] == "--no-flat") {
+                    ModLogger.Log("JAFM.Engine", "Found -nf / --no-flat");
+                    MemoryContentManager.AssetExists("JAFM_WORKAROUND_NOFLAT");
+                }
+                if (args[i] == "-nc" || args[i] == "--no-cache") {
+                    ModLogger.Log("JAFM.Engine", "Found -nc / --no-cache");
+                    MemoryContentManager.AssetExists("JAFM_WORKAROUND_NOCACHE");
+                }
             }
 
             CallInEachModule("ParseArgs", new object[] {args});
