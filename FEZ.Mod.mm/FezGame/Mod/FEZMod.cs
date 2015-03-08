@@ -52,6 +52,9 @@ namespace FezGame.Mod {
         }
 
         public static void PreInitializeModules(Assembly assembly) {
+            if (!assembly.GetName().Name.EndsWith(".mm")) {
+                return;
+            }
             foreach (Type type in assembly.GetTypes()) {
                 if (typeof(FezModule).IsAssignableFrom(type) && !type.IsAbstract) {
                     PreInitializeModule(type);
