@@ -37,10 +37,6 @@ namespace FezGame.Services {
                 return;
             }
 
-            if (MemoryContentManager.AssetExists("Levels/"+levelName)) {
-                orig_Load(levelName);
-                return;
-            }
 			string filePath = ("Resources\\levels\\"+(levelName.ToLower())).Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString())+".xml";
             FileInfo file = new FileInfo(filePath);
             if (!file.Exists) {

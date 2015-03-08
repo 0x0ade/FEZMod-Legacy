@@ -10,3 +10,7 @@ FEZ.Editor.mm/bin/
 FEZ.Editor.mm/obj/
 FEZ.Editor.mm/*.sln
 FEZ.Editor.mm/*.userprefs
+FEZ.Speedrun.mm/bin/
+FEZ.Speedrun.mm/obj/
+FEZ.Speedrun.mm/*.sln
+FEZ.Speedrun.mm/*.userprefs

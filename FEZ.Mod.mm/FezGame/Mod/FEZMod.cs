@@ -7,16 +7,19 @@ using FezEngine.Tools;
 using FezEngine.Services;
 using FezGame.Services;
 using FezGame.Components;
+using FezGame.Structure;
 
 namespace FezGame.Mod {
     public static class FEZMod {
-        public static string Version = "0.1";
+        public static string Version = "0.1.1";
 
         public static List<FezModule> Modules = new List<FezModule>();
 
         public static bool IsAlwaysTurnable = false;
         public static float OverridePixelsPerTrixel = 0f;
         public static bool EnableDebugControls = false;
+        public static bool EnableQuickWarp = true;
+        public static bool EnableFEZometric = true;
 
         public static bool LoadedEssentials { get; private set; }
         public static bool Preloaded { get; private set; }
@@ -143,6 +146,14 @@ namespace FezGame.Mod {
         public static void Preload() {
             CallInEachModule("Preload", new object[0]);
             Preloaded = true;
+        }
+
+        public static void SaveClear(SaveData saveData) {
+            CallInEachModule("SaveClear", new object[] {saveData});
+        }
+
+        public static void SaveClone(SaveData source, SaveData dest) {
+            CallInEachModule("SaveClone", new object[] {source, dest});
         }
 
         private static void CallInEachModule(String methodName, object[] args) {

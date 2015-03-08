@@ -11,6 +11,7 @@ using FezEngine.Structure.Input;
 using FezEngine.Tools;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using FezGame.Mod;
 
 namespace FezGame.Components {
     public class PlayerCameraControl {
@@ -69,6 +70,11 @@ namespace FezGame.Components {
         public void orig_Update(GameTime gameTime) {
         }
         public void Update(GameTime gameTime) {
+            if (!FEZMod.EnableFEZometric) {
+                orig_Update(gameTime);
+                return;
+            }
+
             if (get_InputManager().OpenInventory == FezButtonState.Pressed) {
                 FEZometric = false;
             }

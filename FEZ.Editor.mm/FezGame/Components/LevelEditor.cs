@@ -199,7 +199,7 @@ namespace FezGame.Components {
             Widgets.Add(TrilePickerWidget = new TrilePickerWidget(Game));
 
             //TEST WINDOW
-            ContainerWidget testWindow;
+            /*ContainerWidget testWindow;
             Widgets.Add(testWindow = new ContainerWidget(Game));
             testWindow.Size.X = 256f;
             testWindow.Size.Y = 48f;
@@ -224,7 +224,7 @@ namespace FezGame.Components {
             testTextField.Size.Y = 24f;
             testTextField.UpdateBounds = false;
             testTextField.Position.X = 0;
-            testTextField.Position.Y = 24f;
+            testTextField.Position.Y = 24f;*/
         }
 
         public void Preload() {
@@ -345,7 +345,6 @@ namespace FezGame.Components {
 
             float cursorScale = viewScale * 2f;
             Point cursorPosition = SettingsManager.PositionInViewport(MouseState);
-
 
             GraphicsDeviceExtensions.SetBlendingMode(GraphicsDevice, BlendingMode.Alphablending);
             GraphicsDeviceExtensions.BeginPoint(SpriteBatch);
