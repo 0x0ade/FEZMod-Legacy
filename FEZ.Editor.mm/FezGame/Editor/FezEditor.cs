@@ -41,6 +41,12 @@ namespace FezGame.Editor {
             }
         }
 
+        public virtual void Preload() {
+            if (LevelEditor.Instance != null) {
+                LevelEditor.Instance.Preload();
+            }
+        }
+
     }
 }
 

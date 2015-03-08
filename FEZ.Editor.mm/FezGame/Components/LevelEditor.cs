@@ -18,6 +18,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using System.IO;
 using FezGame.Editor.Widgets;
+using FezGame.Mod;
 
 namespace FezGame.Components {
     public class LevelEditor : DrawableGameComponent, ILevelEditor {
@@ -97,11 +98,6 @@ namespace FezGame.Components {
 
             SpriteBatch = new SpriteBatch(GraphicsDevice);
             GTR = new GlyphTextRenderer(Game);
-
-            PointerCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_POINTER");
-            CanClickCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_CLICKER_A");
-            ClickedCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_CLICKER_B");
-            GrabbedCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_GRABBER");
 
             //GameState.InEditor = true;//Causes some graphical funkyness.
 
@@ -231,6 +227,13 @@ namespace FezGame.Components {
             testTextField.Position.Y = 24f;
         }
 
+        public void Preload() {
+            PointerCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_POINTER");
+            CanClickCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_CLICKER_A");
+            ClickedCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_CLICKER_B");
+            GrabbedCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_GRABBER");
+        }
+
         public override void Update(GameTime gameTime) {
             while (Scheduled.Count > 0) {
                 Scheduled[0]();
@@ -333,7 +336,7 @@ namespace FezGame.Components {
         }
 
         public override void Draw(GameTime gameTime) {
-            if (GameState.InMap || GameState.Loading) {
+            if (GameState.InMap || GameState.Loading || !FEZMod.Preloaded) {
                 return;
             }
 

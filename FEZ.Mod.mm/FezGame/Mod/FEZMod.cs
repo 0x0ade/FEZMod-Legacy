@@ -18,6 +18,9 @@ namespace FezGame.Mod {
         public static float OverridePixelsPerTrixel = 0f;
         public static bool EnableDebugControls = false;
 
+        public static bool LoadedEssentials { get; private set; }
+        public static bool Preloaded { get; private set; }
+
         public static void PreInitialize(string[] args) {
             PreInitialize();
             ParseArgs(args);
@@ -130,6 +133,16 @@ namespace FezGame.Mod {
             }
 
             CallInEachModule("Initialize", new object[0]);
+        }
+
+        public static void LoadEssentials() {
+            CallInEachModule("LoadEssentials", new object[0]);
+            LoadedEssentials = true;
+        }
+
+        public static void Preload() {
+            CallInEachModule("Preload", new object[0]);
+            Preloaded = true;
         }
 
         private static void CallInEachModule(String methodName, object[] args) {

@@ -13,6 +13,8 @@ namespace FezGame.Mod {
         public void PreInitialize() {}
         public virtual void ParseArgs(string[] args) {}
         public virtual void Initialize() {}
+        public virtual void LoadEssentials() {}
+        public virtual void Preload() {}
 
     }
 }

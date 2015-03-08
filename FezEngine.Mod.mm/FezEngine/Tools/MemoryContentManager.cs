@@ -6,6 +6,7 @@ using System.IO;
 using System.Reflection;
 using FezEngine.Structure;
 using FezEngine.Services;
+using FezGame.Mod;
 
 namespace FezEngine.Tools {
     public class MemoryContentManager {
@@ -156,6 +157,7 @@ namespace FezEngine.Tools {
             } else {
                 cachedAssets = new Dictionary<string, byte[]>(0);
             }
+            FEZMod.LoadEssentials();
         }
 
         public void orig_Preload() {
@@ -165,6 +167,7 @@ namespace FezEngine.Tools {
             if (!CacheDisabled) {
                 orig_Preload();
             }
+            FEZMod.Preload();
         }
 
     }
