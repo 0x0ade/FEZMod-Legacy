@@ -8,7 +8,7 @@ namespace FezGame.Structure {
     [MonoModIgnore]
     public class MenuLevel {
 
-        //stub clone of disassemblied code - use with care
+        //stub clone of disassembled code - use with care
 
         private string titleString;
 

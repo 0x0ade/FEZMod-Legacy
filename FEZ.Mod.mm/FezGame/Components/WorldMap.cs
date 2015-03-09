@@ -7,6 +7,7 @@ using FezEngine.Structure.Input;
 using Microsoft.Xna.Framework;
 using FezGame;
 using FezGame.Mod;
+using MonoMod;
 
 namespace FezGame.Components {
     public class WorldMap {
@@ -14,37 +15,10 @@ namespace FezGame.Components {
         public MapNode FocusNode;
         public bool QuickWarping = false;
 
-        public IGameLevelManager orig_get_LevelManager() {
-            return null;
-        }
-
-        public IGameLevelManager get_LevelManager() {
-            return orig_get_LevelManager();
-        }
-
-        public IInputManager orig_get_InputManager() {
-            return null;
-        }
-
-        public IInputManager get_InputManager() {
-            return orig_get_InputManager();
-        }
-
-        public IGameStateManager orig_get_GameState() {
-            return null;
-        }
-
-        public IGameStateManager get_GameState() {
-            return orig_get_GameState();
-        }
-
-        public IPlayerManager orig_get_PlayerManager() {
-            return null;
-        }
-
-        public IPlayerManager get_PlayerManager() {
-            return orig_get_PlayerManager();
-        }
+        public IGameLevelManager LevelManager { [MonoModIgnore] get { return null; } }
+        public IGameStateManager GameState { [MonoModIgnore] get { return null; } }
+        public IInputManager InputManager { [MonoModIgnore] get { return null; } }
+        public IPlayerManager PlayerManager { [MonoModIgnore] get { return null; } }
 
         public void orig_Update(GameTime gameTime) {
         }
@@ -56,26 +30,26 @@ namespace FezGame.Components {
             if (FocusNode != null) {
                 levelName = FocusNode.LevelName;
             }
-            if (get_InputManager().GrabThrow == FezButtonState.Down) {
+            if (InputManager.GrabThrow == FezButtonState.Down) {
                 levelName = Fez.ForcedLevelName;
             }
 
-            if (FEZMod.EnableQuickWarp && get_InputManager().Jump == FezButtonState.Pressed && levelName != null) {
+            if (FEZMod.EnableQuickWarp && InputManager.Jump == FezButtonState.Pressed && levelName != null) {
                 ModLogger.Log("JAFM", "Warping to " + levelName);
                 QuickWarping = true;
-                get_GameState().Loading = true;
-                get_GameState().InMap = false;
-                get_LevelManager().ChangeLevel(levelName);
+                GameState.Loading = true;
+                GameState.InMap = false;
+                LevelManager.ChangeLevel(levelName);
             }
 
-            if (FEZMod.EnableQuickWarp && get_InputManager().Jump == FezButtonState.Released && QuickWarping) {
-                get_GameState().Loading = false;
+            if (FEZMod.EnableQuickWarp && InputManager.Jump == FezButtonState.Released && QuickWarping) {
+                GameState.Loading = false;
                 QuickWarping = false;
             }
 
-            if (FEZMod.EnableFEZometric && get_InputManager().OpenInventory == FezButtonState.Pressed) {
+            if (FEZMod.EnableFEZometric && InputManager.OpenInventory == FezButtonState.Pressed) {
                 ModLogger.Log("JAFM", "Switching to FEZometric mode");
-                get_GameState().InMap = false;
+                GameState.InMap = false;
                 PlayerCameraControl.FEZometric = true;
             }
         }

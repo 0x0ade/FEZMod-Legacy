@@ -8,11 +8,13 @@ namespace FezGame.Services {
             return 1f;
         }
 
-        public float get_InterpolationSpeed() {
-            if (Fez.LongScreenshot) {
-                return 0.06f;
-            } else {
-                return orig_get_InterpolationSpeed();
+        public float InterpolationSpeed {
+            get {
+                if (Fez.LongScreenshot) {
+                    return 0.06f;
+                } else {
+                    return orig_get_InterpolationSpeed();
+                }
             }
         }
 
@@ -20,11 +22,13 @@ namespace FezGame.Services {
             return 1f;
         }
 
-        public float get_Radius() {
-            if (Fez.LongScreenshot) {
-                return 90f;
-            } else {
-                return orig_get_Radius();
+        public float Radius {
+            get {
+                if (Fez.LongScreenshot) {
+                    return 90f;
+                } else {
+                    return orig_get_Radius();
+                }
             }
         }
 

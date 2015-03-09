@@ -14,19 +14,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using System.Reflection;
+using MonoMod;
 
 namespace FezGame.Services {
 	public class GameLevelManager : LevelManager {
 
         public Level oldLevel;
 
-        private IGameStateManager orig_get_GameState() {
-            return null;
-        }
-
-        private IGameStateManager get_GameState() {
-            return orig_get_GameState();
-        }
+        public IGameStateManager GameState { [MonoModIgnore] get { return null; } }
 
         public void orig_Load(string levelName) {
         }
@@ -110,7 +105,7 @@ namespace FezGame.Services {
                 }
             }
 
-            ContentManager cm = get_CMProvider().GetForLevel(levelData.Name);
+            ContentManager cm = CMProvider.GetForLevel(levelData.Name);
             //levelData.Name(levelName);
 
             //Load / prepare content (especially TrileSet)
@@ -511,8 +506,7 @@ namespace FezGame.Services {
 
             levelData.OnDeserialization();
 
-            //Do some save data stuff
-            LevelSaveData save = get_GameState().SaveData.ThisLevel;
+            LevelSaveData save = GameState.SaveData.ThisLevel;
             if (save != null) {
                 save.FirstVisit = false;
             }

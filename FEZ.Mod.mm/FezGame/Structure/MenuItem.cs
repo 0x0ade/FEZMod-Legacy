@@ -1,10 +1,12 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
+using MonoMod;
 
 namespace FezGame.Structure {
+    [MonoModIgnore]
     public interface MenuItem {
 
-        //stub clone of disassemblied code - use with care
+        //stub clone of disassembled code - use with care
 
         float ActivityRatio { get; }
 

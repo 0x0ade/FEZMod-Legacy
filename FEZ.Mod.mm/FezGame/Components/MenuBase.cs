@@ -16,7 +16,7 @@ namespace FezGame.Components {
     [MonoModIgnore]
     public class MenuBase {
 
-        //stub clone of disassemblied code - use with care
+        //stub clone of disassembled code - use with care
 
         public static readonly Action SliderAction;
 
