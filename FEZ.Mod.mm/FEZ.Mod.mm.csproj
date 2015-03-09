@@ -65,6 +65,7 @@
     <Compile Include="FezGame\Structure\MenuItem.cs" />
     <Compile Include="FezGame\Structure\MenuLevel.cs" />
     <Compile Include="FezGame\Components\MenuBase.cs" />
+    <Compile Include="FezGame\Tools\SaveFileOperations.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -74,5 +75,6 @@
     <Folder Include="FezEngine\Services\" />
     <Folder Include="FezGame\Components\" />
     <Folder Include="FezGame\Mod\" />
+    <Folder Include="FezGame\Tools\" />
   </ItemGroup>
 </Project>

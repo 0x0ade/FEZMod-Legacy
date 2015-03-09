@@ -54,6 +54,28 @@ namespace FezGame.Speedrun {
             dest.Set("Time", source.Get<TimeSpan>("Time"));
         }
 
+        public override void SaveRead(SaveData saveData, CrcReader reader) {
+            Dictionary<string, TimeSpan> levelTimes = new Dictionary<string, TimeSpan>();
+            int count = reader.ReadInt32();
+            for (int i = 0; i < count; i++) {
+                levelTimes[reader.ReadString()] = reader.ReadTimeSpan();
+            }
+            saveData.Set("LevelTimes", levelTimes);
+
+            saveData.Set("Time", reader.ReadTimeSpan());
+        }
+
+        public override void SaveWrite(SaveData saveData, CrcWriter writer) {
+            Dictionary<string, TimeSpan> levelTimes = saveData.Get<Dictionary<string, TimeSpan>>("LevelTimes");
+            writer.Write(levelTimes.Count);
+            foreach (KeyValuePair<string, TimeSpan> levelTime in levelTimes) {
+                writer.Write(levelTime.Key);
+                writer.Write(levelTime.Value);
+            }
+
+            writer.Write(saveData.Get<TimeSpan>("Time"));
+        }
+
     }
 }
 

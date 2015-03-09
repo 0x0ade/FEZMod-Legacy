@@ -159,6 +159,14 @@ namespace FezGame.Mod {
             CallInEachModule("SaveClone", new object[] {source, dest});
         }
 
+        public static void SaveRead(SaveData saveData, CrcReader reader) {
+            CallInEachModule("SaveRead", new object[] {saveData, reader});
+        }
+
+        public static void SaveWrite(SaveData saveData, CrcWriter writer) {
+            CallInEachModule("SaveWrite", new object[] {saveData, writer});
+        }
+
         private static void CallInEachModule(String methodName, object[] args) {
             Type[] argsTypes = Type.GetTypeArray(args);
             foreach (FezModule module in Modules) {

@@ -1,5 +1,6 @@
 ﻿using System;
 using FezGame.Structure;
+using FezEngine.Tools;
 
 namespace FezGame.Mod {
     public abstract class FezModule {
@@ -18,6 +19,8 @@ namespace FezGame.Mod {
         public virtual void Preload() {}
         public virtual void SaveClear(SaveData saveData) {}
         public virtual void SaveClone(SaveData source, SaveData dest) {}
+        public virtual void SaveRead(SaveData saveData, CrcReader reader) {}
+        public virtual void SaveWrite(SaveData saveData, CrcWriter writer) {}
 
     }
 }
