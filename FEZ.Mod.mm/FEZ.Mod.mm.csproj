@@ -61,6 +61,10 @@
     <Compile Include="FezGame\Components\PlayerCameraControl.cs" />
     <Compile Include="FezGame\Mod\FEZModSaveHelper.cs" />
     <Compile Include="FezGame\Structure\patch_SaveData.cs" />
+    <Compile Include="MonoMod\MonoModIgnore.cs" />
+    <Compile Include="FezGame\Structure\MenuItem.cs" />
+    <Compile Include="FezGame\Structure\MenuLevel.cs" />
+    <Compile Include="FezGame\Components\MenuBase.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

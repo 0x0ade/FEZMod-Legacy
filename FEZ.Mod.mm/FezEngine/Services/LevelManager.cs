@@ -1,11 +1,11 @@
 ﻿using System;
 using FezEngine.Services;
 using FezEngine.Structure;
+using MonoMod;
 
 namespace FezEngine.Services {
+    [MonoModIgnore]
     public class LevelManager {
-        //This class is going to be ignored by MonoMod.
-
         public Level levelData;
 
         protected IContentManagerProvider orig_get_CMProvider() {

@@ -50,12 +50,15 @@
     <Compile Include="FezGame\Components\SpeedrunInfo.cs" />
     <Compile Include="FezGame\Speedrun\FezSpeedrun.cs" />
     <Compile Include="FezGame\Structure\patch_SaveData.cs" />
+    <Compile Include="FezGame\Structure\SaveManagementLevel.cs" />
+    <Compile Include="MonoMod\MonoModIgnore.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="FezGame\" />
     <Folder Include="FezGame\Components\" />
     <Folder Include="FezGame\Speedrun\" />
+    <Folder Include="MonoMod\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FEZ.Mod.mm\FEZ.Mod.mm.csproj">
