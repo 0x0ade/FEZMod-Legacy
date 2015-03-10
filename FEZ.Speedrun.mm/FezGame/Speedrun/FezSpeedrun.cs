@@ -17,9 +17,11 @@ namespace FezGame.Speedrun {
         public override string Version { get { return FEZMod.Version; } }
 
         public static bool SpeedrunMode = false;
+        public static bool Strict = false;
 
         public static TcpClient LiveSplitClient;
         public static NetworkStream LiveSplitStream;
+        public static bool LiveSplitSync = false;
 
         public FezSpeedrun() {
         }
@@ -32,12 +34,15 @@ namespace FezGame.Speedrun {
                         ModLogger.Log("JAFM", "Connecting to LiveSplit on port "+args[i+1]+"...");
                         LiveSplitClient = new TcpClient("localhost", int.Parse(args[i+1]));
                         LiveSplitStream = FezSpeedrun.LiveSplitClient.GetStream();
-                        byte[] msg = Encoding.ASCII.GetBytes("initgametime\r\n");
-                        LiveSplitStream.Write(msg, 0, msg.Length);
+                        Strict = true;
                     }
                     SpeedrunMode = true;
                     FEZMod.EnableFEZometric = false;
                     FEZMod.EnableQuickWarp = false;
+                }
+                if (args[i] == "-ls" || args[i] == "--livesplit-sync") {
+                    ModLogger.Log("JAFM", "Found -ls / --livesplit-sync");
+                    LiveSplitSync = true;
                 }
             }
         }

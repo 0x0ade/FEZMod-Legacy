@@ -48,6 +48,7 @@ namespace FezGame.Components {
         public float FontBigFactor;
 
         protected string PrevLevel;
+        protected bool WasLoading;
 
         public SpeedrunInfo(Game game)
             : base(game) {
@@ -69,49 +70,71 @@ namespace FezGame.Components {
         }
 
         public override void Update(GameTime gameTime) {
-            if (GameState.TimePaused || GameState.SaveData == null) {
-                return;
-            }
-
             SaveData saveData = GameState.SaveData;
 
             if (saveData == null) {
                 return;
             }
 
-            if (GameState.Loading || GameState.DotLoading) {
-                TimeSpan timeLoading;
-                saveData.Set("TimeLoading", timeLoading = (saveData.Get<TimeSpan>("TimeLoading") + gameTime.ElapsedGameTime));
-                if (FezSpeedrun.LiveSplitClient != null) {
-                    byte[] msg = Encoding.ASCII.GetBytes("setloadingtimes " + timeLoading + "\r\n");
-                    FezSpeedrun.LiveSplitStream.Write(msg, 0, msg.Length);
-                }
+            if (GameState.TimePaused && !FezSpeedrun.Strict) {
                 return;
             }
 
-            TimeSpan time;
-
-            saveData.Set("Time", time = (saveData.Get<TimeSpan>("Time") + gameTime.ElapsedGameTime));
-
             List<Split> levelTimes = saveData.Get<List<Split>>("LevelTimes");
+
+            if (levelTimes == null) {
+                return;
+            }
+
+            if (GameState.Loading) {
+                saveData.Set("TimeLoading", saveData.Get<TimeSpan>("TimeLoading") + gameTime.ElapsedGameTime);
+                if (FezSpeedrun.LiveSplitClient != null) {
+                    byte[] msg = Encoding.ASCII.GetBytes("pausegametime\r\n");
+                    FezSpeedrun.LiveSplitStream.Write(msg, 0, msg.Length);
+                }
+                WasLoading = true;
+                return;
+            }
+
+            if (WasLoading) {
+                WasLoading = false;
+                if (FezSpeedrun.LiveSplitClient != null) {
+                    byte[] msg = Encoding.ASCII.GetBytes("unpausegametime\r\n");
+                    FezSpeedrun.LiveSplitStream.Write(msg, 0, msg.Length);
+                    msg = Encoding.ASCII.GetBytes("setloadingtimes " + saveData.Get<TimeSpan>("TimeLoading") + "\r\n");
+                    FezSpeedrun.LiveSplitStream.Write(msg, 0, msg.Length);
+                }
+            }
 
             if (LevelManager.Name != PrevLevel) {
                 levelTimes.Add(new Split(LevelManager.Name, new TimeSpan()));
-                byte[] msg = PrevLevel == null ? Encoding.ASCII.GetBytes("starttimer\r\n") : Encoding.ASCII.GetBytes("split\r\n");
-                FezSpeedrun.LiveSplitStream.Write(msg, 0, msg.Length);
+                if (LevelManager.Name.StartsWith("VILLAGEVILLE_3D_END_")) {
+                    byte[] msg = Encoding.ASCII.GetBytes("pausegametime\r\n");
+                    FezSpeedrun.LiveSplitStream.Write(msg, 0, msg.Length);
+                    msg = Encoding.ASCII.GetBytes("pause\r\n");
+                    FezSpeedrun.LiveSplitStream.Write(msg, 0, msg.Length);
+                }
                 PrevLevel = LevelManager.Name;
+            }
+
+            if (levelTimes.Count == 0) {
+                return;
             }
 
             levelTimes[levelTimes.Count-1].Time += gameTime.ElapsedGameTime;
 
             saveData.Set("LevelTimes", levelTimes);
 
-            GameState.SaveData = saveData;
+            TimeSpan time;
 
-            if (FezSpeedrun.LiveSplitClient != null) {
+            saveData.Set("Time", time = (saveData.Get<TimeSpan>("Time") + gameTime.ElapsedGameTime));
+
+            if (FezSpeedrun.LiveSplitClient != null && FezSpeedrun.LiveSplitSync) {
                 byte[] msg = Encoding.ASCII.GetBytes("setgametime " + time + "\r\n");
                 FezSpeedrun.LiveSplitStream.Write(msg, 0, msg.Length);
             }
+
+            GameState.SaveData = saveData;
         }
 
         public override void Draw(GameTime gameTime) {
