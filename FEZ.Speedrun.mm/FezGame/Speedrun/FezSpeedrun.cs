@@ -6,6 +6,8 @@ using FezGame.Components;
 using Microsoft.Xna.Framework;
 using FezGame.Structure;
 using System.Collections.Generic;
+using System.Net.Sockets;
+using System.Text;
 
 namespace FezGame.Speedrun {
     public class FezSpeedrun : FezModule {
@@ -16,6 +18,9 @@ namespace FezGame.Speedrun {
 
         public static bool SpeedrunMode = false;
 
+        public static TcpClient LiveSplitClient;
+        public static NetworkStream LiveSplitStream;
+
         public FezSpeedrun() {
         }
 
@@ -23,6 +28,13 @@ namespace FezGame.Speedrun {
             for (int i = 0; i < args.Length; i++) {
                 if (args[i] == "-sr" || args[i] == "--speedrun") {
                     ModLogger.Log("JAFM", "Found -sr / --speedrun");
+                    if (i + 1 < args.Length && !args[i+1].StartsWith("-")) {
+                        ModLogger.Log("JAFM", "Connecting to LiveSplit on port "+args[i+1]+"...");
+                        LiveSplitClient = new TcpClient("localhost", int.Parse(args[i+1]));
+                        LiveSplitStream = FezSpeedrun.LiveSplitClient.GetStream();
+                        byte[] msg = Encoding.ASCII.GetBytes("initgametime\r\n");
+                        LiveSplitStream.Write(msg, 0, msg.Length);
+                    }
                     SpeedrunMode = true;
                     FEZMod.EnableFEZometric = false;
                     FEZMod.EnableQuickWarp = false;
@@ -37,43 +49,47 @@ namespace FezGame.Speedrun {
         }
 
         public override void SaveClear(SaveData saveData) {
-            saveData.Set("LevelTimes", new Dictionary<string, TimeSpan>());
+            saveData.Set("LevelTimes", new List<Split>());
             saveData.Set("Time", new TimeSpan());
+            saveData.Set("TimeLoading", new TimeSpan());
         }
 
         public override void SaveClone(SaveData source, SaveData dest) {
-            Dictionary<string, TimeSpan> sourceLevelTimes = source.Get<Dictionary<string, TimeSpan>>("LevelTimes");
-            Dictionary<string, TimeSpan> destLevelTimes = dest.Get<Dictionary<string, TimeSpan>>("LevelTimes");
+            List<Split> sourceLevelTimes = source.Get<List<Split>>("LevelTimes");
+            List<Split> destLevelTimes = dest.Get<List<Split>>("LevelTimes");
 
             destLevelTimes.Clear();
-            foreach (string level in sourceLevelTimes.Keys) {
-                destLevelTimes.Add(level, sourceLevelTimes[level]);
+            foreach (Split levelTime in sourceLevelTimes) {
+                destLevelTimes.Add(levelTime);
             }
             dest.Set("LevelTimes", destLevelTimes);
 
             dest.Set("Time", source.Get<TimeSpan>("Time"));
+            dest.Set("TimeLoading", source.Get<TimeSpan>("TimeLoading"));
         }
 
         public override void SaveRead(SaveData saveData, CrcReader reader) {
-            Dictionary<string, TimeSpan> levelTimes = new Dictionary<string, TimeSpan>();
+            List<Split> levelTimes = new List<Split>();
             int count = reader.ReadInt32();
             for (int i = 0; i < count; i++) {
-                levelTimes[reader.ReadString()] = reader.ReadTimeSpan();
+                levelTimes.Add(new Split(reader.ReadString(), reader.ReadTimeSpan()));
             }
             saveData.Set("LevelTimes", levelTimes);
 
             saveData.Set("Time", reader.ReadTimeSpan());
+            saveData.Set("TimeLoading", reader.ReadTimeSpan());
         }
 
         public override void SaveWrite(SaveData saveData, CrcWriter writer) {
-            Dictionary<string, TimeSpan> levelTimes = saveData.Get<Dictionary<string, TimeSpan>>("LevelTimes");
+            List<Split> levelTimes = saveData.Get<List<Split>>("LevelTimes");
             writer.Write(levelTimes.Count);
-            foreach (KeyValuePair<string, TimeSpan> levelTime in levelTimes) {
-                writer.Write(levelTime.Key);
-                writer.Write(levelTime.Value);
+            foreach (Split levelTime in levelTimes) {
+                writer.Write(levelTime.Level);
+                writer.Write(levelTime.Time);
             }
 
             writer.Write(saveData.Get<TimeSpan>("Time"));
+            writer.Write(saveData.Get<TimeSpan>("TimeLoading"));
         }
 
     }
