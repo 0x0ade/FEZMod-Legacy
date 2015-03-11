@@ -153,16 +153,18 @@ namespace FezGame.Components {
             float lineBigHeight = FontBig.MeasureString("Time: 01:23:45.6789").Y * viewScale * FontBigFactor;
             GTR.DrawShadowedText(SpriteBatch, FontBig, "Time: "+saveData.Get<TimeSpan>("Time"), new Vector2(0, 0), Color.White, viewScale * FontBigFactor);
 
-            List<Split> levelTimes = saveData.Get<List<Split>>("LevelTimes");
+            if (FezSpeedrun.SpeedrunList) {
+                List<Split> levelTimes = saveData.Get<List<Split>>("LevelTimes");
 
-            int levelTimesCount = levelTimes.Count;
-            levelTimes.CopyTo(tmpLevelTimes.Length < levelTimesCount ? (tmpLevelTimes = new Split[levelTimesCount]) : tmpLevelTimes, 0);
+                int levelTimesCount = levelTimes.Count;
+                levelTimes.CopyTo(tmpLevelTimes.Length < levelTimesCount ? (tmpLevelTimes = new Split[levelTimesCount]) : tmpLevelTimes, 0);
 
-            float lineHeight = 24f;//FontSmall.MeasureString("Time: 01:23:45.6789").Y * viewScale * FontSmallFactor;
-            for (int i = 0; i < levelTimesCount; i++) {
-                string level = tmpLevelTimes[i].Level;
-                TimeSpan time = tmpLevelTimes[i].Time;
-                GTR.DrawShadowedText(SpriteBatch, FontSmall, level+": "+time, new Vector2(0, lineBigHeight + i * lineHeight), Color.White, viewScale * FontSmallFactor);
+                float lineHeight = 24f;//FontSmall.MeasureString("Time: 01:23:45.6789").Y * viewScale * FontSmallFactor;
+                for (int i = 0; i < levelTimesCount; i++) {
+                    string level = tmpLevelTimes[i].Level;
+                    TimeSpan time = tmpLevelTimes[i].Time;
+                    GTR.DrawShadowedText(SpriteBatch, FontSmall, level + ": " + time, new Vector2(0, lineBigHeight + i * lineHeight), Color.White, viewScale * FontSmallFactor);
+                }
             }
 
             SpriteBatch.End();

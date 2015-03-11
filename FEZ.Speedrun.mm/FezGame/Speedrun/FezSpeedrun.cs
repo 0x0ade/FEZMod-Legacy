@@ -17,6 +17,7 @@ namespace FezGame.Speedrun {
         public override string Version { get { return FEZMod.Version; } }
 
         public static bool SpeedrunMode = false;
+        public static bool SpeedrunList = false;
         public static bool Strict = false;
 
         public static TcpClient LiveSplitClient;
@@ -31,14 +32,23 @@ namespace FezGame.Speedrun {
                 if (args[i] == "-sr" || args[i] == "--speedrun") {
                     ModLogger.Log("JAFM", "Found -sr / --speedrun");
                     if (i + 1 < args.Length && !args[i+1].StartsWith("-")) {
-                        ModLogger.Log("JAFM", "Connecting to LiveSplit on port "+args[i+1]+"...");
-                        LiveSplitClient = new TcpClient("localhost", int.Parse(args[i+1]));
-                        LiveSplitStream = FezSpeedrun.LiveSplitClient.GetStream();
-                        Strict = true;
+                        if (args[i + 1] != "strict") {
+                            ModLogger.Log("JAFM", "Connecting to LiveSplit on port " + args[i + 1] + "...");
+                            LiveSplitClient = new TcpClient("localhost", int.Parse(args[i + 1]));
+                            LiveSplitStream = FezSpeedrun.LiveSplitClient.GetStream();
+                            Strict = true;
+                        } else {
+                            ModLogger.Log("JAFM", "Switching to strict mode...");
+                            Strict = true;
+                        }
                     }
                     SpeedrunMode = true;
                     FEZMod.EnableFEZometric = false;
                     FEZMod.EnableQuickWarp = false;
+                }
+                if (args[i] == "-sl" || args[i] == "--split-list") {
+                    ModLogger.Log("JAFM", "Found -sl / --split-list");
+                    SpeedrunList = true;
                 }
                 if (args[i] == "-ls" || args[i] == "--livesplit-sync") {
                     ModLogger.Log("JAFM", "Found -ls / --livesplit-sync");
