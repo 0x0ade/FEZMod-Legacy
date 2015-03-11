@@ -108,7 +108,7 @@ namespace FezGame.Components {
 
             if (LevelManager.Name != PrevLevel) {
                 levelTimes.Add(new Split(LevelManager.Name, new TimeSpan()));
-                if (LevelManager.Name.StartsWith("VILLAGEVILLE_3D_END_")) {
+                if (LevelManager.Name.StartsWith("VILLAGEVILLE_3D_END_") && FezSpeedrun.LiveSplitClient != null) {
                     byte[] msg = Encoding.ASCII.GetBytes("pausegametime\r\n");
                     FezSpeedrun.LiveSplitStream.Write(msg, 0, msg.Length);
                     msg = Encoding.ASCII.GetBytes("pause\r\n");
@@ -117,7 +117,7 @@ namespace FezGame.Components {
                 PrevLevel = LevelManager.Name;
             }
 
-            if (levelTimes.Count == 0) {
+            if (levelTimes.Count == 0 || LevelManager.Name.StartsWith("VILLAGEVILLE_3D_END_")) {
                 return;
             }
 
