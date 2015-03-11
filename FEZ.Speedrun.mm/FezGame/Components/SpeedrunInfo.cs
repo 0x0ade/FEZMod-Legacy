@@ -88,7 +88,7 @@ namespace FezGame.Components {
 
             if (GameState.Loading) {
                 saveData.Set("TimeLoading", saveData.Get<TimeSpan>("TimeLoading") + gameTime.ElapsedGameTime);
-                if (FezSpeedrun.LiveSplitClient != null) {
+                if (FezSpeedrun.LiveSplitClient != null && !WasLoading) {
                     byte[] msg = Encoding.ASCII.GetBytes("pausegametime\r\n");
                     FezSpeedrun.LiveSplitStream.Write(msg, 0, msg.Length);
                 }
