@@ -36,7 +36,7 @@ namespace FezGame.Mod {
             Fez.Version = FEZMod.Version;
             Fez.Version += " (JustAnotherFEZMod)";
 
-            Fez.NoSteamworks = false;
+            Fez.NoSteamworks = true;
 
             System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 
