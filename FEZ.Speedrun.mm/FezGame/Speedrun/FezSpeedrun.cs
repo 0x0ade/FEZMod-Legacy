@@ -50,10 +50,6 @@ namespace FezGame.Speedrun {
                     ModLogger.Log("JAFM", "Found -sl / --split-list");
                     SpeedrunList = true;
                 }
-                if (args[i] == "-ls" || args[i] == "--livesplit-sync") {
-                    ModLogger.Log("JAFM", "Found -ls / --livesplit-sync");
-                    LiveSplitSync = true;
-                }
             }
         }
 
