@@ -52,7 +52,7 @@
     <Compile Include="FezGame\Structure\patch_SaveData.cs" />
     <Compile Include="MonoMod\MonoModIgnore.cs" />
     <Compile Include="FezGame\Speedrun\Split.cs" />
-    <Compile Include="FezGame\Components\MainMenu.cs" />
+    <Compile Include="FezGame\Components\MenuBase.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

@@ -12,9 +12,10 @@ namespace FezGame.Mod {
         public FezModule() {
         }
 
-        public void PreInitialize() {}
+        public virtual void PreInitialize() {}
         public virtual void ParseArgs(string[] args) {}
         public virtual void Initialize() {}
+        public virtual void Exit() {}
         public virtual void LoadEssentials() {}
         public virtual void Preload() {}
         public virtual void SaveClear(SaveData saveData) {}

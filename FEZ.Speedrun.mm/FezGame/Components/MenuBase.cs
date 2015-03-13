@@ -3,13 +3,13 @@ using System;
 using FezGame.Speedrun;
 
 namespace FezGame.Components {
-    public class MainMenu {
+    public class MenuBase {
 
-        public void orig_set_StartedGame(bool startedGame) {
+        public void orig_StartNewGame() {
         }
 
-        public void set_StartedGame(bool startedGame) {
-            orig_set_StartedGame(startedGame);
+        public void StartNewGame() {
+            orig_StartNewGame();
             if (FezSpeedrun.SpeedrunMode) {
                 SpeedrunInfo.Instance.Running = true;
             }

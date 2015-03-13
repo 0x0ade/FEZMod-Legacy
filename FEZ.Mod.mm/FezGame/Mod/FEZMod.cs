@@ -143,6 +143,10 @@ namespace FezGame.Mod {
             CallInEachModule("Initialize", new object[0]);
         }
 
+        public static void Exit() {
+            CallInEachModule("Exit", new object[0]);
+        }
+
         public static void LoadEssentials() {
             CallInEachModule("LoadEssentials", new object[0]);
             LoadedEssentials = true;

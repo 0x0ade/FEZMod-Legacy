@@ -59,6 +59,13 @@ namespace FezGame.Speedrun {
             }
         }
 
+        public override void Exit() {
+            if (LiveSplitClient != null) {
+                LiveSplitStream.Close();
+                LiveSplitClient.Close();
+            }
+        }
+
         public override void SaveClear(SaveData saveData) {
             saveData.Set("LevelTimes", new List<Split>());
             saveData.Set("Time", new TimeSpan());

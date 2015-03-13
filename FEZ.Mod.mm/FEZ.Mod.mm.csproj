@@ -63,6 +63,7 @@
     <Compile Include="FezGame\Structure\patch_SaveData.cs" />
     <Compile Include="MonoMod\MonoModIgnore.cs" />
     <Compile Include="FezGame\Tools\SaveFileOperations.cs" />
+    <Compile Include="FezGame\patch_Fez.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
