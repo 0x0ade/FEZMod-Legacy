@@ -24,6 +24,8 @@ namespace FezGame.Mod {
         public static bool LoadedEssentials { get; private set; }
         public static bool Preloaded { get; private set; }
 
+        private static List<Assembly> LoadedAssemblies = new List<Assembly>();
+
         public static void PreInitialize(string[] args) {
             PreInitialize();
             ParseArgs(args);
@@ -33,8 +35,7 @@ namespace FezGame.Mod {
             ModLogger.Clear();
             ModLogger.Log("JAFM", "JustAnotherFEZMod (JAFM) "+FEZMod.Version);
 
-            Fez.Version = FEZMod.Version;
-            Fez.Version += " (JustAnotherFEZMod)";
+            Fez.Version = "FEZ: "+ Fez.Version + " | JAFM: " + FEZMod.Version;
 
             Fez.NoSteamworks = true;
 
@@ -47,13 +48,17 @@ namespace FezGame.Mod {
             ModLogger.Log("JAFM", "Initializing FEZ mods...");
             foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies()) {
                 PreInitializeModules(assembly);
-                foreach (AssemblyName reference in assembly.GetReferencedAssemblies()) {
-                    PreInitializeModules(Assembly.Load(reference));
-                }
             }
         }
 
         public static void PreInitializeModules(Assembly assembly) {
+            if (LoadedAssemblies.Contains(assembly)) {
+                return;
+            }
+            LoadedAssemblies.Add(assembly);
+            foreach (AssemblyName reference in assembly.GetReferencedAssemblies()) {
+                PreInitializeModules(Assembly.Load(reference));
+            }
             ModLogger.Log("JAFM", "Found referenced assembly "+assembly.GetName().Name);
             if (!assembly.GetName().Name.EndsWith(".mm")) {
                 return;
