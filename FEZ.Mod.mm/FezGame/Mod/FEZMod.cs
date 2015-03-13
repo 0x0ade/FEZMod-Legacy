@@ -54,6 +54,7 @@ namespace FezGame.Mod {
         }
 
         public static void PreInitializeModules(Assembly assembly) {
+            ModLogger.Log("JAFM", "Found referenced assembly "+assembly.GetName().Name);
             if (!assembly.GetName().Name.EndsWith(".mm")) {
                 return;
             }
