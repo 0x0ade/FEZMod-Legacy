@@ -62,10 +62,12 @@ namespace FezGame.Components {
                         FezSpeedrun.LiveSplitStream.Write(msg, 0, msg.Length);
                         msg = Encoding.ASCII.GetBytes("starttimer\r\n");
                         FezSpeedrun.LiveSplitStream.Write(msg, 0, msg.Length);
+                        if (FezSpeedrun.LiveSplitSync) {
+                            msg = Encoding.ASCII.GetBytes("pausegametime\r\n");
+                            FezSpeedrun.LiveSplitStream.Write(msg, 0, msg.Length);
+                        }
                     } else {
-                        byte[] msg = Encoding.ASCII.GetBytes("pausegametime\r\n");
-                        FezSpeedrun.LiveSplitStream.Write(msg, 0, msg.Length);
-                        msg = Encoding.ASCII.GetBytes("pause\r\n");
+                        byte[] msg = Encoding.ASCII.GetBytes("split\r\n");
                         FezSpeedrun.LiveSplitStream.Write(msg, 0, msg.Length);
                     }
                 }
@@ -137,7 +139,13 @@ namespace FezGame.Components {
 
             saveData.Set("LevelTimes", levelTimes);
 
-            saveData.Set("Time", saveData.Get<TimeSpan>("Time") + gameTime.ElapsedGameTime);
+            TimeSpan time;
+            saveData.Set("Time", time = (saveData.Get<TimeSpan>("Time") + gameTime.ElapsedGameTime));
+
+            if (FezSpeedrun.LiveSplitSync) {
+                byte[] msg = Encoding.ASCII.GetBytes("setgametime " + time + "\r\n");
+                FezSpeedrun.LiveSplitStream.Write(msg, 0, msg.Length);
+            }
 
             GameState.SaveData = saveData;
         }
