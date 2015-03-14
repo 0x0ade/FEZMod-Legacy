@@ -147,7 +147,7 @@ namespace FezGame.Mod {
                 ServiceHelper.AddComponent(new DebugControls(ServiceHelper.Game));
             }
 
-            Fez.Exiting += (object sender, EventArgs e) => Exit();
+            ServiceHelper.Game.Exiting += (object sender, EventArgs e) => Exit();
 
             CallInEachModule("Initialize", new object[0]);
         }
