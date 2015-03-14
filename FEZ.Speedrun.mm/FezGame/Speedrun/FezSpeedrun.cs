@@ -45,6 +45,7 @@ namespace FezGame.Speedrun {
                     SpeedrunMode = true;
                     FEZMod.EnableFEZometric = false;
                     FEZMod.EnableQuickWarp = false;
+                    FEZMod.EnableBugfixes = false;
                 }
                 if (args[i] == "-lss" || args[i] == "--livesplit-sync") {
                     ModLogger.Log("JAFM", "Found -lss / --livesplit-sync");

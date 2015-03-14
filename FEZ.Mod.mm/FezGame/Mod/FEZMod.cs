@@ -21,6 +21,7 @@ namespace FezGame.Mod {
         public static bool EnableDebugControls = false;
         public static bool EnableQuickWarp = true;
         public static bool EnableFEZometric = true;
+        public static bool EnableBugfixes = true;
 
         public static bool LoadedEssentials { get; private set; }
         public static bool Preloaded { get; private set; }
