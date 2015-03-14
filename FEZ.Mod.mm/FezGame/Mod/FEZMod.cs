@@ -8,6 +8,7 @@ using FezEngine.Services;
 using FezGame.Services;
 using FezGame.Components;
 using FezGame.Structure;
+using Microsoft.Xna.Framework;
 
 namespace FezGame.Mod {
     public static class FEZMod {
@@ -145,6 +146,8 @@ namespace FezGame.Mod {
             if (EnableDebugControls) {
                 ServiceHelper.AddComponent(new DebugControls(ServiceHelper.Game));
             }
+
+            Fez.Exiting += (object sender, EventArgs e) => Exit();
 
             CallInEachModule("Initialize", new object[0]);
         }
