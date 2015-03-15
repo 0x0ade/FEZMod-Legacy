@@ -417,8 +417,8 @@ namespace FezGame.Components {
                 windowFieldDepth.Position.X = windowLabelDepth.Size.X;
                 windowFieldDepth.Position.Y = windowLabelDepth.Position.Y;
 
-                ButtonWidget windowButtonCreate;
-                window.Widgets.Add(windowButtonCreate = new ButtonWidget(Game, "CREATE", delegate() {
+                ButtonWidget windowButtonChange;
+                window.Widgets.Add(windowButtonChange = new ButtonWidget(Game, "CHANGE", delegate() {
                     GameLevelManagerHelper.Level.Name = windowFieldName.Text;
                     GameLevelManagerHelper.Level.Size = new Vector3(
                         int.Parse(windowFieldWidth.Text),
@@ -427,12 +427,12 @@ namespace FezGame.Components {
                     );
                     windowHeader.CloseButtonWidget.Action();
                 }));
-                windowButtonCreate.Size.X = window.Size.X;
-                windowButtonCreate.Size.Y = 24f;
-                windowButtonCreate.UpdateBounds = false;
-                windowButtonCreate.LabelCentered = true;
-                windowButtonCreate.Position.X = 0f;
-                windowButtonCreate.Position.Y = window.Size.Y - windowButtonCreate.Size.Y;
+                windowButtonChange.Size.X = window.Size.X;
+                windowButtonChange.Size.Y = 24f;
+                windowButtonChange.UpdateBounds = false;
+                windowButtonChange.LabelCentered = true;
+                windowButtonChange.Position.X = 0f;
+                windowButtonChange.Position.Y = window.Size.Y - windowButtonChange.Size.Y;
             }));
             button.Widgets.Add(new ButtonWidget(Game, "Change spawnpoint", delegate() {
                 ContainerWidget window;
@@ -523,6 +523,105 @@ namespace FezGame.Components {
                     LevelManager.StartingPosition.Id.Y = int.Parse(windowFieldY.Text);
                     LevelManager.StartingPosition.Id.Z = int.Parse(windowFieldZ.Text);
                     LevelManager.StartingPosition.Face = (FaceOrientation) Enum.Parse(typeof(FaceOrientation), windowFieldFace.Text);
+                    windowHeader.CloseButtonWidget.Action();
+                }));
+                windowButtonChange.Size.X = window.Size.X;
+                windowButtonChange.Size.Y = 24f;
+                windowButtonChange.UpdateBounds = false;
+                windowButtonChange.LabelCentered = true;
+                windowButtonChange.Position.X = 0f;
+                windowButtonChange.Position.Y = window.Size.Y - windowButtonChange.Size.Y;
+            }));
+            button.Widgets.Add(new ButtonWidget(Game, "Change sky", delegate() {
+                ContainerWidget window;
+                Widgets.Add(window = new ContainerWidget(Game));
+                window.Size.X = 256f;
+                window.Size.Y = 48f;
+                window.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (window.Size.X / 2);
+                window.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (window.Size.Y / 2);
+                window.Label = "Change sky";
+                WindowHeaderWidget windowHeader;
+                window.Widgets.Add(windowHeader = new WindowHeaderWidget(Game));
+
+                ButtonWidget windowLabelSky;
+                window.Widgets.Add(windowLabelSky = new ButtonWidget(Game, "Sky:"));
+                windowLabelSky.Background.A = 0;
+                windowLabelSky.Size.X = 96f;
+                windowLabelSky.Size.Y = 24f;
+                windowLabelSky.UpdateBounds = false;
+                windowLabelSky.LabelCentered = false;
+                windowLabelSky.Position.X = 0f;
+                windowLabelSky.Position.Y = 0f;
+                TextFieldWidget windowFieldSky;
+                window.Widgets.Add(windowFieldSky = new TextFieldWidget(Game));
+                if (LevelManager.Sky != null) {
+                    windowFieldSky.Text = LevelManager.Sky.Name;
+                }
+                windowFieldSky.Size.X = window.Size.X - windowLabelSky.Size.X;
+                windowFieldSky.Size.Y = 24f;
+                windowFieldSky.UpdateBounds = false;
+                windowFieldSky.Position.X = windowLabelSky.Size.X;
+                windowFieldSky.Position.Y = windowLabelSky.Position.Y;
+
+                ButtonWidget windowButtonChange;
+                window.Widgets.Add(windowButtonChange = new ButtonWidget(Game, "CHANGE", delegate() {
+                    Sky sky = windowFieldSky.Text.Length > 0 ? CMProvider.CurrentLevel.Load<Sky>("Skies/" + windowFieldSky.Text) : null;
+                    if (sky != null) {
+                        GameLevelManagerHelper.Level.Sky = sky;
+                        LevelManager.ChangeSky(sky);
+                    }
+                    GameLevelManagerHelper.Level.SkyName = sky != null ? windowFieldSky.Text : null;
+                    windowHeader.CloseButtonWidget.Action();
+                }));
+                windowButtonChange.Size.X = window.Size.X;
+                windowButtonChange.Size.Y = 24f;
+                windowButtonChange.UpdateBounds = false;
+                windowButtonChange.LabelCentered = true;
+                windowButtonChange.Position.X = 0f;
+                windowButtonChange.Position.Y = window.Size.Y - windowButtonChange.Size.Y;
+            }));
+            button.Widgets.Add(new ButtonWidget(Game, "Change song", delegate() {
+                ContainerWidget window;
+                Widgets.Add(window = new ContainerWidget(Game));
+                window.Size.X = 256f;
+                window.Size.Y = 48f;
+                window.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (window.Size.X / 2);
+                window.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (window.Size.Y / 2);
+                window.Label = "Change song";
+                WindowHeaderWidget windowHeader;
+                window.Widgets.Add(windowHeader = new WindowHeaderWidget(Game));
+
+                ButtonWidget windowLabelSong;
+                window.Widgets.Add(windowLabelSong = new ButtonWidget(Game, "Song:"));
+                windowLabelSong.Background.A = 0;
+                windowLabelSong.Size.X = 96f;
+                windowLabelSong.Size.Y = 24f;
+                windowLabelSong.UpdateBounds = false;
+                windowLabelSong.LabelCentered = false;
+                windowLabelSong.Position.X = 0f;
+                windowLabelSong.Position.Y = 0f;
+                TextFieldWidget windowFieldSong;
+                window.Widgets.Add(windowFieldSong = new TextFieldWidget(Game));
+                if (LevelManager.Song != null) {
+                    windowFieldSong.Text = LevelManager.SongName;
+                }
+                windowFieldSong.Size.X = window.Size.X - windowLabelSong.Size.X;
+                windowFieldSong.Size.Y = 24f;
+                windowFieldSong.UpdateBounds = false;
+                windowFieldSong.Position.X = windowLabelSong.Size.X;
+                windowFieldSong.Position.Y = windowLabelSong.Position.Y;
+
+                ButtonWidget windowButtonChange;
+                window.Widgets.Add(windowButtonChange = new ButtonWidget(Game, "CHANGE", delegate() {
+                    TrackedSong song = windowFieldSong.Text.Length > 0 ? CMProvider.CurrentLevel.Load<TrackedSong>("Music/" + windowFieldSong.Text) : null;
+                    if (song != null) {
+                        song.Initialize();
+                        GameLevelManagerHelper.Level.Song = song;
+                        LevelManager.SongChanged = true;
+                        SoundManager.PlayNewSong(song.Name);
+                        SoundManager.UpdateSongActiveTracks();
+                    }
+                    GameLevelManagerHelper.Level.SongName = song != null ? windowFieldSong.Text : null;
                     windowHeader.CloseButtonWidget.Action();
                 }));
                 windowButtonChange.Size.X = window.Size.X;
