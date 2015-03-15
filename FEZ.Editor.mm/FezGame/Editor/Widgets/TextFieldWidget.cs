@@ -72,7 +72,10 @@ namespace FezGame.Editor.Widgets {
             LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, Font, Text + (BlinkStatus ? "|" : ""), Position + Offset, Color.Black, viewScale);
         }
 
-        public override void Click(GameTime gameTime) {
+        public override void Click(GameTime gameTime, int mb) {
+            if (mb != 1) {
+                return;
+            }
             Focused = true;
             BlinkTime = 0f;
             BlinkStatus = true;

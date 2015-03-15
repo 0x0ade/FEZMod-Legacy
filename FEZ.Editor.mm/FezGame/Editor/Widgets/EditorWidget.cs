@@ -97,7 +97,7 @@ namespace FezGame.Editor.Widgets {
             }
         }
 
-        public virtual void Click(GameTime gameTime) {
+        public virtual void Click(GameTime gameTime, int mb) {
         }
         public virtual void Hover(GameTime gameTime) {
         }

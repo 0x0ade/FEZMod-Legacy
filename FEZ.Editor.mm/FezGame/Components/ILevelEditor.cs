@@ -24,6 +24,8 @@ namespace FezGame.Components {
         List<Action> Scheduled { get; set; }
 
         Level CreateNewLevel(string name, int width, int height, int depth, string trileset);
+        TrileInstance CreateNewTrile(int trileId, TrileEmplacement emplacement);
+        void AddTrile(TrileInstance trile);
 
     }
 }

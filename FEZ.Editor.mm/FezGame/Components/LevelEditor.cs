@@ -334,6 +334,103 @@ namespace FezGame.Components {
 
             TopBarWidget.Widgets.Add(button = new ButtonWidget(Game, "Level"));
             button.Background.A = 0;
+            button.Widgets.Add(new ButtonWidget(Game, "Change spawnpoint", delegate() {
+                ContainerWidget window;
+                Widgets.Add(window = new ContainerWidget(Game));
+                window.Size.X = 256f;
+                window.Size.Y = 120f;
+                window.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (window.Size.X / 2);
+                window.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (window.Size.Y / 2);
+                window.Label = "Change spawnpoint";
+                WindowHeaderWidget windowHeader;
+                window.Widgets.Add(windowHeader = new WindowHeaderWidget(Game));
+
+                ButtonWidget windowLabelX;
+                window.Widgets.Add(windowLabelX = new ButtonWidget(Game, "X:"));
+                windowLabelX.Background.A = 0;
+                windowLabelX.Size.X = 96f;
+                windowLabelX.Size.Y = 24f;
+                windowLabelX.UpdateBounds = false;
+                windowLabelX.LabelCentered = false;
+                windowLabelX.Position.X = 0f;
+                windowLabelX.Position.Y = 0f;
+                TextFieldWidget windowFieldX;
+                window.Widgets.Add(windowFieldX = new TextFieldWidget(Game));
+                windowFieldX.Text = LevelManager.StartingPosition.Id.X.ToString();
+                windowFieldX.Size.X = window.Size.X - windowLabelX.Size.X;
+                windowFieldX.Size.Y = 24f;
+                windowFieldX.UpdateBounds = false;
+                windowFieldX.Position.X = windowLabelX.Size.X;
+                windowFieldX.Position.Y = windowLabelX.Position.Y;
+
+                ButtonWidget windowLabelY;
+                window.Widgets.Add(windowLabelY = new ButtonWidget(Game, "Y:"));
+                windowLabelY.Background.A = 0;
+                windowLabelY.Size.X = 96f;
+                windowLabelY.Size.Y = 24f;
+                windowLabelY.UpdateBounds = false;
+                windowLabelY.LabelCentered = false;
+                windowLabelY.Position.X = 0f;
+                windowLabelY.Position.Y = 24f;
+                TextFieldWidget windowFieldY;
+                window.Widgets.Add(windowFieldY = new TextFieldWidget(Game));
+                windowFieldY.Text = LevelManager.StartingPosition.Id.Y.ToString();
+                windowFieldY.Size.X = window.Size.X - windowLabelY.Size.X;
+                windowFieldY.Size.Y = 24f;
+                windowFieldY.UpdateBounds = false;
+                windowFieldY.Position.X = windowLabelY.Size.X;
+                windowFieldY.Position.Y = windowLabelY.Position.Y;
+
+                ButtonWidget windowLabelZ;
+                window.Widgets.Add(windowLabelZ = new ButtonWidget(Game, "Z:"));
+                windowLabelZ.Background.A = 0;
+                windowLabelZ.Size.X = 96f;
+                windowLabelZ.Size.Y = 24f;
+                windowLabelZ.UpdateBounds = false;
+                windowLabelZ.LabelCentered = false;
+                windowLabelZ.Position.X = 0f;
+                windowLabelZ.Position.Y = 48f;
+                TextFieldWidget windowFieldZ;
+                window.Widgets.Add(windowFieldZ = new TextFieldWidget(Game));
+                windowFieldZ.Text = LevelManager.StartingPosition.Id.Z.ToString();
+                windowFieldZ.Size.X = window.Size.X - windowLabelZ.Size.X;
+                windowFieldZ.Size.Y = 24f;
+                windowFieldZ.UpdateBounds = false;
+                windowFieldZ.Position.X = windowLabelZ.Size.X;
+                windowFieldZ.Position.Y = windowLabelZ.Position.Y;
+
+                ButtonWidget windowLabelFace;
+                window.Widgets.Add(windowLabelFace = new ButtonWidget(Game, "Face:"));
+                windowLabelFace.Background.A = 0;
+                windowLabelFace.Size.X = 96f;
+                windowLabelFace.Size.Y = 24f;
+                windowLabelFace.UpdateBounds = false;
+                windowLabelFace.LabelCentered = false;
+                windowLabelFace.Position.X = 0f;
+                windowLabelFace.Position.Y = 72f;
+                TextFieldWidget windowFieldFace;
+                window.Widgets.Add(windowFieldFace = new TextFieldWidget(Game));
+                windowFieldFace.Text = LevelManager.StartingPosition.Face.ToString();
+                windowFieldFace.Size.X = window.Size.X - windowLabelFace.Size.X;
+                windowFieldFace.Size.Y = 24f;
+                windowFieldFace.UpdateBounds = false;
+                windowFieldFace.Position.X = windowLabelFace.Size.X;
+                windowFieldFace.Position.Y = windowLabelFace.Position.Y;
+
+                ButtonWidget windowButtonChange;
+                window.Widgets.Add(windowButtonChange = new ButtonWidget(Game, "CHANGE", delegate() {
+                    LevelManager.StartingPosition.Id.X = int.Parse(windowFieldX.Text);
+                    LevelManager.StartingPosition.Id.Y = int.Parse(windowFieldY.Text);
+                    LevelManager.StartingPosition.Id.Z = int.Parse(windowFieldZ.Text);
+                    LevelManager.StartingPosition.Face = (FaceOrientation) Enum.Parse(typeof(FaceOrientation), windowFieldFace.Text);
+                }));
+                windowButtonChange.Size.X = window.Size.X;
+                windowButtonChange.Size.Y = 24f;
+                windowButtonChange.UpdateBounds = false;
+                windowButtonChange.LabelCentered = true;
+                windowButtonChange.Position.X = 0f;
+                windowButtonChange.Position.Y = window.Size.Y - windowButtonChange.Size.Y;
+            }));
 
             TopBarWidget.Widgets.Add(button = new ButtonWidget(Game, "Trile Set"));
             button.Background.A = 0;
@@ -433,24 +530,10 @@ namespace FezGame.Components {
             }
 
             if (MouseState.LeftButton.State == MouseButtonStates.Clicked && HoveredTrile != null && LevelManager.TrileSet != null && LevelManager.TrileSet.Triles.ContainsKey(TrileId)) {
-                TrileEmplacement emplacement = new TrileEmplacement(HoveredTrile.Position - FezMath.AsVector(HoveredFace));
-                TrileInstance trile = new TrileInstance(emplacement, TrileId);
-                LevelManager.Triles[emplacement] = trile;
-
-                trile.SetPhiLight(CameraManager.Viewpoint.ToPhi());
-
-                trile.PhysicsState = new InstancePhysicsState(trile);
-                trile.Enabled = true;
-
-                trile.Update();
-                LevelMaterializer.AddInstance(trile);
-                LevelMaterializer.RebuildTriles(true);
-                LevelMaterializer.RebuildInstances();
-                LevelMaterializer.UpdateInstance(trile);
-                trile.RefreshTrile();
+                AddTrile(CreateNewTrile(TrileId, new TrileEmplacement(HoveredTrile.Position - FezMath.AsVector(HoveredFace))));
             }
 
-            if (MouseState.RightButton.State == MouseButtonStates.Clicked && HoveredTrile != null && LevelManager.Triles.Count > 1) {
+            if (MouseState.RightButton.State == MouseButtonStates.Clicked && HoveredTrile != null) {
                 LevelManager.ClearTrile(HoveredTrile);
                 HoveredTrile = null;
             }
@@ -513,11 +596,14 @@ namespace FezGame.Components {
                     cursorOnWidget = true;
                     widget.Hover(gameTime);
                     if (!cursorOnChild && MouseState.LeftButton.State == MouseButtonStates.Clicked) {
-                        widget.Click(gameTime);
+                        widget.Click(gameTime, 1);
                         if (FocusedWidget != null) {
                             FocusedWidget.Unfocus(gameTime);
                         }
                         FocusedWidget = widget;
+                    }
+                    if (!cursorOnChild && MouseState.RightButton.State == MouseButtonStates.Clicked) {
+                        widget.Click(gameTime, 3);
                     }
                     if (!cursorOnChild && MouseState.LeftButton.State == MouseButtonStates.DragStarted) {
                         if (DraggingWidget != null) {
@@ -538,7 +624,31 @@ namespace FezGame.Components {
             level.Name = name;
             level.Size = new Vector3(width, height, depth);
             level.TrileSetName = trileset;
+            level.StartingPosition = new TrileFace();
+            level.StartingPosition.Face = FaceOrientation.Front;
+            level.StartingPosition.Id = new TrileEmplacement(width / 2, height / 2, depth / 2);
             return level;
+        }
+
+        public TrileInstance CreateNewTrile(int trileId, TrileEmplacement emplacement) {
+            TrileInstance trile = new TrileInstance(emplacement, trileId);
+            LevelManager.Triles[emplacement] = trile;
+
+            trile.SetPhiLight(CameraManager.Viewpoint.ToPhi());
+
+            trile.PhysicsState = new InstancePhysicsState(trile);
+            trile.Enabled = true;
+
+            return trile;
+        }
+
+        public void AddTrile(TrileInstance trile) {
+            trile.Update();
+            LevelMaterializer.AddInstance(trile);
+            LevelMaterializer.RebuildTriles(true);
+            LevelMaterializer.RebuildInstances();
+            LevelMaterializer.UpdateInstance(trile);
+            trile.RefreshTrile();
         }
 
         protected FaceOrientation GetHoveredFace(BoundingBox box, Ray ray) {

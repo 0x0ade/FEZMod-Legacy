@@ -92,8 +92,8 @@ namespace FezGame.Editor.Widgets {
             LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, Font, Label, Position + Offset + offset, Color.White, viewScale);
         }
 
-        public override void Click(GameTime gameTime) {
-            if (Action != null) {
+        public override void Click(GameTime gameTime, int mb) {
+            if (mb == 1 && Action != null) {
                 LevelEditor.Scheduled.Add(Action);
             }
         }
