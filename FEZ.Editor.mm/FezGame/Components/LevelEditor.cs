@@ -99,6 +99,12 @@ namespace FezGame.Components {
             SpriteBatch = new SpriteBatch(GraphicsDevice);
             GTR = new GlyphTextRenderer(Game);
 
+            Game.Window.TextInput += delegate(Object sender, TextInputEventArgs e) {
+                if (FocusedWidget != null) {
+                    FocusedWidget.TextInput(e.Character);
+                }
+            };
+
             //GameState.InEditor = true;//Causes some graphical funkyness.
 
             Widgets = new List<EditorWidget>();
@@ -111,7 +117,32 @@ namespace FezGame.Components {
             TopBarWidget.Widgets.Add(button = new ButtonWidget(Game, "File"));
             button.Background.A = 0;
             button.Widgets.Add(new ButtonWidget(Game, "New", delegate() {
-                //TODO
+                ContainerWidget window;
+                Widgets.Add(window = new ContainerWidget(Game));
+                window.Size.X = 256f;
+                window.Size.Y = 48f;
+                window.Position.X = 64f;
+                window.Position.Y = 64f;
+                window.Label = "New level";
+                window.Widgets.Add(new WindowHeaderWidget(Game));
+
+                ButtonWidget windowLabelName;
+                window.Widgets.Add(windowLabelName = new ButtonWidget(Game, "Name:"));
+                windowLabelName.Background.A = 0;
+                windowLabelName.Size.X = 64f;
+                windowLabelName.Size.Y = 24f;
+                windowLabelName.UpdateBounds = false;
+                windowLabelName.LabelCentered = false;
+                windowLabelName.Position.X = 0f;
+                windowLabelName.Position.Y = 0f;
+
+                TextFieldWidget windowFieldName;
+                window.Widgets.Add(windowFieldName = new TextFieldWidget(Game));
+                windowFieldName.Size.X = window.Size.X - windowLabelName.Size.X;
+                windowFieldName.Size.Y = 24f;
+                windowFieldName.UpdateBounds = false;
+                windowFieldName.Position.X = windowLabelName.Size.X;
+                windowFieldName.Position.Y = 0;
             }));
             button.Widgets.Add(new ButtonWidget(Game, "Open", delegate() {
                 //TODO
@@ -198,33 +229,6 @@ namespace FezGame.Components {
             //TRILE PICKER
             Widgets.Add(TrilePickerWidget = new TrilePickerWidget(Game));
 
-            //TEST WINDOW
-            /*ContainerWidget testWindow;
-            Widgets.Add(testWindow = new ContainerWidget(Game));
-            testWindow.Size.X = 256f;
-            testWindow.Size.Y = 48f;
-            testWindow.Position.X = 64f;
-            testWindow.Position.Y = 64f;
-            testWindow.Label = "Test window";
-            testWindow.Widgets.Add(new WindowHeaderWidget(Game));
-
-            ButtonWidget testButtonWidget;
-            testWindow.Widgets.Add(testButtonWidget = new ButtonWidget(Game, "Test window with text input."));
-            testButtonWidget.Background.A = 0;
-            testButtonWidget.Size.X = testWindow.Size.X;
-            testButtonWidget.Size.Y = 24f;
-            testButtonWidget.UpdateBounds = false;
-            testButtonWidget.LabelCentered = true;
-            testButtonWidget.Position.X = 0f;
-            testButtonWidget.Position.Y = 0f;
-
-            TextFieldWidget testTextField;
-            testWindow.Widgets.Add(testTextField = new TextFieldWidget(Game));
-            testTextField.Size.X = testWindow.Size.X;
-            testTextField.Size.Y = 24f;
-            testTextField.UpdateBounds = false;
-            testTextField.Position.X = 0;
-            testTextField.Position.Y = 24f;*/
         }
 
         public void Preload() {

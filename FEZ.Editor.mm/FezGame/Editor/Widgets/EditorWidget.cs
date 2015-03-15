@@ -99,17 +99,15 @@ namespace FezGame.Editor.Widgets {
 
         public virtual void Click(GameTime gameTime) {
         }
-
         public virtual void Hover(GameTime gameTime) {
         }
-
         public virtual void Scroll(GameTime gameTime, int turn) {
         }
-
         public virtual void Dragging(GameTime gameTime, MouseButtonStates state) {
         }
-
         public virtual void Unfocus(GameTime gameTime) {
+        }
+        public virtual void TextInput(char c) {
         }
 
         public virtual void DrawBackground(GameTime gameTime) {

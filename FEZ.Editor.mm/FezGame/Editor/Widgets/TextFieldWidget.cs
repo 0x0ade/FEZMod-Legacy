@@ -58,28 +58,6 @@ namespace FezGame.Editor.Widgets {
             }
             BlinkStatus = BlinkStatus && Focused;
 
-            if (Focused && Text != null) {
-                KeyboardState state = Keyboard.GetState();
-                Keys[] keys = state.GetPressedKeys();
-                foreach (Keys key in keys) {
-                    if (Keys.A <= key && key <= Keys.Z) {
-                        String keyChar = key.ToString();
-                        if (state.IsKeyDown(Keys.LeftShift) || state.IsKeyDown(Keys.RightShift)) {
-                            keyChar = keyChar.ToUpper();
-                        } else {
-                            keyChar = keyChar.ToLower();
-                        }
-                        Text += keyChar;
-                    }
-                }
-                if (state.IsKeyDown(Keys.Back)) {
-                    //TODO remove rightmost char
-                }
-                if (state.IsKeyDown(Keys.Delete)) {
-                    //TODO split in two parts, remove first char of right part
-                }
-            }
-
             base.Update(gameTime);
         }
 
@@ -103,6 +81,16 @@ namespace FezGame.Editor.Widgets {
         public override void Unfocus(GameTime gameTime) {
             Focused = false;
             BlinkStatus = false;
+        }
+
+        public override void TextInput(char c) {
+            if (c == '\b') {
+                Text = Text.Substring(0, Math.Max(Text.Length - 1, 0));
+            }
+            if (char.IsControl(c)) {
+                return;
+            }
+            Text += c;
         }
 
     }
