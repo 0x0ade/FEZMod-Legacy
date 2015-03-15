@@ -16,6 +16,8 @@ namespace FezGame.Services {
             }
         }
 
+        public static Level Level;
+
         private static Level ChangeLevel__;
 
         public static Level ChangeLevel_ {

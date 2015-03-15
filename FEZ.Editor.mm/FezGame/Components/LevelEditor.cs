@@ -334,6 +334,106 @@ namespace FezGame.Components {
 
             TopBarWidget.Widgets.Add(button = new ButtonWidget(Game, "Level"));
             button.Background.A = 0;
+            button.Widgets.Add(new ButtonWidget(Game, "Change settings", delegate() {
+                ContainerWidget window;
+                Widgets.Add(window = new ContainerWidget(Game));
+                window.Size.X = 256f;
+                window.Size.Y = 120f;
+                window.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (window.Size.X / 2);
+                window.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (window.Size.Y / 2);
+                window.Label = "Change settings";
+                WindowHeaderWidget windowHeader;
+                window.Widgets.Add(windowHeader = new WindowHeaderWidget(Game));
+
+                ButtonWidget windowLabelName;
+                window.Widgets.Add(windowLabelName = new ButtonWidget(Game, "Name:"));
+                windowLabelName.Background.A = 0;
+                windowLabelName.Size.X = 96f;
+                windowLabelName.Size.Y = 24f;
+                windowLabelName.UpdateBounds = false;
+                windowLabelName.LabelCentered = false;
+                windowLabelName.Position.X = 0f;
+                windowLabelName.Position.Y = 0f;
+                TextFieldWidget windowFieldName;
+                window.Widgets.Add(windowFieldName = new TextFieldWidget(Game));
+                windowFieldName.Text = LevelManager.Name;
+                windowFieldName.Size.X = window.Size.X - windowLabelName.Size.X;
+                windowFieldName.Size.Y = 24f;
+                windowFieldName.UpdateBounds = false;
+                windowFieldName.Position.X = windowLabelName.Size.X;
+                windowFieldName.Position.Y = windowLabelName.Position.Y;
+
+                ButtonWidget windowLabelWidth;
+                window.Widgets.Add(windowLabelWidth = new ButtonWidget(Game, "Width:"));
+                windowLabelWidth.Background.A = 0;
+                windowLabelWidth.Size.X = 96f;
+                windowLabelWidth.Size.Y = 24f;
+                windowLabelWidth.UpdateBounds = false;
+                windowLabelWidth.LabelCentered = false;
+                windowLabelWidth.Position.X = 0f;
+                windowLabelWidth.Position.Y = 24f;
+                TextFieldWidget windowFieldWidth;
+                window.Widgets.Add(windowFieldWidth = new TextFieldWidget(Game));
+                windowFieldWidth.Text = ((int) LevelManager.Size.X).ToString();
+                windowFieldWidth.Size.X = window.Size.X - windowLabelWidth.Size.X;
+                windowFieldWidth.Size.Y = 24f;
+                windowFieldWidth.UpdateBounds = false;
+                windowFieldWidth.Position.X = windowLabelWidth.Size.X;
+                windowFieldWidth.Position.Y = windowLabelWidth.Position.Y;
+
+                ButtonWidget windowLabelHeight;
+                window.Widgets.Add(windowLabelHeight = new ButtonWidget(Game, "Height:"));
+                windowLabelHeight.Background.A = 0;
+                windowLabelHeight.Size.X = 96f;
+                windowLabelHeight.Size.Y = 24f;
+                windowLabelHeight.UpdateBounds = false;
+                windowLabelHeight.LabelCentered = false;
+                windowLabelHeight.Position.X = 0f;
+                windowLabelHeight.Position.Y = 48f;
+                TextFieldWidget windowFieldHeight;
+                window.Widgets.Add(windowFieldHeight = new TextFieldWidget(Game));
+                windowFieldHeight.Text = ((int) LevelManager.Size.Y).ToString();
+                windowFieldHeight.Size.X = window.Size.X - windowLabelHeight.Size.X;
+                windowFieldHeight.Size.Y = 24f;
+                windowFieldHeight.UpdateBounds = false;
+                windowFieldHeight.Position.X = windowLabelHeight.Size.X;
+                windowFieldHeight.Position.Y = windowLabelHeight.Position.Y;
+
+                ButtonWidget windowLabelDepth;
+                window.Widgets.Add(windowLabelDepth = new ButtonWidget(Game, "Depth:"));
+                windowLabelDepth.Background.A = 0;
+                windowLabelDepth.Size.X = 96f;
+                windowLabelDepth.Size.Y = 24f;
+                windowLabelDepth.UpdateBounds = false;
+                windowLabelDepth.LabelCentered = false;
+                windowLabelDepth.Position.X = 0f;
+                windowLabelDepth.Position.Y = 72f;
+                TextFieldWidget windowFieldDepth;
+                window.Widgets.Add(windowFieldDepth = new TextFieldWidget(Game));
+                windowFieldDepth.Text = ((int) LevelManager.Size.Z).ToString();
+                windowFieldDepth.Size.X = window.Size.X - windowLabelDepth.Size.X;
+                windowFieldDepth.Size.Y = 24f;
+                windowFieldDepth.UpdateBounds = false;
+                windowFieldDepth.Position.X = windowLabelDepth.Size.X;
+                windowFieldDepth.Position.Y = windowLabelDepth.Position.Y;
+
+                ButtonWidget windowButtonCreate;
+                window.Widgets.Add(windowButtonCreate = new ButtonWidget(Game, "CREATE", delegate() {
+                    GameLevelManagerHelper.Level.Name = windowFieldName.Text;
+                    GameLevelManagerHelper.Level.Size = new Vector3(
+                        int.Parse(windowFieldWidth.Text),
+                        int.Parse(windowFieldHeight.Text),
+                        int.Parse(windowFieldDepth.Text)
+                    );
+                    windowHeader.CloseButtonWidget.Action();
+                }));
+                windowButtonCreate.Size.X = window.Size.X;
+                windowButtonCreate.Size.Y = 24f;
+                windowButtonCreate.UpdateBounds = false;
+                windowButtonCreate.LabelCentered = true;
+                windowButtonCreate.Position.X = 0f;
+                windowButtonCreate.Position.Y = window.Size.Y - windowButtonCreate.Size.Y;
+            }));
             button.Widgets.Add(new ButtonWidget(Game, "Change spawnpoint", delegate() {
                 ContainerWidget window;
                 Widgets.Add(window = new ContainerWidget(Game));
@@ -410,7 +510,7 @@ namespace FezGame.Components {
                 windowLabelFace.Position.Y = 72f;
                 TextFieldWidget windowFieldFace;
                 window.Widgets.Add(windowFieldFace = new TextFieldWidget(Game));
-                windowFieldFace.Text = LevelManager.StartingPosition.Face.ToString();
+                windowFieldFace.Text = CameraManager.Viewpoint.VisibleOrientation().ToString();
                 windowFieldFace.Size.X = window.Size.X - windowLabelFace.Size.X;
                 windowFieldFace.Size.Y = 24f;
                 windowFieldFace.UpdateBounds = false;
@@ -423,6 +523,7 @@ namespace FezGame.Components {
                     LevelManager.StartingPosition.Id.Y = int.Parse(windowFieldY.Text);
                     LevelManager.StartingPosition.Id.Z = int.Parse(windowFieldZ.Text);
                     LevelManager.StartingPosition.Face = (FaceOrientation) Enum.Parse(typeof(FaceOrientation), windowFieldFace.Text);
+                    windowHeader.CloseButtonWidget.Action();
                 }));
                 windowButtonChange.Size.X = window.Size.X;
                 windowButtonChange.Size.Y = 24f;
@@ -627,6 +728,7 @@ namespace FezGame.Components {
             level.StartingPosition = new TrileFace();
             level.StartingPosition.Face = FaceOrientation.Front;
             level.StartingPosition.Id = new TrileEmplacement(width / 2, height / 2, depth / 2);
+            PlayerManager.Position = level.StartingPosition.Id.AsVector;
             return level;
         }
 
@@ -649,6 +751,11 @@ namespace FezGame.Components {
             LevelMaterializer.RebuildInstances();
             LevelMaterializer.UpdateInstance(trile);
             trile.RefreshTrile();
+
+            if (LevelManager.Triles.Count == 1) {
+                PlayerManager.CheckpointGround = trile;
+                PlayerManager.RespawnAtCheckpoint();
+            }
         }
 
         protected FaceOrientation GetHoveredFace(BoundingBox box, Ray ray) {

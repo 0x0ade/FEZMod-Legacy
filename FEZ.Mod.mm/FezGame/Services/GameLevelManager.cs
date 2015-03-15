@@ -59,6 +59,7 @@ namespace FezGame.Services {
                     ModLogger.Log("JAFM", "Level not found: " + levelName + "; Falling back to the original VILLAGEVILLE_3D...");
                     orig_Load("VILLAGEVILLE_3D");
                 }
+                GameLevelManagerHelper.Level = levelData;
                 return;
             }
 
@@ -531,6 +532,8 @@ namespace FezGame.Services {
             if (save != null) {
                 save.FirstVisit = false;
             }
+
+            GameLevelManagerHelper.Level = levelData;
         }
 
         public void Save(string levelName) {
