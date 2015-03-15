@@ -23,6 +23,8 @@ namespace FezGame.Components {
         List<EditorWidget> Widgets { get; set; }
         List<Action> Scheduled { get; set; }
 
+        Level CreateNewLevel(string name, int width, int height, int depth, string trileset);
+
     }
 }
 

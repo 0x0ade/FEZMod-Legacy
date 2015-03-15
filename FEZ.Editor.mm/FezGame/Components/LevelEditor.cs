@@ -120,32 +120,156 @@ namespace FezGame.Components {
                 ContainerWidget window;
                 Widgets.Add(window = new ContainerWidget(Game));
                 window.Size.X = 256f;
-                window.Size.Y = 48f;
-                window.Position.X = 64f;
-                window.Position.Y = 64f;
+                window.Size.Y = 144f;
+                window.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (window.Size.X / 2);
+                window.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (window.Size.Y / 2);
                 window.Label = "New level";
-                window.Widgets.Add(new WindowHeaderWidget(Game));
+                WindowHeaderWidget windowHeader;
+                window.Widgets.Add(windowHeader = new WindowHeaderWidget(Game));
 
                 ButtonWidget windowLabelName;
                 window.Widgets.Add(windowLabelName = new ButtonWidget(Game, "Name:"));
                 windowLabelName.Background.A = 0;
-                windowLabelName.Size.X = 64f;
+                windowLabelName.Size.X = 96f;
                 windowLabelName.Size.Y = 24f;
                 windowLabelName.UpdateBounds = false;
                 windowLabelName.LabelCentered = false;
                 windowLabelName.Position.X = 0f;
                 windowLabelName.Position.Y = 0f;
-
                 TextFieldWidget windowFieldName;
                 window.Widgets.Add(windowFieldName = new TextFieldWidget(Game));
                 windowFieldName.Size.X = window.Size.X - windowLabelName.Size.X;
                 windowFieldName.Size.Y = 24f;
                 windowFieldName.UpdateBounds = false;
                 windowFieldName.Position.X = windowLabelName.Size.X;
-                windowFieldName.Position.Y = 0;
+                windowFieldName.Position.Y = windowLabelName.Position.Y;
+
+                ButtonWidget windowLabelWidth;
+                window.Widgets.Add(windowLabelWidth = new ButtonWidget(Game, "Width:"));
+                windowLabelWidth.Background.A = 0;
+                windowLabelWidth.Size.X = 96f;
+                windowLabelWidth.Size.Y = 24f;
+                windowLabelWidth.UpdateBounds = false;
+                windowLabelWidth.LabelCentered = false;
+                windowLabelWidth.Position.X = 0f;
+                windowLabelWidth.Position.Y = 24f;
+                TextFieldWidget windowFieldWidth;
+                window.Widgets.Add(windowFieldWidth = new TextFieldWidget(Game));
+                windowFieldWidth.Size.X = window.Size.X - windowLabelWidth.Size.X;
+                windowFieldWidth.Size.Y = 24f;
+                windowFieldWidth.UpdateBounds = false;
+                windowFieldWidth.Position.X = windowLabelWidth.Size.X;
+                windowFieldWidth.Position.Y = windowLabelWidth.Position.Y;
+
+                ButtonWidget windowLabelHeight;
+                window.Widgets.Add(windowLabelHeight = new ButtonWidget(Game, "Height:"));
+                windowLabelHeight.Background.A = 0;
+                windowLabelHeight.Size.X = 96f;
+                windowLabelHeight.Size.Y = 24f;
+                windowLabelHeight.UpdateBounds = false;
+                windowLabelHeight.LabelCentered = false;
+                windowLabelHeight.Position.X = 0f;
+                windowLabelHeight.Position.Y = 48f;
+                TextFieldWidget windowFieldHeight;
+                window.Widgets.Add(windowFieldHeight = new TextFieldWidget(Game));
+                windowFieldHeight.Size.X = window.Size.X - windowLabelHeight.Size.X;
+                windowFieldHeight.Size.Y = 24f;
+                windowFieldHeight.UpdateBounds = false;
+                windowFieldHeight.Position.X = windowLabelHeight.Size.X;
+                windowFieldHeight.Position.Y = windowLabelHeight.Position.Y;
+
+                ButtonWidget windowLabelDepth;
+                window.Widgets.Add(windowLabelDepth = new ButtonWidget(Game, "Depth:"));
+                windowLabelDepth.Background.A = 0;
+                windowLabelDepth.Size.X = 96f;
+                windowLabelDepth.Size.Y = 24f;
+                windowLabelDepth.UpdateBounds = false;
+                windowLabelDepth.LabelCentered = false;
+                windowLabelDepth.Position.X = 0f;
+                windowLabelDepth.Position.Y = 72f;
+                TextFieldWidget windowFieldDepth;
+                window.Widgets.Add(windowFieldDepth = new TextFieldWidget(Game));
+                windowFieldDepth.Size.X = window.Size.X - windowLabelDepth.Size.X;
+                windowFieldDepth.Size.Y = 24f;
+                windowFieldDepth.UpdateBounds = false;
+                windowFieldDepth.Position.X = windowLabelDepth.Size.X;
+                windowFieldDepth.Position.Y = windowLabelDepth.Position.Y;
+
+                ButtonWidget windowLabelTrileset;
+                window.Widgets.Add(windowLabelTrileset = new ButtonWidget(Game, "Trileset:"));
+                windowLabelTrileset.Background.A = 0;
+                windowLabelTrileset.Size.X = 96f;
+                windowLabelTrileset.Size.Y = 24f;
+                windowLabelTrileset.UpdateBounds = false;
+                windowLabelTrileset.LabelCentered = false;
+                windowLabelTrileset.Position.X = 0f;
+                windowLabelTrileset.Position.Y = 96f;
+                TextFieldWidget windowFieldTrileset;
+                window.Widgets.Add(windowFieldTrileset = new TextFieldWidget(Game));
+                windowFieldTrileset.Size.X = window.Size.X - windowLabelTrileset.Size.X;
+                windowFieldTrileset.Size.Y = 24f;
+                windowFieldTrileset.UpdateBounds = false;
+                windowFieldTrileset.Position.X = windowLabelTrileset.Size.X;
+                windowFieldTrileset.Position.Y = windowLabelTrileset.Position.Y;
+
+                ButtonWidget windowButtonCreate;
+                window.Widgets.Add(windowButtonCreate = new ButtonWidget(Game, "CREATE", delegate() {
+                    Level level = CreateNewLevel(
+                        windowFieldName.Text,
+                        int.Parse(windowFieldWidth.Text),
+                        int.Parse(windowFieldHeight.Text),
+                        int.Parse(windowFieldDepth.Text),
+                        windowFieldTrileset.Text
+                    );
+                    GameLevelManagerHelper.ChangeLevel(level);
+                    windowHeader.CloseButtonWidget.Action();
+                }));
+                windowButtonCreate.Size.X = window.Size.X;
+                windowButtonCreate.Size.Y = 24f;
+                windowButtonCreate.UpdateBounds = false;
+                windowButtonCreate.LabelCentered = true;
+                windowButtonCreate.Position.X = 0f;
+                windowButtonCreate.Position.Y = window.Size.Y - windowButtonCreate.Size.Y;
             }));
             button.Widgets.Add(new ButtonWidget(Game, "Open", delegate() {
-                //TODO
+                ContainerWidget window;
+                Widgets.Add(window = new ContainerWidget(Game));
+                window.Size.X = 256f;
+                window.Size.Y = 48f;
+                window.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (window.Size.X / 2);
+                window.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (window.Size.Y / 2);
+                window.Label = "Open level";
+                WindowHeaderWidget windowHeader;
+                window.Widgets.Add(windowHeader = new WindowHeaderWidget(Game));
+
+                ButtonWidget windowLabelName;
+                window.Widgets.Add(windowLabelName = new ButtonWidget(Game, "Name:"));
+                windowLabelName.Background.A = 0;
+                windowLabelName.Size.X = 96f;
+                windowLabelName.Size.Y = 24f;
+                windowLabelName.UpdateBounds = false;
+                windowLabelName.LabelCentered = false;
+                windowLabelName.Position.X = 0f;
+                windowLabelName.Position.Y = 0f;
+                TextFieldWidget windowFieldName;
+                window.Widgets.Add(windowFieldName = new TextFieldWidget(Game));
+                windowFieldName.Size.X = window.Size.X - windowLabelName.Size.X;
+                windowFieldName.Size.Y = 24f;
+                windowFieldName.UpdateBounds = false;
+                windowFieldName.Position.X = windowLabelName.Size.X;
+                windowFieldName.Position.Y = windowLabelName.Position.Y;
+
+                ButtonWidget windowButtonLoad;
+                window.Widgets.Add(windowButtonLoad = new ButtonWidget(Game, "LOAD", delegate() {
+                    LevelManager.ChangeLevel(windowFieldName.Text);
+                    windowHeader.CloseButtonWidget.Action();
+                }));
+                windowButtonLoad.Size.X = window.Size.X;
+                windowButtonLoad.Size.Y = 24f;
+                windowButtonLoad.UpdateBounds = false;
+                windowButtonLoad.LabelCentered = true;
+                windowButtonLoad.Position.X = 0f;
+                windowButtonLoad.Position.Y = window.Size.Y - windowButtonLoad.Size.Y;
             }));
             button.Widgets.Add(new ButtonWidget(Game, "Save", delegate() {
                 WindowHeaderWidget windowHeader = null;
@@ -158,7 +282,7 @@ namespace FezGame.Components {
                         file.Delete();
                     }
                     ModLogger.Log("JAFM.Engine", "Saving level "+LevelManager.Name);
-                    LevelManager.Load("JAFM_WORKAROUND_SAVE:"+LevelManager.Name);
+                    GameLevelManagerHelper.Save(LevelManager.Name);
                     if (windowHeader != null) {
                         windowHeader.CloseButtonWidget.Action();
                     }
@@ -326,7 +450,7 @@ namespace FezGame.Components {
                 trile.RefreshTrile();
             }
 
-            if (MouseState.RightButton.State == MouseButtonStates.Clicked && HoveredTrile != null) {
+            if (MouseState.RightButton.State == MouseButtonStates.Clicked && HoveredTrile != null && LevelManager.Triles.Count > 1) {
                 LevelManager.ClearTrile(HoveredTrile);
                 HoveredTrile = null;
             }
@@ -407,6 +531,14 @@ namespace FezGame.Components {
                 cursorOnWidget = cursorOnWidget || cursorOnChild;
             }
             return cursorOnWidget;
+        }
+
+        public Level CreateNewLevel(string name, int width, int height, int depth, string trileset) {
+            Level level = new Level();
+            level.Name = name;
+            level.Size = new Vector3(width, height, depth);
+            level.TrileSetName = trileset;
+            return level;
         }
 
         protected FaceOrientation GetHoveredFace(BoundingBox box, Ray ray) {

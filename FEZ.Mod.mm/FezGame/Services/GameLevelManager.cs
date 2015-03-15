@@ -23,6 +23,8 @@ namespace FezGame.Services {
 
         public IGameStateManager GameState { [MonoModIgnore] get { return null; } }
 
+        protected Level tmpLevel;
+
         public void orig_Load(string levelName) {
         }
 
@@ -31,11 +33,32 @@ namespace FezGame.Services {
                 Save(levelName.Substring("JAFM_WORKAROUND_SAVE:".Length));
                 return;
             }
+            if (levelName == "JAFM_WORKAROUND_CHANGELEVEL") {
+                ChangeLevel(GameLevelManagerHelper.ChangeLevel_);
+                return;
+            }
+
+            if (tmpLevel != null) {
+                ClearArtSatellites();
+
+                oldLevel = levelData;
+                levelData = tmpLevel;
+                tmpLevel = null;
+
+                levelData.OnDeserialization();
+                return;
+            }
 
 			string filePath = ("Resources\\levels\\"+(levelName.ToLower())).Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString())+".xml";
             FileInfo file = new FileInfo(filePath);
             if (!file.Exists) {
-                orig_Load(levelName);
+                if (MemoryContentManager.AssetExists("LEVELS/"+levelName)) {
+                    orig_Load(levelName);
+                } else {
+                    //Fallback: Spawn at the original VILLAGEVILLE_3D if the level wasn't found at all
+                    ModLogger.Log("JAFM", "Level not found: " + levelName + "; Falling back to the original VILLAGEVILLE_3D...");
+                    orig_Load("VILLAGEVILLE_3D");
+                }
                 return;
             }
 
@@ -135,8 +158,6 @@ namespace FezGame.Services {
                 xmlVolume = xmlVolume["Volume"];
                 Volume volume = new Volume();
 
-                //Thanks, IKVM!
-                //warning IKVMC0100: Class "cli.System.Collections.Generic.HashSet$$00601_$$$_Lcli__FezEngine__FaceOrientation_$$$$_" not found
                 HashSet<FaceOrientation> orientations = new HashSet<FaceOrientation>();
                 XmlElement xmlOrientations = xmlVolume["Orientations"];
                 for (int ii = 0; ii < xmlOrientations.ChildNodes.Count; ii++) {
@@ -1099,6 +1120,27 @@ namespace FezGame.Services {
             xmlDocument.Save(xmlWriter);
             xmlWriter.Close();
             fos.Close();
+        }
+
+        [MonoModIgnore]
+        public void ChangeLevel(string levelName) {
+        }
+
+        public void ChangeLevel(Level level) {
+            ContentManager cm = CMProvider.GetForLevel(level.Name);
+            if (level.SkyName != null) {
+                level.Sky = cm.Load<Sky>("Skies/" + level.SkyName);
+            }
+            if (level.TrileSetName != null) {
+                level.TrileSet = cm.Load<TrileSet>("Trile Sets/" + level.TrileSetName);
+            }
+            if (level.SongName != null) {
+                level.Song = cm.Load<TrackedSong>("Music/" + level.SongName);
+                level.Song.Initialize();
+            }
+
+            tmpLevel = level;
+            ChangeLevel(level.Name);
         }
 
     }

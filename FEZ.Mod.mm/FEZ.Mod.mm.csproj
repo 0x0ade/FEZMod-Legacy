@@ -65,6 +65,7 @@
     <Compile Include="FezGame\Tools\SaveFileOperations.cs" />
     <Compile Include="FezGame\Components\Actions\Bounce.cs" />
     <Compile Include="FezGame\Components\Actions\PlayerAction.cs" />
+    <Compile Include="FezGame\Services\GameLevelManagerHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
