@@ -66,7 +66,7 @@ namespace FezGame.Editor.Widgets {
             float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
             float lineHeight = Font.MeasureString(informations[0]).Y * 0.5f * viewScale;
             for (int i = 0; i < informations.Length; i++) {
-                LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, Font, informations[i], new Vector2(Position.X, Position.Y + i * lineHeight) + Offset, Color.White, viewScale);
+                LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, Font, informations[i], new Vector2(Position.X, Position.Y + i * lineHeight) + Offset, Foreground, viewScale);
             }
         }
 

@@ -41,6 +41,7 @@ namespace FezGame.Editor.Widgets {
             Text = text;
             Font = FontManager.Small;
             ShowChildren = false;
+            Foreground = Color.Black;
             Background = Color.White;
         }
 

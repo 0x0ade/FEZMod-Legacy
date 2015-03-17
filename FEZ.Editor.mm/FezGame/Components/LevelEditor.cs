@@ -568,9 +568,9 @@ namespace FezGame.Components {
                     Sky sky = windowFieldSky.Text.Length > 0 ? CMProvider.CurrentLevel.Load<Sky>("Skies/" + windowFieldSky.Text) : null;
                     if (sky != null) {
                         GameLevelManagerHelper.Level.Sky = sky;
+                        GameLevelManagerHelper.Level.SkyName = sky.Name;
                         LevelManager.ChangeSky(sky);
                     }
-                    GameLevelManagerHelper.Level.SkyName = sky != null ? windowFieldSky.Text : null;
                     windowHeader.CloseButtonWidget.Action();
                 }));
                 windowButtonChange.Size.X = window.Size.X;
@@ -643,6 +643,23 @@ namespace FezGame.Components {
 
             TopBarWidget.Widgets.Add(button = new ButtonWidget(Game, "Scripting"));
             button.Background.A = 0;
+
+            TopBarWidget.Widgets.Add(button = new ButtonWidget(Game, "Editor"));
+            button.Background.A = 0;
+
+            button.Widgets.Add(button = new ButtonWidget(Game, "Toggle theme", delegate() {
+                EditorWidget.DefaultBackground.R = (byte) (255 - EditorWidget.DefaultBackground.R);
+                EditorWidget.DefaultBackground.G = (byte) (255 - EditorWidget.DefaultBackground.G);
+                EditorWidget.DefaultBackground.B = (byte) (255 - EditorWidget.DefaultBackground.B);
+
+                EditorWidget.DefaultForeground.R = (byte) (255 - EditorWidget.DefaultForeground.R);
+                EditorWidget.DefaultForeground.G = (byte) (255 - EditorWidget.DefaultForeground.G);
+                EditorWidget.DefaultForeground.B = (byte) (255 - EditorWidget.DefaultForeground.B);
+
+                foreach (EditorWidget widget in Widgets) {
+                    widget.UpdateTheme();
+                }
+            }));
 
             //INFO
             Widgets.Add(InfoWidget = new InfoWidget(Game));

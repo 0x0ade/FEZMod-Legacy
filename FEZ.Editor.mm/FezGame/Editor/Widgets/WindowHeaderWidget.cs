@@ -95,7 +95,7 @@ namespace FezGame.Editor.Widgets {
             }
 
             float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
-            LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, Font, Label, Position + Offset, Color.White, viewScale);
+            LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, Font, Label, Position + Offset, Foreground, viewScale);
         }
 
         public override void Dragging(GameTime gameTime, MouseButtonStates state) {

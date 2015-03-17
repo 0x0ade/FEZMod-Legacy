@@ -37,6 +37,11 @@ namespace FezGame.Editor.Widgets {
         [ServiceDependency]
         public IContentManagerProvider CMProvider { get; set; }
 
+        public static Color DefaultForeground = Color.White;
+        protected Color PrevDefaultForeground = DefaultForeground;
+        public static Color DefaultBackground = new Color(0f, 0f, 0f, 0.75f);
+        protected Color PrevDefaultBackground = DefaultBackground;
+
         public EditorWidget Parent;
         public List<EditorWidget> Widgets = new List<EditorWidget>();
         public bool ShowChildren = true;
@@ -62,7 +67,23 @@ namespace FezGame.Editor.Widgets {
             }
         }
 
-        public Color Background = new Color(0f, 0f, 0f, 0.75f);
+        protected Color foreground_ = new Color(0f, 0f, 0f, 0f);
+        public Color Foreground {
+            get {
+                Color foreground = foreground_;
+                if (Parent != null && foreground.A == 0) {
+                    foreground = Parent.Foreground;
+                }
+                if (foreground.A == 0) {
+                    return DefaultForeground;
+                }
+                return foreground;
+            }
+            set {
+                foreground_ = value;
+            }
+        }
+        public Color Background = DefaultBackground;
         protected Rectangle backgroundBounds = new Rectangle();
         protected static Texture2D pixelTexture;
 
@@ -126,6 +147,29 @@ namespace FezGame.Editor.Widgets {
             }
 
             LevelEditor.SpriteBatch.Draw(pixelTexture, backgroundBounds, Background);
+        }
+
+        public virtual void UpdateTheme() {
+
+            foreach (EditorWidget widget in Widgets) {
+                widget.UpdateTheme();
+            }
+
+            if (foreground_.A != 0 ||
+                PrevDefaultBackground.R != Background.R || PrevDefaultBackground.G != Background.G || PrevDefaultBackground.B != Background.B) {
+                return;
+            }
+
+            foreground_.R = DefaultForeground.R;
+            foreground_.G = DefaultForeground.G;
+            foreground_.B = DefaultForeground.B;
+
+            Background.R = DefaultBackground.R;
+            Background.G = DefaultBackground.G;
+            Background.B = DefaultBackground.B;
+
+            PrevDefaultForeground = DefaultForeground;
+            PrevDefaultBackground = DefaultBackground;
         }
 
     }
