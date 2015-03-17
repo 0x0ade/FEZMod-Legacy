@@ -58,14 +58,14 @@ namespace FezGame.Editor.Widgets {
             }
             BlinkStatus = BlinkStatus && Focused;
 
-            float offset = Size.Y;
+            float offset = 0f;
             float widthMax = 0f;
             for (int i = 0; i < Widgets.Count; i++) {
                 Widgets[i].Parent = this;
                 Widgets[i].LevelEditor = LevelEditor;
                 Widgets[i].Update(gameTime);
 
-                Widgets[i].Position.X = 0;
+                Widgets[i].Position.X = Size.X;
                 Widgets[i].Position.Y = offset;
 
                 offset += Widgets[i].Size.Y;
@@ -105,6 +105,12 @@ namespace FezGame.Editor.Widgets {
             BlinkStatus = true;
         }
 
+        public override void Hover(GameTime gameTime) {
+            if (Hovered >= 0f) {
+                Hovered = 0.1f;
+            }
+        }
+
         public override void Unfocus(GameTime gameTime) {
             Focused = false;
             BlinkStatus = false;
@@ -121,6 +127,33 @@ namespace FezGame.Editor.Widgets {
                 return;
             }
             Text += c;
+        }
+
+        public void Fill(String root) {
+            Widgets.Clear();
+            IEnumerable<string> list = CMProvider.GetAllIn(root);
+            foreach (string item_ in list) {
+                string item = item_.Substring(root.Length + 1);
+                if (item.Contains("\\") || item.Contains("/")) {
+                    continue;
+                }
+                ButtonWidget button;
+                Widgets.Add(button = new ButtonWidget(Game, item, delegate() {
+                    Text = item;
+                }));
+                button.Background = Background;
+            }
+        }
+
+        public void Fill(IEnumerable<string> list) {
+            Widgets.Clear();
+            foreach (string item in list) {
+                ButtonWidget button;
+                Widgets.Add(button = new ButtonWidget(Game, item, delegate() {
+                    Text = item;
+                }));
+                button.Background = Background;
+            }
         }
 
     }

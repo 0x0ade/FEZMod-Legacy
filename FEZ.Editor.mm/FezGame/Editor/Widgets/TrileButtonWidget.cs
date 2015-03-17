@@ -185,6 +185,7 @@ namespace FezGame.Editor.Widgets {
                     windowFieldFace.UpdateBounds = false;
                     windowFieldFace.Position.X = windowLabelFace.Size.X;
                     windowFieldFace.Position.Y = windowLabelFace.Position.Y;
+                    windowFieldFace.Fill(Enum.GetNames(typeof(FaceOrientation)));
 
                     ButtonWidget windowButtonCreate;
                     window.Widgets.Add(windowButtonCreate = new ButtonWidget(Game, "CREATE", delegate() {

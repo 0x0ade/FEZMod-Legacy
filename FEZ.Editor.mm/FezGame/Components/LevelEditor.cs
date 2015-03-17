@@ -143,6 +143,7 @@ namespace FezGame.Components {
                 windowFieldName.UpdateBounds = false;
                 windowFieldName.Position.X = windowLabelName.Size.X;
                 windowFieldName.Position.Y = windowLabelName.Position.Y;
+                windowFieldName.Fill("Levels");
 
                 ButtonWidget windowLabelWidth;
                 window.Widgets.Add(windowLabelWidth = new ButtonWidget(Game, "Width:"));
@@ -211,6 +212,7 @@ namespace FezGame.Components {
                 windowFieldTrileset.UpdateBounds = false;
                 windowFieldTrileset.Position.X = windowLabelTrileset.Size.X;
                 windowFieldTrileset.Position.Y = windowLabelTrileset.Position.Y;
+                windowFieldTrileset.Fill("Trile Sets");
 
                 ButtonWidget windowButtonCreate;
                 window.Widgets.Add(windowButtonCreate = new ButtonWidget(Game, "CREATE", delegate() {
@@ -258,6 +260,7 @@ namespace FezGame.Components {
                 windowFieldName.UpdateBounds = false;
                 windowFieldName.Position.X = windowLabelName.Size.X;
                 windowFieldName.Position.Y = windowLabelName.Position.Y;
+                windowFieldName.Fill("Levels");
 
                 ButtonWidget windowButtonLoad;
                 window.Widgets.Add(windowButtonLoad = new ButtonWidget(Game, "LOAD", delegate() {
@@ -362,6 +365,7 @@ namespace FezGame.Components {
                 windowFieldName.UpdateBounds = false;
                 windowFieldName.Position.X = windowLabelName.Size.X;
                 windowFieldName.Position.Y = windowLabelName.Position.Y;
+                windowFieldName.Fill("Levels");
 
                 ButtonWidget windowLabelWidth;
                 window.Widgets.Add(windowLabelWidth = new ButtonWidget(Game, "Width:"));
@@ -516,6 +520,7 @@ namespace FezGame.Components {
                 windowFieldFace.UpdateBounds = false;
                 windowFieldFace.Position.X = windowLabelFace.Size.X;
                 windowFieldFace.Position.Y = windowLabelFace.Position.Y;
+                windowFieldFace.Fill(Enum.GetNames(typeof(FaceOrientation)));
 
                 ButtonWidget windowButtonChange;
                 window.Widgets.Add(windowButtonChange = new ButtonWidget(Game, "CHANGE", delegate() {
@@ -562,6 +567,7 @@ namespace FezGame.Components {
                 windowFieldSky.UpdateBounds = false;
                 windowFieldSky.Position.X = windowLabelSky.Size.X;
                 windowFieldSky.Position.Y = windowLabelSky.Position.Y;
+                windowFieldSky.Fill("Skies");
 
                 ButtonWidget windowButtonChange;
                 window.Widgets.Add(windowButtonChange = new ButtonWidget(Game, "CHANGE", delegate() {
@@ -610,6 +616,7 @@ namespace FezGame.Components {
                 windowFieldSong.UpdateBounds = false;
                 windowFieldSong.Position.X = windowLabelSong.Size.X;
                 windowFieldSong.Position.Y = windowLabelSong.Position.Y;
+                windowFieldSong.Fill("Music");
 
                 ButtonWidget windowButtonChange;
                 window.Widgets.Add(windowButtonChange = new ButtonWidget(Game, "CHANGE", delegate() {

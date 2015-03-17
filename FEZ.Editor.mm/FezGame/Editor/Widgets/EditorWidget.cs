@@ -150,7 +150,6 @@ namespace FezGame.Editor.Widgets {
         }
 
         public virtual void UpdateTheme() {
-
             foreach (EditorWidget widget in Widgets) {
                 widget.UpdateTheme();
             }
