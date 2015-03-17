@@ -112,16 +112,16 @@ namespace FezGame.Services {
                 }
                 ParameterInfo param = methodParams[0];
                 Type paramType = param.ParameterType;
-                if (paramType.FullName == "System.String") {
+                if (paramType == typeof(string)) {
                     method.Invoke(levelData, new object[] {value});
                 } else {
-                    if (typeof(System.ValueType).IsAssignableFrom(paramType)) {
-                        MethodInfo parse = paramType.GetMethod("Parse", new Type[]{typeof(System.String)});
+                    if (typeof(ValueType).IsAssignableFrom(paramType)) {
+                        MethodInfo parse = paramType.GetMethod("Parse", new Type[]{typeof(String)});
                         if (parse != null) {
                             method.Invoke(levelData, new object[]{parse.Invoke(null, new object[]{value})});
                         }
-                    } else if (typeof(System.Enum).IsAssignableFrom(paramType)) {
-                        MethodInfo parse = paramType.GetMethod("Parse", new Type[]{typeof(System.Type), typeof(System.String)});
+                    } else if (typeof(Enum).IsAssignableFrom(paramType)) {
+                        MethodInfo parse = paramType.GetMethod("Parse", new Type[]{typeof(Type), typeof(String)});
                         if (parse != null) {
                             method.Invoke(levelData, new object[]{parse.Invoke(null, new object[]{paramType, value})});
                         }
@@ -563,9 +563,9 @@ namespace FezGame.Services {
                 Type returnType = method.ReturnType;
 
                 if (!(
-                    typeof(System.ValueType).IsAssignableFrom(returnType) ||
-                    typeof(System.Enum).IsAssignableFrom(returnType) ||
-                    typeof(System.String).IsAssignableFrom(returnType)
+                    typeof(ValueType).IsAssignableFrom(returnType) ||
+                    typeof(Enum).IsAssignableFrom(returnType) ||
+                    typeof(string).IsAssignableFrom(returnType)
                 )) {
                     continue;
                 }
@@ -1144,6 +1144,8 @@ namespace FezGame.Services {
 
             tmpLevel = level;
             ChangeLevel(level.Name);
+
+            GameLevelManagerHelper.Level = level;
         }
 
     }

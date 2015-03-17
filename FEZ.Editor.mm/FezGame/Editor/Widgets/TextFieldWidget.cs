@@ -20,13 +20,12 @@ using Microsoft.Xna.Framework.Input;
 using FezGame.Components;
 
 namespace FezGame.Editor.Widgets {
-    public class TextFieldWidget : EditorWidget {
+    public class TextFieldWidget : ButtonWidget {
 
         [ServiceDependency]
         public IKeyboardStateManager KeyboardState { get; set; }
 
         public String Text = "";
-        public SpriteFont Font;
 
         protected bool Focused = false;
         protected float BlinkTime = 0f;
@@ -59,7 +58,28 @@ namespace FezGame.Editor.Widgets {
             }
             BlinkStatus = BlinkStatus && Focused;
 
-            base.Update(gameTime);
+            float offset = Size.Y;
+            float widthMax = 0f;
+            for (int i = 0; i < Widgets.Count; i++) {
+                Widgets[i].Parent = this;
+                Widgets[i].LevelEditor = LevelEditor;
+                Widgets[i].Update(gameTime);
+
+                Widgets[i].Position.X = 0;
+                Widgets[i].Position.Y = offset;
+
+                offset += Widgets[i].Size.Y;
+
+                if (widthMax < Widgets[i].Size.X) {
+                    widthMax = Widgets[i].Size.X;
+                }
+            }
+            for (int i = 0; i < Widgets.Count; i++) {
+                Widgets[i].Size.X = widthMax;
+            }
+
+            Hovered -= (float) gameTime.ElapsedGameTime.TotalSeconds;
+            ShowChildren = Hovered > 0f;
         }
 
         public override void Draw(GameTime gameTime) {
@@ -74,6 +94,9 @@ namespace FezGame.Editor.Widgets {
         }
 
         public override void Click(GameTime gameTime, int mb) {
+            if (mb == 3) {
+                Hovered = 0.1f;
+            }
             if (mb != 1) {
                 return;
             }
@@ -90,6 +113,9 @@ namespace FezGame.Editor.Widgets {
         public override void TextInput(char c) {
             if (c == '\b') {
                 Text = Text.Substring(0, Math.Max(Text.Length - 1, 0));
+            }
+            if (c == '\n' && Action != null) {
+                LevelEditor.Scheduled.Add(Action);
             }
             if (char.IsControl(c)) {
                 return;
