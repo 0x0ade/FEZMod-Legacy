@@ -31,6 +31,9 @@ namespace FezGame.Editor.Widgets {
         protected float BlinkTime = 0f;
         protected bool BlinkStatus = false;
 
+        public float ScrollMomentum = 0f;
+        public float ScrollOffset = 0f;
+
         public TextFieldWidget(Game game) 
             : this(game, "") {
         }
@@ -58,6 +61,20 @@ namespace FezGame.Editor.Widgets {
             }
             BlinkStatus = BlinkStatus && Focused;
 
+            if (ShowChildren) {
+                ScrollOffset += ScrollMomentum;
+                ScrollMomentum *= 0.5f;
+                if (ScrollOffset < 0f) {
+                    ScrollOffset = 0f;
+                }
+                if (ScrollOffset > Widgets[0].Size.Y * (Widgets.Count - 1)) {
+                    ScrollOffset = Widgets[0].Size.Y * (Widgets.Count - 1);
+                }
+            } else {
+                ScrollOffset = 0f;
+                ScrollMomentum = 0f;
+            }
+
             float offset = 0f;
             float widthMax = 0f;
             for (int i = 0; i < Widgets.Count; i++) {
@@ -66,7 +83,7 @@ namespace FezGame.Editor.Widgets {
                 Widgets[i].Update(gameTime);
 
                 Widgets[i].Position.X = Size.X;
-                Widgets[i].Position.Y = offset;
+                Widgets[i].Position.Y = offset - ScrollOffset;
 
                 offset += Widgets[i].Size.Y;
 
@@ -111,6 +128,10 @@ namespace FezGame.Editor.Widgets {
             }
         }
 
+        public override void Scroll(GameTime gameTime, int turn) {
+            ScrollMomentum -= turn * 128f;
+        }
+
         public override void Unfocus(GameTime gameTime) {
             Focused = false;
             BlinkStatus = false;
@@ -133,7 +154,7 @@ namespace FezGame.Editor.Widgets {
             Widgets.Clear();
             IEnumerable<string> list = CMProvider.GetAllIn(root);
             foreach (string item_ in list) {
-                string item = item_.Substring(root.Length + 1);
+                string item = item_.Substring(root.Length + 1).ToUpper();
                 if (item.Contains("\\") || item.Contains("/")) {
                     continue;
                 }

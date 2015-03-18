@@ -105,6 +105,12 @@ namespace FezGame.Editor.Widgets {
             }
         }
 
+        public override void Scroll(GameTime gameTime, int turn) {
+            if (Parent is TextFieldWidget) {
+                ((TextFieldWidget)Parent).ScrollMomentum -= turn * 128f;
+            }
+        }
+
     }
 }
 
