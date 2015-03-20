@@ -9,6 +9,7 @@ using FezEngine.Services.Scripting;
 using FezEngine.Structure;
 using FezEngine.Structure.Geometry;
 using FezEngine.Structure.Input;
+using FezEngine.Structure.Scripting;
 using FezEngine.Tools;
 using FezGame.Services;
 using FezGame.Structure;
@@ -62,6 +63,8 @@ namespace FezGame.Components {
         protected Texture2D ClickedCursor;
         protected Texture2D PointerCursor;
 
+        protected int SkipLoading = 0;
+
         public DateTime BuildDate { get; protected set; }
 
         protected KeyValuePair<TrileEmplacement, TrileInstance>[] tmpTriles = new KeyValuePair<TrileEmplacement, TrileInstance>[8192];
@@ -84,7 +87,7 @@ namespace FezGame.Components {
         public LevelEditor(Game game)
             : base(game) {
             UpdateOrder = -10;
-            DrawOrder = 3000;
+            DrawOrder = 4000;
             TrileId = 0;
             Instance = this;
         }
@@ -104,8 +107,6 @@ namespace FezGame.Components {
                     FocusedWidget.TextInput(e.Character);
                 }
             };
-
-            //GameState.InEditor = true;//Causes some graphical funkyness.
 
             Widgets = new List<EditorWidget>();
 
@@ -223,6 +224,8 @@ namespace FezGame.Components {
                         int.Parse(windowFieldDepth.Text),
                         windowFieldTrileset.Text
                     );
+                    GameState.Loading = true;
+                    SkipLoading = 8;
                     GameLevelManagerHelper.ChangeLevel(level);
                     windowHeader.CloseButtonWidget.Action();
                 }));
@@ -264,6 +267,8 @@ namespace FezGame.Components {
 
                 ButtonWidget windowButtonLoad;
                 window.Widgets.Add(windowButtonLoad = new ButtonWidget(Game, "LOAD", delegate() {
+                    GameState.Loading = true;
+                    SkipLoading = 8;
                     LevelManager.ChangeLevel(windowFieldName.Text);
                     windowHeader.CloseButtonWidget.Action();
                 }));
@@ -650,11 +655,69 @@ namespace FezGame.Components {
 
             TopBarWidget.Widgets.Add(button = new ButtonWidget(Game, "Scripting"));
             button.Background.A = 0;
+            button.Widgets.Add(new ButtonWidget(Game, "View Scripts", delegate() {
+                ContainerWidget window;
+                Widgets.Add(window = new ContainerWidget(Game));
+                window.Size.X = 512f;
+                window.Size.Y = 24f;
+                window.Label = "Scripts";
+                WindowHeaderWidget windowHeader;
+                window.Widgets.Add(windowHeader = new WindowHeaderWidget(Game));
+
+                int i = 0;
+                foreach (Script script in LevelManager.Scripts.Values) {
+                    ButtonWidget windowButtonScript;
+                    window.Widgets.Add(windowButtonScript = new ButtonWidget(Game, "["+script.Id+"] "+script.Name+" ("+(script.Triggerless ? "none" : (script.Triggers.Count == 1 ? script.Triggers[0].ToString() : "..."))+") : "+(script.Actions.Count == 1 ? script.Actions[0].ToString() : "...")));
+                    windowButtonScript.Size.X = window.Size.X - 48f;
+                    windowButtonScript.Size.Y = 24f;
+                    windowButtonScript.UpdateBounds = false;
+                    windowButtonScript.LabelCentered = false;
+                    windowButtonScript.Position.X = 0f;
+                    windowButtonScript.Position.Y = i * 24f;
+
+                    ButtonWidget windowButtonClone;
+                    window.Widgets.Add(windowButtonClone = new ButtonWidget(Game, "C"));
+                    windowButtonClone.Background.B = 31;
+                    windowButtonClone.Size.X = 24f;
+                    windowButtonClone.Size.Y = 24f;
+                    windowButtonClone.UpdateBounds = false;
+                    windowButtonClone.LabelCentered = true;
+                    windowButtonClone.Position.X = window.Size.X - 48f;
+                    windowButtonClone.Position.Y = windowButtonScript.Position.Y;
+
+                    ButtonWidget windowButtonRemove;
+                    window.Widgets.Add(windowButtonRemove = new ButtonWidget(Game, "X"));
+                    windowButtonRemove.Background.R = 255;
+                    windowButtonRemove.Size.X = 24f;
+                    windowButtonRemove.Size.Y = 24f;
+                    windowButtonRemove.UpdateBounds = false;
+                    windowButtonRemove.LabelCentered = true;
+                    windowButtonRemove.Position.X = window.Size.X - 24f;
+                    windowButtonRemove.Position.Y = windowButtonScript.Position.Y;
+
+                    i++;
+                }
+
+                window.Size.Y += i * 24f;
+
+                ButtonWidget windowButtonAdd;
+                window.Widgets.Add(windowButtonAdd = new ButtonWidget(Game, "+", delegate() {
+                }));
+                windowButtonAdd.Background.G = 31;
+                windowButtonAdd.Size.X = window.Size.X;
+                windowButtonAdd.Size.Y = 24f;
+                windowButtonAdd.UpdateBounds = false;
+                windowButtonAdd.LabelCentered = true;
+                windowButtonAdd.Position.X = 0f;
+                windowButtonAdd.Position.Y = window.Size.Y - windowButtonAdd.Size.Y;
+
+                window.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (window.Size.X / 2);
+                window.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (window.Size.Y / 2);
+            }));
 
             TopBarWidget.Widgets.Add(button = new ButtonWidget(Game, "Editor"));
             button.Background.A = 0;
-
-            button.Widgets.Add(button = new ButtonWidget(Game, "Toggle theme", delegate() {
+            button.Widgets.Add(new ButtonWidget(Game, "Toggle theme", delegate() {
                 EditorWidget.DefaultBackground.R = (byte) (255 - EditorWidget.DefaultBackground.R);
                 EditorWidget.DefaultBackground.G = (byte) (255 - EditorWidget.DefaultBackground.G);
                 EditorWidget.DefaultBackground.B = (byte) (255 - EditorWidget.DefaultBackground.B);
@@ -689,7 +752,12 @@ namespace FezGame.Components {
                 Scheduled.RemoveAt(0);
             }
 
-            if (GameState.InMap || GameState.Loading) {
+            if ((--SkipLoading) == 0) {
+                GameState.Loading = false;
+                return;
+            }
+
+            if (GameState.Loading || GameState.InMap || GameState.InMenuCube || GameState.InFpsMode) {
                 return;
             }
 

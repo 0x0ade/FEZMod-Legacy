@@ -5,6 +5,7 @@ using FezGame.Mod;
 using FezGame.Components;
 using FezEngine.Tools;
 using Microsoft.Xna.Framework;
+using FezGame.Services;
 
 namespace FezGame.Editor {
     public class FezEditor : FezModule {

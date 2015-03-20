@@ -61,7 +61,7 @@ namespace FezGame.Editor.Widgets {
             }
             BlinkStatus = BlinkStatus && Focused;
 
-            if (ShowChildren) {
+            if (ShowChildren && Widgets.Count > 0) {
                 ScrollOffset += ScrollMomentum;
                 ScrollMomentum *= 0.5f;
                 if (ScrollOffset < 0f) {

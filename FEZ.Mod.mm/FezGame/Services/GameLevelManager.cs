@@ -134,7 +134,9 @@ namespace FezGame.Services {
 
             //Load / prepare content (especially TrileSet)
 
-            levelData.Sky = cm.Load<Sky>("Skies/" + levelData.SkyName);
+            if (levelData.SkyName != null) {
+                levelData.Sky = cm.Load<Sky>("Skies/" + levelData.SkyName);
+            }
             if (levelData.TrileSetName != null) {
                 levelData.TrileSet = cm.Load<TrileSet>("Trile Sets/" + levelData.TrileSetName);
             }
@@ -741,7 +743,7 @@ namespace FezGame.Services {
                 xmlTrile.AppendChild(xmlTrilePosition);
 
                 //this.data.PositionPhi.W = (float) ((int) orientation - 2) * 1.570796f;
-                xmlTrile.SetAttribute("orientation", ((int) ((trile.Data.PositionPhi.W / 1.570796f) + 2)).ToString());
+                xmlTrile.SetAttribute("orientation", ((int) Math.Round((((double)trile.Data.PositionPhi.W) / 1.570796D) + 2D)).ToString());
                 
                 xmlTrileEntry.AppendChild(xmlTrile);
                 xmlTriles.AppendChild(xmlTrileEntry);

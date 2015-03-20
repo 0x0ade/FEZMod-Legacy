@@ -48,7 +48,7 @@ namespace FezGame.Editor.Widgets {
         public override void Update(GameTime gameTime) {
             if (UpdateBounds && Label != null) {
                 float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
-                Size.X = Font.MeasureString(Label).X * viewScale;
+                Size.X = Font.MeasureString(Label).X * viewScale + 4f;
                 Size.Y = 24f;
             }
 
@@ -88,8 +88,22 @@ namespace FezGame.Editor.Widgets {
                 offset.X = Size.X / 2f - Font.MeasureString(Label).X / 2f;
             }
 
+            LevelEditor.SpriteBatch.End();
+
+            GraphicsDeviceExtensions.BeginPoint(LevelEditor.SpriteBatch);
+
+            GraphicsDevice.RasterizerState.ScissorTestEnable = true;
+            GraphicsDevice.ScissorRectangle = backgroundBounds;
+
             float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
             LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, Font, Label, Position + Offset + offset, Foreground, viewScale);
+
+            LevelEditor.SpriteBatch.End();
+
+            GraphicsDeviceExtensions.BeginPoint(LevelEditor.SpriteBatch);
+
+            GraphicsDevice.RasterizerState.ScissorTestEnable = true;
+            GraphicsDevice.ScissorRectangle = GraphicsDevice.Viewport.Bounds;
         }
 
         public override void Click(GameTime gameTime, int mb) {
