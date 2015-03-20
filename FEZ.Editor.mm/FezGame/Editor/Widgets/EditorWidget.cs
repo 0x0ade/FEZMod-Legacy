@@ -149,6 +149,24 @@ namespace FezGame.Editor.Widgets {
             LevelEditor.SpriteBatch.Draw(pixelTexture, backgroundBounds, Background);
         }
 
+        public virtual void StartClipping() {
+            LevelEditor.SpriteBatch.End();
+
+            GraphicsDeviceExtensions.BeginPoint(LevelEditor.SpriteBatch);
+
+            GraphicsDevice.RasterizerState.ScissorTestEnable = true;
+            GraphicsDevice.ScissorRectangle = backgroundBounds;
+        }
+
+        public virtual void StopClipping() {
+            LevelEditor.SpriteBatch.End();
+
+            GraphicsDeviceExtensions.BeginPoint(LevelEditor.SpriteBatch);
+
+            GraphicsDevice.RasterizerState.ScissorTestEnable = true;
+            GraphicsDevice.ScissorRectangle = GraphicsDevice.Viewport.Bounds;
+        }
+
         public virtual void UpdateTheme() {
             foreach (EditorWidget widget in Widgets) {
                 widget.UpdateTheme();

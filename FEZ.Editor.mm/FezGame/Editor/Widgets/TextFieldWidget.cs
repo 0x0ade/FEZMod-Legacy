@@ -30,6 +30,9 @@ namespace FezGame.Editor.Widgets {
         protected bool Focused = false;
         protected float BlinkTime = 0f;
         protected bool BlinkStatus = false;
+        protected int CursorPosition = 0;
+
+        protected bool PressedDEL = false;
 
         public float ScrollMomentum = 0f;
         public float ScrollOffset = 0f;
@@ -45,6 +48,8 @@ namespace FezGame.Editor.Widgets {
             ShowChildren = false;
             Foreground = Color.Black;
             Background = Color.White;
+
+            KeyboardState.RegisterKey(Keys.Delete);
         }
 
         public override void Update(GameTime gameTime) {
@@ -54,12 +59,25 @@ namespace FezGame.Editor.Widgets {
 
             if (Focused) {
                 BlinkTime += (float) gameTime.ElapsedGameTime.TotalSeconds;
+
+                if (KeyboardState.GetKeyState(Keys.Delete) == FezButtonState.Pressed && CursorPosition < Text.Length) {
+                    Text = Text.Substring(0, CursorPosition) + Text.Substring(Math.Max(CursorPosition + 1, CursorPosition));
+                }
             }
             if (BlinkTime >= 0.5f) {
                 BlinkTime -= 0.5f;
-                BlinkStatus = !BlinkStatus;
+                //BlinkStatus = !BlinkStatus;
             }
-            BlinkStatus = BlinkStatus && Focused;
+            BlinkStatus = /*BlinkStatus && */Focused;
+
+            if (InputManager.Left == FezButtonState.Pressed) {
+                CursorPosition--;
+            }
+            if (InputManager.Right == FezButtonState.Pressed) {
+                CursorPosition++;
+            }
+
+            CursorPosition = Math.Max(0, Math.Min(Text.Length, CursorPosition));
 
             if (ShowChildren && Widgets.Count > 0) {
                 ScrollOffset += ScrollMomentum;
@@ -106,8 +124,12 @@ namespace FezGame.Editor.Widgets {
                 return;
             }
 
+            StartClipping();
+
             float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
-            LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, Font, Text + (BlinkStatus ? "|" : ""), Position + Offset, Color.Black, viewScale);
+            LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, Font, Text.Substring(0, CursorPosition) + (BlinkStatus ? "|" : "") + Text.Substring(CursorPosition), Position + Offset, Color.Black, viewScale);
+
+            StopClipping();
         }
 
         public override void Click(GameTime gameTime, int mb) {
@@ -138,16 +160,18 @@ namespace FezGame.Editor.Widgets {
         }
 
         public override void TextInput(char c) {
-            if (c == '\b') {
-                Text = Text.Substring(0, Math.Max(Text.Length - 1, 0));
+            if (c == '\b' && CursorPosition != 0) {
+                Text = Text.Substring(0, Math.Max(0, CursorPosition - 1)) + Text.Substring(CursorPosition);
+                CursorPosition--;
             }
-            if (c == '\n' && Action != null) {
+            if ((c == '\n' || c == '\r') && Action != null) {
                 LevelEditor.Scheduled.Add(Action);
             }
             if (char.IsControl(c)) {
                 return;
             }
-            Text += c;
+            Text = Text.Substring(0, CursorPosition) + c + Text.Substring(CursorPosition);
+            CursorPosition++;
         }
 
         public void Fill(String root) {

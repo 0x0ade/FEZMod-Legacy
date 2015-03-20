@@ -88,22 +88,12 @@ namespace FezGame.Editor.Widgets {
                 offset.X = Size.X / 2f - Font.MeasureString(Label).X / 2f;
             }
 
-            LevelEditor.SpriteBatch.End();
-
-            GraphicsDeviceExtensions.BeginPoint(LevelEditor.SpriteBatch);
-
-            GraphicsDevice.RasterizerState.ScissorTestEnable = true;
-            GraphicsDevice.ScissorRectangle = backgroundBounds;
+            StartClipping();
 
             float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
             LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, Font, Label, Position + Offset + offset, Foreground, viewScale);
 
-            LevelEditor.SpriteBatch.End();
-
-            GraphicsDeviceExtensions.BeginPoint(LevelEditor.SpriteBatch);
-
-            GraphicsDevice.RasterizerState.ScissorTestEnable = true;
-            GraphicsDevice.ScissorRectangle = GraphicsDevice.Viewport.Bounds;
+            StopClipping();
         }
 
         public override void Click(GameTime gameTime, int mb) {
