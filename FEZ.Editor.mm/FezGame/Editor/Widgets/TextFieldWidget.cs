@@ -31,6 +31,7 @@ namespace FezGame.Editor.Widgets {
         protected float BlinkTime = 0f;
         protected bool BlinkStatus = false;
         protected int CursorPosition = 0;
+        protected float CursorScroll = 0f;
 
         protected bool PressedDEL = false;
 
@@ -127,7 +128,17 @@ namespace FezGame.Editor.Widgets {
             StartClipping();
 
             float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
-            LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, Font, Text.Substring(0, CursorPosition) + (BlinkStatus ? "|" : "") + Text.Substring(CursorPosition), Position + Offset, Color.Black, viewScale);
+
+            float cursorOffset = Font.MeasureString((Text + "|").Substring(0, CursorPosition)).X;
+            if (cursorOffset - CursorScroll >= Size.X * 0.75f) {
+                CursorScroll = cursorOffset - Size.X * 0.75f;
+            } else if (cursorOffset - CursorScroll <= Size.X * 0.25f) {
+                CursorScroll = cursorOffset - Size.X * 0.25f;
+            }
+            CursorScroll = Math.Min(Font.MeasureString(Text + "|").X, CursorScroll);
+            CursorScroll = Math.Max(0f, CursorScroll);
+
+            LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, Font, Text.Substring(0, CursorPosition) + (BlinkStatus ? "|" : "") + Text.Substring(CursorPosition), Position + Offset - new Vector2(CursorScroll, 0f), Color.Black, viewScale);
 
             StopClipping();
         }
@@ -142,6 +153,7 @@ namespace FezGame.Editor.Widgets {
             Focused = true;
             BlinkTime = 0f;
             BlinkStatus = true;
+            CursorPosition = Text.Length;
         }
 
         public override void Hover(GameTime gameTime) {
