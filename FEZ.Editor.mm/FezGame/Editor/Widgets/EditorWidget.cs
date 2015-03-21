@@ -45,6 +45,7 @@ namespace FezGame.Editor.Widgets {
         public EditorWidget Parent;
         public List<EditorWidget> Widgets = new List<EditorWidget>();
         public bool ShowChildren = true;
+        public bool ClipChildren = false;
 
         public Vector2 Position = new Vector2(0f);
         public Vector2 Size = new Vector2(128f);
@@ -111,10 +112,20 @@ namespace FezGame.Editor.Widgets {
                 return;
             }
 
+            bool clippingChildren = ClipChildren;
+
+            if (clippingChildren) {
+                StartClipping();
+            }
+
             foreach (EditorWidget widget in Widgets) {
                 widget.Parent = this;
                 widget.LevelEditor = LevelEditor;
                 widget.Draw(gameTime);
+            }
+
+            if (clippingChildren) {
+                StopClipping();
             }
         }
 

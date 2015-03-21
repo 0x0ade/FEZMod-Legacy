@@ -74,7 +74,7 @@ namespace FezGame.Editor.Widgets {
             return new string[] {
                 "Build Date " + LevelEditor.BuildDate,
                 "Level: " + (LevelManager.Name ?? "(none)"),
-                "Gomez Position: " + (PlayerManager != null ? (" (" + PlayerManager.Position.X + ", " + PlayerManager.Position.Y + ", " + PlayerManager.Position.Z + ")") : "(none)"),
+                "Gomez Position: " + (PlayerManager != null ? (" (" + VectorHelper.ToString(PlayerManager.Position) + ")") : "(none)"),
                 "Trile Set: " + (LevelManager.TrileSet != null ? LevelManager.TrileSet.Name : "(none)"),
                 "Hovered Trile ID: " + (LevelEditor.HoveredTrile != null ? LevelEditor.HoveredTrile.TrileId.ToString() : "(none)"),
                 "Hovered Trile: " + (LevelEditor.HoveredTrile != null ? (LevelEditor.HoveredTrile.Trile.Name + " (" + LevelEditor.HoveredTrile.Emplacement.X + ", " + LevelEditor.HoveredTrile.Emplacement.Y + ", " + LevelEditor.HoveredTrile.Emplacement.Z + ")") : "(none)"),

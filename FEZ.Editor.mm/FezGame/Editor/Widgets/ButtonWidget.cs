@@ -30,14 +30,15 @@ namespace FezGame.Editor.Widgets {
         public float Hovered = 0f;
 
         public ButtonWidget(Game game) 
-            : this(game, null) {
+            : this(game, null, (Action) null) {
         }
 
-        public ButtonWidget(Game game, String label) 
-            : this(game, label, null) {
+        public ButtonWidget(Game game, String label, EditorWidget[] widgets, Action action = null) 
+            : this(game, label, action) {
+            Widgets.AddRange(widgets);
         }
 
-        public ButtonWidget(Game game, String label, Action action) 
+        public ButtonWidget(Game game, String label, Action action = null) 
             : base(game) {
             Label = label;
             Action = action;
@@ -46,20 +47,27 @@ namespace FezGame.Editor.Widgets {
         }
 
         public override void Update(GameTime gameTime) {
-            if (UpdateBounds && Label != null) {
-                float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
-                Size.X = Font.MeasureString(Label).X * viewScale + 4f;
+            if (UpdateBounds) {
+                if (Label != null) {
+                    float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
+                    Size.X = Font.MeasureString(Label).X * viewScale + 4f;
+                }
                 Size.Y = 24f;
             }
 
-            float offset = Size.Y;
+            float offset = Parent is ButtonWidget ? 0f : Size.Y;
             float widthMax = 0f;
             for (int i = 0; i < Widgets.Count; i++) {
                 Widgets[i].Parent = this;
                 Widgets[i].LevelEditor = LevelEditor;
                 Widgets[i].Update(gameTime);
 
-                Widgets[i].Position.X = 0;
+                if (Parent is ButtonWidget) {
+                    Widgets[i].Position.X = Size.X;
+                } else {
+                    Widgets[i].Position.X = 0f;
+                }
+
                 Widgets[i].Position.Y = offset;
 
                 offset += Widgets[i].Size.Y;
@@ -70,6 +78,7 @@ namespace FezGame.Editor.Widgets {
             }
             for (int i = 0; i < Widgets.Count; i++) {
                 Widgets[i].Size.X = widthMax;
+                Widgets[i].UpdateBounds = false;
             }
 
             Hovered -= (float) gameTime.ElapsedGameTime.TotalSeconds;

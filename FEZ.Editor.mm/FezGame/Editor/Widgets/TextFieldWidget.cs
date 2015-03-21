@@ -112,6 +112,7 @@ namespace FezGame.Editor.Widgets {
             }
             for (int i = 0; i < Widgets.Count; i++) {
                 Widgets[i].Size.X = widthMax;
+                Widgets[i].UpdateBounds = false;
             }
 
             Hovered -= (float) gameTime.ElapsedGameTime.TotalSeconds;

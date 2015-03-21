@@ -27,6 +27,10 @@ namespace FezGame.Editor.Widgets {
             : base(game) {
         }
 
+        public override void Draw(GameTime gameTime) {
+            base.Draw(gameTime);
+        }
+
     }
 }
 
