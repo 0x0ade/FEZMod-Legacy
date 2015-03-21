@@ -120,7 +120,7 @@ namespace FezGame.Editor.Widgets {
         }
 
         public override void Hover(GameTime gameTime) {
-            Hovered = 0.25f;
+            Hovered = 0.1f;
             base.Hover(gameTime);
         }
 
