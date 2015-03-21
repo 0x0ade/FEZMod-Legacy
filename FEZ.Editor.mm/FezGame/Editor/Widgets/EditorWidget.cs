@@ -132,8 +132,14 @@ namespace FezGame.Editor.Widgets {
         public virtual void Click(GameTime gameTime, int mb) {
         }
         public virtual void Hover(GameTime gameTime) {
+            if (ParentAs<ButtonWidget>() != null && ParentAs<ButtonWidget>().Hovered > 0f) {
+                ParentAs<ButtonWidget>().Hover(gameTime);
+            }
         }
         public virtual void Scroll(GameTime gameTime, int turn) {
+            if (ParentAs<TextFieldWidget>() != null) {
+                ParentAs<TextFieldWidget>().ScrollMomentum -= turn * 128f;
+            }
         }
         public virtual void Dragging(GameTime gameTime, MouseButtonStates state) {
         }
@@ -198,6 +204,17 @@ namespace FezGame.Editor.Widgets {
 
             PrevDefaultForeground = DefaultForeground;
             PrevDefaultBackground = DefaultBackground;
+        }
+
+        public virtual void Refresh() {
+        }
+
+        public T ParentAs<T>() where T : EditorWidget {
+            EditorWidget parent = Parent;
+            while (parent != null && !(parent is T)) {
+                parent = parent.Parent;
+            }
+            return (T) parent;
         }
 
     }

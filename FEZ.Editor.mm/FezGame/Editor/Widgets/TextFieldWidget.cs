@@ -42,6 +42,16 @@ namespace FezGame.Editor.Widgets {
             : this(game, "") {
         }
 
+        public TextFieldWidget(Game game, String text, String root) 
+            : this(game, text) {
+            Fill(root);
+        }
+
+        public TextFieldWidget(Game game, String text, IEnumerable<string> list) 
+            : this(game, text) {
+            Fill(list);
+        }
+
         public TextFieldWidget(Game game, String text) 
             : base(game) {
             Text = text;
@@ -63,6 +73,10 @@ namespace FezGame.Editor.Widgets {
 
                 if (KeyboardState.GetKeyState(Keys.Delete) == FezButtonState.Pressed && CursorPosition < Text.Length) {
                     Text = Text.Substring(0, CursorPosition) + Text.Substring(Math.Max(CursorPosition + 1, CursorPosition));
+                }
+
+                if (ParentAs<ButtonWidget>() != null) {
+                    ParentAs<ButtonWidget>().Hover(gameTime);
                 }
             }
             if (BlinkTime >= 0.5f) {
@@ -116,7 +130,13 @@ namespace FezGame.Editor.Widgets {
             }
 
             Hovered -= (float) gameTime.ElapsedGameTime.TotalSeconds;
+            bool showedChildren = ShowChildren;
             ShowChildren = Hovered > 0f;
+            if (!showedChildren && ShowChildren) {
+                for (int i = 0; i < Widgets.Count; i++) {
+                    Widgets[i].Refresh();
+                }
+            }
         }
 
         public override void Draw(GameTime gameTime) {
@@ -145,9 +165,6 @@ namespace FezGame.Editor.Widgets {
         }
 
         public override void Click(GameTime gameTime, int mb) {
-            if (mb == 3) {
-                Hovered = 0.1f;
-            }
             if (mb != 1) {
                 return;
             }
@@ -161,10 +178,12 @@ namespace FezGame.Editor.Widgets {
             if (Hovered >= 0f) {
                 Hovered = 0.1f;
             }
+            base.Hover(gameTime);
         }
 
         public override void Scroll(GameTime gameTime, int turn) {
             ScrollMomentum -= turn * 128f;
+            base.Scroll(gameTime, turn);
         }
 
         public override void Unfocus(GameTime gameTime) {
@@ -212,6 +231,13 @@ namespace FezGame.Editor.Widgets {
                 }));
                 button.Background = Background;
             }
+        }
+
+        public override void Refresh() {
+            if (RefreshValue == null) {
+                return;
+            }
+            Text = RefreshValue();
         }
 
     }

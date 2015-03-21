@@ -23,12 +23,17 @@ namespace FezGame.Editor.Widgets {
 
         public String Label;
 
-        public ContainerWidget(Game game) 
+        public ContainerWidget(Game game, EditorWidget[] widgets = null)
             : base(game) {
+            if (widgets != null) {
+                Widgets.AddRange(widgets);
+            }
         }
 
-        public override void Draw(GameTime gameTime) {
-            base.Draw(gameTime);
+        public override void Refresh() {
+            foreach (EditorWidget widget in Widgets) {
+                widget.Refresh();
+            }
         }
 
     }

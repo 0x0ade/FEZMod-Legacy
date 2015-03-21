@@ -21,6 +21,8 @@ using FezGame.Components;
 namespace FezGame.Editor.Widgets {
     public class ButtonWidget : EditorWidget {
 
+        public Func<string> RefreshValue;
+
         public String Label;
         public SpriteFont Font;
         public bool LabelCentered = false;
@@ -55,14 +57,14 @@ namespace FezGame.Editor.Widgets {
                 Size.Y = 24f;
             }
 
-            float offset = Parent is ButtonWidget ? 0f : Size.Y;
+            float offset = ParentAs<ButtonWidget>() != null ? 0f : Size.Y;
             float widthMax = 0f;
             for (int i = 0; i < Widgets.Count; i++) {
                 Widgets[i].Parent = this;
                 Widgets[i].LevelEditor = LevelEditor;
                 Widgets[i].Update(gameTime);
 
-                if (Parent is ButtonWidget) {
+                if (ParentAs<ButtonWidget>() != null) {
                     Widgets[i].Position.X = Size.X;
                 } else {
                     Widgets[i].Position.X = 0f;
@@ -82,7 +84,13 @@ namespace FezGame.Editor.Widgets {
             }
 
             Hovered -= (float) gameTime.ElapsedGameTime.TotalSeconds;
+            bool showedChildren = ShowChildren;
             ShowChildren = Hovered > 0f;
+            if (!showedChildren && ShowChildren) {
+                for (int i = 0; i < Widgets.Count; i++) {
+                    Widgets[i].Refresh();
+                }
+            }
         }
 
         public override void Draw(GameTime gameTime) {
@@ -112,16 +120,19 @@ namespace FezGame.Editor.Widgets {
         }
 
         public override void Hover(GameTime gameTime) {
-            Hovered = 0.1f;
-            if (Parent is ButtonWidget && ((ButtonWidget)Parent).Hovered > 0f) {
-                ((ButtonWidget)Parent).Hover(gameTime);
-            }
+            Hovered = 0.25f;
+            base.Hover(gameTime);
         }
 
-        public override void Scroll(GameTime gameTime, int turn) {
-            if (Parent is TextFieldWidget) {
-                ((TextFieldWidget)Parent).ScrollMomentum -= turn * 128f;
+        public override void Unfocus(GameTime gameTime) {
+            Hovered = 0f;
+        }
+
+        public override void Refresh() {
+            if (RefreshValue == null) {
+                return;
             }
+            Label = RefreshValue();
         }
 
     }
