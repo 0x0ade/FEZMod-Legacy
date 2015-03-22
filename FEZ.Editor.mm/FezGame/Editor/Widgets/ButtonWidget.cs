@@ -19,17 +19,14 @@ using Microsoft.Xna.Framework.Graphics;
 using FezGame.Components;
 
 namespace FezGame.Editor.Widgets {
-    public class ButtonWidget : EditorWidget {
+    public class ButtonWidget : ContainerWidget {
 
         public Func<string> RefreshValue;
 
-        public String Label;
         public SpriteFont Font;
         public bool LabelCentered = false;
 
         public Action Action;
-
-        public float Hovered = 0f;
 
         public ButtonWidget(Game game) 
             : this(game, null, (Action) null) {
@@ -57,14 +54,14 @@ namespace FezGame.Editor.Widgets {
                 Size.Y = 24f;
             }
 
-            float offset = ParentAs<ButtonWidget>() != null ? 0f : Size.Y;
+            float offset = ParentAs<ContainerWidget>() != null ? 0f : Size.Y;
             float widthMax = 0f;
             for (int i = 0; i < Widgets.Count; i++) {
                 Widgets[i].Parent = this;
                 Widgets[i].LevelEditor = LevelEditor;
                 Widgets[i].Update(gameTime);
 
-                if (ParentAs<ButtonWidget>() != null) {
+                if (ParentAs<ContainerWidget>() != null) {
                     Widgets[i].Position.X = Size.X;
                 } else {
                     Widgets[i].Position.X = 0f;
@@ -105,27 +102,22 @@ namespace FezGame.Editor.Widgets {
                 offset.X = Size.X / 2f - Font.MeasureString(Label).X / 2f;
             }
 
-            StartClipping();
+            if (ParentAs<ContainerWidget>() == null || ParentAs<ContainerWidget>().ClipChildren) {
+                StartClipping();
+            }
 
             float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
             LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, Font, Label, Position + Offset + offset, Foreground, viewScale);
 
-            StopClipping();
+            if (ParentAs<ContainerWidget>() == null || ParentAs<ContainerWidget>().ClipChildren) {
+                StopClipping();
+            }
         }
 
         public override void Click(GameTime gameTime, int mb) {
             if (mb == 1 && Action != null) {
                 LevelEditor.Scheduled.Add(Action);
             }
-        }
-
-        public override void Hover(GameTime gameTime) {
-            Hovered = 0.1f;
-            base.Hover(gameTime);
-        }
-
-        public override void Unfocus(GameTime gameTime) {
-            Hovered = 0f;
         }
 
         public override void Refresh() {

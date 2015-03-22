@@ -49,8 +49,8 @@ namespace FezGame.Editor.Widgets {
             if (ScrollOffset < 0f) {
                 ScrollOffset = 0f;
             }
-            if (ScrollOffset > Width) {
-                ScrollOffset = Width;
+            if (ScrollOffset > Width - Size.X) {
+                ScrollOffset = Width - Size.X;
             }
 
             if (UpdateBounds) {
@@ -80,7 +80,7 @@ namespace FezGame.Editor.Widgets {
 
             scrollIndicatorBounds.X = backgroundBounds.X + (int) (Size.X * ScrollOffset / Width);
             scrollIndicatorBounds.Y = backgroundBounds.Y + (int) (Size.Y) - 4;
-            scrollIndicatorBounds.Width = 8;
+            scrollIndicatorBounds.Width = (int) (Size.X * Size.X / Width);
             scrollIndicatorBounds.Height = 4;
 
             LevelEditor.SpriteBatch.Draw(pixelTexture, scrollIndicatorBounds, new Color(255, 255, 255, Background.A));

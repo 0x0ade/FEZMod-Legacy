@@ -86,6 +86,7 @@ namespace FezGame.Editor.Widgets {
         }
         public Color Background = DefaultBackground;
         protected Rectangle backgroundBounds = new Rectangle();
+        protected Rectangle ScissorRectanglePrev;
         protected static Texture2D pixelTexture;
 
         public EditorWidget(Game game) 
@@ -132,13 +133,13 @@ namespace FezGame.Editor.Widgets {
         public virtual void Click(GameTime gameTime, int mb) {
         }
         public virtual void Hover(GameTime gameTime) {
-            if (ParentAs<ButtonWidget>() != null && ParentAs<ButtonWidget>().Hovered > 0f) {
-                ParentAs<ButtonWidget>().Hover(gameTime);
+            if (ParentAs<ContainerWidget>() != null && ParentAs<ContainerWidget>().Hovered > 0f) {
+                ParentAs<ContainerWidget>().Hover(gameTime);
             }
         }
         public virtual void Scroll(GameTime gameTime, int turn) {
-            if (ParentAs<TextFieldWidget>() != null) {
-                ParentAs<TextFieldWidget>().ScrollMomentum -= turn * 128f;
+            if (ParentAs<ContainerWidget>() != null) {
+                ParentAs<ContainerWidget>().ScrollMomentum -= turn * 128f;
             }
         }
         public virtual void Dragging(GameTime gameTime, MouseButtonStates state) {
@@ -172,6 +173,7 @@ namespace FezGame.Editor.Widgets {
             GraphicsDeviceExtensions.BeginPoint(LevelEditor.SpriteBatch);
 
             GraphicsDevice.RasterizerState.ScissorTestEnable = true;
+            ScissorRectanglePrev = GraphicsDevice.ScissorRectangle;
             GraphicsDevice.ScissorRectangle = backgroundBounds;
         }
 
@@ -181,7 +183,7 @@ namespace FezGame.Editor.Widgets {
             GraphicsDeviceExtensions.BeginPoint(LevelEditor.SpriteBatch);
 
             GraphicsDevice.RasterizerState.ScissorTestEnable = true;
-            GraphicsDevice.ScissorRectangle = GraphicsDevice.Viewport.Bounds;
+            GraphicsDevice.ScissorRectangle = ScissorRectanglePrev;
         }
 
         public virtual void UpdateTheme() {

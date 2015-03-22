@@ -51,12 +51,14 @@ namespace FezGame.Editor.Widgets {
             if (UpdateBounds) {
                 Size.X = 32f;
                 Size.Y = 32f;
+
+                Tooltip.UpdateBounds = true;
+
+                Tooltip.Label = Trile.Name;
+
+                Tooltip.Position.X = -Tooltip.Size.X / 2f + Size.X / 2f;
+                Tooltip.Position.Y = -Tooltip.Size.Y;
             }
-
-            Tooltip.Label = Trile.Name;
-
-            Tooltip.Position.X = -Tooltip.Size.X / 2f + Size.X / 2f;
-            Tooltip.Position.Y = -Tooltip.Size.Y;
         }
 
         public override void Draw(GameTime gameTime) {

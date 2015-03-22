@@ -35,9 +35,6 @@ namespace FezGame.Editor.Widgets {
 
         protected bool PressedDEL = false;
 
-        public float ScrollMomentum = 0f;
-        public float ScrollOffset = 0f;
-
         public TextFieldWidget(Game game) 
             : this(game, "") {
         }
@@ -75,8 +72,8 @@ namespace FezGame.Editor.Widgets {
                     Text = Text.Substring(0, CursorPosition) + Text.Substring(Math.Max(CursorPosition + 1, CursorPosition));
                 }
 
-                if (ParentAs<ButtonWidget>() != null) {
-                    ParentAs<ButtonWidget>().Hover(gameTime);
+                if (ParentAs<ContainerWidget>() != null) {
+                    ParentAs<ContainerWidget>().Hover(gameTime);
                 }
             }
             if (BlinkTime >= 0.5f) {
@@ -146,7 +143,9 @@ namespace FezGame.Editor.Widgets {
                 return;
             }
 
-            StartClipping();
+            if (ParentAs<ContainerWidget>() == null || !ParentAs<ContainerWidget>().UpdateBounds) {
+                StartClipping();
+            }
 
             float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
 
@@ -161,7 +160,9 @@ namespace FezGame.Editor.Widgets {
 
             LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, Font, Text.Substring(0, CursorPosition) + (BlinkStatus ? "|" : "") + Text.Substring(CursorPosition), Position + Offset - new Vector2(CursorScroll, 0f), Color.Black, viewScale);
 
-            StopClipping();
+            if (ParentAs<ContainerWidget>() == null || !ParentAs<ContainerWidget>().UpdateBounds) {
+                StopClipping();
+            }
         }
 
         public override void Click(GameTime gameTime, int mb) {
@@ -172,18 +173,6 @@ namespace FezGame.Editor.Widgets {
             BlinkTime = 0f;
             BlinkStatus = true;
             CursorPosition = Text.Length;
-        }
-
-        public override void Hover(GameTime gameTime) {
-            if (Hovered >= 0f) {
-                Hovered = 0.1f;
-            }
-            base.Hover(gameTime);
-        }
-
-        public override void Scroll(GameTime gameTime, int turn) {
-            ScrollMomentum -= turn * 128f;
-            base.Scroll(gameTime, turn);
         }
 
         public override void Unfocus(GameTime gameTime) {

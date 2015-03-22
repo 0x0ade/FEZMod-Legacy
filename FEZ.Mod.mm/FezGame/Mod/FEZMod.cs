@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework;
 
 namespace FezGame.Mod {
     public static class FEZMod {
-        public static string Version = "0.1.2";
+        public static string Version = "0.2";
 
         public static List<FezModule> Modules = new List<FezModule>();
 
