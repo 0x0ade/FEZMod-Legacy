@@ -520,6 +520,44 @@ namespace FezGame.Components {
                     LabelCentered = true
                 }
             }));
+            TextFieldWidget fieldWaterHeight;
+            TextFieldWidget fieldWaterType;
+            button.Widgets.Add(new ButtonWidget(Game, "Water", new EditorWidget[] {
+                new ContainerWidget(Game, new EditorWidget[] {
+                    new ButtonWidget(Game, "Type:") {
+                        Background = new Color(EditorWidget.DefaultBackground, 0f),
+                        LabelCentered = false,
+                        Position = new Vector2(0f, 0f)
+                    },
+                    fieldWaterType = new TextFieldWidget(Game, "", Enum.GetNames(typeof(LiquidType))) {
+                        RefreshValue = () => LevelManager.WaterType.ToString(),
+                        Size = new Vector2(160f, 24f),
+                        Position = new Vector2(96f, 0f)
+                    },
+                }) {
+                    Size = new Vector2(256f, 24f)
+                },
+                new ContainerWidget(Game, new EditorWidget[] {
+                    new ButtonWidget(Game, "Height:") {
+                        Background = new Color(EditorWidget.DefaultBackground, 0f),
+                        LabelCentered = false,
+                        Position = new Vector2(0f, 0f)
+                    },
+                    fieldWaterHeight = new TextFieldWidget(Game, "") {
+                        RefreshValue = () => LevelManager.WaterHeight.ToString(),
+                        Size = new Vector2(160f, 24f),
+                        Position = new Vector2(96f, 0f)
+                    },
+                }) {
+                    Size = new Vector2(256f, 24f)
+                },
+                new ButtonWidget(Game, "CHANGE", delegate() {
+                    LevelManager.WaterType = (LiquidType) Enum.Parse(typeof(LiquidType), fieldWaterType.Text);
+                    LevelManager.WaterHeight = float.Parse(fieldWaterHeight.Text);
+                }) {
+                    LabelCentered = true
+                }
+            }));
 
             TopBarWidget.Widgets.Add(button = new ButtonWidget(Game, "Scripting"));
             button.Background.A = 0;

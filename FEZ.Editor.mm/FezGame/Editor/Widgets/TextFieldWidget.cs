@@ -147,6 +147,8 @@ namespace FezGame.Editor.Widgets {
                 StartClipping();
             }
 
+            CursorPosition = Math.Max(0, Math.Min(Text.Length, CursorPosition));
+
             float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
 
             float cursorOffset = Font.MeasureString((Text + "|").Substring(0, CursorPosition)).X;

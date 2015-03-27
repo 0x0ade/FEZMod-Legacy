@@ -37,7 +37,7 @@ namespace FezGame.Mod {
             ModLogger.Clear();
             ModLogger.Log("JAFM", "JustAnotherFEZMod (JAFM) "+FEZMod.Version);
 
-            Fez.Version = "FEZ: "+ Fez.Version + " | JAFM: " + FEZMod.Version;
+            Fez.Version = Fez.Version + " | " + FEZMod.Version;
 
             Fez.NoSteamworks = true;
 
