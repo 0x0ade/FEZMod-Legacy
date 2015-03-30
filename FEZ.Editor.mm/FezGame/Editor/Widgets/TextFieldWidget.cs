@@ -143,9 +143,7 @@ namespace FezGame.Editor.Widgets {
                 return;
             }
 
-            if (ParentAs<ContainerWidget>() == null || !ParentAs<ContainerWidget>().UpdateBounds) {
-                StartClipping();
-            }
+            StartClipping();
 
             CursorPosition = Math.Max(0, Math.Min(Text.Length, CursorPosition));
 
@@ -162,9 +160,7 @@ namespace FezGame.Editor.Widgets {
 
             LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, Font, Text.Substring(0, CursorPosition) + (BlinkStatus ? "|" : "") + Text.Substring(CursorPosition), Position + Offset - new Vector2(CursorScroll, 0f), Color.Black, viewScale);
 
-            if (ParentAs<ContainerWidget>() == null || !ParentAs<ContainerWidget>().UpdateBounds) {
-                StopClipping();
-            }
+            StopClipping();
         }
 
         public override void Click(GameTime gameTime, int mb) {
@@ -226,9 +222,11 @@ namespace FezGame.Editor.Widgets {
 
         public override void Refresh() {
             if (RefreshValue == null) {
+                base.Refresh();
                 return;
             }
-            Text = RefreshValue();
+            Text = (string) RefreshValue();
+            base.Refresh();
         }
 
     }

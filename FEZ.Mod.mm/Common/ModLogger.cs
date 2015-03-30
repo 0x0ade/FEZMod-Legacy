@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Common {
     public class ModLogger {
-        private static readonly string LogFilePath = "JAFM Log.txt";//Creates the .txt to where the game was run (next to FEZ.exe)
+        private static readonly string LogFilePath = "JAFM Log.txt";//Creates the .txt wherever the game is running (next to FEZ.exe)
         private const string TimeFormat = "HH:mm:ss.fff";
 
         public static void Log(string component, string message) {

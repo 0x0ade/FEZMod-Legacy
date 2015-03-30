@@ -21,10 +21,9 @@ using FezGame.Components;
 namespace FezGame.Editor.Widgets {
     public class ButtonWidget : ContainerWidget {
 
-        public Func<string> RefreshValue;
-
         public SpriteFont Font;
         public bool LabelCentered = false;
+        public Vector2 LabelOffset = new Vector2(0f, 0f);
 
         public Action Action;
 
@@ -97,21 +96,17 @@ namespace FezGame.Editor.Widgets {
                 return;
             }
 
-            Vector2 offset = new Vector2(0f, 0f);
+            Vector2 offset = LabelOffset;
             if (LabelCentered) {
-                offset.X = Size.X / 2f - Font.MeasureString(Label).X / 2f;
+                offset.X += Size.X / 2f - Font.MeasureString(Label).X / 2f;
             }
 
-            if (ParentAs<ContainerWidget>() == null || ParentAs<ContainerWidget>().ClipChildren) {
-                StartClipping();
-            }
+            StartClipping();
 
             float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
             LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, Font, Label, Position + Offset + offset, Foreground, viewScale);
 
-            if (ParentAs<ContainerWidget>() == null || ParentAs<ContainerWidget>().ClipChildren) {
-                StopClipping();
-            }
+            StopClipping();
         }
 
         public override void Click(GameTime gameTime, int mb) {
@@ -122,9 +117,11 @@ namespace FezGame.Editor.Widgets {
 
         public override void Refresh() {
             if (RefreshValue == null) {
+                base.Refresh();
                 return;
             }
-            Label = RefreshValue();
+            Label = (string) RefreshValue();
+            base.Refresh();
         }
 
     }

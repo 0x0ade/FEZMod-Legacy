@@ -21,6 +21,8 @@ using FezGame.Components;
 namespace FezGame.Editor.Widgets {
     public class ContainerWidget : EditorWidget {
 
+        public Func<object> RefreshValue;
+
         public string Label;
 
         public float Hovered = 0f;
@@ -70,6 +72,10 @@ namespace FezGame.Editor.Widgets {
                 Widgets[i].Parent = this;
                 Widgets[i].LevelEditor = LevelEditor;
                 Widgets[i].Update(gameTime);
+
+                if (Widgets[i].GetType() == typeof(ContainerWidget)) {
+                    Widgets[i].ClipChildren = true;
+                }
 
                 if (Widgets[i] is WindowHeaderWidget) {
                     continue;
@@ -159,9 +165,12 @@ namespace FezGame.Editor.Widgets {
         }
 
         public override void Refresh() {
-            foreach (EditorWidget widget in Widgets) {
-                widget.Refresh();
+            if (RefreshValue == null) {
+                base.Refresh();
+                return;
             }
+            RefreshValue();
+            base.Refresh();
         }
 
     }

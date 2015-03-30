@@ -118,106 +118,95 @@ namespace FezGame.Components {
 
             TopBarWidget.Widgets.Add(button = new ButtonWidget(Game, "File"));
             button.Background.A = 0;
+
             button.Widgets.Add(new ButtonWidget(Game, "New", delegate() {
                 ContainerWidget window;
-                Widgets.Add(window = new ContainerWidget(Game));
-                window.Size.X = 256f;
-                window.Size.Y = 144f;
+                Widgets.Add(window = new ContainerWidget(Game) {
+                    Size = new Vector2(256f, 144f),
+                    Label = "New level"
+                });
                 window.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (window.Size.X / 2);
                 window.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (window.Size.Y / 2);
-                window.Label = "New level";
                 WindowHeaderWidget windowHeader;
                 window.Widgets.Add(windowHeader = new WindowHeaderWidget(Game));
 
                 ButtonWidget windowLabelName;
-                window.Widgets.Add(windowLabelName = new ButtonWidget(Game, "Name:"));
-                windowLabelName.Background.A = 0;
-                windowLabelName.Size.X = 96f;
-                windowLabelName.Size.Y = 24f;
-                windowLabelName.UpdateBounds = false;
-                windowLabelName.LabelCentered = false;
-                windowLabelName.Position.X = 0f;
-                windowLabelName.Position.Y = 0f;
+                window.Widgets.Add(windowLabelName = new ButtonWidget(Game, "Name:") {
+                    Background = new Color(EditorWidget.DefaultBackground, 0f),
+                    Size = new Vector2(96f, 24f),
+                    UpdateBounds = false,
+                    LabelCentered = false,
+                    Position = new Vector2(0f, 0f)
+                });
                 TextFieldWidget windowFieldName;
-                window.Widgets.Add(windowFieldName = new TextFieldWidget(Game));
-                windowFieldName.Size.X = window.Size.X - windowLabelName.Size.X;
-                windowFieldName.Size.Y = 24f;
-                windowFieldName.UpdateBounds = false;
-                windowFieldName.Position.X = windowLabelName.Size.X;
-                windowFieldName.Position.Y = windowLabelName.Position.Y;
+                window.Widgets.Add(windowFieldName = new TextFieldWidget(Game) {
+                    Size = new Vector2(window.Size.X - windowLabelName.Size.X, 24f),
+                    UpdateBounds = false,
+                    Position = new Vector2(windowLabelName.Size.X, windowLabelName.Position.Y)
+                });
                 windowFieldName.Fill("Levels");
 
                 ButtonWidget windowLabelWidth;
-                window.Widgets.Add(windowLabelWidth = new ButtonWidget(Game, "Width:"));
-                windowLabelWidth.Background.A = 0;
-                windowLabelWidth.Size.X = 96f;
-                windowLabelWidth.Size.Y = 24f;
-                windowLabelWidth.UpdateBounds = false;
-                windowLabelWidth.LabelCentered = false;
-                windowLabelWidth.Position.X = 0f;
-                windowLabelWidth.Position.Y = 24f;
+                window.Widgets.Add(windowLabelWidth = new ButtonWidget(Game, "Width:") {
+                    Background = new Color(EditorWidget.DefaultBackground, 0f),
+                    Size = new Vector2(96f, 24f),
+                    UpdateBounds = false,
+                    LabelCentered = false,
+                    Position = new Vector2(0f, 24f)
+                });
                 TextFieldWidget windowFieldWidth;
-                window.Widgets.Add(windowFieldWidth = new TextFieldWidget(Game));
-                windowFieldWidth.Size.X = window.Size.X - windowLabelWidth.Size.X;
-                windowFieldWidth.Size.Y = 24f;
-                windowFieldWidth.UpdateBounds = false;
-                windowFieldWidth.Position.X = windowLabelWidth.Size.X;
-                windowFieldWidth.Position.Y = windowLabelWidth.Position.Y;
+                window.Widgets.Add(windowFieldWidth = new TextFieldWidget(Game) {
+                    Size = new Vector2(window.Size.X - windowLabelWidth.Size.X, 24f),
+                    UpdateBounds = false,
+                    Position = new Vector2(windowLabelWidth.Size.X, windowLabelWidth.Position.Y)
+                });
 
                 ButtonWidget windowLabelHeight;
-                window.Widgets.Add(windowLabelHeight = new ButtonWidget(Game, "Height:"));
-                windowLabelHeight.Background.A = 0;
-                windowLabelHeight.Size.X = 96f;
-                windowLabelHeight.Size.Y = 24f;
-                windowLabelHeight.UpdateBounds = false;
-                windowLabelHeight.LabelCentered = false;
-                windowLabelHeight.Position.X = 0f;
-                windowLabelHeight.Position.Y = 48f;
+                window.Widgets.Add(windowLabelHeight = new ButtonWidget(Game, "Height:") {
+                    Background = new Color(EditorWidget.DefaultBackground, 0f),
+                    Size = new Vector2(96f, 24f),
+                    UpdateBounds = false,
+                    LabelCentered = false,
+                    Position = new Vector2(0f, 48f)
+                });
                 TextFieldWidget windowFieldHeight;
-                window.Widgets.Add(windowFieldHeight = new TextFieldWidget(Game));
-                windowFieldHeight.Size.X = window.Size.X - windowLabelHeight.Size.X;
-                windowFieldHeight.Size.Y = 24f;
-                windowFieldHeight.UpdateBounds = false;
-                windowFieldHeight.Position.X = windowLabelHeight.Size.X;
-                windowFieldHeight.Position.Y = windowLabelHeight.Position.Y;
+                window.Widgets.Add(windowFieldHeight = new TextFieldWidget(Game) {
+                    Size = new Vector2(window.Size.X - windowLabelHeight.Size.X, 24f),
+                    UpdateBounds = false,
+                    Position = new Vector2(windowLabelHeight.Size.X, windowLabelHeight.Position.Y)
+                });
 
                 ButtonWidget windowLabelDepth;
-                window.Widgets.Add(windowLabelDepth = new ButtonWidget(Game, "Depth:"));
-                windowLabelDepth.Background.A = 0;
-                windowLabelDepth.Size.X = 96f;
-                windowLabelDepth.Size.Y = 24f;
-                windowLabelDepth.UpdateBounds = false;
-                windowLabelDepth.LabelCentered = false;
-                windowLabelDepth.Position.X = 0f;
-                windowLabelDepth.Position.Y = 72f;
+                window.Widgets.Add(windowLabelDepth = new ButtonWidget(Game, "Depth:") {
+                    Background = new Color(EditorWidget.DefaultBackground, 0f),
+                    Size = new Vector2(96f, 24f),
+                    UpdateBounds = false,
+                    LabelCentered = false,
+                    Position = new Vector2(0f, 72f)
+                });
                 TextFieldWidget windowFieldDepth;
-                window.Widgets.Add(windowFieldDepth = new TextFieldWidget(Game));
-                windowFieldDepth.Size.X = window.Size.X - windowLabelDepth.Size.X;
-                windowFieldDepth.Size.Y = 24f;
-                windowFieldDepth.UpdateBounds = false;
-                windowFieldDepth.Position.X = windowLabelDepth.Size.X;
-                windowFieldDepth.Position.Y = windowLabelDepth.Position.Y;
+                window.Widgets.Add(windowFieldDepth = new TextFieldWidget(Game) {
+                    Size = new Vector2(window.Size.X - windowLabelDepth.Size.X, 24f),
+                    UpdateBounds = false,
+                    Position = new Vector2(windowLabelDepth.Size.X, windowLabelDepth.Position.Y)
+                });
 
                 ButtonWidget windowLabelTrileset;
-                window.Widgets.Add(windowLabelTrileset = new ButtonWidget(Game, "Trileset:"));
-                windowLabelTrileset.Background.A = 0;
-                windowLabelTrileset.Size.X = 96f;
-                windowLabelTrileset.Size.Y = 24f;
-                windowLabelTrileset.UpdateBounds = false;
-                windowLabelTrileset.LabelCentered = false;
-                windowLabelTrileset.Position.X = 0f;
-                windowLabelTrileset.Position.Y = 96f;
+                window.Widgets.Add(windowLabelTrileset = new ButtonWidget(Game, "Trileset:") {
+                    Background = new Color(EditorWidget.DefaultBackground, 0f),
+                    Size = new Vector2(96f, 24f),
+                    UpdateBounds = false,
+                    LabelCentered = false,
+                    Position = new Vector2(0f, 96f)
+                });
                 TextFieldWidget windowFieldTrileset;
-                window.Widgets.Add(windowFieldTrileset = new TextFieldWidget(Game));
-                windowFieldTrileset.Size.X = window.Size.X - windowLabelTrileset.Size.X;
-                windowFieldTrileset.Size.Y = 24f;
-                windowFieldTrileset.UpdateBounds = false;
-                windowFieldTrileset.Position.X = windowLabelTrileset.Size.X;
-                windowFieldTrileset.Position.Y = windowLabelTrileset.Position.Y;
-                windowFieldTrileset.Fill("Trile Sets");
+                window.Widgets.Add(windowFieldTrileset = new TextFieldWidget(Game) {
+                    Size = new Vector2(window.Size.X - windowLabelTrileset.Size.X, 24f),
+                    UpdateBounds = false,
+                    Position = new Vector2(windowLabelTrileset.Size.X, windowLabelTrileset.Position.Y)
+                });
 
-                ButtonWidget windowButtonCreate;
-                window.Widgets.Add(windowButtonCreate = new ButtonWidget(Game, "CREATE", delegate() {
+                window.Widgets.Add(new ButtonWidget(Game, "CREATE", delegate() {
                     Level level = CreateNewLevel(
                         windowFieldName.Text,
                         int.Parse(windowFieldWidth.Text),
@@ -229,14 +218,14 @@ namespace FezGame.Components {
                     SkipLoading = 8;
                     GameLevelManagerHelper.ChangeLevel(level);
                     windowHeader.CloseButtonWidget.Action();
-                }));
-                windowButtonCreate.Size.X = window.Size.X;
-                windowButtonCreate.Size.Y = 24f;
-                windowButtonCreate.UpdateBounds = false;
-                windowButtonCreate.LabelCentered = true;
-                windowButtonCreate.Position.X = 0f;
-                windowButtonCreate.Position.Y = window.Size.Y - windowButtonCreate.Size.Y;
+                }) {
+                    Size = new Vector2(window.Size.X, 24f),
+                    UpdateBounds = false,
+                    LabelCentered = true,
+                    Position = new Vector2(0f, window.Size.Y - 24f)
+                });
             }));
+
             TextFieldWidget fieldOpen;
             button.Widgets.Add(new ButtonWidget(Game, "Open", new EditorWidget[] {
                 fieldOpen = new TextFieldWidget(Game, "", "Levels") {
@@ -251,6 +240,7 @@ namespace FezGame.Components {
                     LabelCentered = true
                 }
             }));
+
             button.Widgets.Add(new ButtonWidget(Game, "Save", delegate() {
                 WindowHeaderWidget windowHeader = null;
 
@@ -274,43 +264,41 @@ namespace FezGame.Components {
                 }
 
                 ContainerWidget window;
-                ButtonWidget windowButton;
-                Widgets.Add(window = new ContainerWidget(Game));
-                window.Size.X = 256f;
-                window.Size.Y = 64f;
+                Widgets.Add(window = new ContainerWidget(Game) {
+                    Size = new Vector2(256f, 48f),
+                    Label = "Overwrite level?"
+                });
                 window.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (window.Size.X / 2);
                 window.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (window.Size.Y / 2);
-                window.Label = "Overwrite level?";
                 window.Widgets.Add(windowHeader = new WindowHeaderWidget(Game));
 
-                window.Widgets.Add(windowButton = new ButtonWidget(Game, "Level already existing. Overwrite?"));
-                windowButton.Background.A = 0;
-                windowButton.Size.X = window.Size.X;
-                windowButton.Size.Y = 24f;
-                windowButton.UpdateBounds = false;
-                windowButton.LabelCentered = true;
-                windowButton.Position.X = 0;
-                windowButton.Position.Y = window.Size.Y / 2 - 24f;
+                window.Widgets.Add(new ButtonWidget(Game, "Level already existing. Overwrite?") {
+                    Background = new Color(EditorWidget.DefaultBackground, 0f),
+                    Size = new Vector2(window.Size.X, 24f),
+                    UpdateBounds = false,
+                    LabelCentered = true,
+                    Position = new Vector2(0f, 0f)
+                });
 
-                window.Widgets.Add(windowButton = new ButtonWidget(Game, "YES", save));
-                windowButton.Size.X = 48f;
-                windowButton.Size.Y = 24f;
-                windowButton.UpdateBounds = false;
-                windowButton.LabelCentered = true;
-                windowButton.Position.X = window.Size.X / 2 - windowButton.Size.X - 4f;
-                windowButton.Position.Y = window.Size.Y / 2;
+                window.Widgets.Add(new ButtonWidget(Game, "YES", save) {
+                    Size = new Vector2(window.Size.X / 2f, 24f),
+                    UpdateBounds = false,
+                    LabelCentered = true,
+                    Position = new Vector2(0f, 24f)
+                });
 
-                window.Widgets.Add(windowButton = new ButtonWidget(Game, "NO", windowHeader.CloseButtonWidget.Action));
-                windowButton.Size.X = 48f;
-                windowButton.Size.Y = 24f;
-                windowButton.UpdateBounds = false;
-                windowButton.LabelCentered = true;
-                windowButton.Position.X = window.Size.X / 2 + 4f;
-                windowButton.Position.Y = window.Size.Y / 2;
+                window.Widgets.Add(new ButtonWidget(Game, "NO", windowHeader.CloseButtonWidget.Action) {
+                    Size = new Vector2(window.Size.X / 2f, 24f),
+                    UpdateBounds = false,
+                    LabelCentered = true,
+                    Position = new Vector2(window.Size.X / 2f, 24f)
+                });
             }));
+
 
             TopBarWidget.Widgets.Add(button = new ButtonWidget(Game, "View"));
             button.Background.A = 0;
+
             button.Widgets.Add(new ButtonWidget(Game, "Perspective", new EditorWidget[] {
                 new ButtonWidget(Game, "Front", () => CameraManager.ChangeViewpoint(Viewpoint.Front)),
                 new ButtonWidget(Game, "Left", () => CameraManager.ChangeViewpoint(Viewpoint.Left)),
@@ -318,6 +306,7 @@ namespace FezGame.Components {
                 new ButtonWidget(Game, "Right", () => CameraManager.ChangeViewpoint(Viewpoint.Right)),
                 new ButtonWidget(Game, "Perspective", () => CameraManager.ChangeViewpoint(Viewpoint.Perspective))
             }));
+
             TextFieldWidget fieldPPT;
             button.Widgets.Add(new ButtonWidget(Game, "Pixels per Trixel", new EditorWidget[] {
                 fieldPPT = new TextFieldWidget(Game, "", new string[] {
@@ -411,6 +400,7 @@ namespace FezGame.Components {
                     LabelCentered = true
                 }
             }));
+
             TextFieldWidget fieldSpawnX;
             TextFieldWidget fieldSpawnY;
             TextFieldWidget fieldSpawnZ;
@@ -481,6 +471,7 @@ namespace FezGame.Components {
                     LabelCentered = true
                 }
             }));
+
             TextFieldWidget fieldSky;
             button.Widgets.Add(new ButtonWidget(Game, "Sky", new EditorWidget[] {
                 fieldSky = new TextFieldWidget(Game, "", "Skies") {
@@ -499,6 +490,7 @@ namespace FezGame.Components {
                     LabelCentered = true
                 }
             }));
+
             TextFieldWidget fieldSong;
             button.Widgets.Add(new ButtonWidget(Game, "Song", new EditorWidget[] {
                 fieldSong = new TextFieldWidget(Game, "", "Music") {
@@ -520,6 +512,7 @@ namespace FezGame.Components {
                     LabelCentered = true
                 }
             }));
+
             TextFieldWidget fieldWaterHeight;
             TextFieldWidget fieldWaterType;
             button.Widgets.Add(new ButtonWidget(Game, "Water", new EditorWidget[] {
@@ -559,23 +552,23 @@ namespace FezGame.Components {
                 }
             }));
 
+
             TopBarWidget.Widgets.Add(button = new ButtonWidget(Game, "Scripting"));
             button.Background.A = 0;
+
             button.Widgets.Add(new ButtonWidget(Game, "Volumes", delegate() {
                 ContainerWidget window;
                 Widgets.Add(window = new ContainerWidget(Game) {
-                    UpdateBounds = true
+                    UpdateBounds = true,
+                    Size = new Vector2(512f, 24f),
+                    Label = "Volumes"
                 });
-                window.Size.X = 512f;
-                window.Size.Y = 24f;
-                window.Label = "Volumes";
-                WindowHeaderWidget windowHeader;
-                window.Widgets.Add(windowHeader = new WindowHeaderWidget(Game));
+                window.Widgets.Add(new WindowHeaderWidget(Game));
 
                 int i = 0;
                 foreach (Volume volume in LevelManager.Volumes.Values) {
                     window.Widgets.Add(new ContainerWidget(Game, new EditorWidget[] {
-                        new ButtonWidget(Game, "["+volume.Id+"] "+VectorHelper.ToString(volume.From)+" - "+VectorHelper.ToString(volume.To)) {
+                        new ButtonWidget(Game, "["+volume.Id+"] "+EditorUtils.ToString(volume.From)+" - "+EditorUtils.ToString(volume.To)) {
                             Size = new Vector2(window.Size.X - 48f, 24f),
                             UpdateBounds = false,
                             LabelCentered = false,
@@ -606,20 +599,19 @@ namespace FezGame.Components {
                 window.Size.Y += i * 24f;
                 window.Size.Y = Math.Min(512f, window.Size.Y);
 
-                ButtonWidget windowButtonAdd;
-                window.Widgets.Add(windowButtonAdd = new ButtonWidget(Game, "+", delegate() {
-                }));
-                windowButtonAdd.Background.G = 31;
-                windowButtonAdd.Size.X = window.Size.X;
-                windowButtonAdd.Size.Y = 24f;
-                windowButtonAdd.UpdateBounds = false;
-                windowButtonAdd.LabelCentered = true;
-                windowButtonAdd.Position.X = 0f;
-                windowButtonAdd.Position.Y = window.Size.Y - windowButtonAdd.Size.Y;
+                window.Widgets.Add(new ButtonWidget(Game, "+", delegate() {
+                }) {
+                    Background = new Color(0f, 0.125f, 0f, 1f),
+                    Size = new Vector2(window.Size.X, 24f),
+                    UpdateBounds = false,
+                    LabelCentered = true,
+                    Position = new Vector2(0f, window.Size.Y - 24f)
+                });
 
                 window.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (window.Size.X / 2);
                 window.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (window.Size.Y / 2);
             }));
+
             button.Widgets.Add(new ButtonWidget(Game, "Scripts", delegate() {
                 ContainerWidget window;
                 Widgets.Add(window = new ContainerWidget(Game) {
@@ -628,8 +620,7 @@ namespace FezGame.Components {
                 window.Size.X = 512f;
                 window.Size.Y = 24f;
                 window.Label = "Scripts";
-                WindowHeaderWidget windowHeader;
-                window.Widgets.Add(windowHeader = new WindowHeaderWidget(Game));
+                window.Widgets.Add(new WindowHeaderWidget(Game));
 
                 int i = 0;
                 foreach (Script script in LevelManager.Scripts.Values) {
@@ -665,16 +656,14 @@ namespace FezGame.Components {
                 window.Size.Y += i * 24f;
                 window.Size.Y = Math.Min(512f, window.Size.Y);
 
-                ButtonWidget windowButtonAdd;
-                window.Widgets.Add(windowButtonAdd = new ButtonWidget(Game, "+", delegate() {
-                }));
-                windowButtonAdd.Background.G = 31;
-                windowButtonAdd.Size.X = window.Size.X;
-                windowButtonAdd.Size.Y = 24f;
-                windowButtonAdd.UpdateBounds = false;
-                windowButtonAdd.LabelCentered = true;
-                windowButtonAdd.Position.X = 0f;
-                windowButtonAdd.Position.Y = window.Size.Y - windowButtonAdd.Size.Y;
+                window.Widgets.Add(new ButtonWidget(Game, "+", delegate() {
+                }) {
+                    Background = new Color(0f, 0.125f, 0f, 1f),
+                    Size = new Vector2(window.Size.X, 24f),
+                    UpdateBounds = false,
+                    LabelCentered = true,
+                    Position = new Vector2(0f, window.Size.Y - 24f)
+                });
 
                 window.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (window.Size.X / 2);
                 window.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (window.Size.Y / 2);
@@ -687,13 +676,12 @@ namespace FezGame.Components {
                 window.Size.X = 512f;
                 window.Size.Y = 24f;
                 window.Label = "Art Objects";
-                WindowHeaderWidget windowHeader;
-                window.Widgets.Add(windowHeader = new WindowHeaderWidget(Game));
+                window.Widgets.Add(new WindowHeaderWidget(Game));
 
                 int i = 0;
                 foreach (ArtObjectInstance ao in LevelManager.ArtObjects.Values) {
                     window.Widgets.Add(new ContainerWidget(Game, new EditorWidget[] {
-                        new ButtonWidget(Game, "["+ao.Id+"] "+ao.ArtObjectName+": "+VectorHelper.ToString(ao.Position)) {
+                        new ButtonWidget(Game, "["+ao.Id+"] "+ao.ArtObjectName+": "+EditorUtils.ToString(ao.Position)) {
                             Size = new Vector2(window.Size.X - 48f, 24f),
                             UpdateBounds = false,
                             LabelCentered = false,
@@ -724,16 +712,14 @@ namespace FezGame.Components {
                 window.Size.Y += i * 24f;
                 window.Size.Y = Math.Min(512f, window.Size.Y);
 
-                ButtonWidget windowButtonAdd;
-                window.Widgets.Add(windowButtonAdd = new ButtonWidget(Game, "+", delegate() {
-                }));
-                windowButtonAdd.Background.G = 31;
-                windowButtonAdd.Size.X = window.Size.X;
-                windowButtonAdd.Size.Y = 24f;
-                windowButtonAdd.UpdateBounds = false;
-                windowButtonAdd.LabelCentered = true;
-                windowButtonAdd.Position.X = 0f;
-                windowButtonAdd.Position.Y = window.Size.Y - windowButtonAdd.Size.Y;
+                window.Widgets.Add(new ButtonWidget(Game, "+", delegate() {
+                }) {
+                    Background = new Color(0f, 0.125f, 0f, 1f),
+                    Size = new Vector2(window.Size.X, 24f),
+                    UpdateBounds = false,
+                    LabelCentered = true,
+                    Position = new Vector2(0f, window.Size.Y - 24f)
+                });
 
                 window.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (window.Size.X / 2);
                 window.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (window.Size.Y / 2);
@@ -746,13 +732,12 @@ namespace FezGame.Components {
                 window.Size.X = 512f;
                 window.Size.Y = 24f;
                 window.Label = "Background Planes";
-                WindowHeaderWidget windowHeader;
-                window.Widgets.Add(windowHeader = new WindowHeaderWidget(Game));
+                window.Widgets.Add(new WindowHeaderWidget(Game));
 
                 int i = 0;
                 foreach (BackgroundPlane bp in LevelManager.BackgroundPlanes.Values) {
                     window.Widgets.Add(new ContainerWidget(Game, new EditorWidget[] {
-                        new ButtonWidget(Game, "["+bp.Id+"] "+bp.TextureName+": "+VectorHelper.ToString(bp.Position)) {
+                        new ButtonWidget(Game, "["+bp.Id+"] "+bp.TextureName+": "+EditorUtils.ToString(bp.Position)) {
                             Size = new Vector2(window.Size.X - 48f, 24f),
                             UpdateBounds = false,
                             LabelCentered = false,
@@ -783,16 +768,14 @@ namespace FezGame.Components {
                 window.Size.Y += i * 24f;
                 window.Size.Y = Math.Min(512f, window.Size.Y);
 
-                ButtonWidget windowButtonAdd;
-                window.Widgets.Add(windowButtonAdd = new ButtonWidget(Game, "+", delegate() {
-                }));
-                windowButtonAdd.Background.G = 31;
-                windowButtonAdd.Size.X = window.Size.X;
-                windowButtonAdd.Size.Y = 24f;
-                windowButtonAdd.UpdateBounds = false;
-                windowButtonAdd.LabelCentered = true;
-                windowButtonAdd.Position.X = 0f;
-                windowButtonAdd.Position.Y = window.Size.Y - windowButtonAdd.Size.Y;
+                window.Widgets.Add(new ButtonWidget(Game, "+", delegate() {
+                }) {
+                    Background = new Color(0f, 0.125f, 0f, 1f),
+                    Size = new Vector2(window.Size.X, 24f),
+                    UpdateBounds = false,
+                    LabelCentered = true,
+                    Position = new Vector2(0f, window.Size.Y - 24f)
+                });
 
                 window.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (window.Size.X / 2);
                 window.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (window.Size.Y / 2);
@@ -805,8 +788,7 @@ namespace FezGame.Components {
                 window.Size.X = 256f;
                 window.Size.Y = 24f;
                 window.Label = "Groups";
-                WindowHeaderWidget windowHeader;
-                window.Widgets.Add(windowHeader = new WindowHeaderWidget(Game));
+                window.Widgets.Add(new WindowHeaderWidget(Game));
 
                 int i = 0;
                 foreach (TrileGroup group_ in LevelManager.Groups.Values) {
@@ -842,16 +824,14 @@ namespace FezGame.Components {
                 window.Size.Y += i * 24f;
                 window.Size.Y = Math.Min(512f, window.Size.Y);
 
-                ButtonWidget windowButtonAdd;
-                window.Widgets.Add(windowButtonAdd = new ButtonWidget(Game, "+", delegate() {
-                }));
-                windowButtonAdd.Background.G = 31;
-                windowButtonAdd.Size.X = window.Size.X;
-                windowButtonAdd.Size.Y = 24f;
-                windowButtonAdd.UpdateBounds = false;
-                windowButtonAdd.LabelCentered = true;
-                windowButtonAdd.Position.X = 0f;
-                windowButtonAdd.Position.Y = window.Size.Y - windowButtonAdd.Size.Y;
+                window.Widgets.Add(new ButtonWidget(Game, "+", delegate() {
+                }) {
+                    Background = new Color(0f, 0.125f, 0f, 1f),
+                    Size = new Vector2(window.Size.X, 24f),
+                    UpdateBounds = false,
+                    LabelCentered = true,
+                    Position = new Vector2(0f, window.Size.Y - 24f)
+                });
 
                 window.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (window.Size.X / 2);
                 window.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (window.Size.Y / 2);
@@ -864,8 +844,7 @@ namespace FezGame.Components {
                 window.Size.X = 256f;
                 window.Size.Y = 24f;
                 window.Label = "NPCs";
-                WindowHeaderWidget windowHeader;
-                window.Widgets.Add(windowHeader = new WindowHeaderWidget(Game));
+                window.Widgets.Add(new WindowHeaderWidget(Game));
 
                 int i = 0;
                 foreach (NpcInstance npc in LevelManager.NonPlayerCharacters.Values) {
@@ -901,16 +880,14 @@ namespace FezGame.Components {
                 window.Size.Y += i * 24f;
                 window.Size.Y = Math.Min(512f, window.Size.Y);
 
-                ButtonWidget windowButtonAdd;
-                window.Widgets.Add(windowButtonAdd = new ButtonWidget(Game, "+", delegate() {
-                }));
-                windowButtonAdd.Background.G = 31;
-                windowButtonAdd.Size.X = window.Size.X;
-                windowButtonAdd.Size.Y = 24f;
-                windowButtonAdd.UpdateBounds = false;
-                windowButtonAdd.LabelCentered = true;
-                windowButtonAdd.Position.X = 0f;
-                windowButtonAdd.Position.Y = window.Size.Y - windowButtonAdd.Size.Y;
+                window.Widgets.Add(new ButtonWidget(Game, "+", delegate() {
+                }) {
+                    Background = new Color(0f, 0.125f, 0f, 1f),
+                    Size = new Vector2(window.Size.X, 24f),
+                    UpdateBounds = false,
+                    LabelCentered = true,
+                    Position = new Vector2(0f, window.Size.Y - 24f)
+                });
 
                 window.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (window.Size.X / 2);
                 window.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (window.Size.Y / 2);
@@ -923,8 +900,7 @@ namespace FezGame.Components {
                 window.Size.X = 128f;
                 window.Size.Y = 24f;
                 window.Label = "Paths";
-                WindowHeaderWidget windowHeader;
-                window.Widgets.Add(windowHeader = new WindowHeaderWidget(Game));
+                window.Widgets.Add(new WindowHeaderWidget(Game));
 
                 int i = 0;
                 foreach (MovementPath path in LevelManager.Paths.Values) {
@@ -960,16 +936,14 @@ namespace FezGame.Components {
                 window.Size.Y += i * 24f;
                 window.Size.Y = Math.Min(512f, window.Size.Y);
 
-                ButtonWidget windowButtonAdd;
-                window.Widgets.Add(windowButtonAdd = new ButtonWidget(Game, "+", delegate() {
-                }));
-                windowButtonAdd.Background.G = 31;
-                windowButtonAdd.Size.X = window.Size.X;
-                windowButtonAdd.Size.Y = 24f;
-                windowButtonAdd.UpdateBounds = false;
-                windowButtonAdd.LabelCentered = true;
-                windowButtonAdd.Position.X = 0f;
-                windowButtonAdd.Position.Y = window.Size.Y - windowButtonAdd.Size.Y;
+                window.Widgets.Add(new ButtonWidget(Game, "+", delegate() {
+                }) {
+                    Background = new Color(0f, 0.125f, 0f, 1f),
+                    Size = new Vector2(window.Size.X, 24f),
+                    UpdateBounds = false,
+                    LabelCentered = true,
+                    Position = new Vector2(0f, window.Size.Y - 24f)
+                });
 
                 window.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (window.Size.X / 2);
                 window.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (window.Size.Y / 2);
@@ -982,8 +956,7 @@ namespace FezGame.Components {
                 window.Size.X = 512f;
                 window.Size.Y = 24f;
                 window.Label = "Muted Loops";
-                WindowHeaderWidget windowHeader;
-                window.Widgets.Add(windowHeader = new WindowHeaderWidget(Game));
+                window.Widgets.Add(new WindowHeaderWidget(Game));
 
                 int i = 0;
                 foreach (string loop in LevelManager.MutedLoops) {
@@ -1019,16 +992,14 @@ namespace FezGame.Components {
                 window.Size.Y += i * 24f;
                 window.Size.Y = Math.Min(512f, window.Size.Y);
 
-                ButtonWidget windowButtonAdd;
-                window.Widgets.Add(windowButtonAdd = new ButtonWidget(Game, "+", delegate() {
-                }));
-                windowButtonAdd.Background.G = 31;
-                windowButtonAdd.Size.X = window.Size.X;
-                windowButtonAdd.Size.Y = 24f;
-                windowButtonAdd.UpdateBounds = false;
-                windowButtonAdd.LabelCentered = true;
-                windowButtonAdd.Position.X = 0f;
-                windowButtonAdd.Position.Y = window.Size.Y - windowButtonAdd.Size.Y;
+                window.Widgets.Add(new ButtonWidget(Game, "+", delegate() {
+                }) {
+                    Background = new Color(0f, 0.125f, 0f, 1f),
+                    Size = new Vector2(window.Size.X, 24f),
+                    UpdateBounds = false,
+                    LabelCentered = true,
+                    Position = new Vector2(0f, window.Size.Y - 24f)
+                });
 
                 window.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (window.Size.X / 2);
                 window.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (window.Size.Y / 2);
@@ -1036,58 +1007,147 @@ namespace FezGame.Components {
             button.Widgets.Add(new ButtonWidget(Game, "Ambience Tracks", delegate() {
                 ContainerWidget window;
                 Widgets.Add(window = new ContainerWidget(Game) {
-                    UpdateBounds = true
+                    UpdateBounds = true,
+                    Size = new Vector2(256f, 24f),
+                    Label = "Ambience Tracks"
                 });
-                window.Size.X = 512f;
-                window.Size.Y = 24f;
-                window.Label = "Ambience Tracks";
-                WindowHeaderWidget windowHeader;
-                window.Widgets.Add(windowHeader = new WindowHeaderWidget(Game));
 
-                int i = 0;
-                foreach (AmbienceTrack track in LevelManager.AmbienceTracks) {
-                    window.Widgets.Add(new ContainerWidget(Game, new EditorWidget[] {
-                        new ButtonWidget(Game, track.Name) {
-                            Size = new Vector2(window.Size.X - 48f, 24f),
+                window.RefreshValue = delegate() {
+                    window.Widgets.Clear();
+                    window.Widgets.Add(new WindowHeaderWidget(Game));
+
+                    int i = 0;
+                    foreach (AmbienceTrack track in LevelManager.AmbienceTracks) {
+                        window.Widgets.Add(new ContainerWidget(Game, new EditorWidget[] {
+                            new ButtonWidget(Game, track.Name) {
+                                Size = new Vector2(window.Size.X - 24f, 24f),
+                                UpdateBounds = false,
+                                LabelCentered = false,
+                                Position = new Vector2(0f, 0f)
+                            },
+                            new ButtonWidget(Game, "X", delegate() {
+                                LevelManager.AmbienceTracks.Remove(track);
+                                SoundManager.PlayNewAmbience();
+                                window.Refresh();
+                            }) {
+                                Background = new Color(0.5f, 0f, 0f, 1f),
+                                Size = new Vector2(24f, 24f),
+                                UpdateBounds = false,
+                                LabelCentered = true,
+                                Position = new Vector2(window.Size.X - 24f, 0f)
+                            }
+                        }) {
+                            Size = new Vector2(window.Size.X, 24f),
+                            Background = new Color(EditorWidget.DefaultBackground, 0f)
+                        });
+
+                        i++;
+                    }
+
+                    window.Size.Y = (i+1) * 24f;
+                    window.Size.Y = Math.Min(512f, window.Size.Y);
+
+                    window.Widgets.Add(new ButtonWidget(Game, "+", delegate() {
+                        ContainerWidget windowAdd;
+                        Widgets.Add(windowAdd = new ContainerWidget(Game) {
+                            Size = new Vector2(256f, 144f),
+                            Label = "Add Ambience Track"
+                        });
+                        WindowHeaderWidget windowAddHeader;
+                        windowAdd.Widgets.Add(windowAddHeader = new WindowHeaderWidget(Game));
+
+                        ButtonWidget windowLabelName;
+                        windowAdd.Widgets.Add(windowLabelName = new ButtonWidget(Game, "Name:") {
+                            Background = new Color(EditorWidget.DefaultBackground, 0f),
+                            Size = new Vector2(96f, 24f),
                             UpdateBounds = false,
                             LabelCentered = false,
                             Position = new Vector2(0f, 0f)
-                        },
-                        new ButtonWidget(Game, "C") {
-                            Background = new Color(0f, 0f, 0.125f, 1f),
-                            Size = new Vector2(24f, 24f),
+                        });
+                        TextFieldWidget windowFieldName;
+                        windowAdd.Widgets.Add(windowFieldName = new TextFieldWidget(Game) {
+                            Size = new Vector2(windowAdd.Size.X - windowLabelName.Size.X, 24f),
                             UpdateBounds = false,
-                            LabelCentered = true,
-                            Position = new Vector2(window.Size.X - 48f, 0f)
-                        },
-                        new ButtonWidget(Game, "X") {
-                            Background = new Color(0.5f, 0f, 0f, 1f),
-                            Size = new Vector2(24f, 24f),
-                            UpdateBounds = false,
-                            LabelCentered = true,
-                            Position = new Vector2(window.Size.X - 24f, 0f)
+                            Position = new Vector2(windowLabelName.Size.X, windowLabelName.Position.Y)
+                        });
+                        Dictionary<string, string>.KeyCollection keysOrig = SoundManager.GetPrivate<Dictionary<string, string>>("MusicAliases").Keys;
+                        List<string> keys = new List<string>();
+                        foreach (string keyOrig in keysOrig) {
+                            if (!keyOrig.StartsWith("ambience")) {
+                                continue;
+                            }
+                            string key = keyOrig.Replace("\\", " ^ ").Replace("ambience", "Ambience");
+                            keys.Add(key);
                         }
+                        windowFieldName.Fill(keys);
+
+                        CheckboxWidget windowCheckDawn;
+                        windowAdd.Widgets.Add(windowCheckDawn = new CheckboxWidget(Game, "Dawn") {
+                            Background = new Color(EditorWidget.DefaultBackground, 0f),
+                            Size = new Vector2(windowAdd.Size.X, 24f),
+                            UpdateBounds = false,
+                            LabelCentered = false,
+                            Position = new Vector2(0f, 24f)
+                        });
+
+                        CheckboxWidget windowCheckDay;
+                        windowAdd.Widgets.Add(windowCheckDay = new CheckboxWidget(Game, "Day") {
+                            Background = new Color(EditorWidget.DefaultBackground, 0f),
+                            Size = new Vector2(windowAdd.Size.X, 24f),
+                            UpdateBounds = false,
+                            LabelCentered = false,
+                            Position = new Vector2(0f, 48f)
+                        });
+
+                        CheckboxWidget windowCheckDusk;
+                        windowAdd.Widgets.Add(windowCheckDusk = new CheckboxWidget(Game, "Dusk") {
+                            Background = new Color(EditorWidget.DefaultBackground, 0f),
+                            Size = new Vector2(windowAdd.Size.X, 24f),
+                            UpdateBounds = false,
+                            LabelCentered = false,
+                            Position = new Vector2(0f, 72f)
+                        });
+
+                        CheckboxWidget windowCheckNight;
+                        windowAdd.Widgets.Add(windowCheckNight = new CheckboxWidget(Game, "Night") {
+                            Background = new Color(EditorWidget.DefaultBackground, 0f),
+                            Size = new Vector2(windowAdd.Size.X, 24f),
+                            UpdateBounds = false,
+                            LabelCentered = false,
+                            Position = new Vector2(0f, 96f)
+                        });
+
+                        windowAdd.Widgets.Add(new ButtonWidget(Game, "ADD", delegate() {
+                            LevelManager.AmbienceTracks.Add(new AmbienceTrack() {
+                                Name = windowFieldName.Text,
+                                Dawn = windowCheckDawn.Checked,
+                                Day = windowCheckDay.Checked,
+                                Dusk = windowCheckDusk.Checked,
+                                Night = windowCheckNight.Checked
+                            });
+                            SoundManager.PlayNewAmbience();
+                            windowAddHeader.CloseButtonWidget.Action();
+                            window.Refresh();
+                        }) {
+                            Size = new Vector2(windowAdd.Size.X, 24f),
+                            UpdateBounds = false,
+                            LabelCentered = true,
+                            Position = new Vector2(0f, windowAdd.Size.Y - 24f)
+                        });
+
+                        windowAdd.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (windowAdd.Size.X / 2);
+                        windowAdd.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (windowAdd.Size.Y / 2);
                     }) {
+                        Background = new Color(0f, 0.125f, 0f, 1f),
                         Size = new Vector2(window.Size.X, 24f),
-                        Background = new Color(EditorWidget.DefaultBackground, 0f)
+                        UpdateBounds = false,
+                        LabelCentered = true,
+                        Position = new Vector2(0f, window.Size.Y - 24f)
                     });
 
-                    i++;
-                }
-
-                window.Size.Y += i * 24f;
-                window.Size.Y = Math.Min(512f, window.Size.Y);
-
-                ButtonWidget windowButtonAdd;
-                window.Widgets.Add(windowButtonAdd = new ButtonWidget(Game, "+", delegate() {
-                }));
-                windowButtonAdd.Background.G = 31;
-                windowButtonAdd.Size.X = window.Size.X;
-                windowButtonAdd.Size.Y = 24f;
-                windowButtonAdd.UpdateBounds = false;
-                windowButtonAdd.LabelCentered = true;
-                windowButtonAdd.Position.X = 0f;
-                windowButtonAdd.Position.Y = window.Size.Y - windowButtonAdd.Size.Y;
+                    return null;
+                };
+                window.Refresh();
 
                 window.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (window.Size.X / 2);
                 window.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (window.Size.Y / 2);

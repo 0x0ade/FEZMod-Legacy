@@ -64,7 +64,16 @@ namespace FezGame.Editor.Widgets {
 
         public bool InView {
             get {
-                return GraphicsDevice.Viewport.Bounds.Intersects(backgroundBounds);
+                if (!GraphicsDevice.Viewport.Bounds.Intersects(backgroundBounds)) {
+                    return false;
+                }
+                if (this is WindowHeaderWidget || ParentAs<WindowHeaderWidget>() != null) {
+                    return true;
+                }
+                if (Parent != null && Parent.GetType() == typeof(ContainerWidget) && !Parent.backgroundBounds.Intersects(backgroundBounds)) {
+                    return false;
+                }
+                return true;
             }
         }
 
@@ -168,6 +177,10 @@ namespace FezGame.Editor.Widgets {
         }
 
         public virtual void StartClipping() {
+            if (ParentAs<ContainerWidget>() != null && ParentAs<ContainerWidget>().ClipChildren) {
+                return;
+            }
+
             LevelEditor.SpriteBatch.End();
 
             GraphicsDeviceExtensions.BeginPoint(LevelEditor.SpriteBatch);
@@ -178,6 +191,10 @@ namespace FezGame.Editor.Widgets {
         }
 
         public virtual void StopClipping() {
+            if (ParentAs<ContainerWidget>() != null && ParentAs<ContainerWidget>().ClipChildren) {
+                return;
+            }
+
             LevelEditor.SpriteBatch.End();
 
             GraphicsDeviceExtensions.BeginPoint(LevelEditor.SpriteBatch);
@@ -209,11 +226,14 @@ namespace FezGame.Editor.Widgets {
         }
 
         public virtual void Refresh() {
+            foreach (EditorWidget widget in Widgets) {
+                widget.Refresh();
+            }
         }
 
-        public T ParentAs<T>() where T : EditorWidget {
+        public T ParentAs<T>(bool exact = false) where T : EditorWidget {
             EditorWidget parent = Parent;
-            while (parent != null && !(parent is T)) {
+            while (parent != null && (!(parent is T) || (exact && parent.GetType() != typeof(T)))) {
                 parent = parent.Parent;
             }
             return (T) parent;
