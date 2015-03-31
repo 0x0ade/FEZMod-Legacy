@@ -1312,14 +1312,15 @@ namespace FezGame.Components {
 
         protected bool UpdateWidgets(GameTime gameTime, List<EditorWidget> widgets, Boolean update) {
             bool cursorOnWidget = false;
-            foreach (EditorWidget widget in widgets) {
+            for (int i = widgets.Count - 1; i >= 0; i--) {
+                EditorWidget widget = widgets[i];
                 widget.LevelEditor = this;
                 if (update) {
                     widget.Update(gameTime);
                 }
-                bool cursorOnChild = false;
+                bool cursorOnChild = cursorOnWidget;
                 if (widget.ShowChildren) {
-                    cursorOnChild = UpdateWidgets(gameTime, widget.Widgets, false);
+                    cursorOnChild = cursorOnWidget || UpdateWidgets(gameTime, widget.Widgets, false);
                 }
                 if (widget.Position.X + widget.Offset.X <= MouseState.Position.X && MouseState.Position.X <= widget.Position.X + widget.Offset.X + widget.Size.X &&
                     widget.Position.Y + widget.Offset.Y <= MouseState.Position.Y && MouseState.Position.Y <= widget.Position.Y + widget.Offset.Y + widget.Size.Y) {
