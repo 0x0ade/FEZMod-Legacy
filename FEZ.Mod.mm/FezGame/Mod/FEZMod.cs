@@ -235,6 +235,10 @@ namespace FezGame.Mod {
 
         public static void SaveRead(SaveData saveData, CrcReader reader) {
             CallInEachModule("SaveRead", new object[] {saveData, reader});
+
+            if (EnableBugfixes) {
+                saveData.HasFPView = saveData.HasFPView || saveData.HasStereo3D;
+            }
         }
 
         public static void SaveWrite(SaveData saveData, CrcWriter writer) {
