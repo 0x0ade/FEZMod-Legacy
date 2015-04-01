@@ -116,6 +116,10 @@ namespace FezGame.Mod {
                     ModLogger.Log("JAFM", "Found -nohd / --no-high-definition");
                     EnableHD = false;
                 }
+                if (args[i] == "-pphd" || args[i] == "--pixel-perfect-high-definition") {
+                    ModLogger.Log("JAFM", "Found -pphd / --pixel-perfect-high-definition");
+                    EnablePPHD = true;
+                }
                 if (args[i] == "-4k" || args[i] == "--ultra-high-definition") {
                     ModLogger.Log("JAFM", "Found -4k / --ultra-high-definition");
                     CustomResolutions.Add(new int[]{3840, 2160});
