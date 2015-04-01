@@ -9,6 +9,7 @@ using FezGame.Services;
 using FezGame.Components;
 using FezGame.Structure;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace FezGame.Mod {
     public static class FEZMod {
@@ -22,6 +23,9 @@ namespace FezGame.Mod {
         public static bool EnableQuickWarp = true;
         public static bool EnableFEZometric = true;
         public static bool EnableBugfixes = true;
+        public static bool EnableHD = true;
+        public static bool EnablePPHD = false;
+        public static List<int[]> CustomResolutions = new List<int[]>();
 
         public static bool LoadedEssentials { get; private set; }
         public static bool Preloaded { get; private set; }
@@ -108,6 +112,22 @@ namespace FezGame.Mod {
                     ModLogger.Log("JAFM", "Found -pp / --pixel-perfect");
                     OverridePixelsPerTrixel = 1f;
                 }
+                if (args[i] == "-nohd" || args[i] == "--no-high-definition") {
+                    ModLogger.Log("JAFM", "Found -nohd / --no-high-definition");
+                    EnableHD = false;
+                }
+                if (args[i] == "-4k" || args[i] == "--ultra-high-definition") {
+                    ModLogger.Log("JAFM", "Found -4k / --ultra-high-definition");
+                    CustomResolutions.Add(new int[]{3840, 2160});
+                }
+                if (args[i] == "-8k" || args[i] == "--ultra-ultra-high-definition") {
+                    ModLogger.Log("JAFM", "Found -8k / --ultra-ultra-high-definition");
+                    CustomResolutions.Add(new int[]{4096, 2304});
+                }
+                if ((args[i] == "-cr" || args[i] == "--custom-resolution") && i+2 < args.Length) {
+                    ModLogger.Log("JAFM", "Found -cr / --custom-resolution");
+                    CustomResolutions.Add(new int[]{int.Parse(args[i+1]), int.Parse(args[i+2])});
+                }
                 if (args[i] == "-dc" || args[i] == "--debug-controls") {
                     ModLogger.Log("JAFM", "Found -dc / --debug-controls");
                     EnableDebugControls = true;
@@ -148,7 +168,45 @@ namespace FezGame.Mod {
                 ServiceHelper.AddComponent(new DebugControls(ServiceHelper.Game));
             }
 
-            ServiceHelper.Game.Exiting += (object sender, EventArgs e) => Exit();
+            if (EnableHD) {
+                //TODO clean up garbage. Even if it's called just once, is optimizable.
+                SettingsManager.Resolutions.Clear();
+                DisplayModeCollection supportedModes = GraphicsAdapter.DefaultAdapter.SupportedDisplayModes;
+                List<DisplayMode> allModes = new List<DisplayMode>();
+                allModes.AddRange(supportedModes);
+
+                ConstructorInfo dmConst = typeof(DisplayMode).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, 
+                    new Type[] {typeof(int), typeof(int), typeof(int), typeof(SurfaceFormat)}, null);
+                allModes.Add((DisplayMode) dmConst.Invoke(new object[] {1280, 720, 60, SurfaceFormat.Color}));
+                allModes.Add((DisplayMode) dmConst.Invoke(new object[] {1920, 1080, 60, SurfaceFormat.Color}));
+                foreach (int[] resolution in CustomResolutions) {
+                    allModes.Add((DisplayMode) dmConst.Invoke(new object[] {resolution[0], resolution[1], 60, SurfaceFormat.Color}));
+                }
+
+                foreach (DisplayMode mode in allModes) {
+                    bool added = false;
+                    foreach (DisplayMode mode_ in SettingsManager.Resolutions) {
+                        if (mode.Width == mode_.Width && mode.Height == mode_.Height) {
+                            added = true;
+                            break;
+                        }
+                    }
+                    if (added) {
+                        continue;
+                    }
+                    if (mode.RefreshRate == 60) {
+                        SettingsManager.Resolutions.Add(mode);
+                    } else {
+                        SettingsManager.Resolutions.Add((DisplayMode) dmConst.Invoke(new object[] {mode.Width, mode.Height, 60, SurfaceFormat.Color}));
+                    }
+                }
+
+                SettingsManager.Resolutions.Sort(new Comparison<DisplayMode>(delegate(DisplayMode x, DisplayMode y) {
+                    return x.Width * x.Height - y.Width * y.Height;
+                }));
+            }
+            
+            ServiceHelper.Game.Exiting += (sender, e) => Exit();
 
             CallInEachModule("Initialize", new object[0]);
         }

@@ -95,7 +95,12 @@ namespace FezGame.Editor.Widgets {
         }
         public Color Background = DefaultBackground;
         protected Rectangle backgroundBounds = new Rectangle();
+        protected bool ScissorTestEnablePrev;
         protected Rectangle ScissorRectanglePrev;
+        protected readonly static RasterizerState ScissorRasterizerState = new RasterizerState {
+            CullMode = CullMode.CullCounterClockwiseFace,
+            ScissorTestEnable = true
+        };
         protected static Texture2D pixelTexture;
 
         public EditorWidget(Game game) 
@@ -183,10 +188,11 @@ namespace FezGame.Editor.Widgets {
 
             LevelEditor.SpriteBatch.End();
 
-            GraphicsDeviceExtensions.BeginPoint(LevelEditor.SpriteBatch);
-
-            GraphicsDevice.RasterizerState.ScissorTestEnable = true;
+            ScissorTestEnablePrev = GraphicsDevice.RasterizerState.ScissorTestEnable;
             ScissorRectanglePrev = GraphicsDevice.ScissorRectangle;
+
+            //LevelEditor.SpriteBatch.BeginPoint();
+            LevelEditor.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, ScissorRasterizerState);
             GraphicsDevice.ScissorRectangle = backgroundBounds;
         }
 
@@ -197,9 +203,11 @@ namespace FezGame.Editor.Widgets {
 
             LevelEditor.SpriteBatch.End();
 
-            GraphicsDeviceExtensions.BeginPoint(LevelEditor.SpriteBatch);
-
-            GraphicsDevice.RasterizerState.ScissorTestEnable = true;
+            if (ScissorTestEnablePrev) {
+                LevelEditor.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, ScissorRasterizerState);
+            } else {
+                LevelEditor.SpriteBatch.BeginPoint();
+            }
             GraphicsDevice.ScissorRectangle = ScissorRectanglePrev;
         }
 

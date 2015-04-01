@@ -100,9 +100,6 @@ namespace FezGame.Components {
 
             BuildDate = ReadBuildDate();
 
-            SpriteBatch = new SpriteBatch(GraphicsDevice);
-            GTR = new GlyphTextRenderer(Game);
-
             Game.Window.TextInput += delegate(Object sender, TextInputEventArgs e) {
                 if (FocusedWidget != null) {
                     FocusedWidget.TextInput(e.Character);
@@ -1178,10 +1175,14 @@ namespace FezGame.Components {
         }
 
         public void Preload() {
+            GTR = new GlyphTextRenderer(Game);
+
             PointerCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_POINTER");
             CanClickCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_CLICKER_A");
             ClickedCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_CLICKER_B");
             GrabbedCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_GRABBER");
+
+            SpriteBatch = new SpriteBatch(GraphicsDevice);
         }
 
         public override void Update(GameTime gameTime) {
@@ -1195,7 +1196,7 @@ namespace FezGame.Components {
                 return;
             }
 
-            if (GameState.Loading || GameState.InMap || GameState.InMenuCube || GameState.InFpsMode) {
+            if (GameState.Loading || GameState.InMap || GameState.InMenuCube || GameState.Paused) {
                 return;
             }
 
@@ -1277,7 +1278,7 @@ namespace FezGame.Components {
         }
 
         public override void Draw(GameTime gameTime) {
-            if (GameState.InMap || GameState.Loading || !FEZMod.Preloaded) {
+            if (GameState.Loading || GameState.InMap || GameState.InMenuCube || GameState.Paused || !FEZMod.Preloaded) {
                 return;
             }
 
@@ -1287,8 +1288,8 @@ namespace FezGame.Components {
             float cursorScale = viewScale * 2f;
             Point cursorPosition = SettingsManager.PositionInViewport(MouseState);
 
-            GraphicsDeviceExtensions.SetBlendingMode(GraphicsDevice, BlendingMode.Alphablending);
-            GraphicsDeviceExtensions.BeginPoint(SpriteBatch);
+            GraphicsDevice.SetBlendingMode(BlendingMode.Alphablending);
+            SpriteBatch.BeginPoint();
 
             foreach (EditorWidget widget in Widgets) {
                 widget.LevelEditor = this;
