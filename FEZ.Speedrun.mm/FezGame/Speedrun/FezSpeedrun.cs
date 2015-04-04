@@ -58,7 +58,7 @@ namespace FezGame.Speedrun {
             }
         }
 
-        public override void Initialize() {
+        public override void LoadComponents(Fez game) {
             if (SpeedrunMode) {
                 ServiceHelper.AddComponent(new SpeedrunInfo(ServiceHelper.Game));
             }

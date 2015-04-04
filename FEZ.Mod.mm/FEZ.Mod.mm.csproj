@@ -66,6 +66,13 @@
     <Compile Include="FezGame\Components\Actions\Bounce.cs" />
     <Compile Include="FezGame\Components\Actions\PlayerAction.cs" />
     <Compile Include="FezGame\Services\GameLevelManagerHelper.cs" />
+    <Compile Include="FezGame\Components\SlaveGomezHost.cs" />
+    <Compile Include="FezGame\patch_Fez.cs" />
+    <Compile Include="FezGame\Components\patch_GameLevelHost.cs" />
+    <Compile Include="FezGame\Components\NetworkGomezServer.cs" />
+    <Compile Include="FezGame\Components\NetworkGomezClient.cs" />
+    <Compile Include="FezGame\Components\GomezHost.cs" />
+    <Compile Include="FezGame\Mod\BrutalMonoModWorkarounds.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

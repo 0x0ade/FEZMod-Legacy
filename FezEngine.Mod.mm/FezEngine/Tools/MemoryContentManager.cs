@@ -138,6 +138,10 @@ namespace FezEngine.Tools {
                 Level.FlatDisabled = true;
                 return true;
             }
+            if (assetName == "JAFM_WORKAROUND_NOMUSICEXTRACT") {
+                SoundManager.ExtractDisabled = true;
+                return true;
+            }
 
             string filePath = ("Resources\\"+(assetName.ToLower())).Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString())+".xnb";
             FileInfo file = new FileInfo(filePath);

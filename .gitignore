@@ -14,3 +14,7 @@ FEZ.Speedrun.mm/bin/
 FEZ.Speedrun.mm/obj/
 FEZ.Speedrun.mm/*.sln
 FEZ.Speedrun.mm/*.userprefs
+Common.Mod.mm/bin/
+Common.Mod.mm/obj/
+Common.Mod.mm/*.sln
+Common.Mod.mm/*.userprefs

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using FezGame.Mod;
 using Microsoft.Xna.Framework;
+using MonoMod;
 
 namespace FezEngine.Tools {
     public class ServiceHelper {
@@ -10,11 +11,8 @@ namespace FezEngine.Tools {
 
         private static readonly List<object> services = new List<object>();
 
-        public static void orig_InjectServices(object service) {
-        }
-
+        [MonoModIgnore]
         public static void InjectServices(object service) {
-            orig_InjectServices(service);
         }
 
         public static void orig_InitializeServices() {

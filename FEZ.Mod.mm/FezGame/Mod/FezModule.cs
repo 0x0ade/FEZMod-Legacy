@@ -15,6 +15,7 @@ namespace FezGame.Mod {
         public virtual void PreInitialize() {}
         public virtual void ParseArgs(string[] args) {}
         public virtual void Initialize() {}
+        public virtual void LoadComponents(Fez game) {}
         public virtual void Exit() {}
         public virtual void LoadEssentials() {}
         public virtual void Preload() {}

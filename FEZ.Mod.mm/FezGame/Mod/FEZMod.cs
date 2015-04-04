@@ -26,6 +26,7 @@ namespace FezGame.Mod {
         public static bool EnableHD = true;
         public static bool EnablePPHD = false;
         public static List<int[]> CustomResolutions = new List<int[]>();
+        public static bool EnableMultiplayer = false;
 
         public static bool LoadedEssentials { get; private set; }
         public static bool Preloaded { get; private set; }
@@ -136,6 +137,17 @@ namespace FezGame.Mod {
                     ModLogger.Log("JAFM", "Found -dc / --debug-controls");
                     EnableDebugControls = true;
                 }
+                if (args[i] == "-mp" || args[i] == "--multiplayer") {
+                    ModLogger.Log("JAFM", "Found -mp / --multiplayer");
+                    EnableMultiplayer = true;
+                    if (i+1 < args.Length && !args[i+1].StartsWith("-")) {
+                        ModLogger.Log("JAFM", "Connecting to "+args[i+1]);
+                        NetworkGomezClient.Instance = new NetworkGomezClient(args[i+1]);
+                    } else {
+                        ModLogger.Log("JAFM", "Hosting...");
+                        NetworkGomezServer.Instance = new NetworkGomezServer();
+                    }
+                }
                 /*
                 Explaination as of why the workaround still is required:
                 A module type won't be copied to the patched DLL, which means the
@@ -160,18 +172,16 @@ namespace FezGame.Mod {
                     ModLogger.Log("JAFM.Engine", "Found -nc / --no-cache");
                     MemoryContentManager.AssetExists("JAFM_WORKAROUND_NOCACHE");
                 }
+                if (args[i] == "-nme" || args[i] == "--no-music-extract") {
+                    ModLogger.Log("JAFM.Engine", "Found -nme / --no-music-extract");
+                    MemoryContentManager.AssetExists("JAFM_WORKAROUND_NOMUSICEXTRACT");
+                }
             }
 
             CallInEachModule("ParseArgs", new object[] {args});
         }
 
         public static void Initialize() {
-            ServiceHelper.AddComponent(new FEZModComponent(ServiceHelper.Game));
-
-            if (EnableDebugControls) {
-                ServiceHelper.AddComponent(new DebugControls(ServiceHelper.Game));
-            }
-
             if (EnableHD) {
                 //TODO clean up garbage. Even if it's called just once, is optimizable.
                 SettingsManager.Resolutions.Clear();
@@ -213,6 +223,27 @@ namespace FezGame.Mod {
             ServiceHelper.Game.Exiting += (sender, e) => Exit();
 
             CallInEachModule("Initialize", new object[0]);
+        }
+
+        public static void LoadComponents(Fez game) {
+            ServiceHelper.AddComponent(new FEZModComponent(ServiceHelper.Game));
+
+            if (EnableDebugControls) {
+                ServiceHelper.AddComponent(new DebugControls(ServiceHelper.Game));
+            }
+
+            if (EnableMultiplayer) {
+                ServiceHelper.AddComponent(new SlaveGomezHost(ServiceHelper.Game));
+                if (NetworkGomezClient.Instance != null) {
+                    NetworkGomezClient.Instance.Start();
+                }
+                if (NetworkGomezServer.Instance != null) {
+                    ServiceHelper.Get<ISoundManager>().InitializeLibrary();
+                    NetworkGomezServer.Instance.StartListening();
+                }
+            }
+
+            CallInEachModule("LoadComponents", new object[1] {game});
         }
 
         public static void Exit() {
