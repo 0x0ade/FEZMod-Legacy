@@ -50,18 +50,18 @@ namespace FezGame.Components {
             if (NetworkGomezServer.Instance != null) {
                 return;
             }
-            Thread listener = new Thread(delegate() {
-                NetworkGomezServer.Instance = new NetworkGomezServer(Port + 1);
-                NetworkGomezServer.Instance.StartListening();
-            });
-            listener.IsBackground = true;
-            listener.Start();
+            NetworkGomezServer.Instance = new NetworkGomezServer(Port);
+            NetworkGomezServer.Instance.Stream = Stream;
             Stream.Write(new byte[] { 0 }, 0, 1);
         }
 
         public void Stop() {
-            Stream.Close();
-            Client.Close();
+            if (Stream != null) {
+                Stream.Close();
+            }
+            if (Client != null) {
+                Client.Close();
+            }
         }
 
     }

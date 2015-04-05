@@ -236,8 +236,7 @@ namespace FezGame.Mod {
                 ServiceHelper.AddComponent(new SlaveGomezHost(ServiceHelper.Game));
                 if (NetworkGomezClient.Instance != null) {
                     NetworkGomezClient.Instance.Start();
-                }
-                if (NetworkGomezServer.Instance != null) {
+                } else if (NetworkGomezServer.Instance != null) {
                     ServiceHelper.Get<ISoundManager>().InitializeLibrary();
                     NetworkGomezServer.Instance.StartListening();
                 }

@@ -43,14 +43,20 @@ namespace FezGame.Components {
                 return;
             }
             Stream.Read(new byte[1], 0, 1);//It automatically waits
-            NetworkGomezClient.Instance = new NetworkGomezClient(((IPEndPoint) Client.Client.RemoteEndPoint).Address.ToString(), Port + 1);
-            NetworkGomezClient.Instance.Start();
+            NetworkGomezClient.Instance = new NetworkGomezClient(null, Port);
+            NetworkGomezClient.Instance.Stream = Stream;
         }
 
         public void StopListening() {
-            Stream.Close();
-            Client.Close();
-            Listener.Stop();
+            if (Stream != null) {
+                Stream.Close();
+            }
+            if (Client != null) {
+                Client.Close();
+            }
+            if (Listener != null) {
+                Listener.Stop();
+            }
         }
 
     }
