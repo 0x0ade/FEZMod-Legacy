@@ -39,6 +39,21 @@ namespace FezGame.Components {
             }
         }
 
+        protected Thread updateThread_;
+        public Thread UpdateThread {
+            get {
+                return updateThread_;
+            }
+            set {
+                if (Client != null) {
+                    return;
+                }
+                updateThread_ = value;
+            }
+        }
+
+        public Action Update;
+
         public NetworkGomezClient(string ip = "localhost", int port = 1337) {
             Ip = ip;
             Port = port;
@@ -53,14 +68,29 @@ namespace FezGame.Components {
             NetworkGomezServer.Instance = new NetworkGomezServer(Port);
             NetworkGomezServer.Instance.Stream = Stream;
             Stream.Write(new byte[] { 0 }, 0, 1);
+
+            if (updateThread_ == null) {
+                updateThread_ = new Thread(delegate() {
+                    while (Client != null) {
+                        if (Update != null) {
+                            Update();
+                        }
+                        Thread.Sleep(0);
+                    }
+                });
+                updateThread_.IsBackground = true;
+            }
+            updateThread_.Start();
         }
 
         public void Stop() {
             if (Stream != null) {
                 Stream.Close();
+                Stream = null;
             }
             if (Client != null) {
                 Client.Close();
+                Client = null;
             }
         }
 

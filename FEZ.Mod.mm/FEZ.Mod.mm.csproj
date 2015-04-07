@@ -73,6 +73,7 @@
     <Compile Include="FezGame\Components\NetworkGomezClient.cs" />
     <Compile Include="FezGame\Components\GomezHost.cs" />
     <Compile Include="FezGame\Mod\BrutalMonoModWorkarounds.cs" />
+    <Compile Include="FezGame\Structure\NetworkGomezData.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

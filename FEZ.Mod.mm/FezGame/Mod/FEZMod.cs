@@ -215,9 +215,7 @@ namespace FezGame.Mod {
                     }
                 }
 
-                SettingsManager.Resolutions.Sort(new Comparison<DisplayMode>(delegate(DisplayMode x, DisplayMode y) {
-                    return x.Width * x.Height - y.Width * y.Height;
-                }));
+                SettingsManager.Resolutions.Sort(new Comparison<DisplayMode>((x, y) => x.Width * x.Height - y.Width * y.Height));
             }
             
             ServiceHelper.Game.Exiting += (sender, e) => Exit();

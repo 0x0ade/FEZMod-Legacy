@@ -20,28 +20,40 @@ namespace FezGame.Components {
         private bool lastBackground;
         private bool lastHideFez;
 
+        protected NetworkGomezData networkData;
+
         public void orig_Update(GameTime gameTime) {
         }
 
         public void Update(GameTime gameTime) {
             orig_Update(gameTime);
             if (NetworkGomezServer.Instance != null && NetworkGomezServer.Instance.Stream != null) {
-                //NetworkGomezServer.Formatter.Serialize(NetworkGomezServer.Instance.Stream, );
-                NetworkGomezServer.Formatter.Serialize(NetworkGomezServer.Instance.Stream, playerMesh.Position);
-                NetworkGomezServer.Formatter.Serialize(NetworkGomezServer.Instance.Stream, playerMesh.Rotation);
-                NetworkGomezServer.Formatter.Serialize(NetworkGomezServer.Instance.Stream, playerMesh.Material.Opacity);
-                NetworkGomezServer.Formatter.Serialize(NetworkGomezServer.Instance.Stream, PlayerManager.Background);
-                NetworkGomezServer.Formatter.Serialize(NetworkGomezServer.Instance.Stream, PlayerManager.Action);
-                if (playerMesh.FirstGroup.TextureMatrix != null) {
-                    Matrix? nullable = playerMesh.FirstGroup.TextureMatrix.GetValueInTheMostBrutalWayEver<Matrix?>();
-                    NetworkGomezServer.Formatter.Serialize(NetworkGomezServer.Instance.Stream, nullable.GetValueOrDefault());
-                } else {
-                    NetworkGomezServer.Formatter.Serialize(NetworkGomezServer.Instance.Stream, new Matrix?(default(Matrix)));
-                }
-                //NetworkGomezServer.Formatter.Serialize(NetworkGomezServer.Instance.Stream, 0f);//effect.Background
-                NetworkGomezServer.Formatter.Serialize(NetworkGomezServer.Instance.Stream, playerMesh.Scale);
-                NetworkGomezServer.Formatter.Serialize(NetworkGomezServer.Instance.Stream, lastHideFez);
+                NetworkGomezServer.Instance.Update = NetworkGomezServer.Instance.Update ?? UpdateNetGomez;
             }
+        }
+
+        public void UpdateNetGomez() {
+            if (networkData == null) {
+                networkData = new NetworkGomezData();
+            }
+
+            networkData.DataId++;
+
+            networkData.Position = playerMesh.Position;
+            networkData.Rotation = playerMesh.Rotation;
+            networkData.Opacity = playerMesh.Material.Opacity;
+            networkData.Background = PlayerManager.Background;
+            networkData.Action = PlayerManager.Action;
+            if (playerMesh.FirstGroup.TextureMatrix != null) {
+                Matrix? nullable = playerMesh.FirstGroup.TextureMatrix.GetValueInTheMostBrutalWayEver<Matrix?>();
+                if (nullable != null) {
+                  networkData.TextureMatrix = nullable.GetValueOrDefault();
+                }
+            }
+            //networkData.EffectBackground = 0f;
+            networkData.Scale = playerMesh.Scale;
+            networkData.NoMoreFez = lastHideFez;
+            NetworkGomezServer.Formatter.Serialize(NetworkGomezServer.Instance.Stream, networkData);
         }
 
     }

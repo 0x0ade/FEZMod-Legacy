@@ -10,6 +10,7 @@ using FezGame.Services;
 using FezGame.Structure;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Common;
 
 
 namespace FezGame.Components {
@@ -44,6 +45,8 @@ namespace FezGame.Components {
         public float EffectBackground;
         public Vector3 Scale;
         public bool NoMoreFez = false;
+
+        protected NetworkGomezData networkDataPrev;
 
         public SlaveGomezHost(Game game) 
             : base(game) {
@@ -120,19 +123,9 @@ namespace FezGame.Components {
         }
 
         public override void Update(GameTime gameTime) {
-            if (NetworkGomezClient.Instance == null) {
-                return;
+            if (NetworkGomezClient.Instance != null) {
+                NetworkGomezClient.Instance.Update = NetworkGomezClient.Instance.Update ?? UpdateNetGomez;
             }
-
-            Position = (Vector3) NetworkGomezClient.Formatter.Deserialize(NetworkGomezClient.Instance.Stream);
-            Rotation = (Quaternion) NetworkGomezClient.Formatter.Deserialize(NetworkGomezClient.Instance.Stream);
-            Opacity = (float) NetworkGomezClient.Formatter.Deserialize(NetworkGomezClient.Instance.Stream);
-            Background = (bool) NetworkGomezClient.Formatter.Deserialize(NetworkGomezClient.Instance.Stream);
-            Action = (ActionType) NetworkGomezClient.Formatter.Deserialize(NetworkGomezClient.Instance.Stream);
-            TextureMatrix = (Matrix) NetworkGomezClient.Formatter.Deserialize(NetworkGomezClient.Instance.Stream);
-            //EffectBackground = (float) NetworkGomezClient.Formatter.Deserialize(NetworkGomezClient.Instance.Stream);
-            Scale = (Vector3) NetworkGomezClient.Formatter.Deserialize(NetworkGomezClient.Instance.Stream);
-            NoMoreFez = (bool) NetworkGomezClient.Formatter.Deserialize(NetworkGomezClient.Instance.Stream);
 
             playerMesh.FirstGroup.TextureMatrix.Set(TextureMatrix);
             effect.Background = EffectBackground;
@@ -147,6 +140,25 @@ namespace FezGame.Components {
                 return;
             }
             effect.Animation = Animation.Texture;
+        }
+
+
+        public void UpdateNetGomez() {
+            NetworkGomezData networkData = (NetworkGomezData) NetworkGomezClient.Formatter.Deserialize(NetworkGomezClient.Instance.Stream);
+            if (networkDataPrev != null && networkData.DataId <= networkDataPrev.DataId) {
+                return;
+            }
+            networkDataPrev = networkData;
+
+            Position = networkData.Position;
+            Rotation = networkData.Rotation;
+            Opacity = networkData.Opacity;
+            Background = networkData.Background;
+            Action = networkData.Action;
+            TextureMatrix = networkData.TextureMatrix;
+            //EffectBackground = networkData.EffectBackground;
+            Scale = networkData.Scale;
+            NoMoreFez = networkData.NoMoreFez;
         }
 
     }
