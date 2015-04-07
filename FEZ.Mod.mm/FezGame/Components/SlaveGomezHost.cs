@@ -46,7 +46,7 @@ namespace FezGame.Components {
         public Vector3 Scale;
         public bool NoMoreFez = false;
 
-        protected NetworkGomezData networkDataPrev;
+        protected NetworkGomezData networkData;
 
         public SlaveGomezHost(Game game) 
             : base(game) {
@@ -124,7 +124,20 @@ namespace FezGame.Components {
 
         public override void Update(GameTime gameTime) {
             if (NetworkGomezClient.Instance != null) {
-                NetworkGomezClient.Instance.Update = NetworkGomezClient.Instance.Update ?? UpdateNetGomez;
+                NetworkGomezClient.Instance.Action = NetworkGomezClient.Instance.Action ?? UpdateNetGomez;
+            }
+
+            NetworkGomezData networkData = this.networkData;
+            if (networkData != null) {
+                Position = networkData.Position;
+                Rotation = networkData.Rotation;
+                Opacity = networkData.Opacity;
+                Background = networkData.Background;
+                Action = networkData.Action;
+                TextureMatrix = networkData.TextureMatrix;
+                //EffectBackground = networkData.EffectBackground;
+                Scale = networkData.Scale;
+                NoMoreFez = networkData.NoMoreFez;
             }
 
             playerMesh.FirstGroup.TextureMatrix.Set(TextureMatrix);
@@ -143,22 +156,12 @@ namespace FezGame.Components {
         }
 
 
-        public void UpdateNetGomez() {
-            NetworkGomezData networkData = (NetworkGomezData) NetworkGomezClient.Formatter.Deserialize(NetworkGomezClient.Instance.Stream);
-            if (networkDataPrev != null && networkData.DataId <= networkDataPrev.DataId) {
+        public void UpdateNetGomez(object obj) {
+            NetworkGomezData networkData = obj as NetworkGomezData;
+            if (networkData == null || (this.networkData != null && networkData.DataId <= this.networkData.DataId)) {
                 return;
             }
-            networkDataPrev = networkData;
-
-            Position = networkData.Position;
-            Rotation = networkData.Rotation;
-            Opacity = networkData.Opacity;
-            Background = networkData.Background;
-            Action = networkData.Action;
-            TextureMatrix = networkData.TextureMatrix;
-            //EffectBackground = networkData.EffectBackground;
-            Scale = networkData.Scale;
-            NoMoreFez = networkData.NoMoreFez;
+            this.networkData = networkData;
         }
 
     }

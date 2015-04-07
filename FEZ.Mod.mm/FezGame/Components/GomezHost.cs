@@ -27,12 +27,12 @@ namespace FezGame.Components {
 
         public void Update(GameTime gameTime) {
             orig_Update(gameTime);
-            if (NetworkGomezServer.Instance != null && NetworkGomezServer.Instance.Stream != null) {
-                NetworkGomezServer.Instance.Update = NetworkGomezServer.Instance.Update ?? UpdateNetGomez;
+            if (NetworkGomezServer.Instance != null) {
+                NetworkGomezServer.Instance.Action = NetworkGomezServer.Instance.Action ?? UpdateNetGomez;
             }
         }
 
-        public void UpdateNetGomez() {
+        public object UpdateNetGomez() {
             if (networkData == null) {
                 networkData = new NetworkGomezData();
             }
@@ -53,7 +53,8 @@ namespace FezGame.Components {
             //networkData.EffectBackground = 0f;
             networkData.Scale = playerMesh.Scale;
             networkData.NoMoreFez = lastHideFez;
-            NetworkGomezServer.Formatter.Serialize(NetworkGomezServer.Instance.Stream, networkData);
+
+            return networkData;
         }
 
     }

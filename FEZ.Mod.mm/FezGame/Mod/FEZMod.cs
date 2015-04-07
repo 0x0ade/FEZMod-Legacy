@@ -27,6 +27,7 @@ namespace FezGame.Mod {
         public static bool EnablePPHD = false;
         public static List<int[]> CustomResolutions = new List<int[]>();
         public static bool EnableMultiplayer = false;
+        public static bool EnableMultiplayerLocalhost = false;
 
         public static bool LoadedEssentials { get; private set; }
         public static bool Preloaded { get; private set; }
@@ -147,6 +148,10 @@ namespace FezGame.Mod {
                         ModLogger.Log("JAFM", "Hosting...");
                         NetworkGomezServer.Instance = new NetworkGomezServer();
                     }
+                }
+                if (args[i] == "-mpl" || args[i] == "--multiplayer-localhost") {
+                    ModLogger.Log("JAFM", "Found -mpl / --multiplayer-localhost");
+                    EnableMultiplayerLocalhost = true;
                 }
                 /*
                 Explaination as of why the workaround still is required:
