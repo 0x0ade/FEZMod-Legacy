@@ -138,6 +138,10 @@ namespace FezEngine.Tools {
                 Level.FlatDisabled = true;
                 return true;
             }
+            if (assetName == "JAFM_WORKAROUND_CUSTOMMUSICEXTRACT") {
+                SoundManager.ExtractCustom = true;
+                return true;
+            }
             if (assetName == "JAFM_WORKAROUND_NOMUSICEXTRACT") {
                 SoundManager.ExtractDisabled = true;
                 return true;

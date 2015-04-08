@@ -7,13 +7,22 @@ using System.Threading;
 namespace FezEngine.Services {
     public class SoundManager {
 
+        public static bool ExtractCustom = false;
         public static bool ExtractDisabled = false;
 
         private bool initialized;
         private string MusicTempDir;
         private Dictionary<string, string> MusicAliases;
 
+        public void orig_InitializeLibrary() {
+        }
+
         public void InitializeLibrary() {
+            if (ExtractDisabled || ExtractCustom) {
+                orig_InitializeLibrary();
+                return;
+            }
+
             string root;
             if (Environment.OSVersion.Platform == PlatformID.MacOSX || Directory.Exists("/Users/")) {
                 string environmentVariable = Environment.GetEnvironmentVariable("HOME");

@@ -181,6 +181,10 @@ namespace FezGame.Mod {
                     ModLogger.Log("JAFM.Engine", "Found -nc / --no-cache");
                     MemoryContentManager.AssetExists("JAFM_WORKAROUND_NOCACHE");
                 }
+                if (args[i] == "-cme" || args[i] == "--custom-music-extract") {
+                    ModLogger.Log("JAFM.Engine", "Found -cme / --custom-music-extract");
+                    MemoryContentManager.AssetExists("JAFM_WORKAROUND_CUSTOMMUSICEXTRACT");
+                }
                 if (args[i] == "-nme" || args[i] == "--no-music-extract") {
                     ModLogger.Log("JAFM.Engine", "Found -nme / --no-music-extract");
                     MemoryContentManager.AssetExists("JAFM_WORKAROUND_NOMUSICEXTRACT");
