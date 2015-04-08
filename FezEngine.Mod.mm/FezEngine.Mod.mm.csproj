@@ -7,7 +7,6 @@
     <OutputType>Library</OutputType>
     <RootNamespace>FezEngine.Mod.mm</RootNamespace>
     <AssemblyName>FezEngine.Mod.mm</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -28,7 +27,9 @@
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
+    <Reference Include="System">
+      <HintPath>..\libs\System.dll</HintPath>
+    </Reference>
     <Reference Include="FezEngine">
       <HintPath>..\libs\FezEngine.orig.dll</HintPath>
     </Reference>
@@ -40,6 +41,24 @@
     </Reference>
     <Reference Include="ContentSerialization">
       <HintPath>..\libs\ContentSerialization.dll</HintPath>
+    </Reference>
+    <Reference Include="mscorlib">
+      <HintPath>..\libs\mscorlib.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core">
+      <HintPath>..\libs\System.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data">
+      <HintPath>..\libs\System.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing">
+      <HintPath>..\libs\System.Drawing.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security">
+      <HintPath>..\libs\System.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Configuration">
+      <HintPath>..\libs\System.Configuration.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
