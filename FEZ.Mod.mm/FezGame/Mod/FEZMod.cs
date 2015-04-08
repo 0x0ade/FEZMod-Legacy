@@ -89,6 +89,10 @@ namespace FezGame.Mod {
             ModLogger.Log("JAFM", "Checking for custom arguments...");
 
             for (int i = 0; i < args.Length; i++) {
+                if (args[i] == "-sw" || args[i] == "--steamworks") {
+                    ModLogger.Log("JAFM", "Found -sw / --steamworks");
+                    Fez.NoSteamworks = false;
+                }
                 if ((args[i] == "-l" || args[i] == "--load-level") && i+1 < args.Length) {
                     ModLogger.Log("JAFM", "Found -l / --load-level: "+args[i+1]);
                     Fez.ForcedLevelName = args[i+1];
