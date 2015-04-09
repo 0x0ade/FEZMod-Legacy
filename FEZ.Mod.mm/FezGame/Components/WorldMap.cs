@@ -12,13 +12,15 @@ using MonoMod;
 namespace FezGame.Components {
     public class WorldMap {
 
+        public static WorldMap Instance;
+
         public MapNode FocusNode;
         public bool QuickWarping = false;
 
-        public IGameLevelManager LevelManager { [MonoModIgnore] get { return null; } }
-        public IGameStateManager GameState { [MonoModIgnore] get { return null; } }
-        public IInputManager InputManager { [MonoModIgnore] get { return null; } }
-        public IPlayerManager PlayerManager { [MonoModIgnore] get { return null; } }
+        public IGameLevelManager LevelManager { [MonoModIgnore] get; [MonoModIgnore] set; }
+        public IGameStateManager GameState { [MonoModIgnore] get; [MonoModIgnore] set; }
+        public IInputManager InputManager { [MonoModIgnore] get; [MonoModIgnore] set; }
+        public IPlayerManager PlayerManager { [MonoModIgnore] get; [MonoModIgnore] set; }
 
         public void orig_Update(GameTime gameTime) {
         }

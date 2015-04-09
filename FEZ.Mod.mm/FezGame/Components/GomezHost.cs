@@ -7,11 +7,16 @@ using MonoMod;
 using FezGame.Structure;
 using FezGame.Mod;
 using Common;
+using FezEngine.Tools;
+using FezEngine.Services;
 
 namespace FezGame.Components {
     public class GomezHost {
 
         public IPlayerManager PlayerManager { [MonoModIgnore] get; [MonoModIgnore] set; }
+        public IGameCameraManager CameraManager { [MonoModIgnore] get; [MonoModIgnore] set; }
+        public IGameStateManager GameState { [MonoModIgnore] get; [MonoModIgnore] set; }
+        public ILevelManager LevelManager { [MonoModIgnore] get; [MonoModIgnore] set; }
 
         private GomezEffect effect;
         private readonly Mesh playerMesh;
@@ -53,6 +58,15 @@ namespace FezGame.Components {
             //networkData.EffectBackground = 0f;
             networkData.Scale = playerMesh.Scale;
             networkData.NoMoreFez = lastHideFez;
+
+            networkData.Viewpoint = CameraManager.Viewpoint;
+
+            networkData.InCutscene = GameState.InCutscene;
+            networkData.InMap = GameState.InMap;
+            networkData.InMenuCube = GameState.InMenuCube;
+            networkData.Paused = GameState.Paused;
+
+            networkData.Level = LevelManager.Name;
 
             return networkData;
         }

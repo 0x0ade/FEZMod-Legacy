@@ -46,6 +46,8 @@ namespace FezGame.Components {
         public Vector3 Scale;
         public bool NoMoreFez = false;
 
+        public bool ForceSilhouette = false;
+
         protected NetworkGomezData networkData;
 
         public SlaveGomezHost(Game game) 
@@ -53,8 +55,8 @@ namespace FezGame.Components {
             playerMesh = new Mesh {
                 SamplerState = SamplerState.PointClamp
             };
-            UpdateOrder = 12;
-            DrawOrder = 10;
+            UpdateOrder = 11;
+            DrawOrder = 8;
             Instance = this;
         }
 
@@ -65,24 +67,24 @@ namespace FezGame.Components {
             playerMesh.Position = Position;
             playerMesh.Rotation = Rotation;
             playerMesh.Material.Opacity = Opacity;
-            if (Action.SkipSilhouette()) {
+            if (!Action.SkipSilhouette()) {
                 GraphicsDevice.PrepareStencilRead(CompareFunction.Greater, StencilMask.NoSilhouette);
                 playerMesh.DepthWrites = false;
                 playerMesh.AlwaysOnTop = true;
                 effect.Silhouette = true;
                 playerMesh.Draw();
             }
-            if (Background) {
+            if (!Background) {
                 GraphicsDevice.PrepareStencilRead(CompareFunction.Equal, StencilMask.Hole);
                 playerMesh.AlwaysOnTop = true;
                 playerMesh.DepthWrites = false;
-                effect.Silhouette = false;
+                effect.Silhouette = false || ForceSilhouette;
                 playerMesh.Draw();
             }
             GraphicsDevice.PrepareStencilWrite(StencilMask.Gomez);
             playerMesh.AlwaysOnTop = PlayerManager.Action.NeedsAlwaysOnTop();
             playerMesh.DepthWrites = true;
-            effect.Silhouette = false;
+            effect.Silhouette = false || ForceSilhouette;
             playerMesh.Draw();
             GraphicsDevice.PrepareStencilWrite(StencilMask.None);
         }
@@ -99,7 +101,7 @@ namespace FezGame.Components {
             LevelManager.LevelChanged += delegate {
                 effect.ColorSwapMode = ((LevelManager.WaterType != LiquidType.Sewer) ? ((LevelManager.WaterType != LiquidType.Lava) ? ((!LevelManager.BlinkingAlpha) ? ColorSwapMode.None : ColorSwapMode.Cmyk) : ColorSwapMode.VirtualBoy) : ColorSwapMode.Gameboy);
             };
-            LightingPostProcess.DrawGeometryLights += new Action(PreDraw);
+            LightingPostProcess.DrawGeometryLights += PreDraw;
             base.Initialize();
         }
 
@@ -138,6 +140,25 @@ namespace FezGame.Components {
                 //EffectBackground = networkData.EffectBackground;
                 Scale = networkData.Scale;
                 NoMoreFez = networkData.NoMoreFez;
+
+                ForceSilhouette = false;
+
+                if (networkData.InCutscene || networkData.InMap || networkData.InMenuCube || networkData.Paused) {
+                    ForceSilhouette = true;
+                    Opacity = 0.85f;
+                    //TODO apply star effect?
+                }
+
+                if (networkData.Viewpoint != CameraManager.Viewpoint && networkData.Viewpoint.GetOpposite() != CameraManager.Viewpoint) {
+                    Rotation = CameraManager.Rotation;
+                    Opacity = 0.75f;
+                }
+
+                if (networkData.Level != LevelManager.Name) {
+                    ForceSilhouette = true;
+                    Opacity = 0.85f;
+                    //TODO apply star effect?
+                }
             }
 
             playerMesh.FirstGroup.TextureMatrix.Set(TextureMatrix);
