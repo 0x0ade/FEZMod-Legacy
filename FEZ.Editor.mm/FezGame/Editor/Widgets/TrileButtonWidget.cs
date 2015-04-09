@@ -211,6 +211,14 @@ namespace FezGame.Editor.Widgets {
             }
         }
 
+        public override void Dragging(GameTime gameTime, MouseButtonStates state) {
+            if (Parent != null) {
+                Parent.Dragging(gameTime, state);
+            } else {
+                base.Dragging(gameTime, state);
+            }
+        }
+
     }
 }
 

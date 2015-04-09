@@ -32,7 +32,7 @@ namespace FezGame.Components {
         public ISoundManager SoundManager { private get; set; }
 
         private GomezEffect effect;
-        private readonly Mesh playerMesh;
+        private Mesh playerMesh;
 
         public Vector3 Position;
         public Quaternion Rotation;

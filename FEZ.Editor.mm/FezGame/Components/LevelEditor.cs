@@ -1383,6 +1383,8 @@ namespace FezGame.Components {
             LevelMaterializer.UpdateInstance(trile);
             trile.RefreshTrile();
 
+            trile.Foreign = true;
+
             if (LevelManager.Triles.Count == 1) {
                 PlayerManager.CheckpointGround = trile;
                 PlayerManager.RespawnAtCheckpoint();

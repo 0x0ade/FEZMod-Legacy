@@ -28,6 +28,7 @@ namespace FezGame.Editor.Widgets {
 
         public float ScrollMomentum = 0f;
         public float ScrollOffset = 0f;
+        public float ScrollOffsetPreDrag = 0f;
         public float Width = 0f;
 
         protected Rectangle scrollIndicatorBounds = new Rectangle();
@@ -109,6 +110,18 @@ namespace FezGame.Editor.Widgets {
 
         public override void Scroll(GameTime gameTime, int turn) {
             ScrollMomentum -= turn * 128f;
+        }
+
+        public override void Dragging(GameTime gameTime, MouseButtonStates state) {
+            if (state == MouseButtonStates.DragEnded) {
+                return;
+            }
+
+            if (state == MouseButtonStates.DragStarted) {
+                ScrollOffsetPreDrag = ScrollOffset;
+            }
+
+            ScrollOffset = ScrollOffsetPreDrag + MouseState.LeftButton.DragState.Movement.X * 3f;
         }
 
     }
