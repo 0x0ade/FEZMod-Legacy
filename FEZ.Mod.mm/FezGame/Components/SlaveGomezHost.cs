@@ -47,6 +47,8 @@ namespace FezGame.Components {
         public bool NoMoreFez = false;
 
         public bool ForceSilhouette = false;
+        public bool DrawStars = false;
+        public Texture2D StarsTexture;
 
         protected NetworkGomezData networkData;
 
@@ -64,9 +66,11 @@ namespace FezGame.Components {
             if (GameState.Loading || PlayerManager.Hidden || GameState.InMap || FezMath.AlmostEqual(PlayerManager.GomezOpacity, 0f)) {
                 return;
             }
+
             playerMesh.Position = Position;
             playerMesh.Rotation = Rotation;
             playerMesh.Material.Opacity = Opacity;
+
             if (!Action.SkipSilhouette()) {
                 GraphicsDevice.PrepareStencilRead(CompareFunction.Greater, StencilMask.NoSilhouette);
                 playerMesh.DepthWrites = false;
@@ -74,6 +78,7 @@ namespace FezGame.Components {
                 effect.Silhouette = true;
                 playerMesh.Draw();
             }
+
             if (!Background) {
                 GraphicsDevice.PrepareStencilRead(CompareFunction.Equal, StencilMask.Hole);
                 playerMesh.AlwaysOnTop = true;
@@ -81,12 +86,27 @@ namespace FezGame.Components {
                 effect.Silhouette = false || ForceSilhouette;
                 playerMesh.Draw();
             }
+
             GraphicsDevice.PrepareStencilWrite(StencilMask.Gomez);
             playerMesh.AlwaysOnTop = PlayerManager.Action.NeedsAlwaysOnTop();
             playerMesh.DepthWrites = true;
             effect.Silhouette = false || ForceSilhouette;
             playerMesh.Draw();
-            GraphicsDevice.PrepareStencilWrite(StencilMask.None);
+
+            if (DrawStars) {
+                GraphicsDevice.PrepareStencilRead(CompareFunction.Equal, StencilMask.Gomez);
+
+                float viewScale = GraphicsDevice.GetViewScale() * 0.5f;
+                float m11 = CameraManager.Radius / ((float)StarsTexture.Width / 16f) / viewScale;
+                float m22 = (float)((double)CameraManager.Radius / (double)CameraManager.AspectRatio / ((double)StarsTexture.Height / 16.0)) / viewScale;
+                Matrix textureMatrix = new Matrix(m11, 0.0f, 0.0f, 0.0f, 0.0f, m22, 0.0f, 0.0f, (float)(-(double)m11 / 2.0), (float)(-(double)m22 / 2.0), 1f, 0.0f, 0.0f, 0.0f, 0.0f, 1f);
+                GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
+                ServiceHelper.Get<ITargetRenderingManager>().DrawFullscreen(StarsTexture, textureMatrix, Color.White);
+
+                GraphicsDevice.PrepareStencilRead(CompareFunction.Always, StencilMask.None);
+            } else {
+                GraphicsDevice.PrepareStencilWrite(StencilMask.None);
+            }
         }
 
         public override void Draw(GameTime gameTime) {
@@ -107,6 +127,7 @@ namespace FezGame.Components {
 
         protected override void LoadContent() {
             playerMesh.Effect = effect = new GomezEffect();
+            StarsTexture = ServiceHelper.Get<IContentManagerProvider>().Global.Load<Texture2D>("Other Textures/black_hole/Stars");
         }
 
         private void PreDraw() {
@@ -142,22 +163,19 @@ namespace FezGame.Components {
                 NoMoreFez = networkData.NoMoreFez;
 
                 ForceSilhouette = false;
+                DrawStars = false;
 
                 if (networkData.InCutscene || networkData.InMap || networkData.InMenuCube || networkData.Paused) {
-                    ForceSilhouette = true;
-                    Opacity = 0.85f;
-                    //TODO apply star effect?
+                    DrawStars = true;
                 }
 
-                if (networkData.Viewpoint != CameraManager.Viewpoint && networkData.Viewpoint.GetOpposite() != CameraManager.Viewpoint) {
+                if (networkData.Viewpoint != CameraManager.Viewpoint) {
                     Rotation = CameraManager.Rotation;
                     Opacity = 0.75f;
                 }
 
                 if (networkData.Level != LevelManager.Name) {
-                    ForceSilhouette = true;
-                    Opacity = 0.85f;
-                    //TODO apply star effect?
+                    DrawStars = true;
                 }
             }
 
