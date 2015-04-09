@@ -18,7 +18,7 @@ namespace FezEngine.Services {
         }
 
         public void InitializeLibrary() {
-            if (ExtractDisabled || ExtractCustom) {
+            if (!ExtractDisabled && !ExtractCustom) {
                 orig_InitializeLibrary();
                 return;
             }
