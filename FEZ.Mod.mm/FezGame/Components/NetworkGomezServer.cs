@@ -54,6 +54,10 @@ namespace FezGame.Components {
 
         public IPEndPoint ClientEndpoint;
 
+        public string ServerName;
+        public string ServerInfo;
+        public string ServerInfoFile = "serverinfo.txt";
+
         public NetworkGomezServer(int port = 1337) {
             Port = port;
         }
@@ -126,6 +130,31 @@ namespace FezGame.Components {
             if (Client != null) {
                 Client.Close();
                 Client = null;
+            }
+        }
+
+        public void Broadcast(bool once = false) {
+            if (FEZMod.EnableMultiplayerLocalhost) {
+                return;
+            }
+            if (ServerName == null && ServerInfo == null && File.Exists(ServerInfoFile)) {
+                using (FileStream fs = File.Open(ServerInfoFile, FileMode.Open)) {
+                    using (StreamReader reader = new StreamReader(fs)) {
+                        ServerName = reader.ReadLine().Trim();
+                        ServerInfo = reader.ReadToEnd().Trim();
+                    }
+                }
+            }
+            if (ServerName != null || ServerInfo != null) {
+                string name = Uri.EscapeDataString(ServerName ?? "");
+                string info = Uri.EscapeDataString(ServerInfo ?? "");
+                ModLogger.Log("JAFM.Server", info);
+                using (WebClient client = new WebClient()) {
+                    string ip = client.DownloadString("http://fezmod.tk/servers/broadcast.php?name="+name+"&info="+info);
+                    if (!once) {
+                        Waiters.Wait(15, () => Broadcast());
+                    }
+                }
             }
         }
 

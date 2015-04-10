@@ -248,6 +248,7 @@ namespace FezGame.Mod {
                 if (NetworkGomezClient.Instance != null) {
                     NetworkGomezClient.Instance.Start();
                 } else if (NetworkGomezServer.Instance != null) {
+                    NetworkGomezServer.Instance.Broadcast();
                     ServiceHelper.Get<ISoundManager>().InitializeLibrary();
                     NetworkGomezServer.Instance.StartListening();
                 }
