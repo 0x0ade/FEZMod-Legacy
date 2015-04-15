@@ -39,8 +39,6 @@ namespace FezGame.Components {
 
         public static SpeedrunInfo Instance;
 
-        protected Split[] tmpLevelTimes = new Split[512];
-
         public SpriteBatch SpriteBatch { get; set; }
         public GlyphTextRenderer GTR { get; set; }
 
@@ -50,32 +48,6 @@ namespace FezGame.Components {
         public float FontBigFactor;
 
         protected string PrevLevel;
-        protected bool WasLoading;
-
-        /*protected bool running_ = false;
-        public bool Running {
-            get {
-                return running_;
-            }
-            set {
-                if (running_ != value && FezSpeedrun.LiveSplitClient != null) {
-                    if (value) {
-                        byte[] msg = Encoding.ASCII.GetBytes("initgametime\r\n");
-                        FezSpeedrun.LiveSplitStream.Write(msg, 0, msg.Length);
-                        msg = Encoding.ASCII.GetBytes("starttimer\r\n");
-                        FezSpeedrun.LiveSplitStream.Write(msg, 0, msg.Length);
-                        if (FezSpeedrun.LiveSplitSync) {
-                            msg = Encoding.ASCII.GetBytes("pausegametime\r\n");
-                            FezSpeedrun.LiveSplitStream.Write(msg, 0, msg.Length);
-                        }
-                    } else {
-                        byte[] msg = Encoding.ASCII.GetBytes("split\r\n");
-                        FezSpeedrun.LiveSplitStream.Write(msg, 0, msg.Length);
-                    }
-                }
-                running_ = value;
-            }
-        }*/
 
         public SpeedrunInfo(Game game)
             : base(game) {
@@ -124,62 +96,44 @@ namespace FezGame.Components {
             }
 
             FezSpeedrun.Clock.Update();
-
-            /*if (GameState.Loading) {
-                saveData.Set("TimeLoading", saveData.Get<TimeSpan>("TimeLoading") + gameTime.ElapsedGameTime);
-                if (FezSpeedrun.LiveSplitClient != null && !WasLoading) {
-                    byte[] msg = Encoding.ASCII.GetBytes("pausegametime\r\n");
-                    FezSpeedrun.LiveSplitStream.Write(msg, 0, msg.Length);
-                }
-                WasLoading = true;
-                return;
-            }
-
-            if (WasLoading) {
-                WasLoading = false;
-                if (FezSpeedrun.LiveSplitClient != null) {
-                    byte[] msg = Encoding.ASCII.GetBytes("unpausegametime\r\n");
-                    FezSpeedrun.LiveSplitStream.Write(msg, 0, msg.Length);
-                    msg = Encoding.ASCII.GetBytes("setloadingtimes " + saveData.Get<TimeSpan>("TimeLoading") + "\r\n");
-                    FezSpeedrun.LiveSplitStream.Write(msg, 0, msg.Length);
-                }
-            }*/
-
-            /*if (FezSpeedrun.LiveSplitSync) {
-                byte[] msg = Encoding.ASCII.GetBytes("setgametime " + time + "\r\n");
-                FezSpeedrun.LiveSplitStream.Write(msg, 0, msg.Length);
-            }*/
-
         }
 
         public override void Draw(GameTime gameTime) {
             if (!FEZMod.Preloaded || FezSpeedrun.Clock == null || !FezSpeedrun.Clock.InGame) {
                 return;
             }
-
+            
             Viewport viewport = GraphicsDevice.Viewport;
             float viewScale = GraphicsDevice.GetViewScale();
-
+            
             GraphicsDevice.SetBlendingMode(BlendingMode.Alphablending);
             SpriteBatch.BeginPoint();
-
-
+            
+            
             float lineBigHeight = FontBig.MeasureString("Time: 01:23:45.6789").Y * viewScale * FontBigFactor;
-            GTR.DrawShadowedText(SpriteBatch, FontBig, "Time: "+FezSpeedrun.Clock.Time.ToString().TrimEnd(new char[] {'0'}), new Vector2(0, 0), Color.White, viewScale * FontBigFactor);
-
+            GTR.DrawShadowedText(SpriteBatch, FontBig, "Time: "+FormatTime(FezSpeedrun.Clock.Time.ToString()), new Vector2(0, 0), Color.White, viewScale * FontBigFactor);
+            
             List<Split> levelTimes = FezSpeedrun.Clock.Splits;
-
-            int levelTimesCount = levelTimes.Count;
-            levelTimes.CopyTo(tmpLevelTimes.Length < levelTimesCount ? (tmpLevelTimes = new Split[levelTimesCount]) : tmpLevelTimes, 0);
-
-            float lineHeight = 24f;//FontSmall.MeasureString("Time: 01:23:45.6789").Y * viewScale * FontSmallFactor;
-            for (int i = 0; i < levelTimesCount; i++) {
-                string text = tmpLevelTimes[i].Text;
-                TimeSpan time = tmpLevelTimes[i].Time;
-                GTR.DrawShadowedText(SpriteBatch, FontSmall, text + ": " + time.ToString().TrimEnd(new char[] {'0'}), new Vector2(0, lineBigHeight + i * lineHeight), Color.White, viewScale * FontSmallFactor);
+            
+            float lineHeight = FontSmall.MeasureString("Time: 01:23:45.6789").Y * viewScale * FontSmallFactor;
+            const int maxSplits = 6;
+            for (int i = 0; i < levelTimes.Count && i < maxSplits; i++) {
+                Split split = levelTimes[(levelTimes.Count - 1) - i];
+                string text = split.Text;
+                TimeSpan time = split.Time;
+                GTR.DrawShadowedText(SpriteBatch, FontSmall, text + ": " + FormatTime(time.ToString()), new Vector2(0, lineBigHeight + i * lineHeight), new Color(Color.White, 1f - ((float) i) / ((float) maxSplits + 1f)), viewScale * FontSmallFactor);
             }
 
             SpriteBatch.End();
+        }
+
+        protected static readonly char[] FormatTime_zero = new char[] {'0'};
+        public static string FormatTime(string time) {
+            time = time.TrimEnd(FormatTime_zero);
+            if (time.EndsWith(":")) {
+                time = time + "00";
+            }
+            return time;
         }
 
     }

@@ -10,6 +10,7 @@ using FezEngine.Tools;
 using FezEngine.Tools;
 using FezEngine.Services;
 using Common;
+using FezEngine.Components.Scripting;
 
 namespace FezGame.Speedrun.Clocks {
     public class SpeedrunClock : ISpeedrunClock {
@@ -151,6 +152,10 @@ namespace FezGame.Speedrun.Clocks {
                 }
 
             }
+        }
+
+        public void Dispose() {
+            Running = false;
         }
 
     }

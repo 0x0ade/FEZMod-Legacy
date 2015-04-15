@@ -6,7 +6,7 @@ using FezEngine.Services;
 
 namespace FezGame.Speedrun.Clocks {
     public delegate string SplitCase(ISpeedrunClock clock);
-    public interface ISpeedrunClock {
+    public interface ISpeedrunClock : IDisposable {
 
         bool InGame { get; }
 

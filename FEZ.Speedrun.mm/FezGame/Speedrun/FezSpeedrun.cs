@@ -23,10 +23,6 @@ namespace FezGame.Speedrun {
 
         public static ISpeedrunClock Clock = new SpeedrunClock();
 
-        public static TcpClient LiveSplitClient;
-        public static NetworkStream LiveSplitStream;
-        public static bool LiveSplitSync = false;
-
         public static List<SplitCase> DefaultSplitCases = new List<SplitCase>();
 
         public FezSpeedrun() {
@@ -39,9 +35,9 @@ namespace FezGame.Speedrun {
                     if (i + 1 < args.Length && !args[i+1].StartsWith("-")) {
                         if (args[i + 1] != "strict") {
                             ModLogger.Log("JAFM", "Connecting to LiveSplit on port " + args[i + 1] + "...");
-                            //Clock = new LiveSplitClock("localhost", int.Parse(args[i + 1]));
-                            LiveSplitClient = new TcpClient("localhost", int.Parse(args[i + 1]));
-                            LiveSplitStream = FezSpeedrun.LiveSplitClient.GetStream();
+                            LiveSplitClock lsClock = new LiveSplitClock("localhost", int.Parse(args[i + 1]));
+                            lsClock.Clock = Clock;
+                            Clock = lsClock;
                         } else {
                             ModLogger.Log("JAFM", "Switching to strict mode...");
                             Clock.Strict = true;
@@ -52,9 +48,9 @@ namespace FezGame.Speedrun {
                     FEZMod.EnableQuickWarp = false;
                     FEZMod.EnableBugfixes = false;
                 }
-                if (args[i] == "-lss" || args[i] == "--livesplit-sync") {
+                if (Clock is LiveSplitClock && (args[i] == "-lss" || args[i] == "--livesplit-sync")) {
                     ModLogger.Log("JAFM", "Found -lss / --livesplit-sync");
-                    LiveSplitSync = true;
+                    ((LiveSplitClock) Clock).Sync = true;
                 }
             }
         }
@@ -66,9 +62,9 @@ namespace FezGame.Speedrun {
         }
 
         public override void Exit() {
-            if (LiveSplitClient != null) {
-                LiveSplitStream.Close();
-                LiveSplitClient.Close();
+            if (Clock != null) {
+                Clock.Running = false;
+                Clock.Dispose();
             }
         }
 

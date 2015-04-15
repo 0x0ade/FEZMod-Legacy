@@ -73,6 +73,7 @@
     <Compile Include="FezGame\Components\MenuBase.cs" />
     <Compile Include="FezGame\Speedrun\Clocks\SpeedrunClock.cs" />
     <Compile Include="FezGame\Speedrun\Clocks\ISpeedrunClock.cs" />
+    <Compile Include="FezGame\Speedrun\Clocks\LiveSplitClock.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
