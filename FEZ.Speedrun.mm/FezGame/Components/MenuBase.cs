@@ -11,10 +11,10 @@ namespace FezGame.Components {
         public void StartNewGame() {
             orig_StartNewGame();
             if (FezSpeedrun.SpeedrunMode) {
-                if (SpeedrunInfo.Instance.Running) {
-                    SpeedrunInfo.Instance.Running = false;//Forces the LiveSplit timer to re-run.
+                if (FezSpeedrun.Clock.Running) {
+                    FezSpeedrun.Clock.Running = false; //Forces the clock to reset.
                 }
-                SpeedrunInfo.Instance.Running = true;
+                FezSpeedrun.Clock.Running = true;
             }
         }
 

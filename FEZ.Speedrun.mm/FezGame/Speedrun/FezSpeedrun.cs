@@ -8,6 +8,9 @@ using FezGame.Structure;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
+using FezGame.Speedrun.Clocks;
+using FezEngine.Structure;
+using System.Threading;
 
 namespace FezGame.Speedrun {
     public class FezSpeedrun : FezModule {
@@ -17,12 +20,14 @@ namespace FezGame.Speedrun {
         public override string Version { get { return FEZMod.Version; } }
 
         public static bool SpeedrunMode = false;
-        public static bool SpeedrunList = false;
-        public static bool Strict = false;
+
+        public static ISpeedrunClock Clock = new SpeedrunClock();
 
         public static TcpClient LiveSplitClient;
         public static NetworkStream LiveSplitStream;
         public static bool LiveSplitSync = false;
+
+        public static List<SplitCase> DefaultSplitCases = new List<SplitCase>();
 
         public FezSpeedrun() {
         }
@@ -34,12 +39,12 @@ namespace FezGame.Speedrun {
                     if (i + 1 < args.Length && !args[i+1].StartsWith("-")) {
                         if (args[i + 1] != "strict") {
                             ModLogger.Log("JAFM", "Connecting to LiveSplit on port " + args[i + 1] + "...");
+                            //Clock = new LiveSplitClock("localhost", int.Parse(args[i + 1]));
                             LiveSplitClient = new TcpClient("localhost", int.Parse(args[i + 1]));
                             LiveSplitStream = FezSpeedrun.LiveSplitClient.GetStream();
-                            Strict = true;
                         } else {
                             ModLogger.Log("JAFM", "Switching to strict mode...");
-                            Strict = true;
+                            Clock.Strict = true;
                         }
                     }
                     SpeedrunMode = true;
@@ -50,10 +55,6 @@ namespace FezGame.Speedrun {
                 if (args[i] == "-lss" || args[i] == "--livesplit-sync") {
                     ModLogger.Log("JAFM", "Found -lss / --livesplit-sync");
                     LiveSplitSync = true;
-                }
-                if (args[i] == "-sl" || args[i] == "--split-list") {
-                    ModLogger.Log("JAFM", "Found -sl / --split-list");
-                    SpeedrunList = true;
                 }
             }
         }
@@ -69,50 +70,6 @@ namespace FezGame.Speedrun {
                 LiveSplitStream.Close();
                 LiveSplitClient.Close();
             }
-        }
-
-        public override void SaveClear(SaveData saveData) {
-            saveData.Set("LevelTimes", new List<Split>());
-            saveData.Set("Time", new TimeSpan());
-            saveData.Set("TimeLoading", new TimeSpan());
-        }
-
-        public override void SaveClone(SaveData source, SaveData dest) {
-            List<Split> sourceLevelTimes = source.Get<List<Split>>("LevelTimes");
-            List<Split> destLevelTimes = dest.Get<List<Split>>("LevelTimes");
-
-            destLevelTimes.Clear();
-            foreach (Split levelTime in sourceLevelTimes) {
-                destLevelTimes.Add(levelTime);
-            }
-            dest.Set("LevelTimes", destLevelTimes);
-
-            dest.Set("Time", source.Get<TimeSpan>("Time"));
-            dest.Set("TimeLoading", source.Get<TimeSpan>("TimeLoading"));
-        }
-
-        public override void SaveRead(SaveData saveData, CrcReader reader) {
-            List<Split> levelTimes = new List<Split>();
-            int count = reader.ReadInt32();
-            for (int i = 0; i < count; i++) {
-                levelTimes.Add(new Split(reader.ReadString(), reader.ReadTimeSpan()));
-            }
-            saveData.Set("LevelTimes", levelTimes);
-
-            saveData.Set("Time", reader.ReadTimeSpan());
-            saveData.Set("TimeLoading", reader.ReadTimeSpan());
-        }
-
-        public override void SaveWrite(SaveData saveData, CrcWriter writer) {
-            List<Split> levelTimes = saveData.Get<List<Split>>("LevelTimes");
-            writer.Write(levelTimes.Count);
-            foreach (Split levelTime in levelTimes) {
-                writer.Write(levelTime.Level);
-                writer.Write(levelTime.Time);
-            }
-
-            writer.Write(saveData.Get<TimeSpan>("Time"));
-            writer.Write(saveData.Get<TimeSpan>("TimeLoading"));
         }
 
     }

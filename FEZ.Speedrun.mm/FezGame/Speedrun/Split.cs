@@ -3,15 +3,11 @@
 namespace FezGame.Speedrun {
     public class Split {
 
-        public string Level;
+        public string Text;
         public TimeSpan Time;
 
-        public Split()
-            : this("", new TimeSpan()) {
-        }
-
-        public Split(string level, TimeSpan time) {
-            Level = level;
+        public Split(string text = "", TimeSpan time = new TimeSpan()) {
+            Text = text;
             Time = time;
         }
 
