@@ -71,19 +71,13 @@ namespace FezGame.Components {
                 if (LevelManager == null) {
                     return null;
                 }
-                if (LevelManager.Name != PrevLevel) {
-                    PrevLevel = LevelManager.Name;
-                    return LevelManager.Name;
-                }
-                return null;
-            });
-            FezSpeedrun.DefaultSplitCases.Add(delegate(ISpeedrunClock clock) {
-                if (LevelManager == null) {
-                    return null;
-                }
                 if (LevelManager.Name.StartsWith("VILLAGEVILLE_3D_END_")) {
                     clock.Running = false;
                     return "VILLAGEVILLE_3D_END";
+                }
+                if (LevelManager.Name != PrevLevel) {
+                    PrevLevel = LevelManager.Name;
+                    return LevelManager.Name;
                 }
                 return null;
             });
@@ -109,19 +103,20 @@ namespace FezGame.Components {
             GraphicsDevice.SetBlendingMode(BlendingMode.Alphablending);
             SpriteBatch.BeginPoint();
             
-            
             float lineBigHeight = FontBig.MeasureString("Time: 01:23:45.6789").Y * viewScale * FontBigFactor;
             GTR.DrawShadowedText(SpriteBatch, FontBig, "Time: "+FormatTime(FezSpeedrun.Clock.Time.ToString()), new Vector2(0, 0), Color.White, viewScale * FontBigFactor);
+
+            if (FezSpeedrun.PerRoomTime) {
+                List<Split> levelTimes = FezSpeedrun.Clock.Splits;
             
-            List<Split> levelTimes = FezSpeedrun.Clock.Splits;
-            
-            float lineHeight = FontSmall.MeasureString("Time: 01:23:45.6789").Y * viewScale * FontSmallFactor;
-            const int maxSplits = 6;
-            for (int i = 0; i < levelTimes.Count && i < maxSplits; i++) {
-                Split split = levelTimes[(levelTimes.Count - 1) - i];
-                string text = split.Text;
-                TimeSpan time = split.Time;
-                GTR.DrawShadowedText(SpriteBatch, FontSmall, text + ": " + FormatTime(time.ToString()), new Vector2(0, lineBigHeight + i * lineHeight), new Color(Color.White, 1f - ((float) i) / ((float) maxSplits + 1f)), viewScale * FontSmallFactor);
+                float lineHeight = FontSmall.MeasureString("Time: 01:23:45.6789").Y * viewScale * FontSmallFactor;
+                const int maxSplits = 6;
+                for (int i = 0; i < levelTimes.Count && i < maxSplits; i++) {
+                    Split split = levelTimes[(levelTimes.Count - 1) - i];
+                    string text = split.Text;
+                    TimeSpan time = split.Time;
+                    GTR.DrawShadowedText(SpriteBatch, FontSmall, text + ": " + FormatTime(time.ToString()), new Vector2(0, lineBigHeight + i * lineHeight), new Color(Color.White, 1f - ((float)i) / ((float)maxSplits + 1f)), viewScale * FontSmallFactor);
+                }
             }
 
             SpriteBatch.End();

@@ -81,7 +81,7 @@ namespace FezGame.Speedrun.Clocks {
             Time = new TimeSpan();
             TimeLoading = new TimeSpan();
             Splits = new List<Split>();
-            Strict = false;
+            Strict = true;
             Running = false;
             SplitCases = new List<SplitCase>();
         }
