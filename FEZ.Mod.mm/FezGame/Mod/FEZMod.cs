@@ -10,6 +10,7 @@ using FezGame.Components;
 using FezGame.Structure;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.IO;
 
 namespace FezGame.Mod {
     public static class FEZMod {
@@ -31,6 +32,14 @@ namespace FezGame.Mod {
 
         public static bool LoadedEssentials { get; private set; }
         public static bool Preloaded { get; private set; }
+
+        public static bool InAndroid = false;
+        private static bool runningInAndroid {
+            get {
+                ModLogger.Log("FEZDroid", "Checking if running in Android");
+                return Directory.Exists("/system/app");
+            }
+        }
 
         private static List<Assembly> LoadedAssemblies = new List<Assembly>();
 
@@ -142,6 +151,7 @@ namespace FezGame.Mod {
                     ModLogger.Log("JAFM", "Found -dc / --debug-controls");
                     EnableDebugControls = true;
                 }
+                //TODO extract multiplayer from core
                 if (args[i] == "-mp" || args[i] == "--multiplayer") {
                     ModLogger.Log("JAFM", "Found -mp / --multiplayer");
                     EnableMultiplayer = true;
@@ -156,6 +166,10 @@ namespace FezGame.Mod {
                 if (args[i] == "-mpl" || args[i] == "--multiplayer-localhost") {
                     ModLogger.Log("JAFM", "Found -mpl / --multiplayer-localhost");
                     EnableMultiplayerLocalhost = true;
+                }
+                //TODO extract FEZDroid from core
+                if (args[i] == "--android" || runningInAndroid) {
+                    InAndroid = true;
                 }
                 /*
                 Explaination as of why the workaround still is required:
@@ -189,6 +203,15 @@ namespace FezGame.Mod {
                     ModLogger.Log("JAFM.Engine", "Found -nme / --no-music-extract");
                     MemoryContentManager.AssetExists("JAFM_WORKAROUND_NOMUSICEXTRACT");
                 }
+            }
+
+            if (InAndroid || runningInAndroid) {
+                InAndroid = InAndroid || runningInAndroid;
+                ModLogger.Log("FEZDroid", "Android mode engaged!");
+                InAndroid = true;
+                Fez.SkipLogos = true;
+                Fez.SkipIntro = true;
+                MemoryContentManager.AssetExists("JAFM_WORKAROUND_NOCACHE");
             }
 
             CallInEachModule("ParseArgs", new object[] {args});
