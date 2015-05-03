@@ -91,11 +91,11 @@ namespace FezEngine.Tools {
             ModLogger.Log("JAFM.Engine", "Dumped: "+dumped+" / "+count);
         }
 
-        protected Stream orig_OpenStream(String assetName) {
+        protected Stream orig_OpenStream(string assetName) {
             return null;
         }
 
-        protected Stream OpenStream(String assetName) {
+        protected Stream OpenStream(string assetName) {
             if (DumpAllResources) {
                 DumpAll();
             }
@@ -117,11 +117,11 @@ namespace FezEngine.Tools {
             return orig_OpenStream(assetName);
         }
 
-        public static bool orig_AssetExists(String assetName) {
+        public static bool orig_AssetExists(string assetName) {
             return false;
         }
 
-        public static bool AssetExists(String assetName) {
+        public static bool AssetExists(string assetName) {
             if (assetName == "JAFM_WORKAROUND_DUMP") {
                 DumpResources = true;
                 return true;

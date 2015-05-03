@@ -5,11 +5,11 @@ using System.Reflection;
 namespace FezGame.Editor {
     public static class EditorUtils {
 
-        public static String ToString(this Vector2 v) {
+        public static string ToString(this Vector2 v) {
             return v.X + ", " + v.Y;
         }
 
-        public static String ToString(this Vector3 v) {
+        public static string ToString(this Vector3 v) {
             return v.X + ", " + v.Y + ", " + v.Z;
         }
 

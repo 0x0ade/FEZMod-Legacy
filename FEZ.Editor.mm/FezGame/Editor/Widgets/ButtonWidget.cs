@@ -31,12 +31,12 @@ namespace FezGame.Editor.Widgets {
             : this(game, null, (Action) null) {
         }
 
-        public ButtonWidget(Game game, String label, EditorWidget[] widgets, Action action = null) 
+        public ButtonWidget(Game game, string label, EditorWidget[] widgets, Action action = null) 
             : this(game, label, action) {
             Widgets.AddRange(widgets);
         }
 
-        public ButtonWidget(Game game, String label, Action action = null) 
+        public ButtonWidget(Game game, string label, Action action = null) 
             : base(game) {
             Label = label;
             Action = action;

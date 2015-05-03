@@ -28,7 +28,7 @@ namespace FezGame.Editor.Widgets {
             : this(game, "", false) {
         }
 
-        public CheckboxWidget(Game game, String label, bool checked_ = false) 
+        public CheckboxWidget(Game game, string label, bool checked_ = false) 
             : base(game, label) {
             Checked = checked_;
             Font = FontManager.Small;

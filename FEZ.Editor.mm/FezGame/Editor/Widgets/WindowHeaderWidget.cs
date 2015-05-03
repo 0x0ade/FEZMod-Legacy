@@ -21,7 +21,7 @@ using FezGame.Components;
 namespace FezGame.Editor.Widgets {
     public class WindowHeaderWidget : EditorWidget {
 
-        public String Label;
+        public string Label;
         public SpriteFont Font;
 
         public ButtonWidget CloseButtonWidget { get; protected set; }
@@ -32,7 +32,7 @@ namespace FezGame.Editor.Widgets {
             : this(game, null) {
         }
 
-        public WindowHeaderWidget(Game game, String label) 
+        public WindowHeaderWidget(Game game, string label) 
             : base(game) {
             Label = label;
             Font = FontManager.Small;

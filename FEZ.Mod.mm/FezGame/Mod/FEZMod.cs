@@ -168,7 +168,7 @@ namespace FezGame.Mod {
                     EnableMultiplayerLocalhost = true;
                 }
                 //TODO extract FEZDroid from core
-                if (args[i] == "--android" || runningInAndroid) {
+                if (args[i] == "--android") {
                     InAndroid = true;
                 }
                 /*
@@ -206,11 +206,10 @@ namespace FezGame.Mod {
             }
 
             if (InAndroid || runningInAndroid) {
-                InAndroid = InAndroid || runningInAndroid;
                 ModLogger.Log("FEZDroid", "Android mode engaged!");
                 InAndroid = true;
-                Fez.SkipLogos = true;
                 Fez.SkipIntro = true;
+                Fez.SkipLogos = true;
                 MemoryContentManager.AssetExists("JAFM_WORKAROUND_NOCACHE");
             }
 
@@ -314,7 +313,7 @@ namespace FezGame.Mod {
             CallInEachModule("SaveWrite", new object[] {saveData, writer});
         }
 
-        private static void CallInEachModule(String methodName, object[] args) {
+        private static void CallInEachModule(string methodName, object[] args) {
             Type[] argsTypes = Type.GetTypeArray(args);
             foreach (FezModule module in Modules) {
                 module.GetType().GetMethod(methodName, argsTypes).Invoke(module, args);

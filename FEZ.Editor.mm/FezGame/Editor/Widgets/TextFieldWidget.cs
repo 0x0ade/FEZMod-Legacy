@@ -25,7 +25,7 @@ namespace FezGame.Editor.Widgets {
         [ServiceDependency]
         public IKeyboardStateManager KeyboardState { get; set; }
 
-        public String Text = "";
+        public string Text = "";
 
         protected bool Focused = false;
         protected float BlinkTime = 0f;
@@ -39,17 +39,17 @@ namespace FezGame.Editor.Widgets {
             : this(game, "") {
         }
 
-        public TextFieldWidget(Game game, String text, String root) 
+        public TextFieldWidget(Game game, string text, string root) 
             : this(game, text) {
             Fill(root);
         }
 
-        public TextFieldWidget(Game game, String text, IEnumerable<string> list) 
+        public TextFieldWidget(Game game, string text, IEnumerable<string> list) 
             : this(game, text) {
             Fill(list);
         }
 
-        public TextFieldWidget(Game game, String text) 
+        public TextFieldWidget(Game game, string text) 
             : base(game) {
             Text = text;
             Font = FontManager.Small;
@@ -193,7 +193,7 @@ namespace FezGame.Editor.Widgets {
             CursorPosition++;
         }
 
-        public void Fill(String root) {
+        public void Fill(string root) {
             Widgets.Clear();
             IEnumerable<string> list = CMProvider.GetAllIn(root);
             foreach (string item_ in list) {
@@ -227,6 +227,7 @@ namespace FezGame.Editor.Widgets {
             }
             Text = (string) RefreshValue();
             base.Refresh();
+            Label = null;
         }
 
     }
