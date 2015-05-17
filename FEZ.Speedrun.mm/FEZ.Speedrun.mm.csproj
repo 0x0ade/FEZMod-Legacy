@@ -68,12 +68,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FezGame\Components\SpeedrunInfo.cs" />
     <Compile Include="FezGame\Speedrun\FezSpeedrun.cs" />
-    <Compile Include="MonoMod\MonoModIgnore.cs" />
     <Compile Include="FezGame\Speedrun\Split.cs" />
     <Compile Include="FezGame\Components\MenuBase.cs" />
     <Compile Include="FezGame\Speedrun\Clocks\SpeedrunClock.cs" />
     <Compile Include="FezGame\Speedrun\Clocks\ISpeedrunClock.cs" />
     <Compile Include="FezGame\Speedrun\Clocks\LiveSplitClock.cs" />
+    <Compile Include="MonoMod\MonoModIgnore.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

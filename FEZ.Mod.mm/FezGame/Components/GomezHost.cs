@@ -9,6 +9,7 @@ using FezGame.Mod;
 using Common;
 using FezEngine.Tools;
 using FezEngine.Services;
+using Microsoft.Xna.Framework.Net;
 
 namespace FezGame.Components {
     public class GomezHost {
@@ -25,6 +26,8 @@ namespace FezGame.Components {
         private bool lastBackground;
         private bool lastHideFez;
 
+        private bool dataUpdated = false;
+
         protected NetworkGomezData networkData;
 
         public void orig_Update(GameTime gameTime) {
@@ -35,14 +38,24 @@ namespace FezGame.Components {
             if (NetworkGomezServer.Instance != null) {
                 NetworkGomezServer.Instance.Action = NetworkGomezServer.Instance.Action ?? UpdateNetGomez;
             }
+            dataUpdated = true;
         }
 
         public object UpdateNetGomez() {
+            if (!dataUpdated) {
+                return null;
+            }
+            dataUpdated = false;
+
             if (networkData == null) {
                 networkData = new NetworkGomezData();
             }
 
             networkData.DataId++;
+
+            if (networkData.DataId % NetworkGomezServer.SendModulo != 0) {
+                return null;
+            }
 
             networkData.Position = playerMesh.Position;
             networkData.Rotation = playerMesh.Rotation;

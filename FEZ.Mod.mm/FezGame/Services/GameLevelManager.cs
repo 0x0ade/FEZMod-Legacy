@@ -15,6 +15,7 @@ using System.IO;
 using System.Xml;
 using System.Reflection;
 using MonoMod;
+using System.Xml.Serialization;
 
 namespace FezGame.Services {
 	public class GameLevelManager : LevelManager {
@@ -49,6 +50,8 @@ namespace FezGame.Services {
                 return;
             }
 
+            //levelName = ProcessLevelName(levelName);
+
 			string filePath = ("Resources\\levels\\"+(levelName.ToLower())).Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString())+".xml";
             FileInfo file = new FileInfo(filePath);
             if (!file.Exists) {
@@ -59,6 +62,7 @@ namespace FezGame.Services {
                     ModLogger.Log("JAFM", "Level not found: " + levelName + "; Falling back to the original VILLAGEVILLE_3D...");
                     orig_Load("VILLAGEVILLE_3D");
                 }
+                //ProcessLevelData(levelData);
                 GameLevelManagerHelper.Level = levelData;
                 return;
             }
@@ -77,9 +81,12 @@ namespace FezGame.Services {
             xmlReader.Close();
             fis.Close();
             XmlElement xmlLevel = xmlDocument["Level"];
-            XmlAttributeCollection xmlLevelAttribs = xmlLevel.Attributes;
 
+            levelData = (Level) xmlLevel.Deserialize();
+
+            /*
             //Level attributes
+            XmlAttributeCollection xmlLevelAttribs = xmlLevel.Attributes;
             MethodInfo[] levelMethods = levelData.GetType().GetMethods();
             for (int i = 0; i < levelMethods.Length; i++) {
                 MethodInfo method = levelMethods[i];
@@ -127,7 +134,7 @@ namespace FezGame.Services {
                         }
                     }
                 }
-            }
+            }*/
 
             ContentManager cm = CMProvider.GetForLevel(levelData.Name);
             //levelData.Name(levelName);
@@ -146,12 +153,15 @@ namespace FezGame.Services {
             }
 
             //Actual level content
-            levelData.Size = (Vector3) XmlLevelHelper.Parse(xmlLevel["Size"]);
+
+            /*
+
+            levelData.Size = (Vector3) xmlLevel["Size"].Parse();
 
             XmlElement xmlSpawn = xmlLevel["StartingPosition"]["TrileFace"];
             levelData.StartingPosition = new TrileFace();
             levelData.StartingPosition.Face = (FaceOrientation) Enum.Parse(typeof(FezEngine.FaceOrientation), xmlSpawn.GetAttribute("face"));
-            levelData.StartingPosition.Id = (TrileEmplacement) XmlLevelHelper.Parse(xmlSpawn["TrileId"]);
+            levelData.StartingPosition.Id = (TrileEmplacement) xmlSpawn["TrileId"].Parse();
 
             XmlElement xmlVolumes = xmlLevel["Volumes"];
             levelData.Volumes = new Dictionary<int, Volume>();
@@ -169,9 +179,9 @@ namespace FezGame.Services {
                 }
                 volume.Orientations = orientations;
 
-                volume.From = (Vector3) XmlLevelHelper.Parse(xmlVolume["From"]);
+                volume.From = (Vector3) xmlVolume["From"].Parse();
 
-                volume.To = (Vector3) XmlLevelHelper.Parse(xmlVolume["To"]);
+                volume.To = (Vector3) xmlVolume["To"].Parse();
 
                 levelData.Volumes[key] = volume;
             }
@@ -257,12 +267,12 @@ namespace FezGame.Services {
             for (int i = 0; i < xmlTriles.ChildNodes.Count; i++) {
                 XmlElement xmlTrile = (XmlElement) xmlTriles.ChildNodes.Item(i);
 
-                TrileEmplacement trileEmplacement = (TrileEmplacement) XmlLevelHelper.Parse(xmlTrile);
+                TrileEmplacement trileEmplacement = (TrileEmplacement) xmlTrile.Parse();
                 xmlTrile = xmlTrile["TrileInstance"];
 
                 TrileInstance trile = new TrileInstance(trileEmplacement, int.Parse(xmlTrile.GetAttribute("trileId")));
 
-                trile.Position = (Vector3) XmlLevelHelper.Parse(xmlTrile["Position"]);
+                trile.Position = (Vector3) xmlTrile["Position"].Parse();
 
                 trile.SetPhiLight(byte.Parse(xmlTrile.GetAttribute("orientation")));
 
@@ -279,9 +289,9 @@ namespace FezGame.Services {
                 ArtObjectInstance ao = new ArtObjectInstance();
 
                 ao.ArtObjectName = xmlAO.GetAttribute("name");
-                ao.Position = (Vector3) XmlLevelHelper.Parse(xmlAO["Position"]);
-                ao.Rotation = (Quaternion) XmlLevelHelper.Parse(xmlAO["Rotation"]);
-                ao.Scale = (Vector3) XmlLevelHelper.Parse(xmlAO["Scale"]);
+                ao.Position = (Vector3) xmlAO["Position"].Parse();
+                ao.Rotation = (Quaternion) xmlAO["Rotation"].Parse();
+                ao.Scale = (Vector3) xmlAO["Scale"].Parse();
 
                 XmlElement xmlAOSettings = xmlAO["ArtObjectActorSettings"];
                 ArtObjectActorSettings settings = new ArtObjectActorSettings();
@@ -299,7 +309,7 @@ namespace FezGame.Services {
                     settings.AttachedGroup = new int?();
                 }
                 settings.SpinView = (Viewpoint) Enum.Parse(typeof(FezEngine.Viewpoint), xmlAOSettings.GetAttribute("spinView"));
-                settings.RotationCenter = (Vector3) XmlLevelHelper.Parse(xmlAOSettings["RotationCenter"]);
+                settings.RotationCenter = (Vector3) xmlAOSettings["RotationCenter"].Parse();
 
                 ao.ActorSettings = settings;
 
@@ -338,9 +348,9 @@ namespace FezGame.Services {
                 filter.PackedValue = Convert.ToUInt32(xmlPlane.GetAttribute("filter").Substring(1), 16);
                 plane.Filter = filter;
                 plane.ActorType = (ActorType) Enum.Parse(typeof(FezEngine.Structure.ActorType), xmlPlane.GetAttribute("actorType"));
-                plane.Position = (Vector3) XmlLevelHelper.Parse(xmlPlane["Position"]);
-                plane.Rotation = (Quaternion) XmlLevelHelper.Parse(xmlPlane["Rotation"]);
-                plane.Scale = (Vector3) XmlLevelHelper.Parse(xmlPlane["Scale"]);
+                plane.Position = (Vector3) xmlPlane["Position"].Parse();
+                plane.Rotation = (Quaternion) xmlPlane["Rotation"].Parse();
+                plane.Scale = (Vector3) xmlPlane["Scale"].Parse();
 
                 levelData.BackgroundPlanes[key] = plane;
             }
@@ -372,7 +382,7 @@ namespace FezGame.Services {
                 for (int ii = 0; ii < xmlGroupTriles.ChildNodes.Count; ii++) {
                     XmlElement xmlGroupTrile = (XmlElement) xmlGroupTriles.ChildNodes.Item(ii);
 
-                    TrileInstance groupTrile = new TrileInstance((Vector3) XmlLevelHelper.Parse(xmlGroupTrile["Position"]),
+                    TrileInstance groupTrile = new TrileInstance((Vector3) xmlGroupTrile["Position"].Parse(),
                         int.Parse(xmlGroupTrile.GetAttribute("trileId")));
 
                     groupTrile.SetPhiLight(byte.Parse(xmlGroupTrile.GetAttribute("orientation")));
@@ -380,7 +390,7 @@ namespace FezGame.Services {
                     trileGroup.Triles.Add(groupTrile);
                 }
 
-                trileGroup.SpinCenter = (Vector3) XmlLevelHelper.Parse(xmlGroup["SpinCenter"]);
+                trileGroup.SpinCenter = (Vector3) xmlGroup["SpinCenter"].Parse();
 
                 levelData.Groups[key] = trileGroup;
             }
@@ -407,9 +417,9 @@ namespace FezGame.Services {
 				npc.AvoidsGomez = bool.Parse(xmlNPC.GetAttribute("avoidsGomez"));
 				npc.ActorType = (ActorType) Enum.Parse(typeof(FezEngine.Structure.ActorType), xmlNPC.GetAttribute("actorType"));
 
-                npc.Position = (Vector3) XmlLevelHelper.Parse(xmlNPC["Position"]);
+                npc.Position = (Vector3) xmlNPC["Position"].Parse();
 
-                npc.DestinationOffset = (Vector3) XmlLevelHelper.Parse(xmlNPC["DestinationOffset"]);
+                npc.DestinationOffset = (Vector3) xmlNPC["DestinationOffset"].Parse();
 
                 XmlElement xmlSpeech = xmlNPC["Speech"];
                 List<SpeechLine> speech = new List<SpeechLine>();
@@ -485,9 +495,9 @@ namespace FezGame.Services {
 					segment.WaitTimeOnStart = new TimeSpan(long.Parse(xmlSegment.GetAttribute("waitTimeOnStart")));
 					segment.WaitTimeOnFinish = new TimeSpan(long.Parse(xmlSegment.GetAttribute("waitTimeOnFinish")));
 
-                    segment.Destination = (Vector3) XmlLevelHelper.Parse(xmlSegment["Destination"]);
+                    segment.Destination = (Vector3) xmlSegment["Destination"].Parse();
 
-                    segment.Orientation = (Quaternion) XmlLevelHelper.Parse(xmlSegment["Orientation"]);
+                    segment.Orientation = (Quaternion) xmlSegment["Orientation"].Parse();
 
                     XmlElement xmlSegmentData = xmlSegment["CustomData"]["CameraNodeData"];
                     CameraNodeData segmentData = new CameraNodeData();
@@ -528,6 +538,8 @@ namespace FezGame.Services {
                 levelData.AmbienceTracks.Add(ambienceTrack);
             }
 
+*/
+
             levelData.OnDeserialization();
 
             LevelSaveData save = GameState.SaveData.ThisLevel;
@@ -535,6 +547,7 @@ namespace FezGame.Services {
                 save.FirstVisit = false;
             }
 
+            //ProcessLevelData(levelData);
             GameLevelManagerHelper.Level = levelData;
         }
 

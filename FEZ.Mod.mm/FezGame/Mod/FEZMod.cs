@@ -41,7 +41,7 @@ namespace FezGame.Mod {
             }
         }
 
-        private static List<Assembly> LoadedAssemblies = new List<Assembly>();
+        public static List<Assembly> LoadedAssemblies = new List<Assembly>();
 
         public static void PreInitialize(string[] args) {
             PreInitialize();

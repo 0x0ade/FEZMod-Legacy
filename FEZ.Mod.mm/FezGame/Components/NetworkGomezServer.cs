@@ -19,6 +19,8 @@ namespace FezGame.Components {
 
         public static NetworkGomezServer Instance;
 
+        public static int SendModulo = 4;
+
         public TcpListener ManagementListener;
         public TcpClient ManagementClient;
         public NetworkStream ManagementStream;

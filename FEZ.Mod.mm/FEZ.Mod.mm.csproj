@@ -72,7 +72,6 @@
     <Compile Include="FezGame\Components\WorldMap.cs" />
     <Compile Include="FezGame\Components\DotHost.cs" />
     <Compile Include="FezGame\Mod\FEZMod.cs" />
-    <Compile Include="FezGame\Mod\XmlLevelHelper.cs" />
     <Compile Include="FezGame\Mod\FezModule.cs" />
     <Compile Include="Common\ModLogger.cs" />
     <Compile Include="FezGame\Mod\FEZModComponent.cs" />
@@ -94,6 +93,7 @@
     <Compile Include="FezGame\Mod\BrutalMonoModWorkarounds.cs" />
     <Compile Include="FezGame\Structure\NetworkGomezData.cs" />
     <Compile Include="FezGame\Components\NetworkUpdateDelegates.cs" />
+    <Compile Include="FezGame\Mod\XmlHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

@@ -4,6 +4,9 @@ using FezEngine.Tools;
 using FezEngine.Services;
 using FezEngine.Services.Scripting;
 using FezGame.Services;
+using FezGame.Structure;
+using FezEngine.Components;
+using FezEngine.Structure.Input;
 
 namespace FezGame.Mod {
     public class FEZModComponent : GameComponent {
@@ -20,6 +23,8 @@ namespace FezGame.Mod {
         public IPlayerManager PlayerManager { get; set; }
         [ServiceDependency]
         public IGameLevelManager LevelManager { get; set; }
+        [ServiceDependency]
+        public IInputManager InputManager { get; set; }
         [ServiceDependency]
         public IContentManagerProvider CMProvider { private get; set; }
 
