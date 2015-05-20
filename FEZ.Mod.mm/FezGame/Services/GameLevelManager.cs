@@ -86,21 +86,6 @@ namespace FezGame.Services {
             levelData = (Level) xmlLevel.Deserialize(null, cm, true);
             levelData.Name = levelName;
 
-            //Load / prepare content (especially TrileSet)
-
-            if (levelData.SkyName != null) {
-                levelData.Sky = cm.Load<Sky>("Skies/" + levelData.SkyName);
-            }
-            if (levelData.TrileSetName != null) {
-                levelData.TrileSet = cm.Load<TrileSet>("Trile Sets/" + levelData.TrileSetName);
-            }
-            if (levelData.SongName != null) {
-                levelData.Song = cm.Load<TrackedSong>("Music/" + levelData.SongName);
-                levelData.Song.Initialize();
-            }
-
-            levelData.OnDeserialization();
-
             LevelSaveData save = GameState.SaveData.ThisLevel;
             if (save != null) {
                 save.FirstVisit = false;

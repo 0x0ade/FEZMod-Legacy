@@ -130,10 +130,13 @@ namespace FezGame.Mod {
             }
 
             if (type == null) {
-                ModLogger.Log("FEZMod", "XmlHelper found no Type for " + node.Name);
+                if (elem != null) {
+                    ModLogger.Log("FEZMod", "XmlHelper found no Type for " + node.Name);
+                }
                 return node.InnerText;
             } else {
                 //ModLogger.Log("FEZMod", "elem: " + elem.Name + "; type: " + type.FullName);
+                type = Nullable.GetUnderlyingType(type) ?? type;
             }
 
             object obj = type.New(elem) ?? node.InnerText;
@@ -185,7 +188,7 @@ namespace FezGame.Mod {
 
             if (obj is ICollection) {
                 Type[] types = obj.GetType().GetGenericArguments();
-                ModLogger.Log("FEZMod", "XmlHelper got " + type.FullName + " with " + types.Length + " generic arguments.");
+                //ModLogger.Log("FEZMod", "XmlHelper got " + type.FullName + " with " + types.Length + " generic arguments.");
                 MethodInfo add = type.GetMethod("Add", types);
                 if (add != null) {
                     foreach (XmlNode child in node.ChildNodes) {
@@ -278,13 +281,40 @@ namespace FezGame.Mod {
             }
 
             if (obj is TrileInstance) {
-                ModLogger.Log("FEZMod", "HSD: TrileInstance");
                 ((TrileInstance) obj).SetPhiLight(byte.Parse(elem.GetAttribute("orientation")));
             }
 
             if (obj is ArtObjectInstance) {
-                ModLogger.Log("FEZMod", "HSD: ArtObjectInstance");
                 ((ArtObjectInstance) obj).ArtObject = cm.Load<ArtObject>("Art objects/"+elem.GetAttribute("name"));
+            }
+
+            if (obj is Level) {
+                Level levelData = ((Level) obj);
+                if (levelData.SkyName != null) {
+                    levelData.Sky = cm.Load<Sky>("Skies/" + levelData.SkyName);
+                }
+                if (levelData.TrileSetName != null) {
+                    levelData.TrileSet = cm.Load<TrileSet>("Trile Sets/" + levelData.TrileSetName);
+                }
+                if (levelData.SongName != null) {
+                    levelData.Song = cm.Load<TrackedSong>("Music/" + levelData.SongName);
+                    levelData.Song.Initialize();
+                }
+
+                levelData.OnDeserialization();
+            }
+
+            if (obj is Entity) {
+                ((Entity) obj).Type = ((Entity) obj).Type ?? elem.GetAttribute("entityType");
+            }
+
+            MethodInfo onDeserialization = obj.GetType().GetMethod("OnDeserialization");
+            if (onDeserialization != null) {
+                if (onDeserialization.GetParameters().Length == 0) {
+                    onDeserialization.Invoke(obj, new object[0]);
+                } else {
+                    ModLogger.Log("FEZMod", "XmlHelper can't call OnDeserialization on " + obj + " of type " + obj.GetType().FullName + " because it requires parameters. XmlHelper can't pass parameters.");
+                }
             }
         }
 
@@ -305,8 +335,8 @@ namespace FezGame.Mod {
         public static object New(this Type type, XmlElement elem = null) {
             if (type.IsArray) {
                 if (elem != null) {
-                    ModLogger.Log("FEZMod", "XmlHelper creates an array of exact type " + type.FullName);
-                    ModLogger.Log("FEZMod", "XmlHelper creates an array of element type " + type.GetElementType().FullName);
+                    //ModLogger.Log("FEZMod", "XmlHelper creates an array of exact type " + type.FullName);
+                    //ModLogger.Log("FEZMod", "XmlHelper creates an array of element type " + type.GetElementType().FullName);
                     return Array.CreateInstance(type.GetElementType(), elem.ChildNodes.Count);
                 } else {
                     ModLogger.Log("FEZMod", "XmlHelper can't create an array of exact type " + type.FullName + " with no length");
