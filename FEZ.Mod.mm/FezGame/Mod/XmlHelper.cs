@@ -217,56 +217,67 @@ namespace FezGame.Mod {
                 }
             } else {
                 //ModLogger.Log("FEZMod", "elem: "+elem.Name);
-                foreach (XmlNode child in node.ChildNodes) {
+                foreach (XmlNode child_ in node.ChildNodes) {
                     //ModLogger.Log("FEZMod", "child: "+child.Name);
 
-                    FieldInfo field_;
-                    if ((field_ = type.GetField(child.Name)) != null) {
-                        field_.SetValue(obj, child.Deserialize(type, cm));
-                        continue;
+                    XmlNode[] children;
+
+                    if (child_.ChildNodes.Count == 1) {
+                        children = new XmlNode[] { child_, child_.FirstChild };
+                    } else {
+                        children = new XmlNode[] { child_ };
                     }
 
-                    PropertyInfo property_;
-                    if ((property_ = type.GetProperty(child.Name)) != null) {
-                        MethodInfo setter = property_.GetSetMethod();
-                        if (setter == null) {
-                            ModLogger.Log("FEZMod", "XmlHelper found no setter for Property " + child.Name + " in " + type.FullName);
-                            continue;
-                        }
-                        setter.Invoke(obj, new object[] { child.Deserialize(type, cm) });
-                        continue;
-                    }
-
-                    FieldInfo[] fields = type.GetFields();
-                    foreach (FieldInfo field in fields) {
-                        if (field.FieldType.Name.ToLower() == child.Name.ToLower()) {
-                            field.SetValue(obj, child.Deserialize(type, cm));
-                            fields = null;
+                    foreach (XmlNode child in children) {
+                        FieldInfo field_;
+                        if ((field_ = type.GetField(child.Name)) != null) {
+                            field_.SetValue(obj, child.Deserialize(type, cm));
                             break;
                         }
-                    }
-                    if (fields == null) {
-                        continue;
-                    }
 
-                    PropertyInfo[] properties = type.GetProperties();
-                    foreach (PropertyInfo property in properties) {
-                        if (property.PropertyType.Name.ToLower() == child.Name.ToLower()) {
-                            MethodInfo setter = property.GetSetMethod();
+                        PropertyInfo property_;
+                        if ((property_ = type.GetProperty(child.Name)) != null) {
+                            MethodInfo setter = property_.GetSetMethod();
                             if (setter == null) {
                                 ModLogger.Log("FEZMod", "XmlHelper found no setter for Property " + child.Name + " in " + type.FullName);
-                                continue;
+                                break;
                             }
                             setter.Invoke(obj, new object[] { child.Deserialize(type, cm) });
-                            properties = null;
                             break;
                         }
-                    }
-                    if (properties == null) {
-                        continue;
+
+                        FieldInfo[] fields = type.GetFields();
+                        foreach (FieldInfo field in fields) {
+                            if (field.Name.ToLower() == child.Name.ToLower() || field.FieldType.Name.ToLower() == child.Name.ToLower()) {
+                                field.SetValue(obj, child.Deserialize(type, cm));
+                                fields = null;
+                                break;
+                            }
+                        }
+                        if (fields == null) {
+                            break;
+                        }
+
+                        PropertyInfo[] properties = type.GetProperties();
+                        foreach (PropertyInfo property in properties) {
+                            if (property.Name.ToLower() == child.Name.ToLower() || property.PropertyType.Name.ToLower() == child.Name.ToLower()) {
+                                MethodInfo setter = property.GetSetMethod();
+                                if (setter == null) {
+                                    ModLogger.Log("FEZMod", "XmlHelper found no setter for Property " + child.Name + " in " + type.FullName);
+                                    continue;
+                                }
+                                setter.Invoke(obj, new object[] { child.Deserialize(type, cm) });
+                                properties = null;
+                                break;
+                            }
+                        }
+                        if (properties == null) {
+                            break;
+                        }
+
+                        ModLogger.Log("FEZMod", "XmlHelper found no Field or Property named or for type " + child.Name + " for " + type.FullName);
                     }
 
-                    ModLogger.Log("FEZMod", "XmlHelper found no Field or Property named or for type " + child.Name + " for " + type.FullName);
                 }
             }
 
