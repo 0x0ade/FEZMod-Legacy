@@ -74,6 +74,8 @@
     <Compile Include="FezGame\Speedrun\Clocks\ISpeedrunClock.cs" />
     <Compile Include="FezGame\Speedrun\Clocks\LiveSplitClock.cs" />
     <Compile Include="MonoMod\MonoModIgnore.cs" />
+    <Compile Include="FezGame\Components\TASComponent.cs" />
+    <Compile Include="FezGame\Services\patch_GameStateManager.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -82,6 +84,7 @@
     <Folder Include="FezGame\Speedrun\" />
     <Folder Include="MonoMod\" />
     <Folder Include="FezGame\Speedrun\Clocks\" />
+    <Folder Include="FezGame\Services\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FEZ.Mod.mm\FEZ.Mod.mm.csproj">

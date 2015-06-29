@@ -22,6 +22,8 @@ namespace FezGame.Speedrun {
         public static bool SpeedrunMode = false;
         public static bool PerRoomTime = false;
 
+        public static bool ToolAssistedSpeedrun = false;
+
         public static ISpeedrunClock Clock = new SpeedrunClock();
 
         public static List<SplitCase> DefaultSplitCases = new List<SplitCase>();
@@ -52,12 +54,19 @@ namespace FezGame.Speedrun {
                     ModLogger.Log("JAFM", "Found -prt / --per-room-time");
                     PerRoomTime = true;
                 }
+                if (Clock != null && (args[i] == "-tas" || args[i] == "--tool-assisted-speedrun")) {
+                    ModLogger.Log("JAFM", "Found -tas / --tool-assisted-speedrun");
+                    ToolAssistedSpeedrun = true;
+                }
             }
         }
 
         public override void LoadComponents(Fez game) {
             if (SpeedrunMode) {
                 ServiceHelper.AddComponent(new SpeedrunInfo(ServiceHelper.Game));
+            }
+            if (ToolAssistedSpeedrun) {
+                ServiceHelper.AddComponent(new TASComponent(ServiceHelper.Game));
             }
         }
 
