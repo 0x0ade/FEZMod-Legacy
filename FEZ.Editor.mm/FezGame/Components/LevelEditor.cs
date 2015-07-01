@@ -1323,8 +1323,8 @@ namespace FezGame.Components {
                 if (widget.ShowChildren) {
                     cursorOnChild = cursorOnWidget || UpdateWidgets(gameTime, widget.Widgets, false);
                 }
-                if (widget.Position.X + widget.Offset.X <= MouseState.Position.X && MouseState.Position.X <= widget.Position.X + widget.Offset.X + widget.Size.X &&
-                    widget.Position.Y + widget.Offset.Y <= MouseState.Position.Y && MouseState.Position.Y <= widget.Position.Y + widget.Offset.Y + widget.Size.Y) {
+                if (widget.InView && (widget.Position.X + widget.Offset.X <= MouseState.Position.X && MouseState.Position.X <= widget.Position.X + widget.Offset.X + widget.Size.X &&
+                    widget.Position.Y + widget.Offset.Y <= MouseState.Position.Y && MouseState.Position.Y <= widget.Position.Y + widget.Offset.Y + widget.Size.Y)) {
                     cursorOnWidget = true;
                     widget.Hover(gameTime);
                     if (!cursorOnChild && MouseState.LeftButton.State == MouseButtonStates.Clicked) {
