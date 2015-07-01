@@ -16,6 +16,8 @@ using Common;
 using FezEngine.Effects;
 using System.Collections;
 using System.ComponentModel;
+using System.Collections.Specialized;
+using System.Threading.Tasks;
 
 namespace FezGame.Mod {
     public static class XmlHelper {
@@ -26,6 +28,8 @@ namespace FezGame.Mod {
         }
 
         public static object AutoParse(this XmlElement elem, bool descend = true) {
+            //TODO make this ugly hack obsolete.
+            //Parsing should happen in Deserialize; This is just a workaround for types that don't work yet.
             if (elem == null) {
                 return null;
             }
@@ -53,6 +57,10 @@ namespace FezGame.Mod {
                     float.Parse(elem.GetAttribute("z")),
                     float.Parse(elem.GetAttribute("w"))
                 );
+            }
+
+            if (elem.Name == "FaceOrientation") {
+                return Enum.Parse(typeof(FaceOrientation), elem.InnerText);
             }
 
             if (descend) {
@@ -186,7 +194,16 @@ namespace FezGame.Mod {
                 obj = type.New();
             }
 
-            if (obj is ICollection) {
+            bool isGenericICollection = false;
+            //TODO find out why HashSets don't trigger the usual obj is ICollection but other types do
+            foreach (Type interfaceType in type.GetInterfaces()) {
+                if (interfaceType.IsGenericType && interfaceType.GetGenericTypeDefinition() == typeof(ICollection<>)) {
+                    isGenericICollection = true;
+                    break;
+                }
+            }
+
+            if (obj is ICollection || isGenericICollection) {
                 Type[] types = obj.GetType().GetGenericArguments();
                 //ModLogger.Log("FEZMod", "XmlHelper got " + type.FullName + " with " + types.Length + " generic arguments.");
                 MethodInfo add = type.GetMethod("Add", types);
@@ -312,7 +329,7 @@ namespace FezGame.Mod {
                     levelData.Song.Initialize();
                 }
 
-                levelData.OnDeserialization();
+                //levelData.OnDeserialization();
             }
 
             if (obj is Entity) {
@@ -411,6 +428,7 @@ namespace FezGame.Mod {
             if (type == null || str == null) {
                 return null;
             }
+            type = Nullable.GetUnderlyingType(type) ?? type;
             if (type == typeof(string)) {
                 return str;
             }
