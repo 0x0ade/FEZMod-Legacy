@@ -682,6 +682,8 @@ namespace FezGame.Services {
             xmlDocument.Save(xmlWriter);
             xmlWriter.Close();
             fos.Close();
+
+            GC.Collect(3);
         }
 
         [MonoModIgnore]

@@ -21,7 +21,6 @@ using System.IO;
 using FezGame.Editor.Widgets;
 using FezGame.Mod;
 using FezGame.Editor;
-using System.CodeDom;
 
 namespace FezGame.Components {
     public class LevelEditor : DrawableGameComponent, ILevelEditor {
@@ -1378,27 +1377,56 @@ namespace FezGame.Components {
             TrileInstance trile = new TrileInstance(emplacement, trileId);
             LevelManager.Triles[emplacement] = trile;
 
-            trile.SetPhiLight(CameraManager.Viewpoint.ToPhi());
+            if (CameraManager.Viewpoint.IsOrthographic()) {
+                trile.SetPhiLight(CameraManager.Viewpoint.ToPhi());
+            } else {
+                //TODO get closest viewpoint... somehow.
+            }
 
-            trile.PhysicsState = new InstancePhysicsState(trile);
+            trile.PhysicsState = new InstancePhysicsState(trile) {
+                Respawned = true,
+                Vanished = false
+            };
             trile.Enabled = true;
 
             return trile;
         }
 
         public void AddTrile(TrileInstance trile) {
+            trile.Foreign = true;
+
+            if (LevelManager.TrileExists(trile.Emplacement)) {
+                TrileEmplacement emplacement = trile.Emplacement;
+                LevelMaterializer.RemoveInstance(LevelManager.TrileInstanceAt(ref emplacement));
+            }
+
+            if (LevelManager.Triles.ContainsKey(trile.Emplacement)) {
+                //TODO investigate: Probably an empty trile.
+                LevelManager.Triles.Remove(trile.Emplacement);
+            }
+
             trile.Update();
-            LevelMaterializer.AddInstance(trile);
-            LevelMaterializer.RebuildTriles(true);
-            LevelMaterializer.RebuildInstances();
-            LevelMaterializer.UpdateInstance(trile);
+            trile.OriginalEmplacement = trile.Emplacement;
             trile.RefreshTrile();
 
-            trile.Foreign = true;
+            LevelMaterializer.AddInstance(trile);
+            LevelManager.Triles.Add(trile.Emplacement, trile);
+            trile.Removed = false;
+
+            LevelManager.RecullAt(trile);
+
+            trile.PhysicsState.UpdateInstance();
+            LevelMaterializer.UpdateInstance(trile);
+
 
             if (LevelManager.Triles.Count == 1) {
                 PlayerManager.CheckpointGround = trile;
                 PlayerManager.RespawnAtCheckpoint();
+            }
+
+            CameraManager.RebuildView();
+            if (CameraManager is DefaultCameraManager) {
+                ((DefaultCameraManager) CameraManager).RebuildProjection();
             }
         }
 

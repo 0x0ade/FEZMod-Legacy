@@ -56,7 +56,7 @@ namespace FezEngine.Tools {
 
         public static bool CacheDisabled = false;
 
-        public void DumpAll() {
+        public static void DumpAll() {
             if (cachedAssets == null) {
                 ModLogger.Log("JAFM.Engine", "Cached assets do not exist; ignoring...");
                 return;
