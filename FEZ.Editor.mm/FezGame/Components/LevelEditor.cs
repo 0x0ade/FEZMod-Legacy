@@ -695,7 +695,6 @@ namespace FezGame.Components {
                         });
 
                         windowAdd.Widgets.Add(new ButtonWidget(Game, "ADD", delegate() {
-                            //TODO Add Volume to level
                             string[] fromSplit = windowFieldFrom.Text.Split(new char[] {';'});
                             string[] toSplit = windowFieldTo.Text.Split(new char[] {';'});
                             Volume volume = new Volume() {
@@ -1399,9 +1398,7 @@ namespace FezGame.Components {
             }
 
             if (MouseState.RightButton.State == MouseButtonStates.Clicked && HoveredTrile != null) {
-                LevelMaterializer.CullInstanceOut(HoveredTrile);
                 LevelManager.ClearTrile(HoveredTrile);
-                LevelManager.RecullAt(HoveredTrile.Emplacement);
                 HoveredTrile = null;
             }
 
@@ -1523,7 +1520,7 @@ namespace FezGame.Components {
 
             if (LevelManager.TrileExists(trile.Emplacement)) {
                 TrileEmplacement emplacement = trile.Emplacement;
-                LevelManager.ClearTrile(LevelManager.TrileInstanceAt(ref emplacement));
+                LevelMaterializer.RemoveInstance(LevelManager.TrileInstanceAt(ref emplacement));
             }
 
             if (LevelManager.Triles.ContainsKey(trile.Emplacement)) {
