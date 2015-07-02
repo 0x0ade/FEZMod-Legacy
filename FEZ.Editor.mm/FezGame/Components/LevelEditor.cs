@@ -1516,8 +1516,6 @@ namespace FezGame.Components {
         }
 
         public void AddTrile(TrileInstance trile) {
-            trile.Foreign = true;
-
             if (LevelManager.TrileExists(trile.Emplacement)) {
                 TrileEmplacement emplacement = trile.Emplacement;
                 LevelMaterializer.RemoveInstance(LevelManager.TrileInstanceAt(ref emplacement));
@@ -1535,6 +1533,11 @@ namespace FezGame.Components {
             LevelMaterializer.AddInstance(trile);
             LevelManager.Triles.Add(trile.Emplacement, trile);
             trile.Removed = false;
+
+            if (LevelMaterializer.GetTrileMaterializer(trile.Trile) == null) {
+                LevelMaterializer.RebuildTrile(trile.Trile);
+                LevelMaterializer.RebuildInstances();
+            }
 
             LevelManager.RecullAt(trile);
 
