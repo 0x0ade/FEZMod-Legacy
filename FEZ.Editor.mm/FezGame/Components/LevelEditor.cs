@@ -603,6 +603,130 @@ namespace FezGame.Components {
                     window.Size.Y = Math.Min(512f, window.Size.Y);
 
                     window.Widgets.Add(new ButtonWidget(Game, "+", delegate() {
+                        ContainerWidget windowAdd;
+                        Widgets.Add(windowAdd = new ContainerWidget(Game) {
+                            Size = new Vector2(256f, 192f),
+                            Label = "Add Volume"
+                        });
+                        WindowHeaderWidget windowAddHeader;
+                        windowAdd.Widgets.Add(windowAddHeader = new WindowHeaderWidget(Game));
+
+                        ButtonWidget windowLabelId;
+                        windowAdd.Widgets.Add(windowLabelId = new ButtonWidget(Game, "ID:") {
+                            Background = new Color(EditorWidget.DefaultBackground, 0f),
+                            Size = new Vector2(96f, 24f),
+                            UpdateBounds = false,
+                            LabelCentered = false,
+                            Position = new Vector2(0f, 0f)
+                        });
+                        TextFieldWidget windowFieldId;
+                        windowAdd.Widgets.Add(windowFieldId = new TextFieldWidget(Game) {
+                            Size = new Vector2(windowAdd.Size.X - windowLabelId.Size.X, 24f),
+                            UpdateBounds = false,
+                            Position = new Vector2(windowLabelId.Size.X, windowLabelId.Position.Y)
+                        });
+
+                        ButtonWidget windowLabelFrom;
+                        windowAdd.Widgets.Add(windowLabelFrom = new ButtonWidget(Game, "From:") {
+                            Background = new Color(EditorWidget.DefaultBackground, 0f),
+                            Size = new Vector2(96f, 24f),
+                            UpdateBounds = false,
+                            LabelCentered = false,
+                            Position = new Vector2(0f, 24f)
+                        });
+                        TextFieldWidget windowFieldFrom;
+                        windowAdd.Widgets.Add(windowFieldFrom = new TextFieldWidget(Game) {
+                            Size = new Vector2(windowAdd.Size.X - windowLabelFrom.Size.X, 24f),
+                            UpdateBounds = false,
+                            Position = new Vector2(windowLabelFrom.Size.X, windowLabelFrom.Position.Y),
+                            Text = "0; 1; 1"
+                        });
+
+                        ButtonWidget windowLabelTo;
+                        windowAdd.Widgets.Add(windowLabelTo = new ButtonWidget(Game, "To:") {
+                            Background = new Color(EditorWidget.DefaultBackground, 0f),
+                            Size = new Vector2(96f, 24f),
+                            UpdateBounds = false,
+                            LabelCentered = false,
+                            Position = new Vector2(0f, 48f)
+                        });
+                        TextFieldWidget windowFieldTo;
+                        windowAdd.Widgets.Add(windowFieldTo = new TextFieldWidget(Game) {
+                            Size = new Vector2(windowAdd.Size.X - windowLabelTo.Size.X, 24f),
+                            UpdateBounds = false,
+                            Position = new Vector2(windowLabelTo.Size.X, windowLabelTo.Position.Y),
+                            Text = "1; 0; 1"
+                        });
+
+                        CheckboxWidget windowCheckFront;
+                        windowAdd.Widgets.Add(windowCheckFront = new CheckboxWidget(Game, "Front") {
+                            Background = new Color(EditorWidget.DefaultBackground, 0f),
+                            Size = new Vector2(windowAdd.Size.X, 24f),
+                            UpdateBounds = false,
+                            LabelCentered = false,
+                            Position = new Vector2(0f, 72f)
+                        });
+
+                        CheckboxWidget windowCheckLeft;
+                        windowAdd.Widgets.Add(windowCheckLeft = new CheckboxWidget(Game, "Left") {
+                            Background = new Color(EditorWidget.DefaultBackground, 0f),
+                            Size = new Vector2(windowAdd.Size.X, 24f),
+                            UpdateBounds = false,
+                            LabelCentered = false,
+                            Position = new Vector2(0f, 96f)
+                        });
+
+                        CheckboxWidget windowCheckBack;
+                        windowAdd.Widgets.Add(windowCheckBack = new CheckboxWidget(Game, "Back") {
+                            Background = new Color(EditorWidget.DefaultBackground, 0f),
+                            Size = new Vector2(windowAdd.Size.X, 24f),
+                            UpdateBounds = false,
+                            LabelCentered = false,
+                            Position = new Vector2(0f, 120f)
+                        });
+
+                        CheckboxWidget windowCheckRight;
+                        windowAdd.Widgets.Add(windowCheckRight = new CheckboxWidget(Game, "Right") {
+                            Background = new Color(EditorWidget.DefaultBackground, 0f),
+                            Size = new Vector2(windowAdd.Size.X, 24f),
+                            UpdateBounds = false,
+                            LabelCentered = false,
+                            Position = new Vector2(0f, 144f)
+                        });
+
+                        windowAdd.Widgets.Add(new ButtonWidget(Game, "ADD", delegate() {
+                            //TODO Add Volume to level
+                            string[] fromSplit = windowFieldFrom.Text.Split(new char[] {';'});
+                            string[] toSplit = windowFieldTo.Text.Split(new char[] {';'});
+                            Volume volume = new Volume() {
+                                Id = int.Parse(windowFieldId.Text),
+                                From = new Vector3(
+                                    float.Parse(fromSplit[0].Trim()),
+                                    float.Parse(fromSplit[1].Trim()),
+                                    float.Parse(fromSplit[2].Trim())
+                                ),
+                                To = new Vector3(
+                                    float.Parse(toSplit[0].Trim()),
+                                    float.Parse(toSplit[1].Trim()),
+                                    float.Parse(toSplit[2].Trim())
+                                )
+                            };
+                            if (windowCheckFront.Checked) {volume.Orientations.Add(FaceOrientation.Front);}
+                            if (windowCheckLeft.Checked) {volume.Orientations.Add(FaceOrientation.Left);}
+                            if (windowCheckBack.Checked) {volume.Orientations.Add(FaceOrientation.Back);}
+                            if (windowCheckRight.Checked) {volume.Orientations.Add(FaceOrientation.Right);}
+                            LevelManager.Volumes.Add(volume.Id, volume);
+                            windowAddHeader.CloseButtonWidget.Action();
+                            window.Refresh();
+                        }) {
+                            Size = new Vector2(windowAdd.Size.X, 24f),
+                            UpdateBounds = false,
+                            LabelCentered = true,
+                            Position = new Vector2(0f, windowAdd.Size.Y - 24f)
+                        });
+
+                            windowAdd.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (windowAdd.Size.X / 2);
+                            windowAdd.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (windowAdd.Size.Y / 2);
                     }) {
                         Background = new Color(0f, 0.125f, 0f, 1f),
                         Size = new Vector2(window.Size.X, 24f),
@@ -1275,7 +1399,9 @@ namespace FezGame.Components {
             }
 
             if (MouseState.RightButton.State == MouseButtonStates.Clicked && HoveredTrile != null) {
+                LevelMaterializer.CullInstanceOut(HoveredTrile);
                 LevelManager.ClearTrile(HoveredTrile);
+                LevelManager.RecullAt(HoveredTrile.Emplacement);
                 HoveredTrile = null;
             }
 
@@ -1397,7 +1523,7 @@ namespace FezGame.Components {
 
             if (LevelManager.TrileExists(trile.Emplacement)) {
                 TrileEmplacement emplacement = trile.Emplacement;
-                LevelMaterializer.RemoveInstance(LevelManager.TrileInstanceAt(ref emplacement));
+                LevelManager.ClearTrile(LevelManager.TrileInstanceAt(ref emplacement));
             }
 
             if (LevelManager.Triles.ContainsKey(trile.Emplacement)) {
