@@ -574,13 +574,6 @@ namespace FezGame.Components {
                                 LabelCentered = false,
                                 Position = new Vector2(0f, 0f)
                             },
-                            new ButtonWidget(Game, "C") {
-                                Background = new Color(0f, 0f, 0.125f, 1f),
-                                Size = new Vector2(24f, 24f),
-                                UpdateBounds = false,
-                                LabelCentered = true,
-                                Position = new Vector2(window.Size.X - 48f, 0f)
-                            },
                             new ButtonWidget(Game, "X", delegate() {
                                 LevelManager.Volumes.Remove(volume.Id);
                                 window.Refresh();
@@ -1329,7 +1322,7 @@ namespace FezGame.Components {
                 return;
             }
 
-            if (GameState.Loading || GameState.InMap || GameState.InMenuCube || GameState.Paused) {
+            if (GameState.Loading || GameState.InMap || GameState.InMenuCube || GameState.Paused || string.IsNullOrEmpty(LevelManager.Name)) {
                 return;
             }
 
@@ -1412,7 +1405,7 @@ namespace FezGame.Components {
         }
 
         public override void Draw(GameTime gameTime) {
-            if (GameState.Loading || GameState.InMap || GameState.InMenuCube || GameState.Paused || !FEZMod.Preloaded) {
+            if (GameState.Loading || GameState.InMap || GameState.InMenuCube || GameState.Paused || !FEZMod.Preloaded || string.IsNullOrEmpty(LevelManager.Name)) {
                 return;
             }
 
