@@ -1399,6 +1399,7 @@ namespace FezGame.Components {
 
             if (MouseState.RightButton.State == MouseButtonStates.Clicked && HoveredTrile != null) {
                 LevelManager.ClearTrile(HoveredTrile);
+                LevelMaterializer.CullInstances();
                 HoveredTrile = null;
             }
 
