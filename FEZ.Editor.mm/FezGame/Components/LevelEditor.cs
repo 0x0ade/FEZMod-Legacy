@@ -793,56 +793,72 @@ namespace FezGame.Components {
             }));
             button.Widgets.Add(new ButtonWidget(Game, "Art Objects", delegate() {
                 ContainerWidget window;
-                Widgets.Add(window = new ContainerWidget(Game) {
-                    UpdateBounds = true
-                });
-                window.Size.X = 512f;
-                window.Size.Y = 24f;
-                window.Label = "Art Objects";
-                window.Widgets.Add(new WindowHeaderWidget(Game));
 
-                int i = 0;
-                foreach (ArtObjectInstance ao in LevelManager.ArtObjects.Values) {
-                    window.Widgets.Add(new ContainerWidget(Game, new EditorWidget[] {
-                        new ButtonWidget(Game, "["+ao.Id+"] "+ao.ArtObjectName+": "+EditorUtils.ToString(ao.Position)) {
-                            Size = new Vector2(window.Size.X - 48f, 24f),
-                            UpdateBounds = false,
-                            LabelCentered = false,
-                            Position = new Vector2(0f, 0f)
-                        },
-                        new ButtonWidget(Game, "C") {
-                            Background = new Color(0f, 0f, 0.125f, 1f),
-                            Size = new Vector2(24f, 24f),
-                            UpdateBounds = false,
-                            LabelCentered = true,
-                            Position = new Vector2(window.Size.X - 48f, 0f)
-                        },
-                        new ButtonWidget(Game, "X") {
-                            Background = new Color(0.5f, 0f, 0f, 1f),
-                            Size = new Vector2(24f, 24f),
-                            UpdateBounds = false,
-                            LabelCentered = true,
-                            Position = new Vector2(window.Size.X - 24f, 0f)
-                        }
+                Widgets.Add(window = new ContainerWidget(Game) {
+                    UpdateBounds = true,
+                    Size = new Vector2(512f, 24f),
+                    Label = "Art Objects"
+                });
+
+                window.RefreshValue = delegate() {
+                    window.Widgets.Clear();
+
+                    window.Widgets.Add(new WindowHeaderWidget(Game));
+
+                    int i = 0;
+                    foreach (ArtObjectInstance ao in LevelManager.ArtObjects.Values) {
+                        window.Widgets.Add(new ContainerWidget(Game, new EditorWidget[] {
+                            new ButtonWidget(Game, "["+ao.Id+"] "+ao.ArtObjectName+": "+EditorUtils.ToString(ao.Position)) {
+                                Size = new Vector2(window.Size.X - 48f, 24f),
+                                UpdateBounds = false,
+                                LabelCentered = false,
+                                Position = new Vector2(0f, 0f)
+                            },
+                            new ButtonWidget(Game, "X", delegate() {
+                                int trileGroupId = ao.ActorSettings.AttachedGroup.HasValue ? ao.ActorSettings.AttachedGroup.Value : -1;
+                                if (LevelManager.Groups.ContainsKey(trileGroupId)) {
+                                    TrileGroup trileGroup = LevelManager.Groups[trileGroupId];
+                                    while (trileGroup.Triles.Count > 0) {
+                                        LevelManager.ClearTrile(trileGroup.Triles[0]);
+                                    }
+                                    LevelManager.Groups.Remove(trileGroupId);
+                                }
+                                LevelManager.ArtObjects.Remove(ao.Id);
+                                ao.Dispose();
+                                LevelMaterializer.RegisterSatellites();
+
+                                window.Refresh();
+                            }) {
+                                Background = new Color(0.5f, 0f, 0f, 1f),
+                                Size = new Vector2(24f, 24f),
+                                UpdateBounds = false,
+                                LabelCentered = true,
+                                Position = new Vector2(window.Size.X - 24f, 0f)
+                            }
+                        }) {
+                            Size = new Vector2(window.Size.X, 24f),
+                            Background = new Color(EditorWidget.DefaultBackground, 0f)
+                        });
+
+                        i++;
+                    }
+
+                    window.Size.Y = (i+1) * 24f;
+                    window.Size.Y = Math.Min(512f, window.Size.Y);
+
+                    window.Widgets.Add(new ButtonWidget(Game, "+", delegate() {
                     }) {
+                        Background = new Color(0f, 0.125f, 0f, 1f),
                         Size = new Vector2(window.Size.X, 24f),
-                        Background = new Color(EditorWidget.DefaultBackground, 0f)
+                        UpdateBounds = false,
+                        LabelCentered = true,
+                        Position = new Vector2(0f, window.Size.Y - 24f)
                     });
 
-                    i++;
-                }
+                    return null;
+                };
 
-                window.Size.Y += i * 24f;
-                window.Size.Y = Math.Min(512f, window.Size.Y);
-
-                window.Widgets.Add(new ButtonWidget(Game, "+", delegate() {
-                }) {
-                    Background = new Color(0f, 0.125f, 0f, 1f),
-                    Size = new Vector2(window.Size.X, 24f),
-                    UpdateBounds = false,
-                    LabelCentered = true,
-                    Position = new Vector2(0f, window.Size.Y - 24f)
-                });
+                window.Refresh();
 
                 window.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (window.Size.X / 2);
                 window.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (window.Size.Y / 2);
