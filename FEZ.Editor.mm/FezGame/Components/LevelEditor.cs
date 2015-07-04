@@ -569,7 +569,7 @@ namespace FezGame.Components {
                     foreach (Volume volume in LevelManager.Volumes.Values) {
                         window.Widgets.Add(new ContainerWidget(Game, new EditorWidget[] {
                             new ButtonWidget(Game, "["+volume.Id+"] "+EditorUtils.ToString(volume.From)+" - "+EditorUtils.ToString(volume.To)) {
-                                Size = new Vector2(window.Size.X - 48f, 24f),
+                                Size = new Vector2(window.Size.X - 24f, 24f),
                                 UpdateBounds = false,
                                 LabelCentered = false,
                                 Position = new Vector2(0f, 0f)
@@ -809,7 +809,7 @@ namespace FezGame.Components {
                     foreach (ArtObjectInstance ao in LevelManager.ArtObjects.Values) {
                         window.Widgets.Add(new ContainerWidget(Game, new EditorWidget[] {
                             new ButtonWidget(Game, "["+ao.Id+"] "+ao.ArtObjectName+": "+EditorUtils.ToString(ao.Position)) {
-                                Size = new Vector2(window.Size.X - 48f, 24f),
+                                Size = new Vector2(window.Size.X - 24f, 24f),
                                 UpdateBounds = false,
                                 LabelCentered = false,
                                 Position = new Vector2(0f, 0f)
