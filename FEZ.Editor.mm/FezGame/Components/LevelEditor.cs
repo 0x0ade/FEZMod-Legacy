@@ -926,55 +926,62 @@ namespace FezGame.Components {
             button.Widgets.Add(new ButtonWidget(Game, "Groups", delegate() {
                 ContainerWidget window;
                 Widgets.Add(window = new ContainerWidget(Game) {
-                    UpdateBounds = true
+                    UpdateBounds = true,
+                    Size = new Vector2(256f, 24f),
+                    Label = "Groups"
                 });
-                window.Size.X = 256f;
-                window.Size.Y = 24f;
-                window.Label = "Groups";
-                window.Widgets.Add(new WindowHeaderWidget(Game));
 
-                int i = 0;
-                foreach (TrileGroup group_ in LevelManager.Groups.Values) {
-                    window.Widgets.Add(new ContainerWidget(Game, new EditorWidget[] {
-                        new ButtonWidget(Game, "["+group_.Id+"] "+group_.Name) {
-                            Size = new Vector2(window.Size.X - 48f, 24f),
-                            UpdateBounds = false,
-                            LabelCentered = false,
-                            Position = new Vector2(0f, 0f)
-                        },
-                        new ButtonWidget(Game, "C") {
-                            Background = new Color(0f, 0f, 0.125f, 1f),
-                            Size = new Vector2(24f, 24f),
-                            UpdateBounds = false,
-                            LabelCentered = true,
-                            Position = new Vector2(window.Size.X - 48f, 0f)
-                        },
-                        new ButtonWidget(Game, "X") {
-                            Background = new Color(0.5f, 0f, 0f, 1f),
-                            Size = new Vector2(24f, 24f),
-                            UpdateBounds = false,
-                            LabelCentered = true,
-                            Position = new Vector2(window.Size.X - 24f, 0f)
-                        }
+                window.RefreshValue = delegate() {
+                    window.Widgets.Clear();
+
+                    window.Widgets.Add(new WindowHeaderWidget(Game));
+
+                    int i = 0;
+                    foreach (TrileGroup group_ in LevelManager.Groups.Values) {
+                        window.Widgets.Add(new ContainerWidget(Game, new EditorWidget[] {
+                            new ButtonWidget(Game, "["+group_.Id+"] "+group_.Name) {
+                                Size = new Vector2(window.Size.X - 24f, 24f),
+                                UpdateBounds = false,
+                                LabelCentered = false,
+                                Position = new Vector2(0f, 0f)
+                            },
+                            new ButtonWidget(Game, "X", delegate() {
+                                while (group_.Triles.Count > 0) {
+                                    LevelManager.ClearTrile(group_.Triles[0]);
+                                }
+                                LevelManager.Groups.Remove(group_.Id);
+                                window.Refresh();
+                            }) {
+                                Background = new Color(0.5f, 0f, 0f, 1f),
+                                Size = new Vector2(24f, 24f),
+                                UpdateBounds = false,
+                                LabelCentered = true,
+                                Position = new Vector2(window.Size.X - 24f, 0f)
+                            }
+                        }) {
+                            Size = new Vector2(window.Size.X, 24f),
+                            Background = new Color(EditorWidget.DefaultBackground, 0f)
+                        });
+
+                        i++;
+                    }
+
+                    window.Size.Y = (i+1) * 24f;
+                    window.Size.Y = Math.Min(512f, window.Size.Y);
+
+                    window.Widgets.Add(new ButtonWidget(Game, "+", delegate() {
                     }) {
+                        Background = new Color(0f, 0.125f, 0f, 1f),
                         Size = new Vector2(window.Size.X, 24f),
-                        Background = new Color(EditorWidget.DefaultBackground, 0f)
+                        UpdateBounds = false,
+                        LabelCentered = true,
+                        Position = new Vector2(0f, window.Size.Y - 24f)
                     });
 
-                    i++;
-                }
+                    return null;
+                };
 
-                window.Size.Y += i * 24f;
-                window.Size.Y = Math.Min(512f, window.Size.Y);
-
-                window.Widgets.Add(new ButtonWidget(Game, "+", delegate() {
-                }) {
-                    Background = new Color(0f, 0.125f, 0f, 1f),
-                    Size = new Vector2(window.Size.X, 24f),
-                    UpdateBounds = false,
-                    LabelCentered = true,
-                    Position = new Vector2(0f, window.Size.Y - 24f)
-                });
+                window.Refresh();
 
                 window.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (window.Size.X / 2);
                 window.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (window.Size.Y / 2);
