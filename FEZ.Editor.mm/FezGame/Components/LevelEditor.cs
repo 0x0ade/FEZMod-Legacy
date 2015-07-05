@@ -915,7 +915,7 @@ namespace FezGame.Components {
                             Position = new Vector2(0f, 72f)
                         });
                         TextFieldWidget windowFieldRotation;
-                        windowAdd.Widgets.Add(windowFieldRotation = new TextFieldWidget(Game, "0; 0; 0; 0") {
+                        windowAdd.Widgets.Add(windowFieldRotation = new TextFieldWidget(Game, "0; 0; 0; 1") {
                             Size = new Vector2(windowAdd.Size.X - windowLabelRotation.Size.X, 24f),
                             UpdateBounds = false,
                             Position = new Vector2(windowLabelRotation.Size.X, windowLabelRotation.Position.Y)
