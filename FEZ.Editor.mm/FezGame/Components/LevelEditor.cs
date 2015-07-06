@@ -1552,20 +1552,30 @@ namespace FezGame.Components {
                 return;
             }
 
-            if (MouseState.LeftButton.State == MouseButtonStates.Clicked) {
-                if (FocusedWidget != null) {
-                    FocusedWidget.Unfocus(gameTime);
-                }
-                FocusedWidget = null;
-            }
-
             if (HoveredTrile != null) {
                 HoveredFace = GetHoveredFace(HoveredBox, ray);
                 CursorHovering = true;
             }
 
-            if (MouseState.LeftButton.State == MouseButtonStates.Clicked && HoveredTrile != null && LevelManager.TrileSet != null && LevelManager.TrileSet.Triles.ContainsKey(TrileId)) {
-                AddTrile(CreateNewTrile(TrileId, new TrileEmplacement(HoveredTrile.Position - FezMath.AsVector(HoveredFace))));
+            if (MouseState.LeftButton.State == MouseButtonStates.Clicked) {
+                bool unfocusWidget = true;
+
+                if (HoveredTrile != null) {
+                    TrileEmplacement emplacement = new TrileEmplacement(HoveredTrile.Position - HoveredFace.AsVector());
+                    if (FocusedWidget is TextFieldWidget) {
+                        ((TextFieldWidget) FocusedWidget).Text = emplacement.X + "; " + emplacement.Y + "; " + emplacement.Z;
+                        unfocusWidget = false;
+                    } else if (LevelManager.TrileSet != null && LevelManager.TrileSet.Triles.ContainsKey(TrileId)) {
+                        AddTrile(CreateNewTrile(TrileId, emplacement));
+                    }
+                }
+
+                if (unfocusWidget) {
+                    if (FocusedWidget != null) {
+                        FocusedWidget.Unfocus(gameTime);
+                    }
+                    FocusedWidget = null;
+                }
             }
 
             if (MouseState.RightButton.State == MouseButtonStates.Clicked && HoveredTrile != null) {
