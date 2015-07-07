@@ -70,8 +70,10 @@ namespace FezGame.Components {
         public DateTime BuildDate { get; protected set; }
 
         protected KeyValuePair<TrileEmplacement, TrileInstance>[] tmpTriles = new KeyValuePair<TrileEmplacement, TrileInstance>[8192];
+        protected KeyValuePair<int, ArtObjectInstance>[] tmpAOs = new KeyValuePair<int, ArtObjectInstance>[128];
 
         public TrileInstance HoveredTrile { get; set; }
+        public ArtObjectInstance HoveredAO { get; set; }
         public BoundingBox HoveredBox { get; set; }
         public FaceOrientation HoveredFace { get; set; }
         public int TrileId { get; set; }
@@ -82,6 +84,9 @@ namespace FezGame.Components {
         public InfoWidget InfoWidget;
         public TopBarWidget TopBarWidget;
         public TrilePickerWidget TrilePickerWidget;
+
+        public ButtonWidget TooltipWidget;
+        protected bool TooltipWidgetAdded = false;
 
         protected EditorWidget DraggingWidget;
         protected EditorWidget FocusedWidget;
@@ -1476,6 +1481,9 @@ namespace FezGame.Components {
             //TRILE PICKER
             Widgets.Add(TrilePickerWidget = new TrilePickerWidget(Game));
 
+            //TOOLTIP
+            TooltipWidget = new ButtonWidget(Game);
+
         }
 
         public void Preload() {
@@ -1509,8 +1517,11 @@ namespace FezGame.Components {
                 SinceMouseMoved = 0f;
             }
 
+            TooltipWidget.Label = null;
+            TooltipWidget.Position.X = MouseState.Position.X + 24f;
+            TooltipWidget.Position.Y = MouseState.Position.Y;
+
             CursorHovering = false;
-            HoveredTrile = null;
 
             Vector3 right = CameraManager.InverseView.Right;
             Vector3 up = CameraManager.InverseView.Up;
@@ -1518,10 +1529,10 @@ namespace FezGame.Components {
             Ray ray = new Ray(GraphicsDevice.Viewport.Unproject(new Vector3(MouseState.Position.X, MouseState.Position.Y, 0.0f), CameraManager.Projection, CameraManager.View, Matrix.Identity), forward);
             float intersectionMin = float.MaxValue;
 
+            HoveredTrile = null;
             //Ugly thread-safety workaround
             int trilesCount = LevelManager.Triles.Count;
             LevelManager.Triles.CopyTo(tmpTriles.Length < trilesCount ? (tmpTriles = new KeyValuePair<TrileEmplacement, TrileInstance>[trilesCount]) : tmpTriles, 0);
-
             for (int i = 0; i < trilesCount; i++) {
                 TrileInstance trile = tmpTriles[i].Value;
                 BoundingBox box = new BoundingBox(trile.Position, trile.Position + new Vector3(1f));
@@ -1531,6 +1542,24 @@ namespace FezGame.Components {
                     HoveredBox = box;
                     intersectionMin = intersection.Value;
                 }
+            }
+
+            HoveredAO = null;
+            int aosCount = LevelManager.ArtObjects.Count;
+            LevelManager.ArtObjects.CopyTo(tmpAOs.Length < aosCount ? (tmpAOs = new KeyValuePair<int, ArtObjectInstance>[aosCount]) : tmpAOs, 0);
+            for (int i = 0; i < aosCount; i++) {
+                ArtObjectInstance ao = tmpAOs[i].Value;
+                float? intersection = ray.Intersects(ao.Bounds);
+                if (intersection.HasValue && intersection < intersectionMin) {
+                    HoveredTrile = null;
+                    HoveredAO = ao;
+                    HoveredBox = ao.Bounds;
+                    intersectionMin = intersection.Value;
+                }
+            }
+
+            if (HoveredAO != null) {
+                TooltipWidget.Label = HoveredAO.Id + ": " + HoveredAO.ArtObjectName;
             }
 
             TrilePickerWidget.Position.Y = GraphicsDevice.Viewport.Height - TrilePickerWidget.Size.Y;
@@ -1590,6 +1619,17 @@ namespace FezGame.Components {
 
             CameraManager.PixelsPerTrixel = Math.Max(0.25f, CameraManager.PixelsPerTrixel + 0.25f * MouseState.WheelTurns);
 
+            if (string.IsNullOrEmpty(TooltipWidget.Label)) {
+                if (TooltipWidgetAdded) {
+                    Widgets.Remove(TooltipWidget);
+                    TooltipWidgetAdded = false;
+                }
+            } else {
+                if (!TooltipWidgetAdded) {
+                    Widgets.Add(TooltipWidget);
+                    TooltipWidgetAdded = true;
+                }
+            }
         }
 
         public override void Draw(GameTime gameTime) {
@@ -1633,6 +1673,9 @@ namespace FezGame.Components {
                 widget.LevelEditor = this;
                 if (update) {
                     widget.Update(gameTime);
+                }
+                if (widget == TooltipWidget) {
+                    continue;
                 }
                 bool cursorOnChild = cursorOnWidget;
                 if (widget.ShowChildren) {
