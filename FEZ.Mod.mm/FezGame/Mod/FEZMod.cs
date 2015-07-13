@@ -16,6 +16,8 @@ namespace FezGame.Mod {
     public static class FEZMod {
         public static string Version = "0.2";
 
+        public static string LevelFileFormat = "fml";
+
         public static List<FezModule> Modules = new List<FezModule>();
 
         public static bool IsAlwaysTurnable = false;

@@ -244,59 +244,8 @@ namespace FezGame.Components {
                 }
             }));
 
-            button.Widgets.Add(new ButtonWidget(Game, "Save", delegate() {
-                WindowHeaderWidget windowHeader = null;
-
-                string filePath = ("Resources\\levels\\"+(LevelManager.Name.ToLower())).Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString())+".xml";
-                FileInfo file = new FileInfo(filePath);
-
-                Action save = delegate() {
-                    if (file.Exists) {
-                        file.Delete();
-                    }
-                    ModLogger.Log("JAFM.Engine", "Saving level "+LevelManager.Name);
-                    GameLevelManagerHelper.Save(LevelManager.Name);
-                    if (windowHeader != null) {
-                        windowHeader.CloseButtonWidget.Action();
-                    }
-                };
-
-                if (!file.Exists) {
-                    save();
-                    return;
-                }
-
-                ContainerWidget window;
-                Widgets.Add(window = new ContainerWidget(Game) {
-                    Size = new Vector2(256f, 48f),
-                    Label = "Overwrite level?"
-                });
-                window.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (window.Size.X / 2);
-                window.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (window.Size.Y / 2);
-                window.Widgets.Add(windowHeader = new WindowHeaderWidget(Game));
-
-                window.Widgets.Add(new ButtonWidget(Game, "Level already existing. Overwrite?") {
-                    Background = new Color(EditorWidget.DefaultBackground, 0f),
-                    Size = new Vector2(window.Size.X, 24f),
-                    UpdateBounds = false,
-                    LabelCentered = true,
-                    Position = new Vector2(0f, 0f)
-                });
-
-                window.Widgets.Add(new ButtonWidget(Game, "YES", save) {
-                    Size = new Vector2(window.Size.X / 2f, 24f),
-                    UpdateBounds = false,
-                    LabelCentered = true,
-                    Position = new Vector2(0f, 24f)
-                });
-
-                window.Widgets.Add(new ButtonWidget(Game, "NO", windowHeader.CloseButtonWidget.Action) {
-                    Size = new Vector2(window.Size.X / 2f, 24f),
-                    UpdateBounds = false,
-                    LabelCentered = true,
-                    Position = new Vector2(window.Size.X / 2f, 24f)
-                });
-            }));
+            button.Widgets.Add(new ButtonWidget(Game, "Save (XML)", () => Save()));
+            button.Widgets.Add(new ButtonWidget(Game, "Save (binary)", () => Save(true)));
 
 
             TopBarWidget.Widgets.Add(button = new ButtonWidget(Game, "View"));
@@ -1811,6 +1760,60 @@ namespace FezGame.Components {
             }
 
             return face;
+        }
+
+        public void Save(bool binary = false, bool overwrite = false) {
+            WindowHeaderWidget windowHeader = null;
+
+            string filePath = ("Resources\\levels\\"+(LevelManager.Name.ToLower())).Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString())+"."+(binary?FEZMod.LevelFileFormat:"xml");
+            FileInfo file = new FileInfo(filePath);
+
+            Action save = delegate() {
+                if (file.Exists) {
+                    file.Delete();
+                }
+                ModLogger.Log("JAFM.Engine", "Saving level "+LevelManager.Name);
+                GameLevelManagerHelper.Save(LevelManager.Name, binary);
+                if (windowHeader != null) {
+                    windowHeader.CloseButtonWidget.Action();
+                }
+            };
+
+            if (!file.Exists || overwrite) {
+                save();
+                return;
+            }
+
+            ContainerWidget window;
+            Widgets.Add(window = new ContainerWidget(Game) {
+                Size = new Vector2(256f, 48f),
+                Label = "Overwrite level?"
+            });
+            window.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (window.Size.X / 2);
+            window.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (window.Size.Y / 2);
+            window.Widgets.Add(windowHeader = new WindowHeaderWidget(Game));
+
+            window.Widgets.Add(new ButtonWidget(Game, "Level already existing. Overwrite?") {
+                Background = new Color(EditorWidget.DefaultBackground, 0f),
+                Size = new Vector2(window.Size.X, 24f),
+                UpdateBounds = false,
+                LabelCentered = true,
+                Position = new Vector2(0f, 0f)
+            });
+
+            window.Widgets.Add(new ButtonWidget(Game, "YES", save) {
+                Size = new Vector2(window.Size.X / 2f, 24f),
+                UpdateBounds = false,
+                LabelCentered = true,
+                Position = new Vector2(0f, 24f)
+            });
+
+            window.Widgets.Add(new ButtonWidget(Game, "NO", windowHeader.CloseButtonWidget.Action) {
+                Size = new Vector2(window.Size.X / 2f, 24f),
+                UpdateBounds = false,
+                LabelCentered = true,
+                Position = new Vector2(window.Size.X / 2f, 24f)
+            });
         }
 
         protected DateTime ReadBuildDate() {

@@ -31,7 +31,8 @@ namespace FezGame.Services {
 
         public void Load(string levelName) {
             if (levelName.StartsWith("JAFM_WORKAROUND_SAVE:")) {
-                Save(levelName.Substring("JAFM_WORKAROUND_SAVE:".Length));
+                string[] split = levelName.Split(new char[] {':'});
+                Save(split[1], (split.Length > 2) ? bool.Parse(split[2]) : false);
                 return;
             }
             if (levelName == "JAFM_WORKAROUND_CHANGELEVEL") {
@@ -59,7 +60,7 @@ namespace FezGame.Services {
                     orig_Load(levelName);
                 } else {
                     //Fallback: Spawn at the original VILLAGEVILLE_3D if the level wasn't found at all
-                    ModLogger.Log("JAFM", "Level not found: " + levelName + "; Falling back to the original VILLAGEVILLE_3D...");
+                    ModLogger.Log("FEZMod", "Level not found: " + levelName + "; Falling back to the original VILLAGEVILLE_3D...");
                     orig_Load("VILLAGEVILLE_3D");
                 }
                 //ProcessLevelData(levelData);
@@ -67,7 +68,7 @@ namespace FezGame.Services {
                 return;
             }
 
-            ModLogger.Log("JAFM", "Loading level from XML: "+levelName);
+            ModLogger.Log("FEZMod", "Loading level from XML: "+levelName);
 
             ClearArtSatellites();
 
@@ -95,16 +96,22 @@ namespace FezGame.Services {
             GameLevelManagerHelper.Level = levelData;
         }
 
-        public void Save(string levelName) {
-            string filePath = ("Resources\\levels\\"+(levelName.ToLower())).Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString())+".xml";
+        public void Save(string levelName, bool binary = false) {
+            string filePath = ("Resources\\levels\\"+(levelName.ToLower())).Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString())+"."+(binary?FEZMod.LevelFileFormat:"xml");
             FileInfo file = new FileInfo(filePath);
             if (file.Exists) {
                 return;
             }
 
-            ModLogger.Log("JAFM", "Saving level to XML: "+levelName);
+            if (binary) {
+                ModLogger.Log("FEZMod", "Saving level to binary file: " + levelName);
+                ModLogger.Log("FEZMod", "FEZMod doesn't support saving levels to binary files yet!");
+                return;
+            }
 
-            Module moduleFezEngine = levelData.GetType().Module;//expecting FezEngine.Structure.Level
+            ModLogger.Log("FEZMod", "Saving level to XML: "+levelName);
+
+            //TODO Use XmlHelper.Serialize... if it would exist.
 
             XmlDocument xmlDocument = new XmlDocument();
 

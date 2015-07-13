@@ -29,8 +29,8 @@ namespace FezGame.Services {
             }
         }
 
-        public static void Save(string levelName) {
-            LevelManager.Load("JAFM_WORKAROUND_SAVE:"+levelName);
+        public static void Save(string levelName, bool binary = false) {
+            LevelManager.Load("JAFM_WORKAROUND_SAVE:"+levelName+":"+binary);
         }
 
         public static void ChangeLevel(Level level) {
