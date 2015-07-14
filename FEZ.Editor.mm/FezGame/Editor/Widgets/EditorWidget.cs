@@ -37,10 +37,8 @@ namespace FezGame.Editor.Widgets {
         [ServiceDependency]
         public IContentManagerProvider CMProvider { get; set; }
 
-        public static Color DefaultForeground = Color.White;
-        protected Color PrevDefaultForeground = DefaultForeground;
-        public static Color DefaultBackground = new Color(0f, 0f, 0f, 0.75f);
-        protected Color PrevDefaultBackground = DefaultBackground;
+        protected Color PrevDefaultForeground = LevelEditorOptions.DefaultForeground;
+        protected Color PrevDefaultBackground = LevelEditorOptions.DefaultBackground;
 
         public EditorWidget Parent;
         public List<EditorWidget> Widgets = new List<EditorWidget>();
@@ -85,7 +83,7 @@ namespace FezGame.Editor.Widgets {
                     foreground = Parent.Foreground;
                 }
                 if (foreground.A == 0) {
-                    return DefaultForeground;
+                    return LevelEditorOptions.DefaultForeground;
                 }
                 return foreground;
             }
@@ -93,7 +91,7 @@ namespace FezGame.Editor.Widgets {
                 foreground_ = value;
             }
         }
-        public Color Background = DefaultBackground;
+        public Color Background = LevelEditorOptions.DefaultBackground;
         protected Rectangle backgroundBounds = new Rectangle();
         protected bool ScissorTestEnablePrev;
         protected Rectangle ScissorRectanglePrev;
@@ -221,16 +219,16 @@ namespace FezGame.Editor.Widgets {
                 return;
             }
 
-            foreground_.R = DefaultForeground.R;
-            foreground_.G = DefaultForeground.G;
-            foreground_.B = DefaultForeground.B;
+            foreground_.R = LevelEditorOptions.DefaultForeground.R;
+            foreground_.G = LevelEditorOptions.DefaultForeground.G;
+            foreground_.B = LevelEditorOptions.DefaultForeground.B;
 
-            Background.R = DefaultBackground.R;
-            Background.G = DefaultBackground.G;
-            Background.B = DefaultBackground.B;
+            Background.R = LevelEditorOptions.DefaultBackground.R;
+            Background.G = LevelEditorOptions.DefaultBackground.G;
+            Background.B = LevelEditorOptions.DefaultBackground.B;
 
-            PrevDefaultForeground = DefaultForeground;
-            PrevDefaultBackground = DefaultBackground;
+            PrevDefaultForeground = LevelEditorOptions.DefaultForeground;
+            PrevDefaultBackground = LevelEditorOptions.DefaultBackground;
         }
 
         public virtual void Refresh() {

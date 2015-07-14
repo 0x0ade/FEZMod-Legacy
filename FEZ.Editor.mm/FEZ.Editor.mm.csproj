@@ -80,6 +80,7 @@
     <Compile Include="FezGame\Editor\Widgets\TextFieldWidget.cs" />
     <Compile Include="FezGame\Editor\Widgets\CheckboxWidget.cs" />
     <Compile Include="FezGame\Editor\EditorHelper.cs" />
+    <Compile Include="FezGame\Components\LevelEditorOptions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

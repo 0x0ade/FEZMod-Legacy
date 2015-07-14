@@ -16,6 +16,7 @@ using System.Xml;
 using System.Reflection;
 using MonoMod;
 using System.Xml.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace FezGame.Services {
 	public class GameLevelManager : LevelManager {
@@ -53,9 +54,23 @@ namespace FezGame.Services {
 
             //levelName = ProcessLevelName(levelName);
 
-			string filePath = ("Resources\\levels\\"+(levelName.ToLower())).Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString())+".xml";
-            FileInfo file = new FileInfo(filePath);
-            if (!file.Exists) {
+            string filePath_ = ("Resources\\levels\\"+(levelName.ToLower())).Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString())+".";
+
+            string filePathFML = filePath_ + FEZMod.LevelFileFormat;
+            FileInfo fileFML = new FileInfo(filePathFML);
+            if (fileFML.Exists) {
+                ModLogger.Log("FEZMod", "Loading level from FML: "+levelName);
+
+                using (FileStream fs = new FileStream(fileFML.FullName, FileMode.Open)) {
+                    throw new FormatException("FEZMod can't load FML files yet.");
+                }
+
+                return;
+            }
+
+            string filePathXML = filePath_+"xml";
+            FileInfo fileXML = new FileInfo(filePathXML);
+            if (!fileXML.Exists) {
                 if (MemoryContentManager.AssetExists("LEVELS/"+levelName)) {
                     orig_Load(levelName);
                 } else {
@@ -75,7 +90,7 @@ namespace FezGame.Services {
             oldLevel = levelData;
             levelData = new Level();
 
-			FileStream fis = new FileStream(file.FullName, FileMode.Open);
+            FileStream fis = new FileStream(fileXML.FullName, FileMode.Open);
             XmlReader xmlReader = XmlReader.Create(fis);
             XmlDocument xmlDocument = new XmlDocument();
             xmlDocument.Load(xmlReader);
@@ -105,13 +120,22 @@ namespace FezGame.Services {
 
             if (binary) {
                 ModLogger.Log("FEZMod", "Saving level to binary file: " + levelName);
-                ModLogger.Log("FEZMod", "FEZMod doesn't support saving levels to binary files yet!");
+
+                //TODO use custom writer instead of quickly and dirtily serializing the level
+                //FYI: Levels are not serializable.
+                using (FileStream fs = new FileStream(filePath, FileMode.CreateNew)) {
+                    throw new FormatException("FEZMod can't save FML files yet.");
+                }
+
                 return;
             }
 
             ModLogger.Log("FEZMod", "Saving level to XML: "+levelName);
 
             //TODO Use XmlHelper.Serialize... if it would exist.
+
+            //ANCIENT CODE; DO NOT TOUCH AS LONG AS IT IS WORKING.
+            //Nobody knows what really is going on here and it should be completely replaced with much simpler code.
 
             XmlDocument xmlDocument = new XmlDocument();
 
