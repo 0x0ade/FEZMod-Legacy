@@ -88,7 +88,6 @@ namespace FezGame.Services {
             ClearArtSatellites();
 
             oldLevel = levelData;
-            levelData = new Level();
 
             FileStream fis = new FileStream(fileXML.FullName, FileMode.Open);
             XmlReader xmlReader = XmlReader.Create(fis);

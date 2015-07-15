@@ -102,6 +102,8 @@ namespace FezGame.Components {
         public override void Initialize() {
             base.Initialize();
 
+            LevelEditorOptions.Initialize();
+
             Scheduled = new List<Action>();
 
             BuildDate = ReadBuildDate();
@@ -135,7 +137,7 @@ namespace FezGame.Components {
 
                 ButtonWidget windowLabelName;
                 window.Widgets.Add(windowLabelName = new ButtonWidget(Game, "Name:") {
-                    Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                    Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                     Size = new Vector2(96f, 24f),
                     UpdateBounds = false,
                     LabelCentered = false,
@@ -151,7 +153,7 @@ namespace FezGame.Components {
 
                 ButtonWidget windowLabelWidth;
                 window.Widgets.Add(windowLabelWidth = new ButtonWidget(Game, "Width:") {
-                    Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                    Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                     Size = new Vector2(96f, 24f),
                     UpdateBounds = false,
                     LabelCentered = false,
@@ -166,7 +168,7 @@ namespace FezGame.Components {
 
                 ButtonWidget windowLabelHeight;
                 window.Widgets.Add(windowLabelHeight = new ButtonWidget(Game, "Height:") {
-                    Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                    Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                     Size = new Vector2(96f, 24f),
                     UpdateBounds = false,
                     LabelCentered = false,
@@ -181,7 +183,7 @@ namespace FezGame.Components {
 
                 ButtonWidget windowLabelDepth;
                 window.Widgets.Add(windowLabelDepth = new ButtonWidget(Game, "Depth:") {
-                    Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                    Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                     Size = new Vector2(96f, 24f),
                     UpdateBounds = false,
                     LabelCentered = false,
@@ -196,7 +198,7 @@ namespace FezGame.Components {
 
                 ButtonWidget windowLabelTrileset;
                 window.Widgets.Add(windowLabelTrileset = new ButtonWidget(Game, "Trileset:") {
-                    Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                    Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                     Size = new Vector2(96f, 24f),
                     UpdateBounds = false,
                     LabelCentered = false,
@@ -287,7 +289,7 @@ namespace FezGame.Components {
             button.Widgets.Add(new ButtonWidget(Game, "Settings", new EditorWidget[] {
                 new ContainerWidget(Game, new EditorWidget[] {
                     new ButtonWidget(Game, "Name:") {
-                        Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                        Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                         LabelCentered = false,
                         Position = new Vector2(0f, 0f)
                     },
@@ -301,7 +303,7 @@ namespace FezGame.Components {
                 },
                 new ContainerWidget(Game, new EditorWidget[] {
                     new ButtonWidget(Game, "Width:") {
-                        Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                        Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                         LabelCentered = false,
                         Position = new Vector2(0f, 0f)
                     },
@@ -315,7 +317,7 @@ namespace FezGame.Components {
                 },
                 new ContainerWidget(Game, new EditorWidget[] {
                     new ButtonWidget(Game, "Height:") {
-                        Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                        Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                         LabelCentered = false,
                         Position = new Vector2(0f, 0f)
                     },
@@ -329,7 +331,7 @@ namespace FezGame.Components {
                 },
                 new ContainerWidget(Game, new EditorWidget[] {
                     new ButtonWidget(Game, "Depth:") {
-                        Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                        Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                         LabelCentered = false,
                         Position = new Vector2(0f, 0f)
                     },
@@ -360,7 +362,7 @@ namespace FezGame.Components {
             button.Widgets.Add(new ButtonWidget(Game, "Spawnpoint", new EditorWidget[] {
                 new ContainerWidget(Game, new EditorWidget[] {
                     new ButtonWidget(Game, "X:") {
-                        Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                        Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                         LabelCentered = false,
                         Position = new Vector2(0f, 0f)
                     },
@@ -374,7 +376,7 @@ namespace FezGame.Components {
                 },
                 new ContainerWidget(Game, new EditorWidget[] {
                     new ButtonWidget(Game, "Y:") {
-                        Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                        Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                         LabelCentered = false,
                         Position = new Vector2(0f, 0f)
                     },
@@ -388,7 +390,7 @@ namespace FezGame.Components {
                 },
                 new ContainerWidget(Game, new EditorWidget[] {
                     new ButtonWidget(Game, "Z:") {
-                        Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                        Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                         LabelCentered = false,
                         Position = new Vector2(0f, 0f)
                     },
@@ -402,7 +404,7 @@ namespace FezGame.Components {
                 },
                 new ContainerWidget(Game, new EditorWidget[] {
                     new ButtonWidget(Game, "Face:") {
-                        Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                        Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                         LabelCentered = false,
                         Position = new Vector2(0f, 0f)
                     },
@@ -470,7 +472,7 @@ namespace FezGame.Components {
             button.Widgets.Add(new ButtonWidget(Game, "Water", new EditorWidget[] {
                 new ContainerWidget(Game, new EditorWidget[] {
                     new ButtonWidget(Game, "Type:") {
-                        Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                        Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                         LabelCentered = false,
                         Position = new Vector2(0f, 0f)
                     },
@@ -484,7 +486,7 @@ namespace FezGame.Components {
                 },
                 new ContainerWidget(Game, new EditorWidget[] {
                     new ButtonWidget(Game, "Height:") {
-                        Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                        Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                         LabelCentered = false,
                         Position = new Vector2(0f, 0f)
                     },
@@ -541,7 +543,7 @@ namespace FezGame.Components {
                             }
                         }) {
                             Size = new Vector2(window.Size.X, 24f),
-                            Background = new Color(LevelEditorOptions.DefaultBackground, 0f)
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f)
                         });
 
                         i++;
@@ -561,7 +563,7 @@ namespace FezGame.Components {
 
                         ButtonWidget windowLabelId;
                         windowAdd.Widgets.Add(windowLabelId = new ButtonWidget(Game, "ID:") {
-                            Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                             Size = new Vector2(96f, 24f),
                             UpdateBounds = false,
                             LabelCentered = false,
@@ -576,7 +578,7 @@ namespace FezGame.Components {
 
                         ButtonWidget windowLabelFrom;
                         windowAdd.Widgets.Add(windowLabelFrom = new ButtonWidget(Game, "From:") {
-                            Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                             Size = new Vector2(96f, 24f),
                             UpdateBounds = false,
                             LabelCentered = false,
@@ -591,7 +593,7 @@ namespace FezGame.Components {
 
                         ButtonWidget windowLabelTo;
                         windowAdd.Widgets.Add(windowLabelTo = new ButtonWidget(Game, "To:") {
-                            Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                             Size = new Vector2(96f, 24f),
                             UpdateBounds = false,
                             LabelCentered = false,
@@ -606,7 +608,7 @@ namespace FezGame.Components {
 
                         CheckboxWidget windowCheckFront;
                         windowAdd.Widgets.Add(windowCheckFront = new CheckboxWidget(Game, "Front") {
-                            Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                             Size = new Vector2(windowAdd.Size.X, 24f),
                             UpdateBounds = false,
                             LabelCentered = false,
@@ -615,7 +617,7 @@ namespace FezGame.Components {
 
                         CheckboxWidget windowCheckLeft;
                         windowAdd.Widgets.Add(windowCheckLeft = new CheckboxWidget(Game, "Left") {
-                            Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                             Size = new Vector2(windowAdd.Size.X, 24f),
                             UpdateBounds = false,
                             LabelCentered = false,
@@ -624,7 +626,7 @@ namespace FezGame.Components {
 
                         CheckboxWidget windowCheckBack;
                         windowAdd.Widgets.Add(windowCheckBack = new CheckboxWidget(Game, "Back") {
-                            Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                             Size = new Vector2(windowAdd.Size.X, 24f),
                             UpdateBounds = false,
                             LabelCentered = false,
@@ -633,7 +635,7 @@ namespace FezGame.Components {
 
                         CheckboxWidget windowCheckRight;
                         windowAdd.Widgets.Add(windowCheckRight = new CheckboxWidget(Game, "Right") {
-                            Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                             Size = new Vector2(windowAdd.Size.X, 24f),
                             UpdateBounds = false,
                             LabelCentered = false,
@@ -723,7 +725,7 @@ namespace FezGame.Components {
                         }
                     }) {
                         Size = new Vector2(window.Size.X, 24f),
-                        Background = new Color(LevelEditorOptions.DefaultBackground, 0f)
+                        Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f)
                     });
 
                     i++;
@@ -790,7 +792,7 @@ namespace FezGame.Components {
                             }
                         }) {
                             Size = new Vector2(window.Size.X, 24f),
-                            Background = new Color(LevelEditorOptions.DefaultBackground, 0f)
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f)
                         });
 
                         i++;
@@ -817,7 +819,7 @@ namespace FezGame.Components {
 
                         ButtonWidget windowLabelId;
                         windowAdd.Widgets.Add(windowLabelId = new ButtonWidget(Game, "ID:") {
-                            Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                             Size = new Vector2(96f, 24f),
                             UpdateBounds = false,
                             LabelCentered = false,
@@ -832,7 +834,7 @@ namespace FezGame.Components {
 
                         ButtonWidget windowLabelName;
                         windowAdd.Widgets.Add(windowLabelName = new ButtonWidget(Game, "Name:") {
-                            Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                             Size = new Vector2(96f, 24f),
                             UpdateBounds = false,
                             LabelCentered = false,
@@ -847,7 +849,7 @@ namespace FezGame.Components {
 
                         ButtonWidget windowLabelPosition;
                         windowAdd.Widgets.Add(windowLabelPosition = new ButtonWidget(Game, "Position:") {
-                            Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                             Size = new Vector2(96f, 24f),
                             UpdateBounds = false,
                             LabelCentered = false,
@@ -862,7 +864,7 @@ namespace FezGame.Components {
 
                         ButtonWidget windowLabelRotation;
                         windowAdd.Widgets.Add(windowLabelRotation = new ButtonWidget(Game, "Rotation:") {
-                            Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                             Size = new Vector2(96f, 24f),
                             UpdateBounds = false,
                             LabelCentered = false,
@@ -877,7 +879,7 @@ namespace FezGame.Components {
 
                         ButtonWidget windowLabelCenter;
                         windowAdd.Widgets.Add(windowLabelCenter = new ButtonWidget(Game, "Center:") {
-                            Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                             Size = new Vector2(96f, 24f),
                             UpdateBounds = false,
                             LabelCentered = false,
@@ -892,7 +894,7 @@ namespace FezGame.Components {
 
                         ButtonWidget windowLabelScale;
                         windowAdd.Widgets.Add(windowLabelScale = new ButtonWidget(Game, "Scale:") {
-                            Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                             Size = new Vector2(96f, 24f),
                             UpdateBounds = false,
                             LabelCentered = false,
@@ -1002,7 +1004,7 @@ namespace FezGame.Components {
                             }
                         }) {
                             Size = new Vector2(window.Size.X, 24f),
-                            Background = new Color(LevelEditorOptions.DefaultBackground, 0f)
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f)
                         });
 
                         i++;
@@ -1065,7 +1067,7 @@ namespace FezGame.Components {
                             }
                         }) {
                             Size = new Vector2(window.Size.X, 24f),
-                            Background = new Color(LevelEditorOptions.DefaultBackground, 0f)
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f)
                         });
 
                         i++;
@@ -1126,7 +1128,7 @@ namespace FezGame.Components {
                         }
                     }) {
                         Size = new Vector2(window.Size.X, 24f),
-                        Background = new Color(LevelEditorOptions.DefaultBackground, 0f)
+                        Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f)
                     });
 
                     i++;
@@ -1182,7 +1184,7 @@ namespace FezGame.Components {
                         }
                     }) {
                         Size = new Vector2(window.Size.X, 24f),
-                        Background = new Color(LevelEditorOptions.DefaultBackground, 0f)
+                        Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f)
                     });
 
                     i++;
@@ -1238,7 +1240,7 @@ namespace FezGame.Components {
                         }
                     }) {
                         Size = new Vector2(window.Size.X, 24f),
-                        Background = new Color(LevelEditorOptions.DefaultBackground, 0f)
+                        Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f)
                     });
 
                     i++;
@@ -1293,7 +1295,7 @@ namespace FezGame.Components {
                             }
                         }) {
                             Size = new Vector2(window.Size.X, 24f),
-                            Background = new Color(LevelEditorOptions.DefaultBackground, 0f)
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f)
                         });
 
                         i++;
@@ -1313,7 +1315,7 @@ namespace FezGame.Components {
 
                         ButtonWidget windowLabelName;
                         windowAdd.Widgets.Add(windowLabelName = new ButtonWidget(Game, "Name:") {
-                            Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                             Size = new Vector2(96f, 24f),
                             UpdateBounds = false,
                             LabelCentered = false,
@@ -1338,7 +1340,7 @@ namespace FezGame.Components {
 
                         CheckboxWidget windowCheckDawn;
                         windowAdd.Widgets.Add(windowCheckDawn = new CheckboxWidget(Game, "Dawn") {
-                            Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                             Size = new Vector2(windowAdd.Size.X, 24f),
                             UpdateBounds = false,
                             LabelCentered = false,
@@ -1347,7 +1349,7 @@ namespace FezGame.Components {
 
                         CheckboxWidget windowCheckDay;
                         windowAdd.Widgets.Add(windowCheckDay = new CheckboxWidget(Game, "Day") {
-                            Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                             Size = new Vector2(windowAdd.Size.X, 24f),
                             UpdateBounds = false,
                             LabelCentered = false,
@@ -1356,7 +1358,7 @@ namespace FezGame.Components {
 
                         CheckboxWidget windowCheckDusk;
                         windowAdd.Widgets.Add(windowCheckDusk = new CheckboxWidget(Game, "Dusk") {
-                            Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                             Size = new Vector2(windowAdd.Size.X, 24f),
                             UpdateBounds = false,
                             LabelCentered = false,
@@ -1365,7 +1367,7 @@ namespace FezGame.Components {
 
                         CheckboxWidget windowCheckNight;
                         windowAdd.Widgets.Add(windowCheckNight = new CheckboxWidget(Game, "Night") {
-                            Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                             Size = new Vector2(windowAdd.Size.X, 24f),
                             UpdateBounds = false,
                             LabelCentered = false,
@@ -1411,13 +1413,13 @@ namespace FezGame.Components {
             TopBarWidget.Widgets.Add(button = new ButtonWidget(Game, "Editor"));
             button.Background.A = 0;
             button.Widgets.Add(new ButtonWidget(Game, "Toggle theme", delegate() {
-                LevelEditorOptions.DefaultBackground.R = (byte) (255 - LevelEditorOptions.DefaultBackground.R);
-                LevelEditorOptions.DefaultBackground.G = (byte) (255 - LevelEditorOptions.DefaultBackground.G);
-                LevelEditorOptions.DefaultBackground.B = (byte) (255 - LevelEditorOptions.DefaultBackground.B);
+                LevelEditorOptions.Instance.DefaultBackground.R = (byte) (255 - LevelEditorOptions.Instance.DefaultBackground.R);
+                LevelEditorOptions.Instance.DefaultBackground.G = (byte) (255 - LevelEditorOptions.Instance.DefaultBackground.G);
+                LevelEditorOptions.Instance.DefaultBackground.B = (byte) (255 - LevelEditorOptions.Instance.DefaultBackground.B);
 
-                LevelEditorOptions.DefaultForeground.R = (byte) (255 - LevelEditorOptions.DefaultForeground.R);
-                LevelEditorOptions.DefaultForeground.G = (byte) (255 - LevelEditorOptions.DefaultForeground.G);
-                LevelEditorOptions.DefaultForeground.B = (byte) (255 - LevelEditorOptions.DefaultForeground.B);
+                LevelEditorOptions.Instance.DefaultForeground.R = (byte) (255 - LevelEditorOptions.Instance.DefaultForeground.R);
+                LevelEditorOptions.Instance.DefaultForeground.G = (byte) (255 - LevelEditorOptions.Instance.DefaultForeground.G);
+                LevelEditorOptions.Instance.DefaultForeground.B = (byte) (255 - LevelEditorOptions.Instance.DefaultForeground.B);
 
                 foreach (EditorWidget widget in Widgets) {
                     widget.UpdateTheme();
@@ -1494,7 +1496,7 @@ namespace FezGame.Components {
             }
 
             HoveredAO = null;
-            if (LevelEditorOptions.TooltipArtObjectInfo) {
+            if (LevelEditorOptions.Instance.TooltipArtObjectInfo) {
                 int aosCount = LevelManager.ArtObjects.Count;
                 LevelManager.ArtObjects.CopyTo(tmpAOs.Length < aosCount ? (tmpAOs = new KeyValuePair<int, ArtObjectInstance>[aosCount]) : tmpAOs, 0);
                 for (int i = 0; i < aosCount; i++) {
@@ -1774,19 +1776,19 @@ namespace FezGame.Components {
 
             Action save = delegate() {
                 if (file.Exists) {
-                    FileInfo fileBackupOldest = new FileInfo(filePath_ + LevelEditorOptions.BackupHistory + "." + fileExtension);
+                    FileInfo fileBackupOldest = new FileInfo(filePath_ + LevelEditorOptions.Instance.BackupHistory + "." + fileExtension);
                     if (fileBackupOldest.Exists) {
                         fileBackupOldest.Delete();
                     }
 
-                    for (int i = LevelEditorOptions.BackupHistory - 1; i > 0; i--) {
+                    for (int i = LevelEditorOptions.Instance.BackupHistory - 1; i > 0; i--) {
                         FileInfo fileBackup = new FileInfo(filePath_ + i + "." + fileExtension);
                         if (fileBackup.Exists) {
                             fileBackup.MoveTo(filePath_ + (i+1) + "." + fileExtension);
                         }
                     }
 
-                    if (LevelEditorOptions.BackupHistory <= 0) {
+                    if (LevelEditorOptions.Instance.BackupHistory <= 0) {
                         file.Delete();
                     } else {
                         file.MoveTo(filePath_ + "1." + fileExtension);
@@ -1814,7 +1816,7 @@ namespace FezGame.Components {
             window.Widgets.Add(windowHeader = new WindowHeaderWidget(Game));
 
             window.Widgets.Add(new ButtonWidget(Game, "Level already existing. Overwrite?") {
-                Background = new Color(LevelEditorOptions.DefaultBackground, 0f),
+                Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
                 Size = new Vector2(window.Size.X, 24f),
                 UpdateBounds = false,
                 LabelCentered = true,
