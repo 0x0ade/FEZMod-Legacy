@@ -1774,21 +1774,22 @@ namespace FezGame.Components {
 
             Action save = delegate() {
                 if (file.Exists) {
-
                     FileInfo fileBackupOldest = new FileInfo(filePath_ + LevelEditorOptions.BackupHistory + "." + fileExtension);
                     if (fileBackupOldest.Exists) {
                         fileBackupOldest.Delete();
                     }
 
-                    for (int i = LevelEditorOptions.BackupHistory - 1; i >= 0; i--) {
+                    for (int i = LevelEditorOptions.BackupHistory - 1; i > 0; i--) {
                         FileInfo fileBackup = new FileInfo(filePath_ + i + "." + fileExtension);
-                        file.MoveTo(filePath_ + (i+1) + "." + fileExtension);
+                        if (fileBackup.Exists) {
+                            fileBackup.MoveTo(filePath_ + (i+1) + "." + fileExtension);
+                        }
                     }
 
-                    if (LevelEditorOptions.BackupHistory > 0) {
+                    if (LevelEditorOptions.BackupHistory <= 0) {
                         file.Delete();
                     } else {
-                        file.MoveTo(filePath_ + "0." + fileExtension);
+                        file.MoveTo(filePath_ + "1." + fileExtension);
                     }
                 }
                 ModLogger.Log("JAFM.Engine", "Saving level "+LevelManager.Name);
