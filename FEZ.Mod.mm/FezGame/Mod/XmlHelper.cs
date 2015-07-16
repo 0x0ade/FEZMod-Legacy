@@ -22,71 +22,20 @@ using System.Threading.Tasks;
 namespace FezGame.Mod {
     public static class XmlHelper {
 
-        [Obsolete("Use AutoParse instead.")]
-        public static object Parse(this XmlElement elem, bool descend = true) {
-            return AutoParse(elem, descend);
-        }
-
-        public static object AutoParse(this XmlElement elem, bool descend = true) {
-            //TODO make this ugly hack obsolete.
-            //Parsing should happen in Deserialize; This is just a workaround for types that don't work yet.
-            if (elem == null) {
-                return null;
-            }
-
-            if (elem.Name == "TrileEmplacement") {
-                return new TrileEmplacement(
-                    int.Parse(elem.GetAttribute("x")),
-                    int.Parse(elem.GetAttribute("y")),
-                    int.Parse(elem.GetAttribute("z"))
-                );
-            }
-
-            if (elem.Name == "Vector3") {
-                return new Vector3(
-                    float.Parse(elem.GetAttribute("x")),
-                    float.Parse(elem.GetAttribute("y")),
-                    float.Parse(elem.GetAttribute("z"))
-                );
-            }
-
-            if (elem.Name == "Quaternion") {
-                return new Quaternion(
-                    float.Parse(elem.GetAttribute("x")),
-                    float.Parse(elem.GetAttribute("y")),
-                    float.Parse(elem.GetAttribute("z")),
-                    float.Parse(elem.GetAttribute("w"))
-                );
-            }
-
-            if (elem.Name == "FaceOrientation") {
-                return Enum.Parse(typeof(FaceOrientation), elem.InnerText);
-            }
-
-            if (descend) {
-                return 
-                    AutoParse(elem["TrileEmplacement"]) ??
-                    AutoParse(elem["Vector3"]) ??
-                    AutoParse(elem["Quaternion"]);
-            } else {
-                return null;
-            }
-        }
-
         public static object Deserialize(this XmlNode node, Type parent = null, ContentManager cm = null, bool descend = true) {
             if (node == null) {
                 return null;
+            }
+
+            //TODO make it work with all enums
+            if (node.Name == "FaceOrientation") {
+                return Enum.Parse(typeof(FaceOrientation), node.InnerText);
             }
 
             XmlElement elem = node as XmlElement;
 
             if (node.Name == "Entry") {
                 return node.ChildNodes[0].Deserialize(parent, cm, descend);
-            }
-
-            object parsed = elem.AutoParse(false);
-            if (parsed != null) {
-                return parsed;
             }
 
             Type type = null;
@@ -381,7 +330,8 @@ namespace FezGame.Mod {
                 if (constructor != null) {
                     return constructor.Invoke(new object[0]);
                 } else {
-                    return elem.AutoParse(true);//worst-case hack
+                    ModLogger.Log("FEZMod", "XmlHelper can't find a default constructor for null element of type " + type.FullName);
+                    return null;
                 }
             }
 
@@ -421,7 +371,8 @@ namespace FezGame.Mod {
                 return constructor_.Invoke(new object[0]);
             }
 
-            return elem.AutoParse(true);//worst-case hack
+            ModLogger.Log("FEZMod", "XmlHelper can't find a constructor for element " + elem.Name + " of type " + type.FullName);
+            return null;
         }
 
         public static object Parse(this Type type, string str) {
