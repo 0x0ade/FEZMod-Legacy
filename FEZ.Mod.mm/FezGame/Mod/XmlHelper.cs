@@ -27,11 +27,6 @@ namespace FezGame.Mod {
                 return null;
             }
 
-            //TODO make it work with all enums
-            if (node.Name == "FaceOrientation") {
-                return Enum.Parse(typeof(FaceOrientation), node.InnerText);
-            }
-
             XmlElement elem = node as XmlElement;
 
             if (node.Name == "Entry") {
@@ -94,6 +89,12 @@ namespace FezGame.Mod {
             } else {
                 //ModLogger.Log("FEZMod", "elem: " + elem.Name + "; type: " + type.FullName);
                 type = Nullable.GetUnderlyingType(type) ?? type;
+            }
+
+            object parsed = type.Parse(node.InnerText);
+
+            if (parsed != null) {
+                return parsed;
             }
 
             object obj = type.New(elem) ?? node.InnerText;
@@ -399,7 +400,8 @@ namespace FezGame.Mod {
                 //can happen if a TrileInstance gets created and the "position" parameter in the constructor gets parsed (Vector3)
                 return null;
             }
-            ModLogger.Log("FEZMod", "XmlHelper can't parse " + type.FullName + " from the following data: " + str);
+            //ModLogger.Log("FEZMod", "XmlHelper can't parse " + type.FullName + " from the following data: " + str);
+            //Happens "normally" as Deserialize tries to parse the string first.
             return null;
         }
 
