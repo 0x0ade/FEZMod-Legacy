@@ -138,6 +138,10 @@ namespace FezGame.Services {
 
             XmlDocument xmlDocument = new XmlDocument();
 
+            xmlDocument.AppendChild(levelData.Serialize(xmlDocument));
+
+            /*
+
             XmlElement xmlLevel = xmlDocument.CreateElement("Level");
 
             //Level attributes
@@ -703,8 +707,10 @@ namespace FezGame.Services {
             }
             xmlLevel.AppendChild(xmlAmbienceTracks);
 
+            */
+
             //Write to file
-            xmlDocument.AppendChild(xmlLevel);
+            //xmlDocument.AppendChild(xmlLevel);
             FileStream fos = new FileStream(filePath, FileMode.CreateNew);
             XmlWriterSettings xmlWriterSettings = new XmlWriterSettings();
             xmlWriterSettings.Indent = true;

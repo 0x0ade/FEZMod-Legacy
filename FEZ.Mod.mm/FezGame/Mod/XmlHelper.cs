@@ -18,6 +18,8 @@ using System.Collections;
 using System.ComponentModel;
 using System.Collections.Specialized;
 using System.Threading.Tasks;
+using ContentSerialization.Attributes;
+using System.CodeDom;
 
 namespace FezGame.Mod {
     public static class XmlHelper {
@@ -403,6 +405,111 @@ namespace FezGame.Mod {
             //ModLogger.Log("FEZMod", "XmlHelper can't parse " + type.FullName + " from the following data: " + str);
             //Happens "normally" as Deserialize tries to parse the string first.
             return null;
+        }
+
+        public static XmlNode Serialize(this object obj, XmlDocument document, string name = null) {
+            if (obj == null || document == null) {
+                return null;
+            }
+            Type type = obj.GetType();
+            if (name == null) {
+                name = type.Name;
+            }
+
+            XmlElement elem = document.CreateElement(name);
+
+            if (type.IsEnum || type.IsPrimitive || obj is string) {
+                elem.InnerText = obj.ToString();
+                return elem;
+            }
+
+            bool isGenericICollection = false;
+            //TODO find out why HashSets don't trigger the usual obj is ICollection but other types do
+            foreach (Type interfaceType in type.GetInterfaces()) {
+                if (interfaceType.IsGenericType && interfaceType.GetGenericTypeDefinition() == typeof(ICollection<>)) {
+                    isGenericICollection = true;
+                    break;
+                }
+            }
+
+            if (obj is ICollection || isGenericICollection) {
+                //TODO handle collections
+                return elem;
+            }
+
+            //TODO handle further special types
+
+            //TODO what about this piece of code? (early IKVM port leftover)
+            MethodInfo[] methods = type.GetMethods();
+            for (int i = 0; i < methods.Length; i++) {
+                MethodInfo method = methods[i];
+                string methodLowerCase = method.Name.ToLower();
+                if (!methodLowerCase.StartsWith("get_") || method.IsStatic) {
+                    continue;
+                }
+
+                Type returnType = method.ReturnType;
+
+                if (!(
+                    returnType.IsEnum ||
+                    returnType.IsPrimitive ||
+                    typeof(string).IsAssignableFrom(returnType)
+                )) {
+                    continue;
+                }
+
+                string attributeName = methodLowerCase.Substring(4);
+                object value = method.Invoke(obj, new object[0]);
+                if (value != null) {
+                    elem.SetAttribute(attributeName, value.ToString());
+                }
+            }
+
+            FieldInfo[] fields = type.GetFields();
+            for (int i = 0; i < fields.Length; i++) {
+                FieldInfo field = fields[i];
+                if (field.IsInitOnly ||
+                    field.IsNotSerialized ||
+                    field.IsSpecialName ||
+                    field.IsStatic) {
+                    continue;
+                }
+                object[] attribs = field.GetCustomAttributes(typeof(SerializationAttribute), true);
+                if (attribs.Length > 0 && ((SerializationAttribute) attribs[0]).Ignore) {
+                    continue;
+                }
+                elem.AppendChildIfNotNull(field.GetValue(obj).Serialize(document, field.Name));
+            }
+
+            PropertyInfo[] properties = type.GetProperties();
+            for (int i = 0; i < properties.Length; i++) {
+                PropertyInfo property = properties[i];
+                Type propertyType = property.PropertyType;
+                if (propertyType.IsEnum ||
+                    propertyType.IsPrimitive ||
+                    typeof(string).IsAssignableFrom(propertyType)
+                ) {
+                    continue;
+                }
+                MethodInfo getter = property.GetGetMethod();
+                if (getter.IsStatic) {
+                    continue;
+                }
+                object[] attribs = property.GetCustomAttributes(typeof(SerializationAttribute), true);
+                if (attribs.Length > 0 && ((SerializationAttribute) attribs[0]).Ignore) {
+                    continue;
+                }
+                elem.AppendChildIfNotNull(getter.Invoke(obj, new object[0]).Serialize(document, property.Name));
+            }
+
+            return elem;
+        }
+
+        public static XmlNode AppendChildIfNotNull(this XmlNode parent, XmlNode child) {
+            if (child == null) {
+                return null;
+            }
+            return parent.AppendChild(child);
         }
 
     }
