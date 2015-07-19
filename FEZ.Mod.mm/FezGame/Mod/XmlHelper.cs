@@ -250,22 +250,26 @@ namespace FezGame.Mod {
                 }
             }
 
-            obj.HandleSpecialData(elem, cm);
+            obj.HandleSpecialDataDeserialize(elem, cm);
 
             return obj;
         }
 
-        public static void HandleSpecialData(this object obj, XmlElement elem, ContentManager cm) {
+        public static void HandleSpecialDataDeserialize(this object obj, XmlElement elem, ContentManager cm) {
             if (obj == null || elem == null || cm == null) {
                 return;
             }
 
-            if (obj is TrileInstance) {
+            if (obj is TrileInstance && !string.IsNullOrEmpty(elem.GetAttribute("orientation"))) {
                 ((TrileInstance) obj).SetPhiLight(byte.Parse(elem.GetAttribute("orientation")));
             }
 
             if (obj is ArtObjectInstance) {
-                ((ArtObjectInstance) obj).ArtObject = cm.Load<ArtObject>("Art objects/"+elem.GetAttribute("name"));
+                if (elem.HasAttribute("name")) {
+                    ((ArtObjectInstance) obj).ArtObject = cm.Load<ArtObject>("Art objects/" + elem.GetAttribute("name"));
+                } else {
+                    ((ArtObjectInstance) obj).ArtObject = cm.Load<ArtObject>("Art objects/" + elem.GetAttribute("artobjectname"));
+                }
             }
 
             if (obj is Level) {
@@ -374,12 +378,19 @@ namespace FezGame.Mod {
                 return constructor_.Invoke(new object[0]);
             }
 
+            //TODO get rid of these workarounds.
+            if (type == typeof(Color) && elem.HasAttribute("packedvalue")) {
+                Color color = new Color();
+                color.PackedValue = uint.Parse(elem.GetAttribute("packedvalue"));
+                return color;
+            }
+
             ModLogger.Log("FEZMod", "XmlHelper can't find a constructor for element " + elem.Name + " of type " + type.FullName);
             return null;
         }
 
         public static object Parse(this Type type, string str) {
-            if (type == null || str == null) {
+            if (type == null || string.IsNullOrEmpty(str)) {
                 return null;
             }
             type = Nullable.GetUnderlyingType(type) ?? type;
@@ -423,6 +434,11 @@ namespace FezGame.Mod {
                 return elem;
             }
 
+            elem = elem.HandleSpecialDataSerialize(obj);
+            if (elem == null) {
+                return null;
+            }
+
             bool isGenericICollection = false;
             //TODO find out why HashSets don't trigger the usual obj is ICollection but other types do
             foreach (Type interfaceType in type.GetInterfaces()) {
@@ -434,6 +450,79 @@ namespace FezGame.Mod {
 
             if (obj is ICollection || isGenericICollection) {
                 //TODO handle collections
+                Type[] types = obj.GetType().GetGenericArguments();
+                //ModLogger.Log("FEZMod", "XmlHelper got " + type.FullName + " with " + types.Length + " generic arguments.");
+                if (obj is IList) {
+                    IList list = (IList) obj;
+                    for (int i = 0; i < list.Count; i++) {
+                        elem.AppendChildIfNotNull(list[i].Serialize(document));
+                    }
+                } else if (obj is ICollection) {
+                    ICollection collection = (ICollection) obj;
+                    foreach (object item in collection) {
+                        XmlElement entry = document.CreateElement("Entry");
+                        Type itemType = item.GetType();
+                        bool append = true;
+                        if (itemType.GetGenericTypeDefinition() == typeof(KeyValuePair<,>)) {
+                            object key = itemType.GetProperty("Key").GetGetMethod().Invoke(item, new object[0]);
+                            object value = itemType.GetProperty("Value").GetGetMethod().Invoke(item, new object[0]);
+                            Type keyType = key.GetType();
+                            if (keyType.IsEnum ||
+                                keyType.IsPrimitive ||
+                                typeof(string).IsAssignableFrom(keyType)
+                            ) {
+                                entry.SetAttribute("key", key.ToString());
+                            } else {
+                                append &= null != entry.AppendChildIfNotNull(key.Serialize(document));
+                            }
+                            append &= null != entry.AppendChildIfNotNull(value.Serialize(document));
+                        } else {
+                            append &= null != entry.AppendChildIfNotNull(item.Serialize(document));
+                        }
+                        if (append) {
+                            elem.AppendChild(entry);
+                        }
+                    }
+                } else if (isGenericICollection) {
+                    MethodInfo getItem = type.GetMethod("get_Item");
+                    PropertyInfo propertyKeys = type.GetProperty("Keys");
+                    if (propertyKeys != null) {
+                        IEnumerable keys = (IEnumerable) propertyKeys.GetGetMethod().Invoke(obj, new object[0]);
+                        foreach (object key in keys) {
+                            XmlElement entry = document.CreateElement("Entry");
+                            Type keyType = key.GetType();
+                            bool append = true;
+                            if (keyType.IsEnum ||
+                                keyType.IsPrimitive ||
+                                typeof(string).IsAssignableFrom(keyType)
+                            ) {
+                                entry.SetAttribute("key", key.ToString());
+                            } else {
+                                append &= null != entry.AppendChildIfNotNull(key.Serialize(document));
+                            }
+                            append &= null != entry.AppendChildIfNotNull(getItem.Invoke(obj, new object[] { key }).Serialize(document));
+                            if (append) {
+                                elem.AppendChild(entry);
+                            }
+                        }
+                    } else {
+                        PropertyInfo propertyCount = type.GetProperty("Count");
+                        int count = (int) propertyCount.GetGetMethod().Invoke(obj, new object[0]);
+                        if (getItem != null) {
+                            for (int i = 0; i < count; i++) {
+                                elem.AppendChildIfNotNull(getItem.Invoke(obj, new object[] { i }).Serialize(document));
+                            }
+                        } else {
+                            //Selfnote from Maik: I usually hate Linq, but meh.
+                            MethodInfo elementAt = typeof(System.Linq.Enumerable).GetMethod("ElementAt").MakeGenericMethod(types[0]);
+                            for (int i = 0; i < count; i++) {
+                                elem.AppendChildIfNotNull(elementAt.Invoke(null, new object[] { obj, i }).Serialize(document));
+                            }
+                        }
+                    }
+                } else {
+                    ModLogger.Log("FEZMod", "XmlHelper could not get entries from " + elem.Name + " of type " + type.FullName);
+                }
                 return elem;
             }
 
@@ -444,7 +533,7 @@ namespace FezGame.Mod {
             for (int i = 0; i < methods.Length; i++) {
                 MethodInfo method = methods[i];
                 string methodLowerCase = method.Name.ToLower();
-                if (!methodLowerCase.StartsWith("get_") || method.IsStatic) {
+                if (!methodLowerCase.StartsWith("get_") || method.IsStatic || type.GetMethod("s" + method.Name.Substring(1)) == null) {
                     continue;
                 }
 
@@ -478,7 +567,14 @@ namespace FezGame.Mod {
                 if (attribs.Length > 0 && ((SerializationAttribute) attribs[0]).Ignore) {
                     continue;
                 }
-                elem.AppendChildIfNotNull(field.GetValue(obj).Serialize(document, field.Name));
+                Type fieldType = field.FieldType;
+                if (fieldType.IsEnum ||
+                    fieldType.IsPrimitive ||
+                    typeof(string).IsAssignableFrom(fieldType)) {
+                    elem.SetAttribute(field.Name, field.GetValue(obj).ToString());
+                } else {
+                    elem.AppendChildIfNotNull(field.GetValue(obj).Serialize(document, field.Name));
+                }
             }
 
             PropertyInfo[] properties = type.GetProperties();
@@ -491,8 +587,13 @@ namespace FezGame.Mod {
                 ) {
                     continue;
                 }
+                //ModLogger.Log("FEZMod", "elem: " + name + "; type: " + type.FullName + "; property: " + property.Name + "; propertyType: " + propertyType.FullName);
                 MethodInfo getter = property.GetGetMethod();
-                if (getter.IsStatic) {
+                if (getter == null || getter.IsPrivate || getter.IsStatic) {
+                    continue;
+                }
+                MethodInfo setter = property.GetSetMethod();
+                if (setter == null || setter.IsPrivate) {
                     continue;
                 }
                 object[] attribs = property.GetCustomAttributes(typeof(SerializationAttribute), true);
@@ -500,6 +601,18 @@ namespace FezGame.Mod {
                     continue;
                 }
                 elem.AppendChildIfNotNull(getter.Invoke(obj, new object[0]).Serialize(document, property.Name));
+            }
+
+            return elem;
+        }
+
+        public static XmlElement HandleSpecialDataSerialize(this XmlElement elem, object obj) {
+            if (obj == null || elem == null) {
+                return elem;
+            }
+
+            if (obj is BackgroundPlane && string.IsNullOrEmpty(((BackgroundPlane) obj).TextureName)) {
+                return null;
             }
 
             return elem;
