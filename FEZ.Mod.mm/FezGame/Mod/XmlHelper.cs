@@ -378,13 +378,6 @@ namespace FezGame.Mod {
                 return constructor_.Invoke(new object[0]);
             }
 
-            //TODO get rid of these workarounds.
-            if (type == typeof(Color) && elem.HasAttribute("packedvalue")) {
-                Color color = new Color();
-                color.PackedValue = uint.Parse(elem.GetAttribute("packedvalue"));
-                return color;
-            }
-
             ModLogger.Log("FEZMod", "XmlHelper can't find a constructor for element " + elem.Name + " of type " + type.FullName);
             return null;
         }
@@ -434,7 +427,7 @@ namespace FezGame.Mod {
                 return elem;
             }
 
-            elem = elem.HandleSpecialDataSerialize(obj);
+            elem = elem.HandleSpecialDataPreSerialize(obj);
             if (elem == null) {
                 return null;
             }
@@ -603,16 +596,33 @@ namespace FezGame.Mod {
                 elem.AppendChildIfNotNull(getter.Invoke(obj, new object[0]).Serialize(document, property.Name));
             }
 
+            elem = elem.HandleSpecialDataPostSerialize(obj);
+            if (elem == null) {
+                return null;
+            }
+
             return elem;
         }
 
-        public static XmlElement HandleSpecialDataSerialize(this XmlElement elem, object obj) {
+        public static XmlElement HandleSpecialDataPreSerialize(this XmlElement elem, object obj) {
             if (obj == null || elem == null) {
                 return elem;
             }
 
             if (obj is BackgroundPlane && string.IsNullOrEmpty(((BackgroundPlane) obj).TextureName)) {
                 return null;
+            }
+
+            return elem;
+        }
+
+        public static XmlElement HandleSpecialDataPostSerialize(this XmlElement elem, object obj) {
+            if (obj == null || elem == null) {
+                return elem;
+            }
+
+            if (obj is Color) {
+                elem.RemoveAttribute("packedvalue");
             }
 
             return elem;
