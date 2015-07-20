@@ -1456,9 +1456,9 @@ namespace FezGame.Components {
                 window.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (window.Size.Y / 2);
             }));
 
-            TopBarWidget.Widgets.Add(button = new ButtonWidget(Game, "Editor"));
+            TopBarWidget.Widgets.Add(button = new ButtonWidget(Game, "Settings"));
             button.Background.A = 0;
-            button.Widgets.Add(new ButtonWidget(Game, "Toggle theme", delegate() {
+            button.Widgets.Add(new ButtonWidget(Game, "Invert theme", delegate() {
                 LevelEditorOptions.Instance.DefaultBackground.R = (byte) (255 - LevelEditorOptions.Instance.DefaultBackground.R);
                 LevelEditorOptions.Instance.DefaultBackground.G = (byte) (255 - LevelEditorOptions.Instance.DefaultBackground.G);
                 LevelEditorOptions.Instance.DefaultBackground.B = (byte) (255 - LevelEditorOptions.Instance.DefaultBackground.B);
@@ -1470,6 +1470,30 @@ namespace FezGame.Components {
                 foreach (EditorWidget widget in Widgets) {
                     widget.UpdateTheme();
                 }
+            }));
+            CheckboxWidget checkboxShowAOTooltips;
+            button.Widgets.Add(checkboxShowAOTooltips = new CheckboxWidget(Game, "ArtObject tooltips") {
+                RefreshValue = () => LevelEditorOptions.Instance.TooltipArtObjectInfo
+            });
+            TextFieldWidget fieldBackupHistory;
+            button.Widgets.Add(new ContainerWidget(Game, new EditorWidget[] {
+                new ButtonWidget(Game, "Backup Depth:") {
+                    Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
+                    LabelCentered = false,
+                    Position = new Vector2(0f, 0f)
+                },
+                fieldBackupHistory = new TextFieldWidget(Game) {
+                    RefreshValue = () => LevelEditorOptions.Instance.BackupHistory.ToString(),
+                    Size = new Vector2(48f, 24f),
+                    Position = new Vector2(144f, 0f)
+                }
+            }) {
+                Size = new Vector2(192f, 24f)
+            });
+            button.Widgets.Add(new ButtonWidget(Game, "Save", delegate() {
+                LevelEditorOptions.Instance.TooltipArtObjectInfo = checkboxShowAOTooltips.Checked;
+                LevelEditorOptions.Instance.BackupHistory = int.Parse(fieldBackupHistory.Text);
+                LevelEditorOptions.Instance.Save();
             }));
 
             //INFO

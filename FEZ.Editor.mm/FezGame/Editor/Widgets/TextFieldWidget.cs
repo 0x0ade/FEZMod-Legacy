@@ -226,8 +226,10 @@ namespace FezGame.Editor.Widgets {
                 return;
             }
             Text = (string) RefreshValue();
+            Func<object> refreshValueOrig = RefreshValue;
+            RefreshValue = null;
             base.Refresh();
-            Label = null;
+            RefreshValue = refreshValueOrig;
         }
 
     }

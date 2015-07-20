@@ -43,10 +43,10 @@ namespace FezGame.Components {
         }
 
         public void Save(FileInfo file = null) {
-            Save(this);
+            Save(this, file);
         }
 
-        public static void Save(LevelEditorOptions options = null, FileInfo file = null) {
+        public static void Save(LevelEditorOptions options, FileInfo file = null) {
             options = options ?? Instance;
             file = file ?? FileDefault;
 
@@ -54,7 +54,17 @@ namespace FezGame.Components {
                 file.Delete();
             }
 
-            //TODO XmlHelper.Serialize required
+            XmlDocument xmlDocument = new XmlDocument();
+
+            xmlDocument.AppendChild(options.Serialize(xmlDocument));
+
+            FileStream fos = new FileStream(file.FullName, FileMode.CreateNew);
+            XmlWriterSettings xmlWriterSettings = new XmlWriterSettings();
+            xmlWriterSettings.Indent = true;
+            XmlWriter xmlWriter = XmlWriter.Create(fos, xmlWriterSettings);
+            xmlDocument.Save(xmlWriter);
+            xmlWriter.Close();
+            fos.Close();
         }
 
         public static void Initialize() {

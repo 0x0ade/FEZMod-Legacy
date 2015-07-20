@@ -78,7 +78,10 @@ namespace FezGame.Editor.Widgets {
                 return;
             }
             Checked = (bool) RefreshValue();
+            Func<object> refreshValueOrig = RefreshValue;
+            RefreshValue = null;
             base.Refresh();
+            RefreshValue = refreshValueOrig;
         }
 
     }
