@@ -22,6 +22,7 @@ using FezGame.Editor.Widgets;
 using FezGame.Mod;
 using FezGame.Editor;
 using FezGame.Components.Actions;
+using System.Reflection;
 
 namespace FezGame.Components {
     public class LevelEditor : DrawableGameComponent, ILevelEditor {
@@ -149,7 +150,7 @@ namespace FezGame.Components {
                     UpdateBounds = false,
                     Position = new Vector2(windowLabelName.Size.X, windowLabelName.Position.Y)
                 });
-                windowFieldName.Fill("Levels");
+                windowFieldName.Fill(ContentPaths.Levels);
 
                 ButtonWidget windowLabelWidth;
                 window.Widgets.Add(windowLabelWidth = new ButtonWidget(Game, "Width:") {
@@ -210,6 +211,8 @@ namespace FezGame.Components {
                     UpdateBounds = false,
                     Position = new Vector2(windowLabelTrileset.Size.X, windowLabelTrileset.Position.Y)
                 });
+                windowFieldName.Fill(ContentPaths.TrileSets);
+
 
                 window.Widgets.Add(new ButtonWidget(Game, "CREATE", delegate() {
                     Level level = CreateNewLevel(
@@ -428,7 +431,7 @@ namespace FezGame.Components {
 
             TextFieldWidget fieldSky;
             button.Widgets.Add(new ButtonWidget(Game, "Sky", new EditorWidget[] {
-                fieldSky = new TextFieldWidget(Game, "", "Skies") {
+                fieldSky = new TextFieldWidget(Game, "", ContentPaths.Skies) {
                     RefreshValue = () => (LevelManager.Sky != null) ? LevelManager.Sky.Name : "",
                     Size = new Vector2(160f, 24f),
                     Position = new Vector2(0f, 0f)
@@ -447,7 +450,7 @@ namespace FezGame.Components {
 
             TextFieldWidget fieldSong;
             button.Widgets.Add(new ButtonWidget(Game, "Song", new EditorWidget[] {
-                fieldSong = new TextFieldWidget(Game, "", "Music") {
+                fieldSong = new TextFieldWidget(Game, "", ContentPaths.Music) {
                     RefreshValue = () => (LevelManager.Song != null) ? LevelManager.SongName : "",
                     Size = new Vector2(160f, 24f),
                     Position = new Vector2(0f, 0f)
@@ -841,7 +844,7 @@ namespace FezGame.Components {
                             Position = new Vector2(0f, 24f)
                         });
                         TextFieldWidget windowFieldName;
-                        windowAdd.Widgets.Add(windowFieldName = new TextFieldWidget(Game, "", "Art objects") {
+                        windowAdd.Widgets.Add(windowFieldName = new TextFieldWidget(Game, "", ContentPaths.ArtObjects) {
                             Size = new Vector2(windowAdd.Size.X - windowLabelName.Size.X, 24f),
                             UpdateBounds = false,
                             Position = new Vector2(windowLabelName.Size.X, windowLabelName.Position.Y)
@@ -1053,7 +1056,7 @@ namespace FezGame.Components {
                             Position = new Vector2(0f, 24f)
                         });
                         TextFieldWidget windowFieldName;
-                        windowAdd.Widgets.Add(windowFieldName = new TextFieldWidget(Game, "", "Background planes") {
+                        windowAdd.Widgets.Add(windowFieldName = new TextFieldWidget(Game, "", ContentPaths.BackgroundPlanes) {
                             Size = new Vector2(windowAdd.Size.X - windowLabelName.Size.X, 24f),
                             UpdateBounds = false,
                             Position = new Vector2(windowLabelName.Size.X, windowLabelName.Position.Y)
@@ -1274,55 +1277,201 @@ namespace FezGame.Components {
             button.Widgets.Add(new ButtonWidget(Game, "NPCs", delegate() {
                 ContainerWidget window;
                 Widgets.Add(window = new ContainerWidget(Game) {
-                    UpdateBounds = true
+                    UpdateBounds = true,
+                    Size = new Vector2(256f, 24f),
+                    Label = "NPCs"
                 });
-                window.Size.X = 256f;
-                window.Size.Y = 24f;
-                window.Label = "NPCs";
-                window.Widgets.Add(new WindowHeaderWidget(Game));
 
-                int i = 0;
-                foreach (NpcInstance npc in LevelManager.NonPlayerCharacters.Values) {
-                    window.Widgets.Add(new ContainerWidget(Game, new EditorWidget[] {
-                        new ButtonWidget(Game, "["+npc.Id+"] "+npc.Name) {
-                            Size = new Vector2(window.Size.X - 48f, 24f),
+                window.RefreshValue = delegate() {
+                    window.Widgets.Clear();
+
+                    window.Widgets.Add(new WindowHeaderWidget(Game));
+
+                    int i = 0;
+                    foreach (NpcInstance npc in LevelManager.NonPlayerCharacters.Values) {
+                        window.Widgets.Add(new ContainerWidget(Game, new EditorWidget[] {
+                            new ButtonWidget(Game, "["+npc.Id+"] "+npc.Name) {
+                                Size = new Vector2(window.Size.X - 24f, 24f),
+                                UpdateBounds = false,
+                                LabelCentered = false,
+                                Position = new Vector2(0f, 0f)
+                            },
+                            new ButtonWidget(Game, "X", delegate() {
+                                LevelManager.NonPlayerCharacters.Remove(npc.Id);
+                                ServiceHelper.RemoveComponent(npc.State);
+                                window.Refresh();
+                            }) {
+                                Background = new Color(0.5f, 0f, 0f, 1f),
+                                Size = new Vector2(24f, 24f),
+                                UpdateBounds = false,
+                                LabelCentered = true,
+                                Position = new Vector2(window.Size.X - 24f, 0f)
+                            }
+                        }) {
+                            Size = new Vector2(window.Size.X, 24f),
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f)
+                        });
+
+                        i++;
+                    }
+
+                    window.Size.Y = (i+1) * 24f;
+                    window.Size.Y = Math.Min(512f, window.Size.Y);
+
+                    window.Widgets.Add(new ButtonWidget(Game, "+", delegate() {
+                        ContainerWidget windowAdd;
+                        Widgets.Add(windowAdd = new ContainerWidget(Game) {
+                            Size = new Vector2(256f, 240f),
+                            Label = "Add NPC"
+                        });
+                        WindowHeaderWidget windowAddHeader;
+                        windowAdd.Widgets.Add(windowAddHeader = new WindowHeaderWidget(Game));
+
+                        int maxID = 0;
+                        foreach (int id in LevelManager.NonPlayerCharacters.Keys) {
+                            if (id >= maxID) {
+                                maxID = id + 1;
+                            }
+                        }
+
+                        ButtonWidget windowLabelId;
+                        windowAdd.Widgets.Add(windowLabelId = new ButtonWidget(Game, "ID:") {
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
+                            Size = new Vector2(96f, 24f),
                             UpdateBounds = false,
                             LabelCentered = false,
                             Position = new Vector2(0f, 0f)
-                        },
-                        new ButtonWidget(Game, "C") {
-                            Background = new Color(0f, 0f, 0.125f, 1f),
-                            Size = new Vector2(24f, 24f),
+                        });
+                        TextFieldWidget windowFieldId;
+                        windowAdd.Widgets.Add(windowFieldId = new TextFieldWidget(Game, maxID.ToString()) {
+                            Size = new Vector2(windowAdd.Size.X - windowLabelId.Size.X, 24f),
+                            UpdateBounds = false,
+                            Position = new Vector2(windowLabelId.Size.X, windowLabelId.Position.Y)
+                        });
+
+                        ButtonWidget windowLabelName;
+                        windowAdd.Widgets.Add(windowLabelName = new ButtonWidget(Game, "Name:") {
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
+                            Size = new Vector2(96f, 24f),
+                            UpdateBounds = false,
+                            LabelCentered = false,
+                            Position = new Vector2(0f, 24f)
+                        });
+                        TextFieldWidget windowFieldName;
+                        windowAdd.Widgets.Add(windowFieldName = new TextFieldWidget(Game, "", ContentPaths.CharacterAnimations) {
+                            Size = new Vector2(windowAdd.Size.X - windowLabelName.Size.X, 24f),
+                            UpdateBounds = false,
+                            Position = new Vector2(windowLabelName.Size.X, windowLabelName.Position.Y)
+                        });
+
+                        ButtonWidget windowLabelPosition;
+                        windowAdd.Widgets.Add(windowLabelPosition = new ButtonWidget(Game, "Position:") {
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
+                            Size = new Vector2(96f, 24f),
+                            UpdateBounds = false,
+                            LabelCentered = false,
+                            Position = new Vector2(0f, 48f)
+                        });
+                        TextFieldWidget windowFieldPosition;
+                        windowAdd.Widgets.Add(windowFieldPosition = new TextFieldWidget(Game, "0; 0; 0") {
+                            Size = new Vector2(windowAdd.Size.X - windowLabelPosition.Size.X, 24f),
+                            UpdateBounds = false,
+                            Position = new Vector2(windowLabelPosition.Size.X, windowLabelPosition.Position.Y)
+                        });
+
+                        ButtonWidget windowLabelDestination;
+                        windowAdd.Widgets.Add(windowLabelDestination = new ButtonWidget(Game, "Destination:") {
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
+                            Size = new Vector2(96f, 24f),
+                            UpdateBounds = false,
+                            LabelCentered = false,
+                            Position = new Vector2(0f, 72f)
+                        });
+                        TextFieldWidget windowFieldDestination;
+                        windowAdd.Widgets.Add(windowFieldDestination = new TextFieldWidget(Game, "0; 0; 0") {
+                            Size = new Vector2(windowAdd.Size.X - windowLabelDestination.Size.X, 24f),
+                            UpdateBounds = false,
+                            Position = new Vector2(windowLabelDestination.Size.X, windowLabelDestination.Position.Y)
+                        });
+
+                        ButtonWidget windowLabelWalkSpeed;
+                        windowAdd.Widgets.Add(windowLabelWalkSpeed = new ButtonWidget(Game, "Walk speed:") {
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
+                            Size = new Vector2(96f, 24f),
+                            UpdateBounds = false,
+                            LabelCentered = false,
+                            Position = new Vector2(0f, 96f)
+                        });
+                        TextFieldWidget windowFieldWalkSpeed;
+                        windowAdd.Widgets.Add(windowFieldWalkSpeed = new TextFieldWidget(Game, "1") {
+                            Size = new Vector2(windowAdd.Size.X - windowLabelWalkSpeed.Size.X, 24f),
+                            UpdateBounds = false,
+                            Position = new Vector2(windowLabelWalkSpeed.Size.X, windowLabelWalkSpeed.Position.Y)
+                        });
+
+                        CheckboxWidget windowCheckboxAvoidsGomez;
+                        windowAdd.Widgets.Add(windowCheckboxAvoidsGomez = new CheckboxWidget(Game, "Avoids Gomez") {
+                            Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f),
+                            Size = new Vector2(window.Size.X, 24f),
+                            UpdateBounds = false,
+                            LabelCentered = false,
+                            Position = new Vector2(0f, 120f)
+                        });
+
+                        //TODO add speech lines
+
+                        //TODO add actions
+
+                        windowAdd.Widgets.Add(new ButtonWidget(Game, "ADD", delegate() {
+                            string[] positionSplit = windowFieldPosition.Text.Split(new char[] {';'});
+                            string[] destinationSplit = windowFieldDestination.Text.Split(new char[] {';'});
+                            NpcInstance npc = new NpcInstance() {
+                                Id = int.Parse(windowFieldId.Text),
+                                Name = windowFieldName.Text,
+                                Position = new Vector3(
+                                    float.Parse(positionSplit[0].Trim()),
+                                    float.Parse(positionSplit[1].Trim()),
+                                    float.Parse(positionSplit[2].Trim())
+                                ),
+                                DestinationOffset = new Vector3(
+                                    float.Parse(destinationSplit[0].Trim()),
+                                    float.Parse(destinationSplit[1].Trim()),
+                                    float.Parse(destinationSplit[2].Trim())
+                                ),
+                                WalkSpeed = float.Parse(windowFieldWalkSpeed.Text),
+                                AvoidsGomez = windowCheckboxAvoidsGomez.Checked
+                            };
+
+                            //TODO add speech lines
+
+                            //TODO add actions
+
+                            LevelManager.NonPlayerCharacters[npc.Id] = npc;
+                            ServiceHelper.Get<NpcHost>().GetPrivate<List<NpcState>>("NpcStates").Add(npc.State = new GameNpcState(Game, npc));
+
+                            windowAddHeader.CloseButtonWidget.Action();
+                            window.Refresh();
+                        }) {
+                            Size = new Vector2(windowAdd.Size.X, 24f),
                             UpdateBounds = false,
                             LabelCentered = true,
-                            Position = new Vector2(window.Size.X - 48f, 0f)
-                        },
-                        new ButtonWidget(Game, "X") {
-                            Background = new Color(0.5f, 0f, 0f, 1f),
-                            Size = new Vector2(24f, 24f),
-                            UpdateBounds = false,
-                            LabelCentered = true,
-                            Position = new Vector2(window.Size.X - 24f, 0f)
-                        }
+                            Position = new Vector2(0f, windowAdd.Size.Y - 24f)
+                        });
+
+                        windowAdd.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (windowAdd.Size.X / 2);
+                        windowAdd.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (windowAdd.Size.Y / 2);
                     }) {
+                        Background = new Color(0f, 0.125f, 0f, 1f),
                         Size = new Vector2(window.Size.X, 24f),
-                        Background = new Color(LevelEditorOptions.Instance.DefaultBackground, 0f)
+                        UpdateBounds = false,
+                        LabelCentered = true,
+                        Position = new Vector2(0f, window.Size.Y - 24f)
                     });
 
-                    i++;
-                }
+                    return null;
+                };
 
-                window.Size.Y += i * 24f;
-                window.Size.Y = Math.Min(512f, window.Size.Y);
-
-                window.Widgets.Add(new ButtonWidget(Game, "+", delegate() {
-                }) {
-                    Background = new Color(0f, 0.125f, 0f, 1f),
-                    Size = new Vector2(window.Size.X, 24f),
-                    UpdateBounds = false,
-                    LabelCentered = true,
-                    Position = new Vector2(0f, window.Size.Y - 24f)
-                });
+                window.Refresh();
 
                 window.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (window.Size.X / 2);
                 window.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (window.Size.Y / 2);

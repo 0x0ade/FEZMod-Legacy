@@ -196,11 +196,19 @@ namespace FezGame.Editor.Widgets {
         public void Fill(string root) {
             Widgets.Clear();
             IEnumerable<string> list = CMProvider.GetAllIn(root);
+            List<string> added = new List<string>();
             foreach (string item_ in list) {
                 string item = item_.Substring(root.Length + 1).ToUpper();
-                if (item.Contains("\\") || item.Contains("/")) {
+                if (item.Contains("\\")) {
+                    item = item.Substring(0, item.IndexOf('\\'));
+                }
+                if (item.Contains("/")) {
+                    item = item.Substring(0, item.IndexOf('/'));
+                }
+                if (added.Contains(item)) {
                     continue;
                 }
+                added.Add(item);
                 ButtonWidget button;
                 Widgets.Add(button = new ButtonWidget(Game, item, delegate() {
                     Text = item;
