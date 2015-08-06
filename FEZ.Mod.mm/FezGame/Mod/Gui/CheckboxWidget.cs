@@ -19,7 +19,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using FezGame.Components;
 
-namespace FezGame.Editor.Widgets {
+namespace FezGame.Mod.Gui {
     public class CheckboxWidget : ButtonWidget {
 
         public bool Checked = false;
@@ -50,7 +50,7 @@ namespace FezGame.Editor.Widgets {
             }
 
             backgroundBounds.Width = backgroundBounds.Height = 24;
-            LevelEditor.SpriteBatch.Draw(pixelTexture, backgroundBounds, Color.White);
+            GuiHandler.SpriteBatch.Draw(pixelTexture, backgroundBounds, Color.White);
 
             if (!Checked) {
                 return;
@@ -60,7 +60,7 @@ namespace FezGame.Editor.Widgets {
 
             float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
 
-            LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, Font, " X", Position + Offset, Color.Black, viewScale);
+            GuiHandler.GTR.DrawShadowedText(GuiHandler.SpriteBatch, Font, " X", Position + Offset, Color.Black, viewScale);
 
             StopClipping();
         }

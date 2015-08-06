@@ -69,18 +69,11 @@
     <Compile Include="FezGame\Editor\FezEditor.cs" />
     <Compile Include="FezGame\Components\LevelEditor.cs" />
     <Compile Include="FezGame\Components\ILevelEditor.cs" />
-    <Compile Include="FezGame\Editor\Widgets\EditorWidget.cs" />
-    <Compile Include="FezGame\Editor\Widgets\InfoWidget.cs" />
-    <Compile Include="FezGame\Editor\Widgets\TopBarWidget.cs" />
-    <Compile Include="FezGame\Editor\Widgets\ButtonWidget.cs" />
-    <Compile Include="FezGame\Editor\Widgets\TrilePickerWidget.cs" />
-    <Compile Include="FezGame\Editor\Widgets\TrileButtonWidget.cs" />
-    <Compile Include="FezGame\Editor\Widgets\ContainerWidget.cs" />
-    <Compile Include="FezGame\Editor\Widgets\WindowHeaderWidget.cs" />
-    <Compile Include="FezGame\Editor\Widgets\TextFieldWidget.cs" />
-    <Compile Include="FezGame\Editor\Widgets\CheckboxWidget.cs" />
-    <Compile Include="FezGame\Editor\EditorHelper.cs" />
     <Compile Include="FezGame\Components\LevelEditorOptions.cs" />
+    <Compile Include="FezGame\Mod\Gui\TrileButtonWidget.cs" />
+    <Compile Include="FezGame\Mod\Gui\TrilePickerWidget.cs" />
+    <Compile Include="FezGame\Editor\EditorUtils.cs" />
+    <Compile Include="FezGame\Mod\Gui\EditorInfoWidget.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -93,6 +86,7 @@
     <Folder Include="FezGame\" />
     <Folder Include="FezGame\Editor\" />
     <Folder Include="FezGame\Components\" />
-    <Folder Include="FezGame\Editor\Widgets\" />
+    <Folder Include="FezGame\Mod\" />
+    <Folder Include="FezGame\Mod\Gui\" />
   </ItemGroup>
 </Project>

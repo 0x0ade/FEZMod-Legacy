@@ -18,7 +18,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using FezGame.Components;
 
-namespace FezGame.Editor.Widgets {
+namespace FezGame.Mod.Gui {
     public class ButtonWidget : ContainerWidget {
 
         public SpriteFont Font;
@@ -31,7 +31,7 @@ namespace FezGame.Editor.Widgets {
             : this(game, null, (Action) null) {
         }
 
-        public ButtonWidget(Game game, string label, EditorWidget[] widgets, Action action = null) 
+        public ButtonWidget(Game game, string label, GuiWidget[] widgets, Action action = null) 
             : this(game, label, action) {
             Widgets.AddRange(widgets);
         }
@@ -56,8 +56,6 @@ namespace FezGame.Editor.Widgets {
             float offset = ParentAs<ContainerWidget>() != null ? 0f : Size.Y;
             float widthMax = 0f;
             for (int i = 0; i < Widgets.Count; i++) {
-                Widgets[i].Parent = this;
-                Widgets[i].LevelEditor = LevelEditor;
                 Widgets[i].Update(gameTime);
 
                 if (ParentAs<ContainerWidget>() != null) {
@@ -104,14 +102,14 @@ namespace FezGame.Editor.Widgets {
             StartClipping();
 
             float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
-            LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, Font, Label, Position + Offset + offset, Foreground, viewScale);
+            GuiHandler.GTR.DrawShadowedText(GuiHandler.SpriteBatch, Font, Label, Position + Offset + offset, Foreground, viewScale);
 
             StopClipping();
         }
 
         public override void Click(GameTime gameTime, int mb) {
             if (mb == 1 && Action != null) {
-                LevelEditor.Scheduled.Add(Action);
+                GuiHandler.Scheduled.Add(Action);
             }
         }
 

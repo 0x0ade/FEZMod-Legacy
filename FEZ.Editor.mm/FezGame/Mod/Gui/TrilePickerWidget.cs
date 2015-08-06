@@ -18,8 +18,8 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using FezGame.Components;
 
-namespace FezGame.Editor.Widgets {
-    public class TrilePickerWidget : EditorWidget {
+namespace FezGame.Mod.Gui {
+    public class TrilePickerWidget : GuiWidget {
 
         [ServiceDependency]
         public IGameLevelManager LevelManager { get; set; }
@@ -61,8 +61,6 @@ namespace FezGame.Editor.Widgets {
 
             Width = 0f;
             for (int i = 0; i < Widgets.Count; i++) {
-                Widgets[i].Parent = this;
-                Widgets[i].LevelEditor = LevelEditor;
                 Widgets[i].Update(gameTime);
 
                 Widgets[i].Position.X = Width - ScrollOffset;
@@ -84,7 +82,7 @@ namespace FezGame.Editor.Widgets {
             scrollIndicatorBounds.Width = (int) (Size.X * Size.X / Width);
             scrollIndicatorBounds.Height = 4;
 
-            LevelEditor.SpriteBatch.Draw(pixelTexture, scrollIndicatorBounds, new Color(255, 255, 255, Background.A));
+            GuiHandler.SpriteBatch.Draw(pixelTexture, scrollIndicatorBounds, new Color(255, 255, 255, Background.A));
         }
 
         public void UpdateWidgets() {

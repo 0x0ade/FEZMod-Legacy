@@ -31,6 +31,8 @@ namespace FezGame.Mod {
         public static List<int[]> CustomResolutions = new List<int[]>();
         public static bool EnableMultiplayer = false;
         public static bool EnableMultiplayerLocalhost = false;
+        public static bool GetComponentsAsServices = false;
+        public static bool HandleComponents = false;
 
         public static bool LoadedEssentials { get; private set; }
         public static bool Preloaded { get; private set; }

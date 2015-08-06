@@ -18,10 +18,10 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using FezGame.Components;
 
-namespace FezGame.Editor.Widgets {
-    public class EditorWidget : DrawableGameComponent {
+namespace FezGame.Mod.Gui {
+    public class GuiWidget : DrawableGameComponent {
 
-        public ILevelEditor LevelEditor { get; set; }
+        public IGuiHandler GuiHandler { get; set; }
         [ServiceDependency]
         public IMouseStateManager MouseState { get; set; }
         [ServiceDependency]
@@ -37,11 +37,11 @@ namespace FezGame.Editor.Widgets {
         [ServiceDependency]
         public IContentManagerProvider CMProvider { get; set; }
 
-        protected Color PrevDefaultForeground = LevelEditorOptions.Instance.DefaultForeground;
-        protected Color PrevDefaultBackground = LevelEditorOptions.Instance.DefaultBackground;
+        protected Color PrevDefaultForeground;
+        protected Color PrevDefaultBackground;
 
-        public EditorWidget Parent;
-        public List<EditorWidget> Widgets = new List<EditorWidget>();
+        public GuiWidget Parent;
+        public List<GuiWidget> Widgets = new List<GuiWidget>();
         public bool ShowChildren = true;
         public bool ClipChildren = false;
 
@@ -53,7 +53,7 @@ namespace FezGame.Editor.Widgets {
         public Vector2 Offset {
             get {
                 Vector2 offset = new Vector2(0f);
-                for (EditorWidget parent = Parent; parent != null; parent = parent.Parent) {
+                for (GuiWidget parent = Parent; parent != null; parent = parent.Parent) {
                     offset += parent.Position;
                 }
                 return offset;
@@ -83,7 +83,7 @@ namespace FezGame.Editor.Widgets {
                     foreground = Parent.Foreground;
                 }
                 if (foreground.A == 0) {
-                    return LevelEditorOptions.Instance.DefaultForeground;
+                    return GuiHandler.DefaultForeground;
                 }
                 return foreground;
             }
@@ -91,7 +91,7 @@ namespace FezGame.Editor.Widgets {
                 foreground_ = value;
             }
         }
-        public Color Background = LevelEditorOptions.Instance.DefaultBackground;
+        public Color Background;
         protected Rectangle backgroundBounds = new Rectangle();
         protected bool ScissorTestEnablePrev;
         protected Rectangle ScissorRectanglePrev;
@@ -101,15 +101,30 @@ namespace FezGame.Editor.Widgets {
         };
         protected static Texture2D pixelTexture;
 
-        public EditorWidget(Game game) 
+        protected bool initialized = false;
+
+        public GuiWidget(Game game) 
             : base(game) {
             ServiceHelper.InjectServices(this);
         }
 
-        public override void Update(GameTime gameTime) {
-            foreach (EditorWidget widget in Widgets) {
+        public void PreUpdate() {
+            if (!initialized) {
+                PrevDefaultForeground = GuiHandler.DefaultForeground;
+                Background = PrevDefaultBackground = GuiHandler.DefaultBackground;
+
+                initialized = true;
+            }
+
+            foreach (GuiWidget widget in Widgets) {
                 widget.Parent = this;
-                widget.LevelEditor = LevelEditor;
+                widget.GuiHandler = GuiHandler;
+                widget.PreUpdate();
+            }
+        }
+
+        public override void Update(GameTime gameTime) {
+            foreach (GuiWidget widget in Widgets) {
                 widget.Update(gameTime);
             }
         }
@@ -131,9 +146,9 @@ namespace FezGame.Editor.Widgets {
                 StartClipping();
             }
 
-            foreach (EditorWidget widget in Widgets) {
+            foreach (GuiWidget widget in Widgets) {
                 widget.Parent = this;
-                widget.LevelEditor = LevelEditor;
+                widget.GuiHandler = GuiHandler;
                 widget.Draw(gameTime);
             }
 
@@ -176,7 +191,7 @@ namespace FezGame.Editor.Widgets {
                 pixelTexture.SetData<Color>(new Color[] { Color.White });
             }
 
-            LevelEditor.SpriteBatch.Draw(pixelTexture, backgroundBounds, Background);
+            GuiHandler.SpriteBatch.Draw(pixelTexture, backgroundBounds, Background);
         }
 
         public virtual void StartClipping() {
@@ -184,13 +199,13 @@ namespace FezGame.Editor.Widgets {
                 return;
             }
 
-            LevelEditor.SpriteBatch.End();
+            GuiHandler.SpriteBatch.End();
 
             ScissorTestEnablePrev = GraphicsDevice.RasterizerState.ScissorTestEnable;
             ScissorRectanglePrev = GraphicsDevice.ScissorRectangle;
 
-            //LevelEditor.SpriteBatch.BeginPoint();
-            LevelEditor.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, ScissorRasterizerState);
+            //GuiHandler.SpriteBatch.BeginPoint();
+            GuiHandler.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, ScissorRasterizerState);
             GraphicsDevice.ScissorRectangle = backgroundBounds;
         }
 
@@ -199,18 +214,18 @@ namespace FezGame.Editor.Widgets {
                 return;
             }
 
-            LevelEditor.SpriteBatch.End();
+            GuiHandler.SpriteBatch.End();
 
             if (ScissorTestEnablePrev) {
-                LevelEditor.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, ScissorRasterizerState);
+                GuiHandler.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, ScissorRasterizerState);
             } else {
-                LevelEditor.SpriteBatch.BeginPoint();
+                GuiHandler.SpriteBatch.BeginPoint();
             }
             GraphicsDevice.ScissorRectangle = ScissorRectanglePrev;
         }
 
         public virtual void UpdateTheme() {
-            foreach (EditorWidget widget in Widgets) {
+            foreach (GuiWidget widget in Widgets) {
                 widget.UpdateTheme();
             }
 
@@ -219,26 +234,26 @@ namespace FezGame.Editor.Widgets {
                 return;
             }
 
-            foreground_.R = LevelEditorOptions.Instance.DefaultForeground.R;
-            foreground_.G = LevelEditorOptions.Instance.DefaultForeground.G;
-            foreground_.B = LevelEditorOptions.Instance.DefaultForeground.B;
+            foreground_.R = GuiHandler.DefaultForeground.R;
+            foreground_.G = GuiHandler.DefaultForeground.G;
+            foreground_.B = GuiHandler.DefaultForeground.B;
 
-            Background.R = LevelEditorOptions.Instance.DefaultBackground.R;
-            Background.G = LevelEditorOptions.Instance.DefaultBackground.G;
-            Background.B = LevelEditorOptions.Instance.DefaultBackground.B;
+            Background.R = GuiHandler.DefaultBackground.R;
+            Background.G = GuiHandler.DefaultBackground.G;
+            Background.B = GuiHandler.DefaultBackground.B;
 
-            PrevDefaultForeground = LevelEditorOptions.Instance.DefaultForeground;
-            PrevDefaultBackground = LevelEditorOptions.Instance.DefaultBackground;
+            PrevDefaultForeground = GuiHandler.DefaultForeground;
+            PrevDefaultBackground = GuiHandler.DefaultBackground;
         }
 
         public virtual void Refresh() {
-            foreach (EditorWidget widget in Widgets) {
+            foreach (GuiWidget widget in Widgets) {
                 widget.Refresh();
             }
         }
 
-        public T ParentAs<T>(bool exact = false) where T : EditorWidget {
-            EditorWidget parent = Parent;
+        public T ParentAs<T>(bool exact = false) where T : GuiWidget {
+            GuiWidget parent = Parent;
             while (parent != null && (!(parent is T) || (exact && parent.GetType() != typeof(T)))) {
                 parent = parent.Parent;
             }

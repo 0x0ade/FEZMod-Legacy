@@ -18,8 +18,8 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using FezGame.Components;
 
-namespace FezGame.Editor.Widgets {
-    public class ContainerWidget : EditorWidget {
+namespace FezGame.Mod.Gui {
+    public class ContainerWidget : GuiWidget {
 
         public Func<object> RefreshValue;
 
@@ -33,7 +33,7 @@ namespace FezGame.Editor.Widgets {
         public float InnerHeight { get; protected set; }
         protected Rectangle scrollIndicatorBounds = new Rectangle();
 
-        public ContainerWidget(Game game, EditorWidget[] widgets = null)
+        public ContainerWidget(Game game, GuiWidget[] widgets = null)
             : base(game) {
             if (widgets != null) {
                 Widgets.AddRange(widgets);
@@ -50,7 +50,7 @@ namespace FezGame.Editor.Widgets {
             ClipChildren = true;
 
             float innerHeight = 0f;
-            foreach (EditorWidget widget in Widgets) {
+            foreach (GuiWidget widget in Widgets) {
                 if (widget is WindowHeaderWidget) {
                     continue;
                 }
@@ -69,8 +69,6 @@ namespace FezGame.Editor.Widgets {
 
             float offset = 0f;
             for (int i = 0; i < Widgets.Count; i++) {
-                Widgets[i].Parent = this;
-                Widgets[i].LevelEditor = LevelEditor;
                 Widgets[i].Update(gameTime);
 
                 if (Widgets[i].GetType() == typeof(ContainerWidget)) {
@@ -106,13 +104,11 @@ namespace FezGame.Editor.Widgets {
                 StartClipping();
             }
 
-            foreach (EditorWidget widget in Widgets) {
+            foreach (GuiWidget widget in Widgets) {
                 if (widget is WindowHeaderWidget) {
                     continue;
                 }
 
-                widget.Parent = this;
-                widget.LevelEditor = LevelEditor;
                 widget.Draw(gameTime);
             }
 
@@ -120,13 +116,11 @@ namespace FezGame.Editor.Widgets {
                 StopClipping();
             }
 
-            foreach (EditorWidget widget in Widgets) {
+            foreach (GuiWidget widget in Widgets) {
                 if (!(widget is WindowHeaderWidget)) {
                     continue;
                 }
 
-                widget.Parent = this;
-                widget.LevelEditor = LevelEditor;
                 widget.Draw(gameTime);
             }
         }
@@ -147,7 +141,7 @@ namespace FezGame.Editor.Widgets {
             scrollIndicatorBounds.Width = 4;
             scrollIndicatorBounds.Height = (int) (Size.Y * Size.Y / InnerHeight);
 
-            LevelEditor.SpriteBatch.Draw(pixelTexture, scrollIndicatorBounds, new Color(255, 255, 255, Background.A));
+            GuiHandler.SpriteBatch.Draw(pixelTexture, scrollIndicatorBounds, new Color(255, 255, 255, Background.A));
         }
 
         public override void Hover(GameTime gameTime) {

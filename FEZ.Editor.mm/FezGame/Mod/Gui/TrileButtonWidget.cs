@@ -18,7 +18,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using FezGame.Components;
 
-namespace FezGame.Editor.Widgets {
+namespace FezGame.Mod.Gui {
     public class TrileButtonWidget : ButtonWidget {
 
         [ServiceDependency]
@@ -68,7 +68,7 @@ namespace FezGame.Editor.Widgets {
                 return;
             }
 
-            LevelEditor.SpriteBatch.Draw(TrileAtlas, new Rectangle(
+            GuiHandler.SpriteBatch.Draw(TrileAtlas, new Rectangle(
                 (int) (Position.X + Offset.X),
                 (int) (Position.Y + Offset.Y),
                 32, 32
@@ -85,11 +85,11 @@ namespace FezGame.Editor.Widgets {
             }
 
             if (mb == 1) {
-                LevelEditor.TrileId = Trile.Id;
+                ((ILevelEditor) GuiHandler).TrileId = Trile.Id;
             } else if (mb == 3) {
-                LevelEditor.Scheduled.Add(delegate() {
+                GuiHandler.Scheduled.Add(delegate() {
                     ContainerWidget window;
-                    LevelEditor.Widgets.Add(window = new ContainerWidget(Game));
+                    GuiHandler.Widgets.Add(window = new ContainerWidget(Game));
                     window.Size.X = 256f;
                     window.Size.Y = 144f;
                     window.Position.X = GraphicsDevice.Viewport.Width / 2 - (int)(window.Size.X / 2);
@@ -192,13 +192,13 @@ namespace FezGame.Editor.Widgets {
                     ButtonWidget windowButtonCreate;
                     window.Widgets.Add(windowButtonCreate = new ButtonWidget(Game, "CREATE", delegate() {
                         int trileId = int.Parse(windowFieldID.Text);
-                        TrileInstance trile = LevelEditor.CreateNewTrile(trileId,new TrileEmplacement(
+                        TrileInstance trile = ((ILevelEditor) GuiHandler).CreateNewTrile(trileId,new TrileEmplacement(
                                               int.Parse(windowFieldX.Text),
                                               int.Parse(windowFieldY.Text),
                                               int.Parse(windowFieldZ.Text)
                         ));
                         trile.Phi = ((FaceOrientation) Enum.Parse(typeof(FaceOrientation), windowFieldFace.Text)).ToPhi();
-                        LevelEditor.AddTrile(trile);
+                        ((ILevelEditor) GuiHandler).AddTrile(trile);
                         windowHeader.CloseButtonWidget.Action();
                     }));
                     windowButtonCreate.Size.X = window.Size.X;

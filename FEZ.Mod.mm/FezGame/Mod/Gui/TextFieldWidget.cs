@@ -19,7 +19,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using FezGame.Components;
 
-namespace FezGame.Editor.Widgets {
+namespace FezGame.Mod.Gui {
     public class TextFieldWidget : ButtonWidget {
 
         [ServiceDependency]
@@ -108,8 +108,6 @@ namespace FezGame.Editor.Widgets {
             float offset = 0f;
             float widthMax = 0f;
             for (int i = 0; i < Widgets.Count; i++) {
-                Widgets[i].Parent = this;
-                Widgets[i].LevelEditor = LevelEditor;
                 Widgets[i].Update(gameTime);
 
                 Widgets[i].Position.X = Size.X;
@@ -158,7 +156,7 @@ namespace FezGame.Editor.Widgets {
             CursorScroll = Math.Min(Font.MeasureString(Text + "|").X, CursorScroll);
             CursorScroll = Math.Max(0f, CursorScroll);
 
-            LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, Font, Text.Substring(0, CursorPosition) + (BlinkStatus ? "|" : "") + Text.Substring(CursorPosition), Position + Offset - new Vector2(CursorScroll, 0f), Color.Black, viewScale);
+            GuiHandler.GTR.DrawShadowedText(GuiHandler.SpriteBatch, Font, Text.Substring(0, CursorPosition) + (BlinkStatus ? "|" : "") + Text.Substring(CursorPosition), Position + Offset - new Vector2(CursorScroll, 0f), Color.Black, viewScale);
 
             StopClipping();
         }
@@ -184,7 +182,7 @@ namespace FezGame.Editor.Widgets {
                 CursorPosition--;
             }
             if ((c == '\n' || c == '\r') && Action != null) {
-                LevelEditor.Scheduled.Add(Action);
+                GuiHandler.Scheduled.Add(Action);
             }
             if (char.IsControl(c)) {
                 return;

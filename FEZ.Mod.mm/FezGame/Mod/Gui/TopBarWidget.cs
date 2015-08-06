@@ -18,8 +18,8 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using FezGame.Components;
 
-namespace FezGame.Editor.Widgets {
-    public class TopBarWidget : EditorWidget {
+namespace FezGame.Mod.Gui {
+    public class TopBarWidget : GuiWidget {
 
         public TopBarWidget(Game game) 
             : base(game) {
@@ -37,8 +37,6 @@ namespace FezGame.Editor.Widgets {
 
             float offset = 0f;
             for (int i = 0; i < Widgets.Count; i++) {
-                Widgets[i].Parent = this;
-                Widgets[i].LevelEditor = LevelEditor;
                 Widgets[i].Update(gameTime);
 
                 Widgets[i].Position.X = offset;

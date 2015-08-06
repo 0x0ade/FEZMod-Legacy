@@ -63,10 +63,11 @@ namespace FezGame.Components {
             networkData.Background = PlayerManager.Background;
             networkData.Action = PlayerManager.Action;
             if (playerMesh.FirstGroup.TextureMatrix != null) {
-                Matrix? nullable = playerMesh.FirstGroup.TextureMatrix.Value;
+                //FIXME
+                /*Matrix? nullable = playerMesh.FirstGroup.TextureMatrix.Value;
                 if (nullable != null) {
                   networkData.TextureMatrix = nullable.GetValueOrDefault();
-                }
+                }*/
             }
             //networkData.EffectBackground = 0f;
             networkData.Scale = playerMesh.Scale;

@@ -70,12 +70,12 @@ namespace FezEngine.Tools {
             }
             DumpAllResourcesCount = count;
             ModLogger.Log("JAFM.Engine", "Dumping "+count+" assets...");
-            String[] assetNames = new String[count];
-            cachedAssets.Keys.CopyTo(assetNames, 0);
+            String[] assetNames_ = new String[count];
+            cachedAssets.Keys.CopyTo(assetNames_, 0);
 
             for (int i = 0; i < count; i++) {
-                byte[] bytes = cachedAssets[assetNames[i]];
-                string assetName = assetNames[i].ToLower();
+                byte[] bytes = cachedAssets[assetNames_[i]];
+                string assetName = assetNames_[i].ToLower();
                 string filePath = ("Resources\\"+(assetName.ToLower())).Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString())+".xnb";
                 FileInfo file = new FileInfo(filePath);
                 if (!file.Exists) {

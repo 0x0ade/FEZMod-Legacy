@@ -93,6 +93,15 @@
     <Compile Include="FezGame\Structure\NetworkGomezData.cs" />
     <Compile Include="FezGame\Components\NetworkUpdateDelegates.cs" />
     <Compile Include="FezGame\Mod\XmlHelper.cs" />
+    <Compile Include="FezGame\Mod\Gui\IGuiHandler.cs" />
+    <Compile Include="FezGame\Mod\Gui\ButtonWidget.cs" />
+    <Compile Include="FezGame\Mod\Gui\CheckboxWidget.cs" />
+    <Compile Include="FezGame\Mod\Gui\ContainerWidget.cs" />
+    <Compile Include="FezGame\Mod\Gui\GuiWidget.cs" />
+    <Compile Include="FezGame\Mod\Gui\InfoWidget.cs" />
+    <Compile Include="FezGame\Mod\Gui\TextFieldWidget.cs" />
+    <Compile Include="FezGame\Mod\Gui\TopBarWidget.cs" />
+    <Compile Include="FezGame\Mod\Gui\WindowHeaderWidget.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -104,5 +113,6 @@
     <Folder Include="FezGame\Mod\" />
     <Folder Include="FezGame\Tools\" />
     <Folder Include="FezGame\Components\Actions\" />
+    <Folder Include="FezGame\Mod\Gui\" />
   </ItemGroup>
 </Project>

@@ -18,8 +18,8 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using FezGame.Components;
 
-namespace FezGame.Editor.Widgets {
-    public class WindowHeaderWidget : EditorWidget {
+namespace FezGame.Mod.Gui {
+    public class WindowHeaderWidget : GuiWidget {
 
         public string Label;
         public SpriteFont Font;
@@ -47,7 +47,7 @@ namespace FezGame.Editor.Widgets {
                 if (Parent.Parent != null) {
                     Parent.Parent.Widgets.Remove(Parent);
                 } else {
-                    LevelEditor.Widgets.Remove(Parent);
+                    GuiHandler.Widgets.Remove(Parent);
                 }
             };
         }
@@ -76,8 +76,6 @@ namespace FezGame.Editor.Widgets {
 
             float offset = 0f;
             for (int i = 0; i < Widgets.Count; i++) {
-                Widgets[i].Parent = this;
-                Widgets[i].LevelEditor = LevelEditor;
                 Widgets[i].Update(gameTime);
 
                 offset += Widgets[i].Size.X;
@@ -95,7 +93,7 @@ namespace FezGame.Editor.Widgets {
             }
 
             float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
-            LevelEditor.GTR.DrawShadowedText(LevelEditor.SpriteBatch, Font, Label, Position + Offset, Foreground, viewScale);
+            GuiHandler.GTR.DrawShadowedText(GuiHandler.SpriteBatch, Font, Label, Position + Offset, Foreground, viewScale);
         }
 
         public override void Dragging(GameTime gameTime, MouseButtonStates state) {

@@ -9,22 +9,11 @@ namespace FezEngine.Tools {
 
         public static Game Game { get; set; }
 
-        private static readonly List<object> services = new List<object>();
+        private static List<object> services = new List<object>();
         private static readonly List<IGameComponent> components = new List<IGameComponent>();
         private static readonly Dictionary<Type, IGameComponent> componentMap = new Dictionary<Type, IGameComponent>();
         private static readonly Dictionary<IGameComponent, List<Type>> componentMapReverse = new Dictionary<IGameComponent, List<Type>>();
 
-        /// <summary>
-        /// Whether to call GetComponent when Get fails on getting a service. Useful for FEZMod.
-        /// </summary>
-        public static bool GetComponentsAsServices = true;
-        /// <summary>
-        /// Whether to handle components in a similar manner like services, that means store them and add the ability to get them by type.
-        /// </summary>
-        public static bool HandleComponents = true;
-
-        //Not working until patching generic methods has been fixed in MonoMod.
-        /*
         [MonoModIgnore]
         public static void InjectServices(object service) {
         }
@@ -41,19 +30,19 @@ namespace FezEngine.Tools {
             }
         }
 
-        public static T orig_Get<T>() {
-            return default (T);
+        public static T orig_Get<T>() where T : class {
+            return null;
         }
 
-        public static T Get<T>() {
+        public static T Get<T>() where T : class {
             T obj = orig_Get<T>();
             if (obj != null) {
                 return obj;
             }
-            if (GetComponentsAsServices && typeof(IGameComponent).IsAssignableFrom(typeof(T))) {
+            if (FEZMod.GetComponentsAsServices && typeof(IGameComponent).IsAssignableFrom(typeof(T))) {
                 return (T) GetComponent(typeof(T));
             }
-            return default (T);
+            return null;
         }
 
         public static object orig_Get(Type type) {
@@ -65,7 +54,7 @@ namespace FezEngine.Tools {
             if (obj != null) {
                 return obj;
             }
-            if (GetComponentsAsServices && typeof(IGameComponent).IsAssignableFrom(type)) {
+            if (FEZMod.GetComponentsAsServices && typeof(IGameComponent).IsAssignableFrom(type)) {
                 return GetComponent(type);
             }
             return null;
@@ -77,7 +66,7 @@ namespace FezEngine.Tools {
         public static void AddComponent(IGameComponent component, bool addServices) {
             orig_AddComponent(component, addServices);
 
-            if (!addServices && HandleComponents) {
+            if (!addServices && FEZMod.HandleComponents) {
                 components.Add(component);
                 componentMap[component.GetType()] = component;
             }
@@ -87,7 +76,8 @@ namespace FezEngine.Tools {
         }
 
         public static void RemoveComponent<T>(T component) where T : IGameComponent {
-            if (!HandleComponents) {
+            if (!FEZMod.HandleComponents) {
+                orig_RemoveComponent(component);
                 return;
             }
 
@@ -109,7 +99,7 @@ namespace FezEngine.Tools {
         }
 
         public static object GetComponent(Type type) {
-            if (!HandleComponents) {
+            if (!FEZMod.HandleComponents) {
                 return null;
             }
 
@@ -135,7 +125,6 @@ namespace FezEngine.Tools {
 
             return null;
         }
-        */
 
     }
 }

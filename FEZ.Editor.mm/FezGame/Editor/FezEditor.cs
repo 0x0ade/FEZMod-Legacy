@@ -36,6 +36,11 @@ namespace FezGame.Editor {
             }
         }
 
+        public override void Initialize() {
+            FEZMod.GetComponentsAsServices = true;
+            FEZMod.HandleComponents = true;
+        }
+
         public override void LoadComponents(Fez game) {
             if (InEditor) {
                 ServiceHelper.AddComponent((IGameComponent) new LevelEditor(ServiceHelper.Game));

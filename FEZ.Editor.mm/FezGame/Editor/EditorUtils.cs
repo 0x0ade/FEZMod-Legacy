@@ -5,14 +5,6 @@ using System.Reflection;
 namespace FezGame.Editor {
     public static class EditorUtils {
 
-        public static string ToString(this Vector2 v) {
-            return v.X + ", " + v.Y;
-        }
-
-        public static string ToString(this Vector3 v) {
-            return v.X + ", " + v.Y + ", " + v.Z;
-        }
-
         public static T GetPrivate<T>(this object instance, string fieldName) {
             FieldInfo field = instance.GetType().GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
             if (field == null) {
@@ -25,6 +17,14 @@ namespace FezGame.Editor {
             return
                 rectangle.X <= point.X && point.X <= rectangle.X + rectangle.Width &&
                 rectangle.Y <= point.Y && point.Y <= rectangle.Y + rectangle.Height;
+        }
+
+        public static string ToString(Vector2 v) {
+            return v.X + ", " + v.Y;
+        }
+
+        public static string ToString(Vector3 v) {
+            return v.X + ", " + v.Y + ", " + v.Z;
         }
 
     }
