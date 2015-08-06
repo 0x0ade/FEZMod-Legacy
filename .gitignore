@@ -18,3 +18,5 @@ Common.Mod.mm/bin/
 Common.Mod.mm/obj/
 Common.Mod.mm/*.sln
 Common.Mod.mm/*.userprefs
+
+FEZ.Secret.mm/*
