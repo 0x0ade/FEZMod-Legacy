@@ -108,10 +108,14 @@ namespace FezGame.Mod.Gui {
             ServiceHelper.InjectServices(this);
         }
 
-        public void PreUpdate() {
+        public virtual void PreUpdate() {
             if (!initialized) {
                 PrevDefaultForeground = GuiHandler.DefaultForeground;
-                Background = PrevDefaultBackground = GuiHandler.DefaultBackground;
+                PrevDefaultBackground = GuiHandler.DefaultBackground;
+
+                if (Background == default(Color)) {
+                    Background = PrevDefaultBackground;
+                }
 
                 initialized = true;
             }
@@ -234,13 +238,8 @@ namespace FezGame.Mod.Gui {
                 return;
             }
 
-            foreground_.R = GuiHandler.DefaultForeground.R;
-            foreground_.G = GuiHandler.DefaultForeground.G;
-            foreground_.B = GuiHandler.DefaultForeground.B;
-
-            Background.R = GuiHandler.DefaultBackground.R;
-            Background.G = GuiHandler.DefaultBackground.G;
-            Background.B = GuiHandler.DefaultBackground.B;
+            foreground_ = GuiHandler.DefaultForeground;
+            Background = GuiHandler.DefaultBackground;
 
             PrevDefaultForeground = GuiHandler.DefaultForeground;
             PrevDefaultBackground = GuiHandler.DefaultBackground;

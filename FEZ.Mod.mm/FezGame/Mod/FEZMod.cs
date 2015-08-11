@@ -78,12 +78,15 @@ namespace FezGame.Mod {
             }
             LoadedAssemblies.Add(assembly);
             foreach (AssemblyName reference in assembly.GetReferencedAssemblies()) {
+                if (!reference.Name.EndsWith(".mm")) {
+                    continue;
+                }
                 PreInitializeModules(Assembly.Load(reference));
             }
-            ModLogger.Log("JAFM", "Found referenced assembly "+assembly.GetName().Name);
             if (!assembly.GetName().Name.EndsWith(".mm")) {
                 return;
             }
+            ModLogger.Log("JAFM", "Found referenced assembly "+assembly.GetName().Name);
             foreach (Type type in assembly.GetTypes()) {
                 if (typeof(FezModule).IsAssignableFrom(type) && !type.IsAbstract) {
                     PreInitializeModule(type);

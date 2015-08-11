@@ -33,6 +33,9 @@ namespace FezGame.Mod.Gui {
         public float InnerHeight { get; protected set; }
         protected Rectangle scrollIndicatorBounds = new Rectangle();
 
+        public bool DoNotClipChildren = false;
+        protected bool clipChildrenSet = false;
+
         public ContainerWidget(Game game, GuiWidget[] widgets = null)
             : base(game) {
             if (widgets != null) {
@@ -47,7 +50,11 @@ namespace FezGame.Mod.Gui {
                 return;
             }
 
-            ClipChildren = true;
+            if (!DoNotClipChildren) {
+                ClipChildren |= !clipChildrenSet;
+            }
+
+            ClipChildren &= !DoNotClipChildren;
 
             float innerHeight = 0f;
             foreach (GuiWidget widget in Widgets) {

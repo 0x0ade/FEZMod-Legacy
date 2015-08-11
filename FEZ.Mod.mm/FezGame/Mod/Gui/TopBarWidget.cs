@@ -42,6 +42,8 @@ namespace FezGame.Mod.Gui {
                 Widgets[i].Position.X = offset;
                 Widgets[i].Position.Y = 0;
 
+                Widgets[i].Background.A = 0;
+
                 offset += Widgets[i].Size.X + 12f;
             }
         }

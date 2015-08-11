@@ -31,14 +31,11 @@ namespace FezGame.Editor {
                     //Fez.SkipLogos = true;
                     Fez.SkipIntro = true;
                     FEZMod.EnableDebugControls = true;
+                    FEZMod.GetComponentsAsServices = true;
+                    FEZMod.HandleComponents = true;
                     InEditor = true;
                 }
             }
-        }
-
-        public override void Initialize() {
-            FEZMod.GetComponentsAsServices = true;
-            FEZMod.HandleComponents = true;
         }
 
         public override void LoadComponents(Fez game) {

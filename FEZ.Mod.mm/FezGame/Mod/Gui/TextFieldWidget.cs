@@ -113,6 +113,8 @@ namespace FezGame.Mod.Gui {
                 Widgets[i].Position.X = Size.X;
                 Widgets[i].Position.Y = offset - ScrollOffset;
 
+                Widgets[i].Background = Background;
+
                 offset += Widgets[i].Size.Y;
 
                 if (widthMax < Widgets[i].Size.X) {
@@ -207,22 +209,22 @@ namespace FezGame.Mod.Gui {
                     continue;
                 }
                 added.Add(item);
-                ButtonWidget button;
-                Widgets.Add(button = new ButtonWidget(Game, item, delegate() {
+                Widgets.Add(new ButtonWidget(Game, item, delegate() {
                     Text = item;
-                }));
-                button.Background = Background;
+                }) {
+                    Background = Background
+                });
             }
         }
 
         public void Fill(IEnumerable<string> list) {
             Widgets.Clear();
             foreach (string item in list) {
-                ButtonWidget button;
-                Widgets.Add(button = new ButtonWidget(Game, item, delegate() {
+                Widgets.Add(new ButtonWidget(Game, item, delegate() {
                     Text = item;
-                }));
-                button.Background = Background;
+                }) {
+                    Background = Background
+                });
             }
         }
 

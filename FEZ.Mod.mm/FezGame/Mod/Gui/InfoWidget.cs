@@ -95,7 +95,7 @@ namespace FezGame.Mod.Gui {
         }
 
         protected static DateTime ReadBuildDate() {
-            string location = Assembly.GetCallingAssembly().Location;
+            string location = Assembly.GetEntryAssembly().Location;
             byte[] array = new byte[2048];
             Stream stream = null;
             try {

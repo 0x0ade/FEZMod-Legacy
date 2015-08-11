@@ -36,10 +36,10 @@ namespace FezEngine.Tools {
 
         public static T Get<T>() where T : class {
             T obj = orig_Get<T>();
-            if (obj != null) {
+            if (obj != null || !FEZMod.GetComponentsAsServices) {
                 return obj;
             }
-            if (FEZMod.GetComponentsAsServices && typeof(IGameComponent).IsAssignableFrom(typeof(T))) {
+            if (typeof(IGameComponent).IsAssignableFrom(typeof(T))) {
                 return (T) GetComponent(typeof(T));
             }
             return null;
@@ -51,10 +51,10 @@ namespace FezEngine.Tools {
 
         public static object Get(Type type) {
             object obj = orig_Get(type);
-            if (obj != null) {
+            if (obj != null || !FEZMod.GetComponentsAsServices) {
                 return obj;
             }
-            if (FEZMod.GetComponentsAsServices && typeof(IGameComponent).IsAssignableFrom(type)) {
+            if (typeof(IGameComponent).IsAssignableFrom(type)) {
                 return GetComponent(type);
             }
             return null;
