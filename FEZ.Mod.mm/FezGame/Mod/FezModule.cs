@@ -1,6 +1,7 @@
 ﻿using System;
 using FezGame.Structure;
 using FezEngine.Tools;
+using FezEngine.Structure;
 
 namespace FezGame.Mod {
     public abstract class FezModule {
@@ -23,6 +24,8 @@ namespace FezGame.Mod {
         public virtual void SaveClone(SaveData source, SaveData dest) {}
         public virtual void SaveRead(SaveData saveData, CrcReader reader) {}
         public virtual void SaveWrite(SaveData saveData, CrcWriter writer) {}
+        public virtual string ProcessLevelName(string levelName) {return levelName;}
+        public virtual void ProcessLevelData(Level levelData) {}
 
     }
 }

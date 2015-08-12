@@ -11,6 +11,7 @@ using FezGame.Structure;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.IO;
+using FezEngine.Structure;
 
 namespace FezGame.Mod {
     public static class FEZMod {
@@ -320,11 +321,28 @@ namespace FezGame.Mod {
             CallInEachModule("SaveWrite", new object[] {saveData, writer});
         }
 
+        public static string ProcessLevelName(string levelName) {
+            return CallInEachModule<string>("ProcessLevelName", levelName);
+        }
+
+        public static void ProcessLevelData(Level levelData) {
+            CallInEachModule("ProcessLevelData", new object[] {levelData});
+        }
+
         private static void CallInEachModule(string methodName, object[] args) {
             Type[] argsTypes = Type.GetTypeArray(args);
             foreach (FezModule module in Modules) {
                 module.GetType().GetMethod(methodName, argsTypes).Invoke(module, args);
             }
+        }
+
+        private static T CallInEachModule<T>(string methodName, T arg) {
+            Type[] argsTypes = { typeof(T) };
+            object[] args = { arg };
+            foreach (FezModule module in Modules) {
+                arg = (T) module.GetType().GetMethod(methodName, argsTypes).Invoke(module, args);
+            }
+            return arg;
         }
 
     }

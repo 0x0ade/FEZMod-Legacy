@@ -52,7 +52,7 @@ namespace FezGame.Services {
                 return;
             }
 
-            //levelName = ProcessLevelName(levelName);
+            levelName = FEZMod.ProcessLevelName(levelName);
 
             string filePath_ = ("Resources\\levels\\"+(levelName.ToLower())).Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString())+".";
 
@@ -78,7 +78,7 @@ namespace FezGame.Services {
                     ModLogger.Log("FEZMod", "Level not found: " + levelName + "; Falling back to the original VILLAGEVILLE_3D...");
                     orig_Load("VILLAGEVILLE_3D");
                 }
-                //ProcessLevelData(levelData);
+                FEZMod.ProcessLevelData(levelData);
                 GameLevelManagerHelper.Level = levelData;
                 return;
             }
@@ -106,7 +106,7 @@ namespace FezGame.Services {
                 save.FirstVisit = false;
             }
 
-            //ProcessLevelData(levelData);
+            FEZMod.ProcessLevelData(levelData);
             GameLevelManagerHelper.Level = levelData;
         }
 
