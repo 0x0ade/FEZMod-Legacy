@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.Xna.Framework.Graphics;
 using System.IO;
+using System.Xml;
+using FezGame.Mod;
 
 namespace FezEngine.Tools {
     public class SharedContentManager {
@@ -31,6 +33,18 @@ namespace FezEngine.Tools {
                             return Texture2D.FromStream(ServiceHelper.Game.GraphicsDevice, fs) as T;
                         }
                     }
+                }
+
+                string xmlPath = MemoryContentManager.Externalize(assetName) + ".xml";
+                if (File.Exists(xmlPath)) {
+                    FileStream fis = new FileStream(xmlPath, FileMode.Open);
+                    XmlReader xmlReader = XmlReader.Create(fis);
+                    XmlDocument xmlDocument = new XmlDocument();
+                    xmlDocument.Load(xmlReader);
+                    xmlReader.Close();
+                    fis.Close();
+
+                    return xmlDocument.Deserialize(typeof(T), null, true) as T;
                 }
 
                 return orig_ReadAsset<T>(assetName);

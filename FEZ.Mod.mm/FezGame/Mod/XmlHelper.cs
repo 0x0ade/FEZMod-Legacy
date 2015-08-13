@@ -305,11 +305,17 @@ namespace FezGame.Mod {
         public static Type FindType(this string name) {
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
             foreach (Assembly assembly in assemblies) {
-                Type[] types = assembly.GetTypes();
-                foreach (Type type in types) {
-                    if (type.Name == name && type.FullName.EndsWith("."+name)) {
-                        return type;
+                try {
+                    Type[] types = assembly.GetTypes();
+                    foreach (Type type in types) {
+                        if (type.Name == name && type.FullName.EndsWith("."+name)) {
+                            return type;
+                        }
                     }
+                } catch (Exception e) {
+                    ModLogger.Log("FEZMod", "Failed searching a type in XmlHelper's FindType.");
+                    ModLogger.Log("FEZMod", "Assembly: " + assembly.GetName().Name);
+                    ModLogger.Log("FEZMod", e.Message);
                 }
             }
 

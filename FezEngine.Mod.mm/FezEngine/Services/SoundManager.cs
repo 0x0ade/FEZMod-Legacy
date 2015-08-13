@@ -3,6 +3,8 @@ using Common;
 using System.IO;
 using System.Collections.Generic;
 using System.Threading;
+using Microsoft.Xna.Framework.Audio;
+using FezEngine.Tools;
 
 namespace FezEngine.Services {
     public class SoundManager {
@@ -92,6 +94,36 @@ namespace FezEngine.Services {
                     }
                 }
             }
+        }
+
+        public OggStream orig_GetCue(string name, bool asyncPrecache = false) {
+            return null;
+        }
+
+        public OggStream GetCue(string name, bool asyncPrecache = false) {
+            bool isAmbience = name.Contains("Ambience");
+
+            string oggFile = MemoryContentManager.Externalize((isAmbience ? "" : "music/") + name.Replace(" ^ ", "\\")) + ".ogg";
+            ModLogger.Log("FEZMod.SoundManager", oggFile);
+            if (File.Exists(oggFile)) {
+                OggStream oggStream = (OggStream) null;
+                try {
+                    oggStream = new OggStream(oggFile, 6) {
+                        Category = isAmbience ? "Ambience" : "Music",
+                        IsLooped = isAmbience
+                    };
+                    oggStream.RealName = name;
+                    oggStream.Prepare(asyncPrecache);
+                    if (name.Contains("Gomez")) {
+                        oggStream.LowPass = false;
+                    }
+                } catch (Exception ex) {
+                    ModLogger.Log("FEZMod.SoundManager", ex.Message);
+                }
+                return oggStream;
+            }
+
+            return orig_GetCue(name, asyncPrecache);
         }
 
     }
