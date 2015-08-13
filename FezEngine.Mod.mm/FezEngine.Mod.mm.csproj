@@ -69,6 +69,7 @@
     <Compile Include="FezEngine\Tools\SettingsManager.cs" />
     <Compile Include="MonoMod\MonoModIgnore.cs" />
     <Compile Include="FezEngine\Services\SoundManager.cs" />
+    <Compile Include="FezEngine\Tools\SharedContentManager.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
