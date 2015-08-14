@@ -12,12 +12,15 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.IO;
 using FezEngine.Structure;
+using EasyStorage;
 
 namespace FezGame.Mod {
     public static class FEZMod {
         public static string Version = "0.2";
 
         public static string LevelFileFormat = "fml";
+
+        public static FieldInfo DisableCloudSaves;
 
         public static List<FezModule> Modules = new List<FezModule>();
 
@@ -59,7 +62,12 @@ namespace FezGame.Mod {
 
             Fez.Version = Fez.Version + " | " + FEZMod.Version;
 
+            DisableCloudSaves = typeof(PCSaveDevice).GetField("DisableCloudSaves");
+
             Fez.NoSteamworks = true;
+            if (DisableCloudSaves != null) {
+                DisableCloudSaves.SetValue(null, true);
+            }
 
             System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 
@@ -109,6 +117,9 @@ namespace FezGame.Mod {
                 if (args[i] == "-sw" || args[i] == "--steamworks") {
                     ModLogger.Log("JAFM", "Found -sw / --steamworks");
                     Fez.NoSteamworks = false;
+                    if (DisableCloudSaves != null) {
+                        DisableCloudSaves.SetValue(null, false);
+                    }
                 }
                 if ((args[i] == "-l" || args[i] == "--load-level") && i+1 < args.Length) {
                     ModLogger.Log("JAFM", "Found -l / --load-level: "+args[i+1]);

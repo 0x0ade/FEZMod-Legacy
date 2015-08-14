@@ -104,7 +104,6 @@ namespace FezEngine.Services {
             bool isAmbience = name.Contains("Ambience");
 
             string oggFile = MemoryContentManager.Externalize((isAmbience ? "" : "music/") + name.Replace(" ^ ", "\\")) + ".ogg";
-            ModLogger.Log("FEZMod.SoundManager", oggFile);
             if (File.Exists(oggFile)) {
                 OggStream oggStream = (OggStream) null;
                 try {

@@ -29,6 +29,11 @@ namespace FezGame.Mod {
                 return null;
             }
 
+            if (node is XmlDeclaration) {
+                ModLogger.Log("FEZMod", "XmlHelper found XmlDeclaration; skipping...");
+                return node.NextSibling.Deserialize(parent, cm, descend);
+            }
+
             XmlElement elem = node as XmlElement;
 
             if (node.Name == "Entry") {
@@ -50,6 +55,10 @@ namespace FezGame.Mod {
                         break;
                     }
                 }
+            }
+
+            if (type == null && parent != null && (typeof(IList).IsAssignableFrom(parent) || parent.IsArray)) {
+                type = parent.GetElementType();
             }
 
             if (type == null && parent != null) {
@@ -178,7 +187,7 @@ namespace FezGame.Mod {
                     IList list = (IList) obj;
                     int i = 0;
                     foreach (XmlNode child in node.ChildNodes) {
-                        list[i] = child.Deserialize(parent, cm, descend);
+                        list[i] = child.Deserialize(type, cm, descend);
                         i++;
                     }
                 } else {
@@ -312,10 +321,13 @@ namespace FezGame.Mod {
                             return type;
                         }
                     }
-                } catch (Exception e) {
+                } catch (ReflectionTypeLoadException e) {
                     ModLogger.Log("FEZMod", "Failed searching a type in XmlHelper's FindType.");
                     ModLogger.Log("FEZMod", "Assembly: " + assembly.GetName().Name);
                     ModLogger.Log("FEZMod", e.Message);
+                    foreach (Exception le in e.LoaderExceptions) {
+                        ModLogger.Log("FEZMod", le.Message);
+                    }
                 }
             }
 

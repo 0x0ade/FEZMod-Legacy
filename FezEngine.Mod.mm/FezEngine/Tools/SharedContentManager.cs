@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System.IO;
 using System.Xml;
 using FezGame.Mod;
+using Common;
 
 namespace FezEngine.Tools {
     public class SharedContentManager {
@@ -44,7 +45,7 @@ namespace FezEngine.Tools {
                     xmlReader.Close();
                     fis.Close();
 
-                    return xmlDocument.Deserialize(typeof(T), null, true) as T;
+                    return xmlDocument.Deserialize(null, null, true) as T;
                 }
 
                 return orig_ReadAsset<T>(assetName);
