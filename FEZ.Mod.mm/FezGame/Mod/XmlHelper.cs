@@ -77,17 +77,19 @@ namespace FezGame.Mod {
             }
 
             if (type == null) {
-                type = node.Name.FindType();
+                type = node.Name.FindSpecialType(parent);
             }
 
             if (type == null) {
-                if (descend) {
-                    foreach (XmlNode child in node.ChildNodes) {
-                        //childNode can be a XmlText...
-                        object obj_ = child.Deserialize(parent, cm, true);
-                        if (obj_ != null) {
-                            return obj_;
-                        }
+                type = node.Name.FindType();
+            }
+            
+            if (type == null && descend) {
+                foreach (XmlNode child in node.ChildNodes) {
+                    //childNode can be a XmlText...
+                    object obj_ = child.Deserialize(parent, cm, true);
+                    if (obj_ != null) {
+                        return obj_;
                     }
                 }
             }
@@ -139,7 +141,14 @@ namespace FezGame.Mod {
                             continue;
                         }
                         //ModLogger.Log("FEZMod", "property: " + property.Name + "; type: " + property.PropertyType.FullName + "; in: " + type.FullName + "; attrib: " + attrib.Name+ "; content: " + attrib.InnerText + "; elem: " + elem.Name);
-                        setter.Invoke(obj, new object[] { property.PropertyType.Parse(attrib.InnerText) });
+                        object obj_ = property.PropertyType.Parse(attrib.InnerText);
+                        try {
+                            setter.Invoke(obj, new object[] { obj_ });
+                        } catch (Exception e) {
+                            ModLogger.Log("FEZMod", "XmlHelper failed to set property Property " + property.Name + " in " + type.FullName);
+                            ModLogger.Log("FEZMod", e.Message);
+                            ModLogger.Log("FEZMod", obj_.GetType().FullName);
+                        }
                         properties = null;
                         break;
                     }
@@ -180,7 +189,14 @@ namespace FezGame.Mod {
                                 child.ChildNodes[1].Deserialize(parent, cm, descend)
                             });
                         } else {
-                            add.Invoke(obj, new object[] { child.Deserialize(parent, cm, descend) });
+                            object obj_ = child.Deserialize(parent, cm, descend);
+                            try {
+                                add.Invoke(obj, new object[] { obj_ });
+                            } catch (Exception e) {
+                                ModLogger.Log("FEZMod", "XmlHelper failed to add item in " + type.FullName);
+                                ModLogger.Log("FEZMod", e.Message);
+                                ModLogger.Log("FEZMod", obj_.GetType().FullName);
+                            }
                         }
                     }
                 } else if (obj is IList) {
@@ -220,13 +236,22 @@ namespace FezGame.Mod {
                                 ModLogger.Log("FEZMod", "XmlHelper found no setter for Property " + child.Name + " in " + type.FullName);
                                 break;
                             }
-                            setter.Invoke(obj, new object[] { child.Deserialize(type, cm) });
+                            object obj_ = child.Deserialize(type, cm);
+                            try {
+                                setter.Invoke(obj, new object[] { obj_ });
+                            } catch (Exception e) {
+                                ModLogger.Log("FEZMod", "XmlHelper failed to set property Property " + child.Name + " in " + type.FullName);
+                                ModLogger.Log("FEZMod", e.Message);
+                                ModLogger.Log("FEZMod", obj_.GetType().FullName);
+                            }
                             break;
                         }
+                        
+                        Type childType = child.Name.FindSpecialType(type);
 
                         FieldInfo[] fields = type.GetFields();
                         foreach (FieldInfo field in fields) {
-                            if (field.Name.ToLower() == child.Name.ToLower() || field.FieldType.Name.ToLower() == child.Name.ToLower()) {
+                            if (field.Name.ToLower() == child.Name.ToLower() || field.FieldType.IsAssignableFrom(childType)) {
                                 field.SetValue(obj, child.Deserialize(type, cm));
                                 fields = null;
                                 break;
@@ -238,13 +263,20 @@ namespace FezGame.Mod {
 
                         PropertyInfo[] properties = type.GetProperties();
                         foreach (PropertyInfo property in properties) {
-                            if (property.Name.ToLower() == child.Name.ToLower() || property.PropertyType.Name.ToLower() == child.Name.ToLower()) {
+                            if (property.Name.ToLower() == child.Name.ToLower() || property.PropertyType.IsAssignableFrom(childType)) {
                                 MethodInfo setter = property.GetSetMethod();
                                 if (setter == null) {
                                     ModLogger.Log("FEZMod", "XmlHelper found no setter for Property " + child.Name + " in " + type.FullName);
                                     continue;
                                 }
-                                setter.Invoke(obj, new object[] { child.Deserialize(type, cm) });
+                                object obj_ = child.Deserialize(type, cm);
+                                try {
+                                    setter.Invoke(obj, new object[] { obj_ });
+                                } catch (Exception e) {
+                                    ModLogger.Log("FEZMod", "XmlHelper failed to set property Property " + child.Name + " in " + type.FullName);
+                                    ModLogger.Log("FEZMod", e.Message);
+                                    ModLogger.Log("FEZMod", obj_.GetType().FullName);
+                                }
                                 properties = null;
                                 break;
                             }
@@ -265,7 +297,7 @@ namespace FezGame.Mod {
         }
 
         public static void HandleSpecialDataDeserialize(this object obj, XmlElement elem, ContentManager cm) {
-            if (obj == null || elem == null || cm == null) {
+            if (obj == null || elem == null) {
                 return;
             }
 
@@ -301,6 +333,13 @@ namespace FezGame.Mod {
                 ((Entity) obj).Type = ((Entity) obj).Type ?? elem.GetAttribute("entityType");
             }
 
+            if (obj is MapNode) {
+                ((MapNode) obj).LevelName = ((MapNode) obj).LevelName ?? elem.GetAttribute("name");
+                if (elem.HasAttribute("type")) {
+                    ((MapNode) obj).NodeType = (LevelNodeType) Enum.Parse(typeof(LevelNodeType), elem.GetAttribute("type"));
+                }
+            }
+
             MethodInfo onDeserialization = obj.GetType().GetMethod("OnDeserialization");
             if (onDeserialization != null) {
                 if (onDeserialization.GetParameters().Length == 0) {
@@ -332,6 +371,39 @@ namespace FezGame.Mod {
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Finds a type based on its special (xnb_parse) name, falling back to FindType otherwise.
+        /// </summary>
+        /// <returns>The type found.</returns>
+        /// <param name="name">Name of the type to find. Usually the name of the node.</param>
+        /// <param name="parent">Parent node's type.</param>
+        public static Type FindSpecialType(this string name, Type parent) {
+            if (string.IsNullOrEmpty(name) || parent == null) {
+                return name.FindType();
+            }
+
+            //Use the following logging method call to specify the conditions for a special type.
+            //ModLogger.Log("FEZMod", "XmlHelper FindSpecialType debug name: " + name + "; parent: " + parent.FullName);
+            
+            if ((typeof(MapTree).IsAssignableFrom(parent) || typeof(MapNode).IsAssignableFrom(parent)) && name == "Node") {
+                return typeof(MapNode);
+            }
+
+            if (typeof(MapNode).IsAssignableFrom(parent) && name == "Connection") {
+                return typeof(MapNode.Connection);
+            }
+
+            if (typeof(WinConditions).IsAssignableFrom(parent) && name == "Scripts") {
+                return typeof(List<int>);
+            }
+
+            if (typeof(WinConditions).IsAssignableFrom(parent) && name == "Script") {
+                return typeof(int);
+            }
+
+            return name.FindType();
         }
 
         public static object New(this Type type, XmlElement elem = null) {
