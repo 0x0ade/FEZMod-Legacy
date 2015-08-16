@@ -94,6 +94,7 @@ namespace FezGame.Components {
         protected GuiWidget FocusedWidget;
 
         protected bool ThumbnailScheduled = false;
+        protected int ThumbnailSize;
         protected RenderTargetHandle ThumbnailRT;
 
         public Color DefaultForeground {
@@ -268,7 +269,11 @@ namespace FezGame.Components {
                 }
             }));
 
-            button.Widgets.Add(new ButtonWidget(Game, "Recreate thumbnail", () => CreateThumbnail(true)));
+            button.Widgets.Add(new ButtonWidget(Game, "Recreate thumbnail", new GuiWidget[] {
+                new ButtonWidget(Game, "128px (default)", () => CreateThumbnail(128)),
+                new ButtonWidget(Game, "256px", () => CreateThumbnail(256)),
+                new ButtonWidget(Game, "512px", () => CreateThumbnail(512))
+            }));
             button.Widgets.Add(new ButtonWidget(Game, "Save (XML)", () => Save()));
             button.Widgets.Add(new ButtonWidget(Game, "Save (binary)", () => Save(true)));
 
@@ -1881,6 +1886,8 @@ namespace FezGame.Components {
 
             if (ThumbnailScheduled) {
                 if (ThumbnailRT == null) {
+
+
                     ThumbnailRT = TRM.TakeTarget();
                     TRM.ScheduleHook(DrawOrder, ThumbnailRT.Target);
                 }
@@ -2021,10 +2028,9 @@ namespace FezGame.Components {
 
                 TRM.Resolve(ThumbnailRT.Target, false);
                 using (System.Drawing.Bitmap bitmap = ThumbnailRT.Target.ToBitmap()) {
-                    float size = 512f; //TODO get nearest lower PoT based on Math.min(bitmap.Width, bitmap.Height)
-                    float x = ThumbnailRT.Target.Width / 2 - size / 2f;
-                    float y = ThumbnailRT.Target.Height / 2 - size / 2f;
-                    using (System.Drawing.Bitmap thumbnail = bitmap.Clone(new System.Drawing.Rectangle((int) x, (int) y, (int) size, (int) size), bitmap.PixelFormat)) {
+                    float x = ThumbnailRT.Target.Width / 2 - ThumbnailSize / 2f;
+                    float y = ThumbnailRT.Target.Height / 2 - ThumbnailSize / 2f;
+                    using (System.Drawing.Bitmap thumbnail = bitmap.Clone(new System.Drawing.Rectangle((int) x, (int) y, ThumbnailSize, ThumbnailSize), bitmap.PixelFormat)) {
                         using (FileStream fs = new FileStream(("other textures/map_screens/" + LevelManager.Name).Externalize() + ".png", FileMode.Create)) {
                             thumbnail.Save(fs, ImageFormat.Png);
                         }
@@ -2244,7 +2250,7 @@ namespace FezGame.Components {
                 }
                 ModLogger.Log("FEZMod.Editor", "Saving level "+LevelManager.Name);
                 GameLevelManagerHelper.Save(LevelManager.Name, binary);
-                CreateThumbnail(true);
+                CreateThumbnail();
                 if (windowHeader != null) {
                     windowHeader.CloseButtonWidget.Action();
                 }
@@ -2287,7 +2293,7 @@ namespace FezGame.Components {
             });
         }
 
-        public void CreateThumbnail(bool overwrite = false) {
+        public void CreateThumbnail(int size = 128, bool overwrite = true) {
             string filePath = ("other textures/map_screens/" + LevelManager.Name).Externalize() + ".png";
             if (File.Exists(filePath)) {
                 if (!overwrite) {
@@ -2296,6 +2302,7 @@ namespace FezGame.Components {
                 File.Delete(filePath);
             }
             ThumbnailScheduled = true;
+            ThumbnailSize = size;
         }
 
     }

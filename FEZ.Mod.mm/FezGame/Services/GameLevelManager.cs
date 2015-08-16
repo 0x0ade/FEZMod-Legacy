@@ -95,10 +95,9 @@ namespace FezGame.Services {
             xmlDocument.Load(xmlReader);
             xmlReader.Close();
             fis.Close();
-            XmlElement xmlLevel = xmlDocument["Level"];
 
             ContentManager cm = CMProvider.GetForLevel(levelName);
-            levelData = (Level) xmlLevel.Deserialize(null, cm, true);
+            levelData = (Level) xmlDocument.Deserialize(null, cm, true);
             levelData.Name = levelName;
 
             LevelSaveData save = GameState.SaveData.ThisLevel;

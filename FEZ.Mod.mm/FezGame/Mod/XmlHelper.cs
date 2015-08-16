@@ -24,6 +24,10 @@ using System.CodeDom;
 namespace FezGame.Mod {
     public static class XmlHelper {
 
+        public static List<string> BlacklistedAssemblies = new List<string>() {
+            "SDL2-CS" //OpenTK
+        };
+
         public static object Deserialize(this XmlNode node, Type parent = null, ContentManager cm = null, bool descend = true) {
             if (node == null) {
                 return null;
@@ -80,10 +84,6 @@ namespace FezGame.Mod {
                 type = node.Name.FindSpecialType(parent);
             }
 
-            if (type == null) {
-                type = node.Name.FindType();
-            }
-            
             if (type == null && descend) {
                 foreach (XmlNode child in node.ChildNodes) {
                     //childNode can be a XmlText...
@@ -108,6 +108,14 @@ namespace FezGame.Mod {
 
             if (parsed != null) {
                 return parsed;
+            }
+
+            if (elem != null && elem.HasAttribute("key")) {
+                parsed = type.Parse(elem.GetAttribute("key"));
+
+                if (parsed != null) {
+                    return parsed;
+                }
             }
 
             object obj = type.New(elem) ?? node.InnerText;
@@ -182,7 +190,7 @@ namespace FezGame.Mod {
                         string attribKey = child is XmlElement ? ((XmlElement) child).GetAttribute("key") : null;
                         if (!string.IsNullOrEmpty(attribKey)) {
                             object key = types[0].Parse(attribKey);
-                            add.Invoke(obj, new object[] { key, child.Deserialize(parent, cm, descend) });
+                            add.Invoke(obj, new object[] { key, child.Deserialize(parent, cm, true) });
                         } else if (child.ChildNodes.Count > 1 && child.ChildNodes.Count == types.Length) {
                             add.Invoke(obj, new object[] {
                                 child.ChildNodes[0].Deserialize(parent, cm, descend),
@@ -340,19 +348,43 @@ namespace FezGame.Mod {
                 }
             }
 
+            if (obj is MapNode) {
+                ((MapNode) obj).LevelName = ((MapNode) obj).LevelName ?? elem.GetAttribute("name");
+                if (elem.HasAttribute("type")) {
+                    ((MapNode) obj).NodeType = (LevelNodeType) Enum.Parse(typeof(LevelNodeType), elem.GetAttribute("type"));
+                }
+            }
+
+            if (obj is WinConditions && elem.HasAttribute("chests")) {
+                WinConditions wc = (WinConditions) obj;
+                wc.ChestCount = int.Parse(elem.GetAttribute("chests"));
+                wc.LockedDoorCount = int.Parse(elem.GetAttribute("lockedDoors"));
+                wc.UnlockedDoorCount = int.Parse(elem.GetAttribute("unlockedDoors"));
+                wc.CubeShardCount = int.Parse(elem.GetAttribute("cubeShards"));
+                wc.SplitUpCount = int.Parse(elem.GetAttribute("splitUp"));
+                wc.SecretCount = int.Parse(elem.GetAttribute("secrets"));
+                wc.OtherCollectibleCount = int.Parse(elem.GetAttribute("others"));
+            }
+
             MethodInfo onDeserialization = obj.GetType().GetMethod("OnDeserialization");
             if (onDeserialization != null) {
                 if (onDeserialization.GetParameters().Length == 0) {
                     onDeserialization.Invoke(obj, new object[0]);
                 } else {
-                    ModLogger.Log("FEZMod", "XmlHelper can't call OnDeserialization on " + obj + " of type " + obj.GetType().FullName + " because it requires parameters. XmlHelper can't pass parameters.");
+                    //ModLogger.Log("FEZMod", "XmlHelper can't call OnDeserialization on " + obj + " of type " + obj.GetType().FullName + " because it requires parameters. XmlHelper can't pass parameters.");
                 }
             }
         }
 
         public static Type FindType(this string name) {
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            List<Assembly> delayedAssemblies = new List<Assembly>();
+
             foreach (Assembly assembly in assemblies) {
+                if (assembly.GetName().Name.EndsWith(".mm") || BlacklistedAssemblies.Contains(assembly.GetName().Name)) {
+                    delayedAssemblies.Add(assembly);
+                    continue;
+                }
                 try {
                     Type[] types = assembly.GetTypes();
                     foreach (Type type in types) {
@@ -361,12 +393,32 @@ namespace FezGame.Mod {
                         }
                     }
                 } catch (ReflectionTypeLoadException e) {
+                    /*ModLogger.Log("FEZMod", "Failed searching a type in XmlHelper's FindType.");
+                    ModLogger.Log("FEZMod", "Assembly: " + assembly.GetName().Name);
+                    ModLogger.Log("FEZMod", e.Message);
+                    foreach (Exception le in e.LoaderExceptions) {
+                        ModLogger.Log("FEZMod", le.Message);
+                    }*/
+                }
+            }
+
+            foreach (Assembly assembly in delayedAssemblies) {
+                try {
+                    Type[] types = assembly.GetTypes();
+                    foreach (Type type in types) {
+                        if (type.Name == name && type.FullName.EndsWith("."+name)) {
+                            return type;
+                        }
+                    }
+                } catch (ReflectionTypeLoadException e) {
+                    /*
                     ModLogger.Log("FEZMod", "Failed searching a type in XmlHelper's FindType.");
                     ModLogger.Log("FEZMod", "Assembly: " + assembly.GetName().Name);
                     ModLogger.Log("FEZMod", e.Message);
                     foreach (Exception le in e.LoaderExceptions) {
                         ModLogger.Log("FEZMod", le.Message);
                     }
+                    */
                 }
             }
 
@@ -386,7 +438,11 @@ namespace FezGame.Mod {
 
             //Use the following logging method call to specify the conditions for a special type.
             //ModLogger.Log("FEZMod", "XmlHelper FindSpecialType debug name: " + name + "; parent: " + parent.FullName);
-            
+
+            if (typeof(NpcInstance).IsAssignableFrom(parent) && name == "Action") {
+                return null;
+            }
+
             if ((typeof(MapTree).IsAssignableFrom(parent) || typeof(MapNode).IsAssignableFrom(parent)) && name == "Node") {
                 return typeof(MapNode);
             }
