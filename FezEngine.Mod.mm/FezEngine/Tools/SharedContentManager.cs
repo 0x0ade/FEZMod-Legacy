@@ -16,7 +16,7 @@ namespace FezEngine.Tools {
 
             private T ReadAsset<T>(string assetName) where T : class {
                 if (typeof(T) == typeof(Texture2D)) {
-                    string imagePath = MemoryContentManager.Externalize(assetName);
+                    string imagePath = assetName.Externalize();
                     string imageExtension = null;
 
                     if (File.Exists(imagePath + ".png")) {
@@ -36,7 +36,7 @@ namespace FezEngine.Tools {
                     }
                 }
 
-                string xmlPath = MemoryContentManager.Externalize(assetName) + ".xml";
+                string xmlPath = assetName.Externalize() + ".xml";
                 if (File.Exists(xmlPath)) {
                     FileStream fis = new FileStream(xmlPath, FileMode.Open);
                     XmlReader xmlReader = XmlReader.Create(fis);

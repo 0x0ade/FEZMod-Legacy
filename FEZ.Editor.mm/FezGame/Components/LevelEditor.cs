@@ -23,6 +23,7 @@ using FezGame.Editor;
 using FezGame.Components.Actions;
 using System.Reflection;
 using FezGame.Mod.Gui;
+using System.Drawing.Imaging;
 
 namespace FezGame.Components {
     public class LevelEditor : DrawableGameComponent, ILevelEditor, IGuiHandler {
@@ -53,6 +54,8 @@ namespace FezGame.Components {
         public ISpeechBubbleManager SpeechBubble { get; set; }
         [ServiceDependency]
         public IContentManagerProvider CMProvider { get; set; }
+        [ServiceDependency]
+        public ITargetRenderingManager TRM { get; set; }
 
         public static LevelEditor Instance;
 
@@ -89,6 +92,9 @@ namespace FezGame.Components {
 
         protected GuiWidget DraggingWidget;
         protected GuiWidget FocusedWidget;
+
+        protected bool ThumbnailScheduled = false;
+        protected RenderTargetHandle ThumbnailRT;
 
         public Color DefaultForeground {
             get {
@@ -262,9 +268,9 @@ namespace FezGame.Components {
                 }
             }));
 
+            button.Widgets.Add(new ButtonWidget(Game, "Recreate thumbnail", () => CreateThumbnail(true)));
             button.Widgets.Add(new ButtonWidget(Game, "Save (XML)", () => Save()));
             button.Widgets.Add(new ButtonWidget(Game, "Save (binary)", () => Save(true)));
-
 
             TopBarWidget.Widgets.Add(button = new ButtonWidget(Game, "View"));
             button.Background.A = 0;
@@ -1873,6 +1879,14 @@ namespace FezGame.Components {
                 return;
             }
 
+            if (ThumbnailScheduled) {
+                if (ThumbnailRT == null) {
+                    ThumbnailRT = TRM.TakeTarget();
+                    TRM.ScheduleHook(DrawOrder, ThumbnailRT.Target);
+                }
+                return;
+            }
+
             SinceMouseMoved += (float) gameTime.ElapsedGameTime.TotalSeconds;
             if (MouseState.Movement.X != 0 || MouseState.Movement.Y != 0) {
                 SinceMouseMoved = 0f;
@@ -1997,6 +2011,29 @@ namespace FezGame.Components {
 
         public override void Draw(GameTime gameTime) {
             if (GameState.Loading || GameState.InMap || GameState.InMenuCube || GameState.Paused || !FEZMod.Preloaded || string.IsNullOrEmpty(LevelManager.Name)) {
+                return;
+            }
+
+            if (ThumbnailScheduled) {
+                if (ThumbnailRT == null) {
+                    return;
+                }
+
+                TRM.Resolve(ThumbnailRT.Target, false);
+                using (System.Drawing.Bitmap bitmap = ThumbnailRT.Target.ToBitmap()) {
+                    float size = 512f; //TODO get nearest lower PoT based on Math.min(bitmap.Width, bitmap.Height)
+                    float x = ThumbnailRT.Target.Width / 2 - size / 2f;
+                    float y = ThumbnailRT.Target.Height / 2 - size / 2f;
+                    using (System.Drawing.Bitmap thumbnail = bitmap.Clone(new System.Drawing.Rectangle((int) x, (int) y, (int) size, (int) size), bitmap.PixelFormat)) {
+                        using (FileStream fs = new FileStream(("other textures/map_screens/" + LevelManager.Name).Externalize() + ".png", FileMode.Create)) {
+                            thumbnail.Save(fs, ImageFormat.Png);
+                        }
+                    }
+                }
+                TRM.ReturnTarget(ThumbnailRT);
+                ThumbnailRT =  null;
+                ThumbnailScheduled = false;
+                //maybe show a flash or something; in the meantime simply don't render the editor
                 return;
             }
 
@@ -2180,7 +2217,7 @@ namespace FezGame.Components {
         public void Save(bool binary = false, bool overwrite = false) {
             WindowHeaderWidget windowHeader = null;
 
-            string filePath_ = ("Resources\\levels\\" + (LevelManager.Name.ToLower())).Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString()) + ".";
+            string filePath_ = ("levels\\" + LevelManager.Name).Externalize() + ".";
             string fileExtension = (binary ? FEZMod.LevelFileFormat : "xml");
             string filePath = filePath_ + fileExtension;
             FileInfo file = new FileInfo(filePath);
@@ -2205,8 +2242,9 @@ namespace FezGame.Components {
                         file.MoveTo(filePath_ + "1." + fileExtension);
                     }
                 }
-                ModLogger.Log("JAFM.Engine", "Saving level "+LevelManager.Name);
+                ModLogger.Log("FEZMod.Editor", "Saving level "+LevelManager.Name);
                 GameLevelManagerHelper.Save(LevelManager.Name, binary);
+                CreateThumbnail(true);
                 if (windowHeader != null) {
                     windowHeader.CloseButtonWidget.Action();
                 }
@@ -2247,6 +2285,17 @@ namespace FezGame.Components {
                 LabelCentered = true,
                 Position = new Vector2(window.Size.X / 2f, 24f)
             });
+        }
+
+        public void CreateThumbnail(bool overwrite = false) {
+            string filePath = ("other textures/map_screens/" + LevelManager.Name).Externalize() + ".png";
+            if (File.Exists(filePath)) {
+                if (!overwrite) {
+                    return;
+                }
+                File.Delete(filePath);
+            }
+            ThumbnailScheduled = true;
         }
 
     }

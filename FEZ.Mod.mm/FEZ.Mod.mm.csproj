@@ -105,6 +105,7 @@
     <Compile Include="FezGame\Mod\Gui\TextFieldWidget.cs" />
     <Compile Include="FezGame\Mod\Gui\TopBarWidget.cs" />
     <Compile Include="FezGame\Mod\Gui\WindowHeaderWidget.cs" />
+    <Compile Include="FezGame\Mod\FEZModContentHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

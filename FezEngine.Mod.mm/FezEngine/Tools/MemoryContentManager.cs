@@ -76,7 +76,7 @@ namespace FezEngine.Tools {
             for (int i = 0; i < count; i++) {
                 byte[] bytes = cachedAssets[assetNames_[i]];
                 string assetName = assetNames_[i].ToLower();
-                string filePath = Externalize(assetName) + ".xnb";
+                string filePath = assetName.Externalize() + ".xnb";
                 FileInfo file = new FileInfo(filePath);
                 if (!file.Exists) {
                     file.Directory.Create();
@@ -100,7 +100,7 @@ namespace FezEngine.Tools {
                 DumpAll();
             }
 
-            string filePath = Externalize(assetName) + ".xnb";
+            string filePath = assetName.Externalize() + ".xnb";
             FileInfo file = new FileInfo(filePath);
             if (file.Exists) {
                 FileStream fis = new FileStream(filePath, FileMode.Open);
@@ -147,7 +147,7 @@ namespace FezEngine.Tools {
                 return true;
             }
 
-            if (File.Exists(Externalize(assetName) + ".xnb")) {
+            if (File.Exists(assetName.Externalize() + ".xnb")) {
                 return true;
             }
 
@@ -174,10 +174,6 @@ namespace FezEngine.Tools {
                 orig_Preload();
             }
             FEZMod.Preload();
-        }
-
-        public static string Externalize(string assetName) {
-            return ("Resources\\" + (assetName.ToLower())).Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString());
         }
 
     }

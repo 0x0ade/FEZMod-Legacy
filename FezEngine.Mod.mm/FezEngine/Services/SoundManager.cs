@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Microsoft.Xna.Framework.Audio;
 using FezEngine.Tools;
+using FezGame.Mod;
 
 namespace FezEngine.Services {
     public class SoundManager {
@@ -103,7 +104,7 @@ namespace FezEngine.Services {
         public OggStream GetCue(string name, bool asyncPrecache = false) {
             bool isAmbience = name.Contains("Ambience");
 
-            string oggFile = MemoryContentManager.Externalize((isAmbience ? "" : "music/") + name.Replace(" ^ ", "\\")) + ".ogg";
+            string oggFile = ((isAmbience ? "" : "music/") + name.Replace(" ^ ", "\\")).Externalize() + ".ogg";
             if (File.Exists(oggFile)) {
                 OggStream oggStream = (OggStream) null;
                 try {
