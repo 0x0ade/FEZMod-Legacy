@@ -1886,8 +1886,6 @@ namespace FezGame.Components {
 
             if (ThumbnailScheduled) {
                 if (ThumbnailRT == null) {
-
-
                     ThumbnailRT = TRM.TakeTarget();
                     TRM.ScheduleHook(DrawOrder, ThumbnailRT.Target);
                 }
@@ -2037,8 +2035,9 @@ namespace FezGame.Components {
                     }
                 }
                 TRM.ReturnTarget(ThumbnailRT);
-                ThumbnailRT =  null;
+                ThumbnailRT = null;
                 ThumbnailScheduled = false;
+                FEZMod.CreatingThumbnail = false;
                 //maybe show a flash or something; in the meantime simply don't render the editor
                 return;
             }
@@ -2301,6 +2300,7 @@ namespace FezGame.Components {
                 }
                 File.Delete(filePath);
             }
+            FEZMod.CreatingThumbnail = true;
             ThumbnailScheduled = true;
             ThumbnailSize = size;
         }

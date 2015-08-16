@@ -85,6 +85,16 @@ namespace FezGame.Components {
             return networkData;
         }
 
+        public void orig_Draw(GameTime gameTime) {
+        }
+
+        public void Draw(GameTime gameTime) {
+            if (FEZMod.CreatingThumbnail) {
+                return;
+            }
+            orig_Draw(gameTime);
+        }
+
     }
 }
 

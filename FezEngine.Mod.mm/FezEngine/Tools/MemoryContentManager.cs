@@ -150,6 +150,21 @@ namespace FezEngine.Tools {
             if (File.Exists(assetName.Externalize() + ".xnb")) {
                 return true;
             }
+            if (File.Exists(assetName.Externalize() + ".ogg")) {
+                return true;
+            }
+            if (File.Exists(assetName.Externalize() + ".png")) {
+                return true;
+            }
+            if (File.Exists(assetName.Externalize() + ".jpg")) {
+                return true;
+            }
+            if (File.Exists(assetName.Externalize() + ".jpeg")) {
+                return true;
+            }
+            if (File.Exists(assetName.Externalize() + ".gif")) {
+                return true;
+            }
 
             return orig_AssetExists(assetName);
         }

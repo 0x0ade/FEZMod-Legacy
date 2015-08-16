@@ -2,6 +2,7 @@
 using FezEngine.Structure;
 using FezGame;
 using Microsoft.Xna.Framework;
+using FezGame.Mod;
 
 namespace FezGame.Components {
     public class DotHost {
@@ -17,6 +18,9 @@ namespace FezGame.Components {
                 if (this.eIdle != null) {
                     eIdle.VolumeFactor = 0f;
                 }
+                return;
+            }
+            if (FEZMod.CreatingThumbnail) {
                 return;
             }
             orig_Draw(gameTime);
