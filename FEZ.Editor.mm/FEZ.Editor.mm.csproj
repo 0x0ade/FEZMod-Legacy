@@ -74,6 +74,7 @@
     <Compile Include="FezGame\Mod\Gui\TrilePickerWidget.cs" />
     <Compile Include="FezGame\Editor\EditorUtils.cs" />
     <Compile Include="FezGame\Mod\Gui\EditorInfoWidget.cs" />
+    <Compile Include="FezGame\Mod\Gui\ThumbnailCreatorWidget.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

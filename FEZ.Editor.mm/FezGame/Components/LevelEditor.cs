@@ -93,8 +93,10 @@ namespace FezGame.Components {
         protected GuiWidget DraggingWidget;
         protected GuiWidget FocusedWidget;
 
-        protected bool ThumbnailScheduled = false;
-        protected int ThumbnailSize;
+        public bool ThumbnailScheduled { get; set; }
+        public int ThumbnailX { get; set; }
+        public int ThumbnailY { get; set; }
+        public int ThumbnailSize { get; set; }
         protected RenderTargetHandle ThumbnailRT;
 
         public Color DefaultForeground {
@@ -2026,9 +2028,9 @@ namespace FezGame.Components {
 
                 TRM.Resolve(ThumbnailRT.Target, false);
                 using (System.Drawing.Bitmap bitmap = ThumbnailRT.Target.ToBitmap()) {
-                    float x = ThumbnailRT.Target.Width / 2 - ThumbnailSize / 2f;
-                    float y = ThumbnailRT.Target.Height / 2 - ThumbnailSize / 2f;
-                    using (System.Drawing.Bitmap thumbnail = bitmap.Clone(new System.Drawing.Rectangle((int) x, (int) y, ThumbnailSize, ThumbnailSize), bitmap.PixelFormat)) {
+                    //float x = ThumbnailRT.Target.Width / 2 - ThumbnailSize / 2f;
+                    //float y = ThumbnailRT.Target.Height / 2 - ThumbnailSize / 2f;
+                    using (System.Drawing.Bitmap thumbnail = bitmap.Clone(new System.Drawing.Rectangle(ThumbnailX, ThumbnailY, ThumbnailSize, ThumbnailSize), bitmap.PixelFormat)) {
                         using (FileStream fs = new FileStream(("other textures/map_screens/" + LevelManager.Name).Externalize() + ".png", FileMode.Create)) {
                             thumbnail.Save(fs, ImageFormat.Png);
                         }
@@ -2047,6 +2049,10 @@ namespace FezGame.Components {
 
             float cursorScale = viewScale * 2f;
             Point cursorPosition = SettingsManager.PositionInViewport(MouseState);
+            Texture2D cursor = MouseState.LeftButton.State == MouseButtonStates.Dragging || MouseState.RightButton.State == MouseButtonStates.Dragging ? GrabbedCursor : (CursorHovering ? (MouseState.LeftButton.State == MouseButtonStates.Down || MouseState.RightButton.State == MouseButtonStates.Down ? ClickedCursor : CanClickCursor) : PointerCursor);
+            if (cursor == CanClickCursor || cursor == ClickedCursor) {
+                cursorPosition.X -= 8;
+            }
 
             GraphicsDevice.SetBlendingMode(BlendingMode.Alphablending);
             SpriteBatch.BeginPoint();
@@ -2056,7 +2062,7 @@ namespace FezGame.Components {
                 widget.Draw(gameTime);
             }
 
-            SpriteBatch.Draw(MouseState.LeftButton.State == MouseButtonStates.Dragging || MouseState.RightButton.State == MouseButtonStates.Dragging ? GrabbedCursor : (CursorHovering ? (MouseState.LeftButton.State == MouseButtonStates.Down || MouseState.RightButton.State == MouseButtonStates.Down ? ClickedCursor : CanClickCursor) : PointerCursor), 
+            SpriteBatch.Draw(cursor, 
                 new Vector2(
                     (float) cursorPosition.X - cursorScale * 11.5f,
                     (float) cursorPosition.Y - cursorScale * 8.5f
@@ -2300,9 +2306,8 @@ namespace FezGame.Components {
                 }
                 File.Delete(filePath);
             }
-            FEZMod.CreatingThumbnail = true;
-            ThumbnailScheduled = true;
             ThumbnailSize = size;
+            Widgets.Add(new ThumbnailCreatorWidget(Game));
         }
 
     }
