@@ -18,5 +18,9 @@ Common.Mod.mm/bin/
 Common.Mod.mm/obj/
 Common.Mod.mm/*.sln
 Common.Mod.mm/*.userprefs
+MonoGame.Framework.FML.mm/bin/
+MonoGame.Framework.FML.mm/obj/
+MonoGame.Framework.FML.mm/*.sln
+MonoGame.Framework.FML.mm/*.userprefs
 
 FEZ.Secret.mm/*

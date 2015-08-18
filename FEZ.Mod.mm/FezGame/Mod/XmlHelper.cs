@@ -411,14 +411,12 @@ namespace FezGame.Mod {
                         }
                     }
                 } catch (ReflectionTypeLoadException e) {
-                    /*
                     ModLogger.Log("FEZMod", "Failed searching a type in XmlHelper's FindType.");
                     ModLogger.Log("FEZMod", "Assembly: " + assembly.GetName().Name);
                     ModLogger.Log("FEZMod", e.Message);
                     foreach (Exception le in e.LoaderExceptions) {
                         ModLogger.Log("FEZMod", le.Message);
                     }
-                    */
                 }
             }
 

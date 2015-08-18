@@ -1,8 +1,0 @@
-/home/maik/monodevelop/MonoMod/FEZMod/MonoGame.Framework.FML.mm/obj/Debug/.NETFramework,Version=v4.5.AssemblyAttribute.cs
-/home/maik/monodevelop/MonoMod/FEZMod/MonoGame.Framework.FML.mm/bin/Debug/MonoGame.Framework.FML.mm.dll.mdb
-/home/maik/monodevelop/MonoMod/FEZMod/MonoGame.Framework.FML.mm/bin/Debug/MonoGame.Framework.FML.mm.dll
-/home/maik/monodevelop/MonoMod/FEZMod/MonoGame.Framework.FML.mm/obj/Debug/MonoGame.Framework.FML.mm.dll
-/home/maik/monodevelop/MonoMod/FEZMod/MonoGame.Framework.FML.mm/obj/Debug/MonoGame.Framework.FML.mm.dll.mdb
-/home/maik/monodevelop/MonoMod/FEZMod/MonoGame.Framework.FML.mm/bin/Debug/MonoGame.Framework.dll
-/home/maik/monodevelop/MonoMod/FEZMod/MonoGame.Framework.FML.mm/bin/Debug/System.Drawing.dll
-/home/maik/monodevelop/MonoMod/FEZMod/MonoGame.Framework.FML.mm/bin/Debug/System.Xml.dll
