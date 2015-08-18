@@ -1463,11 +1463,13 @@ namespace FezGame.Components {
                             UpdateBounds = false,
                             LabelCentered = false
                         });
-                        
+
+                        Dictionary<string, string>.KeyCollection speechLines = typeof(GameText).GetPrivateStatic<Dictionary<string, string>>("Fallback").Keys;
                         columns[1].Widgets.Add(new ButtonWidget(Game, "+ SPEECH", delegate() {
                             ContainerWidget widgetSpeech = null;
+                            TextFieldWidget widgetFieldSpeech = null;
                             columns[1].Widgets.Insert(columns[1].Widgets.Count - 2, widgetSpeech = new ContainerWidget(Game, new GuiWidget[] {
-                                new TextFieldWidget(Game) {
+                                widgetFieldSpeech = new TextFieldWidget(Game) {
                                     Size = new Vector2(columnWidth - 24f, 24f),
                                     UpdateBounds = false,
                                     Position = new Vector2(0f, 0f)
@@ -1485,42 +1487,13 @@ namespace FezGame.Components {
                                 Size = new Vector2(columnWidth, 24f),
                                 Background = new Color(DefaultBackground, 0f)
                             });
+                            widgetFieldSpeech.Fill(speechLines);
                         }) {
                             Background = new Color(0f, 0.125f, 0f, 1f),
                             Size = new Vector2(columnWidth, 24f),
                             UpdateBounds = false,
                             LabelCentered = true
                         });
-
-                        /*
-                        columns[2].Widgets.Add(new ButtonWidget(Game, "+ ACTION", delegate() {
-                            ContainerWidget widgetAction = null;
-                            columns[2].Widgets.Insert(columns[2].Widgets.Count - 1, widgetAction = new ContainerWidget(Game, new GuiWidget[] {
-                                new TextFieldWidget(Game) {
-                                    Size = new Vector2(columnWidth - 24f, 24f),
-                                    UpdateBounds = false,
-                                    Position = new Vector2(0f, 0f)
-                                },
-                                new ButtonWidget(Game, "X", delegate() {
-                                    columns[2].Widgets.Remove(widgetAction);
-                                }) {
-                                    Background = new Color(0.5f, 0f, 0f, 1f),
-                                    Size = new Vector2(24f, 24f),
-                                    UpdateBounds = false,
-                                    LabelCentered = true,
-                                    Position = new Vector2(columnWidth - 24f, 0f)
-                                }
-                            }) {
-                                Size = new Vector2(columnWidth, 24f),
-                                Background = new Color(DefaultBackground, 0f)
-                            });
-                        }) {
-                            Background = new Color(0f, 0.125f, 0f, 1f),
-                            Size = new Vector2(columnWidth, 24f),
-                            UpdateBounds = false,
-                            LabelCentered = true
-                        });
-                        */
 
                         columns[0].Widgets.Add(new ButtonWidget(Game, "ADD NPC", delegate() {
                             string[] positionSplit = windowFieldPosition.Text.Split(new char[] {';'});
@@ -1558,20 +1531,7 @@ namespace FezGame.Components {
                                 }
                                 npc.Speech.Add(line);
                             }
-
-                            /*
-                            for (int ri = 0; ri < columns[2].Widgets.Count; ri++) {
-                                GuiWidget rowWidget = columns[2].Widgets[ri];
-                                if (!(rowWidget is ContainerWidget) || rowWidget.Widgets.Count != 2) {
-                                    continue;
-                                }
-                                TextFieldWidget lineWidget = (TextFieldWidget) rowWidget.Widgets[0];
-                                npc.Actions[(NpcAction) Enum.Parse(typeof(NpcAction), lineWidget.Text)] = new NpcActionContent() {
-                                    AnimationName = lineWidget.Text
-                                };
-                                //TODO SoundName?
-                            }
-                            */
+                                
 
                             string root = ContentPaths.CharacterAnimations + "/" + npc.Name;
                             IEnumerable<string> list = CMProvider.GetAllIn(root);

@@ -13,6 +13,14 @@ namespace FezGame.Editor {
             return (T) field.GetValue(instance);
         }
 
+        public static T GetPrivateStatic<T>(this Type type, string fieldName) {
+            FieldInfo field = type.GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Static);
+            if (field == null) {
+                return default (T);
+            }
+            return (T) field.GetValue(null);
+        }
+
         public static bool Inside(this Vector2 point, Rectangle rectangle) {
             return
                 rectangle.X <= point.X && point.X <= rectangle.X + rectangle.Width &&

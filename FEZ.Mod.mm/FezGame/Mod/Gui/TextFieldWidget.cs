@@ -137,7 +137,17 @@ namespace FezGame.Mod.Gui {
         }
 
         public override void Draw(GameTime gameTime) {
+            GuiWidget lastScissor = null;
+            if (ScissorHistory.Count > 0) {
+                lastScissor = ScissorHistory[ScissorHistory.Count - 1];
+            }
+            if (lastScissor != null) {
+                lastScissor.StopClipping();
+            }
             base.Draw(gameTime);
+            if (lastScissor != null) {
+                lastScissor.StartClipping();
+            }
 
             if (!InView || Text == null) {
                 return;

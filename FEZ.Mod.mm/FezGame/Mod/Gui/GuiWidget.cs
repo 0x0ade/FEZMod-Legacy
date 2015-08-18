@@ -95,6 +95,7 @@ namespace FezGame.Mod.Gui {
         protected Rectangle backgroundBounds = new Rectangle();
         protected bool ScissorTestEnablePrev;
         protected Rectangle ScissorRectanglePrev;
+        protected List<GuiWidget> ScissorHistory = new List<GuiWidget>();
         protected readonly static RasterizerState ScissorRasterizerState = new RasterizerState {
             CullMode = CullMode.CullCounterClockwiseFace,
             ScissorTestEnable = true
@@ -211,6 +212,8 @@ namespace FezGame.Mod.Gui {
             //GuiHandler.SpriteBatch.BeginPoint();
             GuiHandler.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, ScissorRasterizerState);
             GraphicsDevice.ScissorRectangle = backgroundBounds;
+
+            ScissorHistory.Add(this);
         }
 
         public virtual void StopClipping() {
@@ -226,6 +229,8 @@ namespace FezGame.Mod.Gui {
                 GuiHandler.SpriteBatch.BeginPoint();
             }
             GraphicsDevice.ScissorRectangle = ScissorRectanglePrev;
+
+            ScissorHistory.Remove(this);
         }
 
         public virtual void UpdateTheme() {
@@ -238,11 +243,8 @@ namespace FezGame.Mod.Gui {
                 return;
             }
 
-            foreground_ = GuiHandler.DefaultForeground;
-            Background = GuiHandler.DefaultBackground;
-
-            PrevDefaultForeground = GuiHandler.DefaultForeground;
-            PrevDefaultBackground = GuiHandler.DefaultBackground;
+            PrevDefaultForeground = foreground_ = GuiHandler.DefaultForeground;
+            PrevDefaultBackground = Background = GuiHandler.DefaultBackground;
         }
 
         public virtual void Refresh() {
