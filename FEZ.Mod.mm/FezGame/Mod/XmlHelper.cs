@@ -20,15 +20,22 @@ using System.Collections.Specialized;
 using System.Threading.Tasks;
 using ContentSerialization.Attributes;
 using System.CodeDom;
+using FezEngine.Content;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace FezGame.Mod {
     public static class XmlHelper {
 
         public static List<string> BlacklistedAssemblies = new List<string>() {
-            "SDL2-CS" //OpenTK
+            "SDL2-CS", //OpenTK
+            "System.Drawing" //Thanks Rectangle!
         };
 
         public static object Deserialize(this XmlNode node, Type parent = null, ContentManager cm = null, bool descend = true) {
+            if (cm == null) {
+                cm = ServiceHelper.Get<IContentManagerProvider>().Global;
+            }
+
             if (node == null) {
                 return null;
             }
@@ -366,6 +373,24 @@ namespace FezGame.Mod {
                 wc.OtherCollectibleCount = int.Parse(elem.GetAttribute("others"));
             }
 
+            if (obj is AnimatedTexture) {
+                AnimatedTexture ani = (AnimatedTexture) obj;
+                int width = int.Parse(elem.GetAttribute("width"));
+                int height = int.Parse(elem.GetAttribute("height"));
+                ani.FrameWidth = int.Parse(elem.GetAttribute("actualWidth"));
+                ani.FrameHeight = int.Parse(elem.GetAttribute("actualHeight"));
+                ani.Texture = cm.Load<Texture2D>(elem.OwnerDocument.DocumentElement.GetAttribute("assetName") + ".ani");
+                ani.Offsets = new Rectangle[elem.FirstChild.ChildNodes.Count];
+                float[] durations = new float[elem.FirstChild.ChildNodes.Count];
+                for (int i = 0; i < elem.FirstChild.ChildNodes.Count; i++) {
+                    XmlNode child = elem.FirstChild.ChildNodes[i];
+                    ani.Offsets[i] = (Rectangle) child.FirstChild.Deserialize(null, null, false);
+                    durations[i] = (float) new TimeSpan(long.Parse(((XmlElement) child).GetAttribute("duration"))).TotalSeconds;
+                }
+                ani.Timing = new AnimationTiming(0, durations.Length - 1, durations);
+                ani.PotOffset = new Vector2((float) (FezMath.NextPowerOfTwo((double) ani.FrameWidth) - ani.FrameWidth), (float) (FezMath.NextPowerOfTwo((double) ani.FrameHeight) - ani.FrameHeight));
+            }
+
             MethodInfo onDeserialization = obj.GetType().GetMethod("OnDeserialization");
             if (onDeserialization != null) {
                 if (onDeserialization.GetParameters().Length == 0) {
@@ -430,7 +455,7 @@ namespace FezGame.Mod {
         /// <param name="name">Name of the type to find. Usually the name of the node.</param>
         /// <param name="parent">Parent node's type.</param>
         public static Type FindSpecialType(this string name, Type parent) {
-            if (string.IsNullOrEmpty(name) || parent == null) {
+            if (string.IsNullOrEmpty(name)) {
                 return name.FindType();
             }
 
@@ -455,6 +480,14 @@ namespace FezGame.Mod {
 
             if (typeof(WinConditions).IsAssignableFrom(parent) && name == "Script") {
                 return typeof(int);
+            }
+
+            if (parent == null && name == "AnimatedTexturePC") {
+                return typeof(AnimatedTexture);
+            }
+
+            if (typeof(AnimatedTexture).IsAssignableFrom(parent) && name == "FramePC") {
+                return typeof(FrameContent);
             }
 
             return name.FindType();
