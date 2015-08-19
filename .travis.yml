@@ -9,6 +9,7 @@ script:
     - ./build_engine.sh
     - ./build_editor.sh
     - ./build_speedrun.sh
+    - ./build_fixmonolive.sh
 after_success:
     - wget http://fezmod.tk/files/travis/deploy.sh
     - chmod +x ./deploy.sh
