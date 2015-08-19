@@ -14,17 +14,8 @@ namespace FezEngine.Tools {
             }
 
             private T ReadAsset<T>(string assetName) where T : class {
-                string xmlPath = assetName.Externalize() + ".xml";
-                if (File.Exists(xmlPath)) {
-                    FileStream fis = new FileStream(xmlPath, FileMode.Open);
-                    XmlReader xmlReader = XmlReader.Create(fis);
-                    XmlDocument xmlDocument = new XmlDocument();
-                    xmlDocument.Load(xmlReader);
-                    xmlReader.Close();
-                    fis.Close();
-                    xmlDocument.DocumentElement.SetAttribute("assetName", assetName);
-
-                    return xmlDocument.Deserialize(null, null, true) as T;
+                if (assetName.Contains("-fm-")) {
+                    assetName = assetName.Substring(0, assetName.IndexOf("-fm-"));
                 }
 
                 if (typeof(T) == typeof(Texture2D)) {
@@ -46,6 +37,19 @@ namespace FezEngine.Tools {
                             return Texture2D.FromStream(ServiceHelper.Game.GraphicsDevice, fs) as T;
                         }
                     }
+                }
+
+                string xmlPath = assetName.Externalize() + ".xml";
+                if (File.Exists(xmlPath)) {
+                    FileStream fis = new FileStream(xmlPath, FileMode.Open);
+                    XmlReader xmlReader = XmlReader.Create(fis);
+                    XmlDocument xmlDocument = new XmlDocument();
+                    xmlDocument.Load(xmlReader);
+                    xmlReader.Close();
+                    fis.Close();
+                    xmlDocument.DocumentElement.SetAttribute("assetName", assetName);
+
+                    return xmlDocument.Deserialize(null, null, true) as T;
                 }
 
                 return orig_ReadAsset<T>(assetName);

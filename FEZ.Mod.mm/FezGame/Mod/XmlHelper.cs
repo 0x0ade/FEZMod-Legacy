@@ -22,6 +22,7 @@ using ContentSerialization.Attributes;
 using System.CodeDom;
 using FezEngine.Content;
 using Microsoft.Xna.Framework.Graphics;
+using FezEngine.Structure.Geometry;
 
 namespace FezGame.Mod {
     public static class XmlHelper {
@@ -29,6 +30,13 @@ namespace FezGame.Mod {
         public static List<string> BlacklistedAssemblies = new List<string>() {
             "SDL2-CS", //OpenTK
             "System.Drawing" //Thanks Rectangle!
+        };
+        public static List<Type> HatedTypesNew = new List<Type>() {
+            typeof(VertexPositionNormalTextureInstance) //Thanks parameter Normal being of type Vector3, but being a byte in XML...
+        };
+        public static List<Type> HatedTypesSpecial = new List<Type>() {
+            typeof(AnimatedTexture), //Thanks for Frames requiring to be specially parsed...
+            typeof(ArtObject), //Thanks for basically everything requiring to be specially parsed...
         };
 
         public static object Deserialize(this XmlNode node, Type parent = null, ContentManager cm = null, bool descend = true) {
@@ -41,7 +49,7 @@ namespace FezGame.Mod {
             }
 
             if (node is XmlDeclaration) {
-                ModLogger.Log("FEZMod", "XmlHelper found XmlDeclaration; skipping...");
+                //ModLogger.Log("FEZMod", "XmlHelper found XmlDeclaration; skipping...");
                 return node.NextSibling.Deserialize(parent, cm, descend);
             }
 
@@ -94,7 +102,7 @@ namespace FezGame.Mod {
             if (type == null && descend) {
                 foreach (XmlNode child in node.ChildNodes) {
                     //childNode can be a XmlText...
-                    object obj_ = child.Deserialize(parent, cm, true);
+                    object obj_ = child.Deserialize(parent, cm);
                     if (obj_ != null) {
                         return obj_;
                     }
@@ -127,7 +135,7 @@ namespace FezGame.Mod {
 
             object obj = type.New(elem) ?? node.InnerText;
 
-            if (obj is string) {
+            if (obj is string || HatedTypesNew.Contains(type)) {
                 return obj;
             }
 
@@ -179,6 +187,11 @@ namespace FezGame.Mod {
                 obj = type.New();
             }
 
+            if (HatedTypesSpecial.Contains(type)) {
+                obj.HandleSpecialDataDeserialize(elem, cm);
+                return obj;
+            }
+
             bool isGenericICollection = false;
             //TODO find out why HashSets don't trigger the usual obj is ICollection but other types do
             foreach (Type interfaceType in type.GetInterfaces()) {
@@ -197,7 +210,7 @@ namespace FezGame.Mod {
                         string attribKey = child is XmlElement ? ((XmlElement) child).GetAttribute("key") : null;
                         if (!string.IsNullOrEmpty(attribKey)) {
                             object key = types[0].Parse(attribKey);
-                            add.Invoke(obj, new object[] { key, child.Deserialize(parent, cm, true) });
+                            add.Invoke(obj, new object[] { key, child.Deserialize(parent, cm) });
                         } else if (child.ChildNodes.Count > 1 && child.ChildNodes.Count == types.Length) {
                             add.Invoke(obj, new object[] {
                                 child.ChildNodes[0].Deserialize(parent, cm, descend),
@@ -384,11 +397,37 @@ namespace FezGame.Mod {
                 float[] durations = new float[elem.FirstChild.ChildNodes.Count];
                 for (int i = 0; i < elem.FirstChild.ChildNodes.Count; i++) {
                     XmlNode child = elem.FirstChild.ChildNodes[i];
-                    ani.Offsets[i] = (Rectangle) child.FirstChild.Deserialize(null, null, false);
+                    ani.Offsets[i] = (Rectangle) child.FirstChild.Deserialize(null, cm, false);
                     durations[i] = (float) new TimeSpan(long.Parse(((XmlElement) child).GetAttribute("duration"))).TotalSeconds;
                 }
                 ani.Timing = new AnimationTiming(0, durations.Length - 1, durations);
                 ani.PotOffset = new Vector2((float) (FezMath.NextPowerOfTwo((double) ani.FrameWidth) - ani.FrameWidth), (float) (FezMath.NextPowerOfTwo((double) ani.FrameHeight) - ani.FrameHeight));
+            }
+
+            if (obj is ArtObject) {
+                ArtObject ao = (ArtObject) obj;
+                ao.Name = elem.GetAttribute("name");
+                ao.Cubemap = cm.Load<Texture2D>(elem.OwnerDocument.DocumentElement.GetAttribute("assetName") + "-fm-Texture2D");//.MixAlpha(cm.Load<Texture2D>(elem.OwnerDocument.DocumentElement.GetAttribute("assetName") + "_alpha"));
+                ao.Size = (Vector3) elem.ChildNodes[0].FirstChild.Deserialize();
+                XmlNode geometryNode = null;
+                foreach (XmlNode childNode in elem.ChildNodes) {
+                    if (childNode.Name == "ShaderInstancedIndexedPrimitives") {
+                        geometryNode = childNode;
+                        break;
+                    }
+                }
+                if (geometryNode != null) {
+                    XmlElement geometryElem = (XmlElement) geometryNode;
+                    //PrimitiveType type = (PrimitiveType) typeof(PrimitiveType).Parse(geometryElem.GetAttribute("type"));
+                    //Let's just assume all art objects use TriangleLists.
+                    //Note the suffix s in TriangleLists...
+                    ao.Geometry = new ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>(PrimitiveType.TriangleList, 60);
+                    ao.Geometry.NeedsEffectCommit = true;
+                    ao.Geometry.Vertices = (VertexPositionNormalTextureInstance[]) geometryElem.ChildNodes[0].Deserialize(typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>), cm);
+                    ao.Geometry.Indices = (int[]) geometryElem.ChildNodes[1].Deserialize(typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>), cm);
+                }
+                ao.ActorType = (ActorType) typeof(ActorType).Parse(elem.GetAttribute("actorType"));
+                ao.NoSihouette = bool.Parse(elem.GetAttribute("noSilhouette"));
             }
 
             MethodInfo onDeserialization = obj.GetType().GetMethod("OnDeserialization");
@@ -490,6 +529,10 @@ namespace FezGame.Mod {
                 return typeof(FrameContent);
             }
 
+            if (typeof(ArtObject).IsAssignableFrom(parent) && name == "ShaderInstancedIndexedPrimitives") {
+                return typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>);
+            }
+
             return name.FindType();
         }
 
@@ -524,9 +567,9 @@ namespace FezGame.Mod {
             ConstructorInfo[] constructors = type.GetConstructors();
             foreach (ConstructorInfo constructor in constructors) {
                 ParameterInfo[] parameters = constructor.GetParameters();
-                if (attribs == null && parameters == null) {
+                if (!elem.HasAttributes && parameters.Length == 0) {
                     return constructor.Invoke(new object[0]);
-                } else if (attribs == null || parameters == null) {
+                } else if (!elem.HasAttributes || parameters.Length == 0) {
                     continue;
                 }
                 if (attribs.Count != parameters.Length) {
@@ -553,6 +596,15 @@ namespace FezGame.Mod {
             ConstructorInfo constructor_ = type.GetDefaultConstructor();
             if (constructor_ != null) {
                 return constructor_.Invoke(new object[0]);
+            }
+
+            if (type == typeof(VertexPositionNormalTextureInstance)) {
+                //TODO make this method automatically pass the child nodes when needed
+                return new VertexPositionNormalTextureInstance(
+                    (Vector3) elem.ChildNodes[0].FirstChild.Deserialize(),
+                    byte.Parse(elem.ChildNodes[1].InnerText),
+                    (Vector2) elem.ChildNodes[2].FirstChild.Deserialize()
+                );
             }
 
             ModLogger.Log("FEZMod", "XmlHelper can't find a constructor for element " + elem.Name + " of type " + type.FullName);
