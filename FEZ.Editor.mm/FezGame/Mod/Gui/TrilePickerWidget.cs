@@ -91,6 +91,9 @@ namespace FezGame.Mod.Gui {
 
             //WARNING: It is not performant as it reads the orig atlas from the GPU / VRAM, modifies it on the CPU and then pushes it back to VRAM.
             //TODO: Learn how to use FBOs in MonoDevelop / XNA.
+            if (TrileAtlas != null) {
+                TrileAtlas.Dispose();
+            }
             TrileAtlas = new Texture2D(GraphicsDevice, LevelManager.TrileSet.TextureAtlas.Width, LevelManager.TrileSet.TextureAtlas.Height);
             Color[] trileAtlasData = new Color[TrileAtlas.Width * TrileAtlas.Height];
             LevelManager.TrileSet.TextureAtlas.GetData(trileAtlasData);
