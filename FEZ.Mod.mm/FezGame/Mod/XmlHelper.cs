@@ -27,21 +27,25 @@ using System.Globalization;
 using System.Threading;
 
 namespace FezGame.Mod {
-    public struct CacheKey_Type_Member {
-        public Type Type;
-        public object Member;
-    }
     public struct CacheKey_Type_NodeName {
         public Type Type;
         public string NodeName;
+    }
+    public struct CacheKey_NodeName_AttribName {
+        public string NodeName;
+        public string AttribName;
     }
 
     public static class XmlHelper {
 
         private readonly static Dictionary<string, Type> CacheTypes = new Dictionary<string, Type>();
         private readonly static Dictionary<CacheKey_Type_NodeName, Type> CacheTypesSpecial = new Dictionary<CacheKey_Type_NodeName, Type>();
-        private readonly static Dictionary<CacheKey_Type_Member, FieldInfo> CacheFields = new Dictionary<CacheKey_Type_Member, FieldInfo>();
-        private readonly static Dictionary<CacheKey_Type_Member, MethodInfo> CacheMethods = new Dictionary<CacheKey_Type_Member, MethodInfo>();
+        private readonly static Dictionary<Type, FieldInfo[]> CacheTypesFields = new Dictionary<Type, FieldInfo[]>();
+        private readonly static Dictionary<Type, PropertyInfo[]> CacheTypesProperties = new Dictionary<Type, PropertyInfo[]>();
+        private readonly static Dictionary<CacheKey_Type_NodeName, FieldInfo> CacheFields = new Dictionary<CacheKey_Type_NodeName, FieldInfo>();
+        private readonly static Dictionary<CacheKey_Type_NodeName, PropertyInfo> CacheProperties = new Dictionary<CacheKey_Type_NodeName, PropertyInfo>();
+        private readonly static Dictionary<CacheKey_NodeName_AttribName, FieldInfo> CacheAttribFields = new Dictionary<CacheKey_NodeName_AttribName, FieldInfo>();
+        private readonly static Dictionary<CacheKey_NodeName_AttribName, PropertyInfo> CacheAttribProperties = new Dictionary<CacheKey_NodeName_AttribName, PropertyInfo>();
         private readonly static Dictionary<CacheKey_Type_NodeName, ConstructorInfo> CacheConstructors = new Dictionary<CacheKey_Type_NodeName, ConstructorInfo>();
         private readonly static Dictionary<ConstructorInfo, ParameterInfo[]> CacheConstructorsParameters = new Dictionary<ConstructorInfo, ParameterInfo[]>();
 
@@ -58,6 +62,8 @@ namespace FezGame.Mod {
             typeof(ArtObject) //Thanks for basically everything requiring to be specially parsed...
         };
 
+        private static CacheKey_Type_NodeName deserialize_key;
+        private static CacheKey_NodeName_AttribName deserialize_key_attrib;
         public static object Deserialize(this XmlNode node, Type parent = null, ContentManager cm = null, bool descend = true) {
             if (FEZMod.OverrideCulturueManualyBecauseMonoIsA_____) {
                 Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
@@ -72,7 +78,6 @@ namespace FezGame.Mod {
             }
 
             if (node is XmlDeclaration) {
-                //ModLogger.Log("FEZMod", "XmlHelper found XmlDeclaration; skipping...");
                 return node.NextSibling.Deserialize(parent, cm, descend);
             }
 
@@ -85,16 +90,32 @@ namespace FezGame.Mod {
             Type type = null;
 
             if (type == null && parent != null) {
-                FieldInfo[] fields = parent.GetFields();
-                foreach (FieldInfo field in fields) {
-                    if (field.Name.ToLower() == node.Name.ToLower()) {
-                        type = field.FieldType;
-                        foreach (XmlNode child in node.ChildNodes) {
-                            if (child.Name.ToLower() == type.Name.ToLower()) {
-                                return child.Deserialize(parent, cm, descend);
-                            }
+                FieldInfo field_;
+                deserialize_key.Type = parent;
+                deserialize_key.NodeName = node.Name.ToLower();
+                if (CacheFields.TryGetValue(deserialize_key, out field_)) {
+                    type = field_.FieldType;
+                }
+                if (type == null) {
+                    FieldInfo[] fields;
+                    if (!CacheTypesFields.TryGetValue(parent, out fields)) {
+                        CacheTypesFields[parent] = fields = parent.GetFields();
+                    }
+                    string nodeName = node.Name.ToLower();
+                    foreach (FieldInfo field in fields) {
+                        if (field.Name.ToLower() == nodeName) {
+                            CacheFields[deserialize_key] = field;
+                            type = field.FieldType;
+                            break;
                         }
-                        break;
+                    }
+                }
+                if (type != null) {
+                    string typeName = type.Name.ToLower();
+                    foreach (XmlNode child in node.ChildNodes) {
+                        if (child.Name.ToLower() == typeName) {
+                            return child.Deserialize(parent, cm, descend);
+                        }
                     }
                 }
             }
@@ -104,16 +125,32 @@ namespace FezGame.Mod {
             }
 
             if (type == null && parent != null) {
-                PropertyInfo[] properties = parent.GetProperties();
-                foreach (PropertyInfo property in properties) {
-                    if (property.Name.ToLower() == node.Name.ToLower()) {
-                        type = property.PropertyType;
-                        foreach (XmlNode child in node.ChildNodes) {
-                            if (child.Name.ToLower() == type.Name.ToLower()) {
-                                return child.Deserialize(parent, cm, descend);
-                            }
+                PropertyInfo property_;
+                deserialize_key.Type = parent;
+                deserialize_key.NodeName = node.Name.ToLower();
+                if (CacheProperties.TryGetValue(deserialize_key, out property_)) {
+                    type = property_.PropertyType;
+                }
+                if (type == null) {
+                    PropertyInfo[] properties;
+                    if (!CacheTypesProperties.TryGetValue(parent, out properties)) {
+                        CacheTypesProperties[parent] = properties = parent.GetProperties();
+                    }
+                    string nodeName = node.Name.ToLower();
+                    foreach (PropertyInfo property in properties) {
+                        if (property.Name.ToLower() == node.Name.ToLower()) {
+                            CacheProperties[deserialize_key] = property;
+                            type = property.PropertyType;
+                            break;
                         }
-                        break;
+                    }
+                }
+                if (type != null) {
+                    string typeName = type.Name.ToLower();
+                    foreach (XmlNode child in node.ChildNodes) {
+                        if (child.Name.ToLower() == typeName) {
+                            return child.Deserialize(parent, cm, descend);
+                        }
                     }
                 }
             }
@@ -138,7 +175,6 @@ namespace FezGame.Mod {
                 }
                 return node.InnerText;
             } else {
-                //ModLogger.Log("FEZMod", "elem: " + elem.Name + "; type: " + type.FullName);
                 type = Nullable.GetUnderlyingType(type) ?? type;
             }
 
@@ -165,10 +201,28 @@ namespace FezGame.Mod {
             XmlAttributeCollection attribs = node.Attributes;
 
             foreach (XmlAttribute attrib in attribs) {
-                FieldInfo[] fields = type.GetFields();
+                deserialize_key_attrib.NodeName = node.Name;
+                deserialize_key_attrib.AttribName = attrib.Name.ToLower();
+
+                FieldInfo field_;
+                if (CacheAttribFields.TryGetValue(deserialize_key_attrib, out field_)) {
+                    field_.SetValue(obj, field_.FieldType.Parse(attrib.InnerText));
+                    continue;
+                }
+
+                PropertyInfo property_;
+                if (CacheAttribProperties.TryGetValue(deserialize_key_attrib, out property_)) {
+                    property_.SetValue(obj, property_.PropertyType.Parse(attrib.InnerText), null);
+                    continue;
+                }
+
+                FieldInfo[] fields;
+                if (!CacheTypesFields.TryGetValue(type, out fields)) {
+                    CacheTypesFields[type] = fields = type.GetFields();
+                }
                 foreach (FieldInfo field in fields) {
-                    if (field.Name.ToLower() == attrib.Name.ToLower()) {
-                        //ModLogger.Log("FEZMod", "field: " + field.Name + "; type: " + field.FieldType.FullName + "; in: " + type.FullName + "; attrib: " + attrib.Name+ "; content: " + attrib.InnerText + "; elem: " + elem.Name);
+                    if (field.Name.ToLower() == deserialize_key_attrib.AttribName) {
+                        CacheAttribFields[deserialize_key_attrib] = field;
                         field.SetValue(obj, field.FieldType.Parse(attrib.InnerText));
                         fields = null;
                         break;
@@ -178,23 +232,18 @@ namespace FezGame.Mod {
                     continue;
                 }
 
-                PropertyInfo[] properties = type.GetProperties();
+                PropertyInfo[] properties;
+                if (!CacheTypesProperties.TryGetValue(type, out properties)) {
+                    CacheTypesProperties[type] = properties = type.GetProperties();
+                }
                 foreach (PropertyInfo property in properties) {
                     if (property.Name.ToLower() == attrib.Name.ToLower()) {
-                        MethodInfo setter = property.GetSetMethod();
-                        if (setter == null) {
+                        if (!property.CanWrite) {
                             ModLogger.Log("FEZMod", "XmlHelper found no setter for Property " + attrib.Name + " in " + type.FullName);
                             continue;
                         }
-                        //ModLogger.Log("FEZMod", "property: " + property.Name + "; type: " + property.PropertyType.FullName + "; in: " + type.FullName + "; attrib: " + attrib.Name+ "; content: " + attrib.InnerText + "; elem: " + elem.Name);
-                        object obj_ = property.PropertyType.Parse(attrib.InnerText);
-                        try {
-                            setter.Invoke(obj, new object[] { obj_ });
-                        } catch (Exception e) {
-                            ModLogger.Log("FEZMod", "XmlHelper failed to set property Property " + property.Name + " in " + type.FullName);
-                            ModLogger.Log("FEZMod", e.Message);
-                            ModLogger.Log("FEZMod", obj_.GetType().FullName);
-                        }
+                        CacheAttribProperties[deserialize_key_attrib] = property;
+                        property.SetValue(obj, property.PropertyType.Parse(attrib.InnerText), null);
                         properties = null;
                         break;
                     }
@@ -304,7 +353,10 @@ namespace FezGame.Mod {
                         
                         Type childType = child.Name.FindSpecialType(type);
 
-                        FieldInfo[] fields = type.GetFields();
+                        FieldInfo[] fields;
+                        if (!CacheTypesFields.TryGetValue(type, out fields)) {
+                            CacheTypesFields[type] = fields = type.GetFields();
+                        }
                         foreach (FieldInfo field in fields) {
                             if (field.Name.ToLower() == child.Name.ToLower() || field.FieldType.IsAssignableFrom(childType)) {
                                 field.SetValue(obj, child.Deserialize(type, cm));
@@ -867,7 +919,10 @@ namespace FezGame.Mod {
                 }
             }
 
-            FieldInfo[] fields = type.GetFields();
+            FieldInfo[] fields;
+            if (!CacheTypesFields.TryGetValue(type, out fields)) {
+                CacheTypesFields[type] = fields = type.GetFields();
+            }
             for (int i = 0; i < fields.Length; i++) {
                 FieldInfo field = fields[i];
                 if (field.IsInitOnly ||
