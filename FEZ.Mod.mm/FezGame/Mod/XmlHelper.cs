@@ -50,6 +50,7 @@ namespace FezGame.Mod {
         private readonly static Dictionary<CacheKey_Type_NodeName, DynamicMethodDelegate> CacheConstructors = new Dictionary<CacheKey_Type_NodeName, DynamicMethodDelegate>();
         private readonly static Dictionary<DynamicMethodDelegate, ParameterInfo[]> CacheConstructorsParameters = new Dictionary<DynamicMethodDelegate, ParameterInfo[]>();
         private readonly static Dictionary<Type, MethodInfo> CacheAddMethods = new Dictionary<Type, MethodInfo>();
+        private readonly static Dictionary<Type, MethodInfo> CacheParseMethods = new Dictionary<Type, MethodInfo>();
 
 
         public static List<string> BlacklistedAssemblies = new List<string>() {
@@ -294,16 +295,16 @@ namespace FezGame.Mod {
                         string attribKey = child is XmlElement ? ((XmlElement) child).GetAttribute("key") : null;
                         if (!string.IsNullOrEmpty(attribKey)) {
                             object key = types[0].Parse(attribKey);
-                            ReflectionHelper.InvokeMethod(add, obj, new object[] { key, child.Deserialize(parent, cm) });
+                            ReflectionHelper.InvokeMethod(add, obj, ArrayObject(key, child.Deserialize(parent, cm)));
                         } else if (child.ChildNodes.Count > 1 && child.ChildNodes.Count == types.Length) {
-                            ReflectionHelper.InvokeMethod(add, obj, new object[] {
+                            ReflectionHelper.InvokeMethod(add, obj, ArrayObject(
                                 child.ChildNodes[0].Deserialize(parent, cm, descend),
                                 child.ChildNodes[1].Deserialize(parent, cm, descend)
-                            });
+                            ));
                         } else {
                             object obj_ = child.Deserialize(parent, cm, descend);
                             try {
-                                ReflectionHelper.InvokeMethod(add, obj, new object[] { obj_ });
+                                ReflectionHelper.InvokeMethod(add, obj, ArrayObject(obj_));
                             } catch (Exception e) {
                                 ModLogger.Log("FEZMod", "XmlHelper failed to add item in " + type.FullName);
                                 ModLogger.Log("FEZMod", e.Message);
@@ -329,9 +330,9 @@ namespace FezGame.Mod {
                     XmlNode[] children;
 
                     if (child_.ChildNodes.Count == 1) {
-                        children = new XmlNode[] { child_, child_.FirstChild };
+                        children = ArrayXmlNode(child_, child_.FirstChild);
                     } else {
-                        children = new XmlNode[] { child_ };
+                        children = ArrayXmlNode(child_);
                     }
 
                     foreach (XmlNode child in children) {
@@ -497,8 +498,8 @@ namespace FezGame.Mod {
             }
 
             if (obj is ArtObject) {
-                ModLogger.Log("FEZMod", "Deserializing the inner pieces of ArtObject...");
-                DateTime timeStart = DateTime.UtcNow;
+                //ModLogger.Log("FEZMod", "Deserializing the inner pieces of ArtObject...");
+                //DateTime timeStart = DateTime.UtcNow;
                 ArtObject ao = (ArtObject) obj;
                 ao.Name = elem.GetAttribute("name");
                 ao.Cubemap = cm.Load<Texture2D>(elem.OwnerDocument.DocumentElement.GetAttribute("assetName") + "-fm-Texture2D").MixAlpha(cm.Load<Texture2D>(elem.OwnerDocument.DocumentElement.GetAttribute("assetName") + "_alpha"));
@@ -522,14 +523,14 @@ namespace FezGame.Mod {
                 }
                 ao.ActorType = (ActorType) typeof(ActorType).Parse(elem.GetAttribute("actorType"));
                 ao.NoSihouette = bool.Parse(elem.GetAttribute("noSilhouette"));
-                DateTime timeEnd = DateTime.UtcNow;
-                ModLogger.Log("FEZMod", "Deserialized the inner pieces of ArtObject in " + (timeEnd - timeStart).TotalMilliseconds + "ms");
+                //DateTime timeEnd = DateTime.UtcNow;
+                //ModLogger.Log("FEZMod", "Deserialized the inner pieces of ArtObject in " + (timeEnd - timeStart).TotalMilliseconds + "ms");
             }
 
             MethodInfo onDeserialization = obj.GetType().GetMethod("OnDeserialization");
             if (onDeserialization != null) {
                 if (onDeserialization.GetParameters().Length == 0) {
-                    ReflectionHelper.InvokeMethod(onDeserialization, obj, new object[0]);
+                    ReflectionHelper.InvokeMethod(onDeserialization, obj, ArrayObject());
                 } else {
                     //ModLogger.Log("FEZMod", "XmlHelper can't call OnDeserialization on " + obj + " of type " + obj.GetType().FullName + " because it requires parameters. XmlHelper can't pass parameters.");
                 }
@@ -669,12 +670,12 @@ namespace FezGame.Mod {
             if (CacheConstructors.TryGetValue(new_key, out constructor_)) {
                 ParameterInfo[] parameters = CacheConstructorsParameters[constructor_];
                 if (parameters == null || parameters.Length == 0) {
-                    return constructor_(null, new object[0]);
+                    return constructor_(null, ArrayObject());
                 }
 
                 XmlAttributeCollection attribs_ = elem.Attributes;
 
-                object[] objs = new object[parameters.Length];
+                object[] objs = ArrayObjectOfLen(parameters.Length);
                 int i = 0;
                 foreach (ParameterInfo parameter in parameters) {
                     objs[i] = parameter.ParameterType.Parse(attribs_[i].InnerText);
@@ -707,7 +708,7 @@ namespace FezGame.Mod {
             if (elem == null) {
                 ConstructorInfo constructor = type.GetDefaultConstructor();
                 if (constructor != null) {
-                    return constructor.Invoke(new object[0]);
+                    return constructor.Invoke(ArrayObject());
                 } else {
                     ModLogger.Log("FEZMod", "XmlHelper can't find a default constructor for null element of type " + type.FullName);
                     return null;
@@ -722,14 +723,14 @@ namespace FezGame.Mod {
                 if (!elem.HasAttributes && parameters.Length == 0) {
                     CacheConstructors[new_key] = constructor_ = ReflectionHelper.CreateDelegate(constructor);
                     CacheConstructorsParameters[constructor_] = null;
-                    return constructor_(null, new object[0]);
+                    return constructor_(null, ArrayObject());
                 } else if (!elem.HasAttributes || parameters.Length == 0) {
                     continue;
                 }
                 if (attribs.Count != parameters.Length) {
                     continue;
                 }
-                object[] objs = new object[parameters.Length];
+                object[] objs = ArrayObjectOfLen(parameters.Length);
                 int i = 0;
                 foreach (ParameterInfo parameter in parameters) {
                     //ModLogger.Log("FEZMod", "parameter: " + parameter.Name + "; type: " + parameter.ParameterType.FullName + "; in: " + type.FullName + "; attrib: " + attribs[i].Name+ "; content: " + attribs[i].InnerText + "; elem: " + elem.Name);
@@ -753,7 +754,7 @@ namespace FezGame.Mod {
             if (constructorDefault != null) {
                 CacheConstructors[new_key] = constructor_ = ReflectionHelper.CreateDelegate(constructorDefault);
                 CacheConstructorsParameters[constructor_] = null;
-                return constructor_(null, new object[0]);
+                return constructor_(null, ArrayObject());
             }
 
             ModLogger.Log("FEZMod", "XmlHelper can't find a constructor for element " + elem.Name + " of type " + type.FullName);
@@ -776,7 +777,11 @@ namespace FezGame.Mod {
                 return Enum.Parse(type, str);
             }
             if (type.IsPrimitive) {
-                return ReflectionHelper.InvokeMethod(type.GetMethod("Parse", new Type[] { typeof(String) }), null, new object[] { str });
+                MethodInfo parse;
+                if (!CacheAddMethods.TryGetValue(type, out parse)) {
+                    CacheParseMethods[type] = parse = type.GetMethod("Parse", new Type[] { typeof(String) });
+                }
+                return ReflectionHelper.InvokeMethod(parse, null, ArrayObject(str));
             }
             if (type == typeof(Color)) {
                 Color color = new Color();
@@ -879,7 +884,7 @@ namespace FezGame.Mod {
                             } else {
                                 append &= null != entry.AppendChildIfNotNull(key.Serialize(document));
                             }
-                            append &= null != entry.AppendChildIfNotNull(getItem.Invoke(obj, new object[] { key }).Serialize(document));
+                            append &= null != entry.AppendChildIfNotNull(getItem.Invoke(obj, ArrayObject(key)).Serialize(document));
                             if (append) {
                                 elem.AppendChild(entry);
                             }
@@ -889,13 +894,13 @@ namespace FezGame.Mod {
                         int count = (int) propertyCount.GetGetMethod().Invoke(obj, new object[0]);
                         if (getItem != null) {
                             for (int i = 0; i < count; i++) {
-                                elem.AppendChildIfNotNull(getItem.Invoke(obj, new object[] { i }).Serialize(document));
+                                elem.AppendChildIfNotNull(getItem.Invoke(obj, ArrayObject(i)).Serialize(document));
                             }
                         } else {
                             //Selfnote from Maik: I usually hate Linq, but meh.
                             MethodInfo elementAt = typeof(System.Linq.Enumerable).GetMethod("ElementAt").MakeGenericMethod(types[0]);
                             for (int i = 0; i < count; i++) {
-                                elem.AppendChildIfNotNull(elementAt.Invoke(null, new object[] { obj, i }).Serialize(document));
+                                elem.AppendChildIfNotNull(elementAt.Invoke(null, ArrayObject(obj, i)).Serialize(document));
                             }
                         }
                     }
@@ -1030,6 +1035,88 @@ namespace FezGame.Mod {
                 return null;
             }
             return parent.AppendChild(child);
+        }
+
+        //ARRAY HELPERS
+
+        public static void FillArray<T>(T[][] array) {
+            if (array[0] != null) {
+                return;
+            }
+            for (int i = 0; i < array.Length; i++) {
+                array[i] = new T[i];
+            }
+        }
+
+        //TODO find a way to automatically generate this.
+        private static object[][] arrayObject = new object[8][];
+        public static object[] ArrayObjectOfLen(int len) {
+            FillArray<object>(arrayObject);
+            return len < arrayObject.Length ? arrayObject[len] : new object[len];
+        }
+        public static object[] ArrayObject() {
+            object[] array = ArrayObjectOfLen(0);
+            return array;
+        }
+        public static object[] ArrayObject(object a) {
+            object[] array = ArrayObjectOfLen(1);
+            array[0] = a;
+            return array;
+        }
+        public static object[] ArrayObject(object a, object b) {
+            object[] array = ArrayObjectOfLen(2);
+            array[0] = a; array[1] = b;
+            return array;
+        }
+        public static object[] ArrayObject(object a, object b, object c) {
+            object[] array = ArrayObjectOfLen(3);
+            array[0] = a; array[1] = b; array[2] = c;
+            return array;
+        }
+        public static object[] ArrayObject(object a, object b, object c, object d) {
+            object[] array = ArrayObjectOfLen(4);
+            array[0] = a; array[1] = b; array[2] = c; array[3] = d;
+            return array;
+        }
+        public static object[] ArrayObject(object a, object b, object c, object d, object e) {
+            object[] array = ArrayObjectOfLen(5);
+            array[0] = a; array[1] = b; array[2] = c; array[3] = d; array[4] = e;
+            return array;
+        }
+        public static object[] ArrayObject(object a, object b, object c, object d, object e, object f) {
+            object[] array = ArrayObjectOfLen(6);
+            array[0] = a; array[1] = b; array[2] = c; array[3] = d; array[4] = e; array[5] = f;
+            return array;
+        }
+        public static object[] ArrayObject(object a, object b, object c, object d, object e, object f, object g) {
+            object[] array = ArrayObjectOfLen(7);
+            array[0] = a; array[1] = b; array[2] = c; array[3] = d; array[4] = e; array[5] = f; array[6] = g;
+            return array;
+        }
+        public static object[] ArrayObject(object a, object b, object c, object d, object e, object f, object g, object h) {
+            object[] array = ArrayObjectOfLen(8);
+            array[0] = a; array[1] = b; array[2] = c; array[3] = d; array[4] = e; array[5] = f; array[6] = g; array[7] = h;
+            return array;
+        }
+
+        private static XmlNode[][] arrayXmlNode = new XmlNode[8][];
+        public static XmlNode[] ArrayXmlNodeOfLen(int len) {
+            FillArray<XmlNode>(arrayXmlNode);
+            return len < arrayXmlNode.Length ? arrayXmlNode[len] : new XmlNode[len];
+        }
+        public static XmlNode[] ArrayXmlNode() {
+            XmlNode[] array = ArrayXmlNodeOfLen(0);
+            return array;
+        }
+        public static XmlNode[] ArrayXmlNode(XmlNode a) {
+            XmlNode[] array = ArrayXmlNodeOfLen(1);
+            array[0] = a;
+            return array;
+        }
+        public static XmlNode[] ArrayXmlNode(XmlNode a, XmlNode b) {
+            XmlNode[] array = ArrayXmlNodeOfLen(2);
+            array[0] = a; array[1] = b;
+            return array;
         }
 
     }
