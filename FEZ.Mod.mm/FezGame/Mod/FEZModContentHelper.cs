@@ -9,16 +9,14 @@ using FezEngine.Tools;
 using Microsoft.Xna.Framework;
 
 namespace FezGame.Mod {
-    public struct FEZModContentHelperAlphaMapCacheKey {
+    public struct CacheKey_RGB_A {
         public Texture2D RGB;
         public Texture2D A;
     }
 
     public static class FEZModContentHelper {
 
-        private readonly static Dictionary<FEZModContentHelperAlphaMapCacheKey, Texture2D> mixAlphaMap = new Dictionary<FEZModContentHelperAlphaMapCacheKey, Texture2D>();
-        private readonly static FEZModContentHelperAlphaMapCacheKey[] mixAlphaCaches = new FEZModContentHelperAlphaMapCacheKey[32];
-        private static int mixAlphaIndex = 0;
+        private readonly static Dictionary<CacheKey_RGB_A, Texture2D> CacheMixAlpha = new Dictionary<CacheKey_RGB_A, Texture2D>();
 
         public static string Externalize(this string assetName) {
             return ("Resources\\" + (assetName.ToLower())).Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString());
@@ -61,16 +59,16 @@ namespace FezGame.Mod {
             return bitmap;
         }
 
+        private static CacheKey_RGB_A mixAlpha_key;
         public static Texture2D MixAlpha(this Texture2D textureRGB, Texture2D textureA) {
-            FEZModContentHelperAlphaMapCacheKey cache = mixAlphaCaches[mixAlphaIndex];
-            mixAlphaIndex = (mixAlphaIndex + 1) % mixAlphaCaches.Length;
-            cache.RGB = textureRGB;
-            cache.A = textureA;
+            mixAlpha_key.RGB = textureRGB;
+            mixAlpha_key.A = textureA;
 
             Texture2D textureRGBA;
 
-            if (mixAlphaMap.TryGetValue(cache, out textureRGBA)) {
-                return textureRGBA;
+            if (CacheMixAlpha.TryGetValue(mixAlpha_key, out textureRGBA)) {
+                //return textureRGBA;
+                textureRGBA.Dispose();
             }
 
             textureRGBA = new Texture2D(ServiceHelper.Game.GraphicsDevice, textureRGB.Width, textureRGB.Height);
@@ -86,7 +84,7 @@ namespace FezGame.Mod {
             }
             textureRGBA.SetData(dataRGBA);
 
-            mixAlphaMap[cache] = textureRGBA;
+            CacheMixAlpha[mixAlpha_key] = textureRGBA;
 
             return textureRGBA;
         }
