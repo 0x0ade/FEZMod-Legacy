@@ -9,10 +9,15 @@ using FezEngine.Tools;
 using Microsoft.Xna.Framework;
 
 namespace FezGame.Mod {
+    public struct FEZModContentHelperAlphaMapCacheKey {
+        public Texture2D RGB;
+        public Texture2D A;
+    }
+
     public static class FEZModContentHelper {
 
-        private readonly static Dictionary<Texture2D[], Texture2D> mixAlphaMap = new Dictionary<Texture2D[], Texture2D>();
-        private readonly static Texture2D[][] mixAlphaCaches = new Texture2D[32][];
+        private readonly static Dictionary<FEZModContentHelperAlphaMapCacheKey, Texture2D> mixAlphaMap = new Dictionary<FEZModContentHelperAlphaMapCacheKey, Texture2D>();
+        private readonly static FEZModContentHelperAlphaMapCacheKey[] mixAlphaCaches = new FEZModContentHelperAlphaMapCacheKey[32];
         private static int mixAlphaIndex = 0;
 
         public static string Externalize(this string assetName) {
@@ -57,13 +62,10 @@ namespace FezGame.Mod {
         }
 
         public static Texture2D MixAlpha(this Texture2D textureRGB, Texture2D textureA) {
-            Texture2D[] cache = mixAlphaCaches[mixAlphaIndex];
-            if (cache == null) {
-                cache = mixAlphaCaches[mixAlphaIndex] = new Texture2D[2];
-            }
+            FEZModContentHelperAlphaMapCacheKey cache = mixAlphaCaches[mixAlphaIndex];
             mixAlphaIndex = (mixAlphaIndex + 1) % mixAlphaCaches.Length;
-            cache[0] = textureRGB;
-            cache[1] = textureA;
+            cache.RGB = textureRGB;
+            cache.A = textureA;
 
             Texture2D textureRGBA;
 
@@ -72,11 +74,13 @@ namespace FezGame.Mod {
             }
 
             textureRGBA = new Texture2D(ServiceHelper.Game.GraphicsDevice, textureRGB.Width, textureRGB.Height);
+
             Color[] dataRGBA = new Color[textureRGBA.Width * textureRGBA.Height];
             textureRGB.GetData(dataRGBA);
+
             Color[] dataA = new Color[textureA.Width * textureA.Height];
             textureA.GetData(dataA);
-            textureRGBA.GetData(dataRGBA);
+
             for (int i = 0; i < dataRGBA.Length; i++) {
                 dataRGBA[i].A = dataA[i].A;
             }

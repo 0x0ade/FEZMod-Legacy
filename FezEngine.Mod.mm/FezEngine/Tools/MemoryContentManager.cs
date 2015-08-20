@@ -58,7 +58,7 @@ namespace FezEngine.Tools {
 
         public static void DumpAll() {
             if (cachedAssets == null) {
-                ModLogger.Log("JAFM.Engine", "Cached assets do not exist; ignoring...");
+                ModLogger.Log("FEZMod.Engine", "Cached assets do not exist; ignoring...");
                 return;
             }
 
@@ -69,7 +69,7 @@ namespace FezEngine.Tools {
                 return;
             }
             DumpAllResourcesCount = count;
-            ModLogger.Log("JAFM.Engine", "Dumping "+count+" assets...");
+            ModLogger.Log("FEZMod.Engine", "Dumping "+count+" assets...");
             String[] assetNames_ = new String[count];
             cachedAssets.Keys.CopyTo(assetNames_, 0);
 
@@ -80,7 +80,7 @@ namespace FezEngine.Tools {
                 FileInfo file = new FileInfo(filePath);
                 if (!file.Exists) {
                     file.Directory.Create();
-                    ModLogger.Log("JAFM.Engine", (i+1)+" / "+count+": "+assetName+" -> "+filePath);
+                    ModLogger.Log("FEZMod.Engine", (i+1)+" / "+count+": "+assetName+" -> "+filePath);
                     FileStream fos = new FileStream(filePath, FileMode.CreateNew);
                     fos.Write(bytes, 0, bytes.Length);
                     fos.Close();
@@ -88,7 +88,7 @@ namespace FezEngine.Tools {
                 }
             }
 
-            ModLogger.Log("JAFM.Engine", "Dumped: "+dumped+" / "+count);
+            ModLogger.Log("FEZMod.Engine", "Dumped: "+dumped+" / "+count);
         }
 
         protected Stream orig_OpenStream(string assetName) {
@@ -107,7 +107,7 @@ namespace FezEngine.Tools {
                 return fis;
             } else if (DumpResources) {
                 file.Directory.Create();
-                ModLogger.Log("JAFM.Engine", assetName+" -> "+filePath);
+                ModLogger.Log("FEZMod.Engine", assetName+" -> "+filePath);
                 Stream ois = orig_OpenStream(assetName);
                 FileStream fos = new FileStream(filePath, FileMode.CreateNew);
                 ois.CopyTo(fos);
@@ -122,27 +122,27 @@ namespace FezEngine.Tools {
         }
 
         public static bool AssetExists(string assetName) {
-            if (assetName == "JAFM_WORKAROUND_DUMP") {
+            if (assetName == "FEZMOD_WORKAROUND_DUMP") {
                 DumpResources = true;
                 return true;
             }
-            if (assetName == "JAFM_WORKAROUND_DUMPALL") {
+            if (assetName == "FEZMOD_WORKAROUND_DUMPALL") {
                 DumpAllResources = true;
                 return true;
             }
-            if (assetName == "JAFM_WORKAROUND_NOCACHE") {
+            if (assetName == "FEZMOD_WORKAROUND_NOCACHE") {
                 CacheDisabled = true;
                 return true;
             }
-            if (assetName == "JAFM_WORKAROUND_NOFLAT") {
+            if (assetName == "FEZMOD_WORKAROUND_NOFLAT") {
                 Level.FlatDisabled = true;
                 return true;
             }
-            if (assetName == "JAFM_WORKAROUND_CUSTOMMUSICEXTRACT") {
+            if (assetName == "FEZMOD_WORKAROUND_CUSTOMMUSICEXTRACT") {
                 SoundManager.ExtractCustom = true;
                 return true;
             }
-            if (assetName == "JAFM_WORKAROUND_NOMUSICEXTRACT") {
+            if (assetName == "FEZMOD_WORKAROUND_NOMUSICEXTRACT") {
                 SoundManager.ExtractDisabled = true;
                 return true;
             }

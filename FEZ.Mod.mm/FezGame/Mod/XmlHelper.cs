@@ -23,9 +23,13 @@ using System.CodeDom;
 using FezEngine.Content;
 using Microsoft.Xna.Framework.Graphics;
 using FezEngine.Structure.Geometry;
+using System.Globalization;
+using System.Threading;
 
 namespace FezGame.Mod {
     public static class XmlHelper {
+
+        //public readonly static Dictionary<string, FieldInfo> CacheFields = new Dictionary<string, FieldInfo>();
 
         public static List<string> BlacklistedAssemblies = new List<string>() {
             "SDL2-CS", //OpenTK
@@ -36,10 +40,14 @@ namespace FezGame.Mod {
         };
         public static List<Type> HatedTypesSpecial = new List<Type>() {
             typeof(AnimatedTexture), //Thanks for Frames requiring to be specially parsed...
-            typeof(ArtObject), //Thanks for basically everything requiring to be specially parsed...
+            typeof(ArtObject) //Thanks for basically everything requiring to be specially parsed...
         };
 
         public static object Deserialize(this XmlNode node, Type parent = null, ContentManager cm = null, bool descend = true) {
+            if (FEZMod.OverrideCulturueManualyBecauseMonoIsA_____) {
+                Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            }
+
             if (cm == null) {
                 cm = ServiceHelper.Get<IContentManagerProvider>().Global;
             }
@@ -325,6 +333,10 @@ namespace FezGame.Mod {
         }
 
         public static void HandleSpecialDataDeserialize(this object obj, XmlElement elem, ContentManager cm) {
+            if (FEZMod.OverrideCulturueManualyBecauseMonoIsA_____) {
+                Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            }
+
             if (obj == null || elem == null) {
                 return;
             }
@@ -407,7 +419,7 @@ namespace FezGame.Mod {
             if (obj is ArtObject) {
                 ArtObject ao = (ArtObject) obj;
                 ao.Name = elem.GetAttribute("name");
-                ao.Cubemap = cm.Load<Texture2D>(elem.OwnerDocument.DocumentElement.GetAttribute("assetName") + "-fm-Texture2D");//.MixAlpha(cm.Load<Texture2D>(elem.OwnerDocument.DocumentElement.GetAttribute("assetName") + "_alpha"));
+                ao.Cubemap = cm.Load<Texture2D>(elem.OwnerDocument.DocumentElement.GetAttribute("assetName") + "-fm-Texture2D").MixAlpha(cm.Load<Texture2D>(elem.OwnerDocument.DocumentElement.GetAttribute("assetName") + "_alpha"));
                 ao.Size = (Vector3) elem.ChildNodes[0].FirstChild.Deserialize();
                 XmlNode geometryNode = null;
                 foreach (XmlNode childNode in elem.ChildNodes) {
@@ -537,6 +549,10 @@ namespace FezGame.Mod {
         }
 
         public static object New(this Type type, XmlElement elem = null) {
+            if (FEZMod.OverrideCulturueManualyBecauseMonoIsA_____) {
+                Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            }
+
             if (type.IsArray) {
                 if (elem != null) {
                     //ModLogger.Log("FEZMod", "XmlHelper creates an array of exact type " + type.FullName);
@@ -612,6 +628,10 @@ namespace FezGame.Mod {
         }
 
         public static object Parse(this Type type, string str) {
+            if (FEZMod.OverrideCulturueManualyBecauseMonoIsA_____) {
+                Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            }
+
             if (type == null || string.IsNullOrEmpty(str)) {
                 return null;
             }
@@ -641,6 +661,10 @@ namespace FezGame.Mod {
         }
 
         public static XmlNode Serialize(this object obj, XmlDocument document, string name = null) {
+            if (FEZMod.OverrideCulturueManualyBecauseMonoIsA_____) {
+                Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            }
+
             if (obj == null || document == null) {
                 return null;
             }
@@ -834,6 +858,10 @@ namespace FezGame.Mod {
         }
 
         public static XmlElement HandleSpecialDataPreSerialize(this XmlElement elem, object obj) {
+            if (FEZMod.OverrideCulturueManualyBecauseMonoIsA_____) {
+                Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            }
+
             if (obj == null || elem == null) {
                 return elem;
             }
@@ -846,6 +874,10 @@ namespace FezGame.Mod {
         }
 
         public static XmlElement HandleSpecialDataPostSerialize(this XmlElement elem, object obj) {
+            if (FEZMod.OverrideCulturueManualyBecauseMonoIsA_____) {
+                Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            }
+
             if (obj == null || elem == null) {
                 return elem;
             }
