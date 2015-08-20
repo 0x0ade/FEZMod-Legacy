@@ -48,6 +48,7 @@ namespace FezGame.Mod {
         private readonly static Dictionary<CacheKey_NodeName_AttribName, PropertyInfo> CacheAttribProperties = new Dictionary<CacheKey_NodeName_AttribName, PropertyInfo>();
         private readonly static Dictionary<CacheKey_Type_NodeName, ConstructorInfo> CacheConstructors = new Dictionary<CacheKey_Type_NodeName, ConstructorInfo>();
         private readonly static Dictionary<ConstructorInfo, ParameterInfo[]> CacheConstructorsParameters = new Dictionary<ConstructorInfo, ParameterInfo[]>();
+        private readonly static Dictionary<Type, MethodInfo> CacheAddMethods = new Dictionary<Type, MethodInfo>();
 
 
         public static List<string> BlacklistedAssemblies = new List<string>() {
@@ -278,10 +279,16 @@ namespace FezGame.Mod {
             }
 
             if (obj is ICollection || isGenericICollection) {
-                Type[] types = obj.GetType().GetGenericArguments();
-                //ModLogger.Log("FEZMod", "XmlHelper got " + type.FullName + " with " + types.Length + " generic arguments.");
-                MethodInfo add = type.GetMethod("Add", types);
+                MethodInfo add;
+                Type[] types = null;
+                if (!CacheAddMethods.TryGetValue(type, out add)) {
+                    types = type.GetGenericArguments();
+                    CacheAddMethods[type] = add = type.GetMethod("Add", types);
+                }
                 if (add != null) {
+                    if (types == null) {
+                        types = type.GetGenericArguments();
+                    }
                     foreach (XmlNode child in node.ChildNodes) {
                         string attribKey = child is XmlElement ? ((XmlElement) child).GetAttribute("key") : null;
                         if (!string.IsNullOrEmpty(attribKey)) {
@@ -327,27 +334,34 @@ namespace FezGame.Mod {
                     }
 
                     foreach (XmlNode child in children) {
+                        deserialize_key.Type = type;
+                        deserialize_key.NodeName = child.Name.ToLower();
+
                         FieldInfo field_;
+                        if (CacheFields.TryGetValue(deserialize_key, out field_)) {
+                            field_.SetValue(obj, child.Deserialize(type, cm));
+                            continue;
+                        }
+
+                        PropertyInfo property_;
+                        if (CacheProperties.TryGetValue(deserialize_key, out property_)) {
+                            property_.SetValue(obj, child.Deserialize(type, cm), null);
+                            continue;
+                        }
+
                         if ((field_ = type.GetField(child.Name)) != null) {
+                            CacheFields[deserialize_key] = field_;
                             field_.SetValue(obj, child.Deserialize(type, cm));
                             break;
                         }
 
-                        PropertyInfo property_;
                         if ((property_ = type.GetProperty(child.Name)) != null) {
-                            MethodInfo setter = property_.GetSetMethod();
-                            if (setter == null) {
+                            if (!property_.CanWrite) {
                                 ModLogger.Log("FEZMod", "XmlHelper found no setter for Property " + child.Name + " in " + type.FullName);
                                 break;
                             }
-                            object obj_ = child.Deserialize(type, cm);
-                            try {
-                                setter.Invoke(obj, new object[] { obj_ });
-                            } catch (Exception e) {
-                                ModLogger.Log("FEZMod", "XmlHelper failed to set property Property " + child.Name + " in " + type.FullName);
-                                ModLogger.Log("FEZMod", e.Message);
-                                ModLogger.Log("FEZMod", obj_.GetType().FullName);
-                            }
+                            CacheProperties[deserialize_key] = property_;
+                            property_.SetValue(obj, child.Deserialize(type, cm), null);
                             break;
                         }
                         
@@ -358,7 +372,8 @@ namespace FezGame.Mod {
                             CacheTypesFields[type] = fields = type.GetFields();
                         }
                         foreach (FieldInfo field in fields) {
-                            if (field.Name.ToLower() == child.Name.ToLower() || field.FieldType.IsAssignableFrom(childType)) {
+                            if (field.Name.ToLower() == deserialize_key.NodeName || field.FieldType.IsAssignableFrom(childType)) {
+                                CacheFields[deserialize_key] = field;
                                 field.SetValue(obj, child.Deserialize(type, cm));
                                 fields = null;
                                 break;
@@ -370,20 +385,13 @@ namespace FezGame.Mod {
 
                         PropertyInfo[] properties = type.GetProperties();
                         foreach (PropertyInfo property in properties) {
-                            if (property.Name.ToLower() == child.Name.ToLower() || property.PropertyType.IsAssignableFrom(childType)) {
-                                MethodInfo setter = property.GetSetMethod();
-                                if (setter == null) {
+                            if (property.Name.ToLower() == deserialize_key.NodeName || property.PropertyType.IsAssignableFrom(childType)) {
+                                if (!property.CanWrite) {
                                     ModLogger.Log("FEZMod", "XmlHelper found no setter for Property " + child.Name + " in " + type.FullName);
                                     continue;
                                 }
-                                object obj_ = child.Deserialize(type, cm);
-                                try {
-                                    setter.Invoke(obj, new object[] { obj_ });
-                                } catch (Exception e) {
-                                    ModLogger.Log("FEZMod", "XmlHelper failed to set property Property " + child.Name + " in " + type.FullName);
-                                    ModLogger.Log("FEZMod", e.Message);
-                                    ModLogger.Log("FEZMod", obj_.GetType().FullName);
-                                }
+                                CacheProperties[deserialize_key] = property;
+                                property.SetValue(obj, child.Deserialize(type, cm), null);
                                 properties = null;
                                 break;
                             }
