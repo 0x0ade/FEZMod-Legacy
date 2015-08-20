@@ -1,5 +1,5 @@
 ﻿using System;
-using Common;
+using FezGame.Mod;
 using FezGame.Mod;
 
 namespace FezGame {

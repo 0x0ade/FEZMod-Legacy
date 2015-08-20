@@ -1,4 +1,4 @@
-﻿using Common;
+﻿using FezGame.Mod;
 using System;
 using FezGame;
 using FezGame.Mod;

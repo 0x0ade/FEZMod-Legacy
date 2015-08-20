@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using System.Reflection;
-using Common;
+using FezGame.Mod;
 using FezEngine.Effects;
 using System.Collections;
 using System.ComponentModel;
@@ -25,6 +25,7 @@ using Microsoft.Xna.Framework.Graphics;
 using FezEngine.Structure.Geometry;
 using System.Globalization;
 using System.Threading;
+using Common;
 
 namespace FezGame.Mod {
     public struct CacheKey_Type_NodeName {
@@ -46,8 +47,8 @@ namespace FezGame.Mod {
         private readonly static Dictionary<CacheKey_Type_NodeName, PropertyInfo> CacheProperties = new Dictionary<CacheKey_Type_NodeName, PropertyInfo>();
         private readonly static Dictionary<CacheKey_NodeName_AttribName, FieldInfo> CacheAttribFields = new Dictionary<CacheKey_NodeName_AttribName, FieldInfo>();
         private readonly static Dictionary<CacheKey_NodeName_AttribName, PropertyInfo> CacheAttribProperties = new Dictionary<CacheKey_NodeName_AttribName, PropertyInfo>();
-        private readonly static Dictionary<CacheKey_Type_NodeName, ConstructorInfo> CacheConstructors = new Dictionary<CacheKey_Type_NodeName, ConstructorInfo>();
-        private readonly static Dictionary<ConstructorInfo, ParameterInfo[]> CacheConstructorsParameters = new Dictionary<ConstructorInfo, ParameterInfo[]>();
+        private readonly static Dictionary<CacheKey_Type_NodeName, DynamicMethodDelegate> CacheConstructors = new Dictionary<CacheKey_Type_NodeName, DynamicMethodDelegate>();
+        private readonly static Dictionary<DynamicMethodDelegate, ParameterInfo[]> CacheConstructorsParameters = new Dictionary<DynamicMethodDelegate, ParameterInfo[]>();
         private readonly static Dictionary<Type, MethodInfo> CacheAddMethods = new Dictionary<Type, MethodInfo>();
 
 
@@ -207,13 +208,13 @@ namespace FezGame.Mod {
 
                 FieldInfo field_;
                 if (CacheAttribFields.TryGetValue(deserialize_key_attrib, out field_)) {
-                    field_.SetValue(obj, field_.FieldType.Parse(attrib.InnerText));
+                    ReflectionHelper.SetValue(field_, obj, field_.FieldType.Parse(attrib.InnerText));
                     continue;
                 }
 
                 PropertyInfo property_;
                 if (CacheAttribProperties.TryGetValue(deserialize_key_attrib, out property_)) {
-                    property_.SetValue(obj, property_.PropertyType.Parse(attrib.InnerText), null);
+                    ReflectionHelper.SetValue(property_, obj, property_.PropertyType.Parse(attrib.InnerText));
                     continue;
                 }
 
@@ -224,7 +225,7 @@ namespace FezGame.Mod {
                 foreach (FieldInfo field in fields) {
                     if (field.Name.ToLower() == deserialize_key_attrib.AttribName) {
                         CacheAttribFields[deserialize_key_attrib] = field;
-                        field.SetValue(obj, field.FieldType.Parse(attrib.InnerText));
+                        ReflectionHelper.SetValue(field, obj, field.FieldType.Parse(attrib.InnerText));
                         fields = null;
                         break;
                     }
@@ -244,7 +245,7 @@ namespace FezGame.Mod {
                             continue;
                         }
                         CacheAttribProperties[deserialize_key_attrib] = property;
-                        property.SetValue(obj, property.PropertyType.Parse(attrib.InnerText), null);
+                        ReflectionHelper.SetValue(property, obj, property.PropertyType.Parse(attrib.InnerText));
                         properties = null;
                         break;
                     }
@@ -293,16 +294,16 @@ namespace FezGame.Mod {
                         string attribKey = child is XmlElement ? ((XmlElement) child).GetAttribute("key") : null;
                         if (!string.IsNullOrEmpty(attribKey)) {
                             object key = types[0].Parse(attribKey);
-                            add.Invoke(obj, new object[] { key, child.Deserialize(parent, cm) });
+                            ReflectionHelper.InvokeMethod(add, obj, new object[] { key, child.Deserialize(parent, cm) });
                         } else if (child.ChildNodes.Count > 1 && child.ChildNodes.Count == types.Length) {
-                            add.Invoke(obj, new object[] {
+                            ReflectionHelper.InvokeMethod(add, obj, new object[] {
                                 child.ChildNodes[0].Deserialize(parent, cm, descend),
                                 child.ChildNodes[1].Deserialize(parent, cm, descend)
                             });
                         } else {
                             object obj_ = child.Deserialize(parent, cm, descend);
                             try {
-                                add.Invoke(obj, new object[] { obj_ });
+                                ReflectionHelper.InvokeMethod(add, obj, new object[] { obj_ });
                             } catch (Exception e) {
                                 ModLogger.Log("FEZMod", "XmlHelper failed to add item in " + type.FullName);
                                 ModLogger.Log("FEZMod", e.Message);
@@ -339,19 +340,19 @@ namespace FezGame.Mod {
 
                         FieldInfo field_;
                         if (CacheFields.TryGetValue(deserialize_key, out field_)) {
-                            field_.SetValue(obj, child.Deserialize(type, cm));
+                            ReflectionHelper.SetValue(field_, obj, child.Deserialize(type, cm));
                             continue;
                         }
 
                         PropertyInfo property_;
                         if (CacheProperties.TryGetValue(deserialize_key, out property_)) {
-                            property_.SetValue(obj, child.Deserialize(type, cm), null);
+                            ReflectionHelper.SetValue(property_, obj, child.Deserialize(type, cm));
                             continue;
                         }
 
                         if ((field_ = type.GetField(child.Name)) != null) {
                             CacheFields[deserialize_key] = field_;
-                            field_.SetValue(obj, child.Deserialize(type, cm));
+                            ReflectionHelper.SetValue(field_, obj, child.Deserialize(type, cm));
                             break;
                         }
 
@@ -361,7 +362,7 @@ namespace FezGame.Mod {
                                 break;
                             }
                             CacheProperties[deserialize_key] = property_;
-                            property_.SetValue(obj, child.Deserialize(type, cm), null);
+                            ReflectionHelper.SetValue(property_, obj, child.Deserialize(type, cm));
                             break;
                         }
                         
@@ -374,7 +375,7 @@ namespace FezGame.Mod {
                         foreach (FieldInfo field in fields) {
                             if (field.Name.ToLower() == deserialize_key.NodeName || field.FieldType.IsAssignableFrom(childType)) {
                                 CacheFields[deserialize_key] = field;
-                                field.SetValue(obj, child.Deserialize(type, cm));
+                                ReflectionHelper.SetValue(field, obj, child.Deserialize(type, cm));
                                 fields = null;
                                 break;
                             }
@@ -391,7 +392,7 @@ namespace FezGame.Mod {
                                     continue;
                                 }
                                 CacheProperties[deserialize_key] = property;
-                                property.SetValue(obj, child.Deserialize(type, cm), null);
+                                ReflectionHelper.SetValue(property, obj, child.Deserialize(type, cm));
                                 properties = null;
                                 break;
                             }
@@ -496,6 +497,8 @@ namespace FezGame.Mod {
             }
 
             if (obj is ArtObject) {
+                ModLogger.Log("FEZMod", "Deserializing the inner pieces of ArtObject...");
+                DateTime timeStart = DateTime.UtcNow;
                 ArtObject ao = (ArtObject) obj;
                 ao.Name = elem.GetAttribute("name");
                 ao.Cubemap = cm.Load<Texture2D>(elem.OwnerDocument.DocumentElement.GetAttribute("assetName") + "-fm-Texture2D").MixAlpha(cm.Load<Texture2D>(elem.OwnerDocument.DocumentElement.GetAttribute("assetName") + "_alpha"));
@@ -519,12 +522,14 @@ namespace FezGame.Mod {
                 }
                 ao.ActorType = (ActorType) typeof(ActorType).Parse(elem.GetAttribute("actorType"));
                 ao.NoSihouette = bool.Parse(elem.GetAttribute("noSilhouette"));
+                DateTime timeEnd = DateTime.UtcNow;
+                ModLogger.Log("FEZMod", "Deserialized the inner pieces of ArtObject in " + (timeEnd - timeStart).TotalMilliseconds + "ms");
             }
 
             MethodInfo onDeserialization = obj.GetType().GetMethod("OnDeserialization");
             if (onDeserialization != null) {
                 if (onDeserialization.GetParameters().Length == 0) {
-                    onDeserialization.Invoke(obj, new object[0]);
+                    ReflectionHelper.InvokeMethod(onDeserialization, obj, new object[0]);
                 } else {
                     //ModLogger.Log("FEZMod", "XmlHelper can't call OnDeserialization on " + obj + " of type " + obj.GetType().FullName + " because it requires parameters. XmlHelper can't pass parameters.");
                 }
@@ -658,13 +663,13 @@ namespace FezGame.Mod {
                 );
             }
 
-            ConstructorInfo constructor_ = null;
+            DynamicMethodDelegate constructor_ = null;
             new_key.Type = type;
             new_key.NodeName = elem.Name;
             if (CacheConstructors.TryGetValue(new_key, out constructor_)) {
                 ParameterInfo[] parameters = CacheConstructorsParameters[constructor_];
                 if (parameters == null || parameters.Length == 0) {
-                    return constructor_.Invoke(new object[0]);
+                    return constructor_(null, new object[0]);
                 }
 
                 XmlAttributeCollection attribs_ = elem.Attributes;
@@ -680,7 +685,7 @@ namespace FezGame.Mod {
                     i++;
                 }
                 if (i >= objs.Length) {
-                    return constructor_.Invoke(objs);
+                    return constructor_(null, objs);
                 }
             }
 
@@ -715,7 +720,9 @@ namespace FezGame.Mod {
             foreach (ConstructorInfo constructor in constructors) {
                 ParameterInfo[] parameters = constructor.GetParameters();
                 if (!elem.HasAttributes && parameters.Length == 0) {
-                    return constructor.Invoke(new object[0]);
+                    CacheConstructors[new_key] = constructor_ = ReflectionHelper.CreateDelegate(constructor);
+                    CacheConstructorsParameters[constructor_] = null;
+                    return constructor_(null, new object[0]);
                 } else if (!elem.HasAttributes || parameters.Length == 0) {
                     continue;
                 }
@@ -737,17 +744,16 @@ namespace FezGame.Mod {
                     continue;
                 }
 
-                CacheConstructors[new_key] = constructor;
-                CacheConstructorsParameters[constructor] = parameters;
-                return constructor.Invoke(objs);
+                CacheConstructors[new_key] = constructor_ = ReflectionHelper.CreateDelegate(constructor);
+                CacheConstructorsParameters[constructor_] = parameters;
+                return constructor_(null, objs);
             }
 
             ConstructorInfo constructorDefault = type.GetDefaultConstructor();
             if (constructorDefault != null) {
-                CacheConstructors[new_key] = constructorDefault;
-                CacheConstructorsParameters[constructorDefault] = null;
-
-                return constructorDefault.Invoke(new object[0]);
+                CacheConstructors[new_key] = constructor_ = ReflectionHelper.CreateDelegate(constructorDefault);
+                CacheConstructorsParameters[constructor_] = null;
+                return constructor_(null, new object[0]);
             }
 
             ModLogger.Log("FEZMod", "XmlHelper can't find a constructor for element " + elem.Name + " of type " + type.FullName);
@@ -770,7 +776,7 @@ namespace FezGame.Mod {
                 return Enum.Parse(type, str);
             }
             if (type.IsPrimitive) {
-                return type.GetMethod("Parse", new Type[] { typeof(String) }).Invoke(null, new object[] { str });
+                return ReflectionHelper.InvokeMethod(type.GetMethod("Parse", new Type[] { typeof(String) }), null, new object[] { str });
             }
             if (type == typeof(Color)) {
                 Color color = new Color();

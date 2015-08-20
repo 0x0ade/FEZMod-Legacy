@@ -1,5 +1,5 @@
 ﻿using System;
-using Common;
+using FezGame.Mod;
 using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;

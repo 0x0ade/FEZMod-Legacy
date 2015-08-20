@@ -3,7 +3,7 @@ using System.IO;
 using System.Drawing.Imaging;
 using Microsoft.Xna.Framework.Graphics;
 using System.Runtime.InteropServices;
-using Common;
+using FezGame.Mod;
 using System.Collections.Generic;
 using FezEngine.Tools;
 using Microsoft.Xna.Framework;

@@ -9,7 +9,7 @@ using FezEngine.Tools;
 
 using FezEngine.Tools;
 using FezEngine.Services;
-using Common;
+using FezGame.Mod;
 using FezEngine.Components.Scripting;
 
 namespace FezGame.Speedrun.Clocks {

@@ -10,7 +10,7 @@ using FezGame.Services;
 using FezGame.Structure;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Common;
+using FezGame.Mod;
 
 
 namespace FezGame.Components {

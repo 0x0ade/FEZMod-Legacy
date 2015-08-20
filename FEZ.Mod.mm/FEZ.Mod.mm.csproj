@@ -66,6 +66,9 @@
     <Reference Include="EasyStorage">
       <HintPath>..\libs\EasyStorage.dll</HintPath>
     </Reference>
+    <Reference Include="Common">
+      <HintPath>..\libs\Common.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -76,7 +79,6 @@
     <Compile Include="FezGame\Components\DotHost.cs" />
     <Compile Include="FezGame\Mod\FEZMod.cs" />
     <Compile Include="FezGame\Mod\FezModule.cs" />
-    <Compile Include="Common\ModLogger.cs" />
     <Compile Include="FezGame\Mod\FEZModComponent.cs" />
     <Compile Include="FezGame\Services\GameCameraManager.cs" />
     <Compile Include="FezGame\Components\PlayerCameraControl.cs" />
@@ -106,6 +108,7 @@
     <Compile Include="FezGame\Mod\Gui\TopBarWidget.cs" />
     <Compile Include="FezGame\Mod\Gui\WindowHeaderWidget.cs" />
     <Compile Include="FezGame\Mod\FEZModContentHelper.cs" />
+    <Compile Include="FezGame\ModLogger.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

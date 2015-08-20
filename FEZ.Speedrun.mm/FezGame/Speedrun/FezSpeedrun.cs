@@ -1,6 +1,6 @@
 ﻿using System;
 using FezGame.Mod;
-using Common;
+using FezGame.Mod;
 using FezEngine.Tools;
 using FezGame.Components;
 using Microsoft.Xna.Framework;

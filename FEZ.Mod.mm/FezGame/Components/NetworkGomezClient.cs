@@ -9,7 +9,7 @@ using System.Runtime.Remoting.Lifetime;
 using FezGame.Components;
 
 
-using Common;
+using FezGame.Mod;
 using FezGame.Mod;
 using FezEngine.Components;
 
