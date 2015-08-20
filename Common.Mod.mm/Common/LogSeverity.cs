@@ -1,7 +1,7 @@
 ﻿using System;
 using MonoMod;
 
-namespace FezGame.Mod {
+namespace Common {
     [MonoModIgnore]
     public enum LogSeverity {
         Information,

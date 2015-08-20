@@ -39,18 +39,18 @@ namespace FezGame.Mod {
 
     public static class XmlHelper {
 
-        private readonly static Dictionary<string, Type> CacheTypes = new Dictionary<string, Type>();
-        private readonly static Dictionary<CacheKey_Type_NodeName, Type> CacheTypesSpecial = new Dictionary<CacheKey_Type_NodeName, Type>();
-        private readonly static Dictionary<Type, FieldInfo[]> CacheTypesFields = new Dictionary<Type, FieldInfo[]>();
-        private readonly static Dictionary<Type, PropertyInfo[]> CacheTypesProperties = new Dictionary<Type, PropertyInfo[]>();
-        private readonly static Dictionary<CacheKey_Type_NodeName, FieldInfo> CacheFields = new Dictionary<CacheKey_Type_NodeName, FieldInfo>();
-        private readonly static Dictionary<CacheKey_Type_NodeName, PropertyInfo> CacheProperties = new Dictionary<CacheKey_Type_NodeName, PropertyInfo>();
-        private readonly static Dictionary<CacheKey_NodeName_AttribName, FieldInfo> CacheAttribFields = new Dictionary<CacheKey_NodeName_AttribName, FieldInfo>();
-        private readonly static Dictionary<CacheKey_NodeName_AttribName, PropertyInfo> CacheAttribProperties = new Dictionary<CacheKey_NodeName_AttribName, PropertyInfo>();
-        private readonly static Dictionary<CacheKey_Type_NodeName, DynamicMethodDelegate> CacheConstructors = new Dictionary<CacheKey_Type_NodeName, DynamicMethodDelegate>();
-        private readonly static Dictionary<DynamicMethodDelegate, ParameterInfo[]> CacheConstructorsParameters = new Dictionary<DynamicMethodDelegate, ParameterInfo[]>();
-        private readonly static Dictionary<Type, MethodInfo> CacheAddMethods = new Dictionary<Type, MethodInfo>();
-        private readonly static Dictionary<Type, MethodInfo> CacheParseMethods = new Dictionary<Type, MethodInfo>();
+        private readonly static Dictionary<string, Type> CacheTypes = new Dictionary<string, Type>(128);
+        private readonly static Dictionary<CacheKey_Type_NodeName, Type> CacheTypesSpecial = new Dictionary<CacheKey_Type_NodeName, Type>(32);
+        private readonly static Dictionary<Type, FieldInfo[]> CacheTypesFields = new Dictionary<Type, FieldInfo[]>(128);
+        private readonly static Dictionary<Type, PropertyInfo[]> CacheTypesProperties = new Dictionary<Type, PropertyInfo[]>(128);
+        private readonly static Dictionary<CacheKey_Type_NodeName, FieldInfo> CacheFields = new Dictionary<CacheKey_Type_NodeName, FieldInfo>(256);
+        private readonly static Dictionary<CacheKey_Type_NodeName, PropertyInfo> CacheProperties = new Dictionary<CacheKey_Type_NodeName, PropertyInfo>(256);
+        private readonly static Dictionary<CacheKey_NodeName_AttribName, FieldInfo> CacheAttribFields = new Dictionary<CacheKey_NodeName_AttribName, FieldInfo>(256);
+        private readonly static Dictionary<CacheKey_NodeName_AttribName, PropertyInfo> CacheAttribProperties = new Dictionary<CacheKey_NodeName_AttribName, PropertyInfo>(256);
+        private readonly static Dictionary<CacheKey_Type_NodeName, DynamicMethodDelegate> CacheConstructors = new Dictionary<CacheKey_Type_NodeName, DynamicMethodDelegate>(128);
+        private readonly static Dictionary<DynamicMethodDelegate, ParameterInfo[]> CacheConstructorsParameters = new Dictionary<DynamicMethodDelegate, ParameterInfo[]>(128);
+        private readonly static Dictionary<Type, MethodInfo> CacheAddMethods = new Dictionary<Type, MethodInfo>(64);
+        private readonly static Dictionary<Type, MethodInfo> CacheParseMethods = new Dictionary<Type, MethodInfo>(32);
 
 
         public static List<string> BlacklistedAssemblies = new List<string>() {
@@ -58,7 +58,8 @@ namespace FezGame.Mod {
             "System.Drawing" //Thanks Rectangle!
         };
         public static List<Type> HatedTypesNew = new List<Type>() {
-            typeof(VertexPositionNormalTextureInstance) //Thanks parameter Normal being of type Vector3, but being a byte in XML...
+            typeof(VertexPositionNormalTextureInstance), //Thanks parameter Normal being of type Vector3, but being a byte in XML...
+            typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>) //Thanks for your children causing typecast exceptions...
         };
         public static List<Type> HatedTypesSpecial = new List<Type>() {
             typeof(AnimatedTexture), //Thanks for Frames requiring to be specially parsed...
@@ -513,18 +514,16 @@ namespace FezGame.Mod {
                 }
                 if (geometryNode != null) {
                     XmlElement geometryElem = (XmlElement) geometryNode;
-                    //PrimitiveType type = (PrimitiveType) typeof(PrimitiveType).Parse(geometryElem.GetAttribute("type"));
-                    //Let's just assume all art objects use TriangleLists.
-                    //Note the suffix s in TriangleLists...
-                    ao.Geometry = new ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>(PrimitiveType.TriangleList, 60);
-                    ao.Geometry.NeedsEffectCommit = true;
-                    ao.Geometry.Vertices = (VertexPositionNormalTextureInstance[]) geometryElem.ChildNodes[0].Deserialize(typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>), cm);
-                    ao.Geometry.Indices = (int[]) geometryElem.ChildNodes[1].Deserialize(typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>), cm);
+                    ao.Geometry = (ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>) geometryNode.Deserialize();
                 }
                 ao.ActorType = (ActorType) typeof(ActorType).Parse(elem.GetAttribute("actorType"));
                 ao.NoSihouette = bool.Parse(elem.GetAttribute("noSilhouette"));
                 //DateTime timeEnd = DateTime.UtcNow;
                 //ModLogger.Log("FEZMod", "Deserialized the inner pieces of ArtObject in " + (timeEnd - timeStart).TotalMilliseconds + "ms");
+            }
+
+            if (obj is TrileSet) {
+                ((TrileSet) obj).TextureAtlas = cm.Load<Texture2D>(elem.OwnerDocument.DocumentElement.GetAttribute("assetName") + "-fm-Texture2D").MixAlpha(cm.Load<Texture2D>(elem.OwnerDocument.DocumentElement.GetAttribute("assetName") + "_alpha"));
             }
 
             MethodInfo onDeserialization = obj.GetType().GetMethod("OnDeserialization");
@@ -612,7 +611,7 @@ namespace FezGame.Mod {
             }
 
             //Use the following logging method call to specify the conditions for a special type.
-            //ModLogger.Log("FEZMod", "XmlHelper FindSpecialType debug name: " + name + "; parent: " + parent.FullName);
+            //ModLogger.Log("FEZMod", "XmlHelper FindSpecialType debug name: " + name + "; parent: " + (parent == null ? "null" : parent.FullName));
 
             if (typeof(NpcInstance).IsAssignableFrom(parent) && name == "Action") {
                 return CacheTypesSpecial[findSpecialType_key] = null;
@@ -642,7 +641,7 @@ namespace FezGame.Mod {
                 return CacheTypesSpecial[findSpecialType_key] = typeof(FrameContent);
             }
 
-            if (typeof(ArtObject).IsAssignableFrom(parent) && name == "ShaderInstancedIndexedPrimitives") {
+            if (name == "ShaderInstancedIndexedPrimitives") {
                 return CacheTypesSpecial[findSpecialType_key] = typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>);
             }
 
@@ -662,6 +661,17 @@ namespace FezGame.Mod {
                     byte.Parse(elem.ChildNodes[1].InnerText),
                     (Vector2) elem.ChildNodes[2].FirstChild.Deserialize()
                 );
+            }
+
+            if (type == typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>)) {
+                //PrimitiveType type = (PrimitiveType) typeof(PrimitiveType).Parse(geometryElem.GetAttribute("type"));
+                //Let's just assume all art objects and trile sets use TriangleLists.
+                //Note the suffix s in TriangleLists...
+                ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix> geometry = new ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>(PrimitiveType.TriangleList, 60);
+                geometry.NeedsEffectCommit = true;
+                geometry.Vertices = (VertexPositionNormalTextureInstance[]) elem.ChildNodes[0].Deserialize(typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>));
+                geometry.Indices = (int[]) elem.ChildNodes[1].Deserialize(typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>));
+                return geometry;
             }
 
             DynamicMethodDelegate constructor_ = null;

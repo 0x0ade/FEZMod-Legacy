@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FezGame.Mod {
+namespace Common {
     public class Logger {
 
         public static void orig_Log(string component, LogSeverity severity, string message) {
