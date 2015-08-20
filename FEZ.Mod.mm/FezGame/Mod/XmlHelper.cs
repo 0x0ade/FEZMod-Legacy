@@ -27,9 +27,24 @@ using System.Globalization;
 using System.Threading;
 
 namespace FezGame.Mod {
+    public struct CacheKey_Type_Member {
+        public Type Type;
+        public object Member;
+    }
+    public struct CacheKey_Type_NodeName {
+        public Type Type;
+        public string NodeName;
+    }
+
     public static class XmlHelper {
 
-        //public readonly static Dictionary<string, FieldInfo> CacheFields = new Dictionary<string, FieldInfo>();
+        private readonly static Dictionary<string, Type> CacheTypes = new Dictionary<string, Type>();
+        private readonly static Dictionary<CacheKey_Type_NodeName, Type> CacheTypesSpecial = new Dictionary<CacheKey_Type_NodeName, Type>();
+        private readonly static Dictionary<CacheKey_Type_Member, FieldInfo> CacheFields = new Dictionary<CacheKey_Type_Member, FieldInfo>();
+        private readonly static Dictionary<CacheKey_Type_Member, MethodInfo> CacheMethods = new Dictionary<CacheKey_Type_Member, MethodInfo>();
+        private readonly static Dictionary<CacheKey_Type_NodeName, ConstructorInfo> CacheConstructors = new Dictionary<CacheKey_Type_NodeName, ConstructorInfo>();
+        private readonly static Dictionary<ConstructorInfo, ParameterInfo[]> CacheConstructorsParameters = new Dictionary<ConstructorInfo, ParameterInfo[]>();
+
 
         public static List<string> BlacklistedAssemblies = new List<string>() {
             "SDL2-CS", //OpenTK
@@ -143,7 +158,7 @@ namespace FezGame.Mod {
 
             object obj = type.New(elem) ?? node.InnerText;
 
-            if (obj is string || HatedTypesNew.Contains(type)) {
+            if (obj is string) {
                 return obj;
             }
 
@@ -193,6 +208,10 @@ namespace FezGame.Mod {
             if (obj == null) {
                 ModLogger.Log("FEZMod", "XmlHelper couldn't create a new object for " + node.Name + " of type " + type.FullName);
                 obj = type.New();
+            }
+
+            if (HatedTypesNew.Contains(type)) {
+                return obj;
             }
 
             if (HatedTypesSpecial.Contains(type)) {
@@ -453,6 +472,11 @@ namespace FezGame.Mod {
         }
 
         public static Type FindType(this string name) {
+            Type type_ = null;
+            if (CacheTypes.TryGetValue(name, out type_)) {
+                return type_;
+            }
+
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
             List<Assembly> delayedAssemblies = new List<Assembly>();
 
@@ -465,6 +489,7 @@ namespace FezGame.Mod {
                     Type[] types = assembly.GetTypes();
                     foreach (Type type in types) {
                         if (type.Name == name && type.FullName.EndsWith("."+name)) {
+                            CacheTypes[name] = type;
                             return type;
                         }
                     }
@@ -483,6 +508,7 @@ namespace FezGame.Mod {
                     Type[] types = assembly.GetTypes();
                     foreach (Type type in types) {
                         if (type.Name == name && type.FullName.EndsWith("."+name)) {
+                            CacheTypes[name] = type;
                             return type;
                         }
                     }
@@ -496,9 +522,11 @@ namespace FezGame.Mod {
                 }
             }
 
+            CacheTypes[name] = null;
             return null;
         }
 
+        private static CacheKey_Type_NodeName findSpecialType_key;
         /// <summary>
         /// Finds a type based on its special (xnb_parse) name, falling back to FindType otherwise.
         /// </summary>
@@ -510,47 +538,90 @@ namespace FezGame.Mod {
                 return name.FindType();
             }
 
+            Type type_ = null;
+            findSpecialType_key.Type = parent;
+            findSpecialType_key.NodeName = name;
+            if (CacheTypesSpecial.TryGetValue(findSpecialType_key, out type_)) {
+                return type_;
+            }
+
             //Use the following logging method call to specify the conditions for a special type.
             //ModLogger.Log("FEZMod", "XmlHelper FindSpecialType debug name: " + name + "; parent: " + parent.FullName);
 
             if (typeof(NpcInstance).IsAssignableFrom(parent) && name == "Action") {
-                return null;
+                return CacheTypesSpecial[findSpecialType_key] = null;
             }
 
             if ((typeof(MapTree).IsAssignableFrom(parent) || typeof(MapNode).IsAssignableFrom(parent)) && name == "Node") {
-                return typeof(MapNode);
+                return CacheTypesSpecial[findSpecialType_key] = typeof(MapNode);
             }
 
             if (typeof(MapNode).IsAssignableFrom(parent) && name == "Connection") {
-                return typeof(MapNode.Connection);
+                return CacheTypesSpecial[findSpecialType_key] = typeof(MapNode.Connection);
             }
 
             if (typeof(WinConditions).IsAssignableFrom(parent) && name == "Scripts") {
-                return typeof(List<int>);
+                return CacheTypesSpecial[findSpecialType_key] = typeof(List<int>);
             }
 
             if (typeof(WinConditions).IsAssignableFrom(parent) && name == "Script") {
-                return typeof(int);
+                return CacheTypesSpecial[findSpecialType_key] = typeof(int);
             }
 
             if (parent == null && name == "AnimatedTexturePC") {
-                return typeof(AnimatedTexture);
+                return CacheTypesSpecial[findSpecialType_key] = typeof(AnimatedTexture);
             }
 
             if (typeof(AnimatedTexture).IsAssignableFrom(parent) && name == "FramePC") {
-                return typeof(FrameContent);
+                return CacheTypesSpecial[findSpecialType_key] = typeof(FrameContent);
             }
 
             if (typeof(ArtObject).IsAssignableFrom(parent) && name == "ShaderInstancedIndexedPrimitives") {
-                return typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>);
+                return CacheTypesSpecial[findSpecialType_key] = typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>);
             }
 
             return name.FindType();
         }
 
+        private static CacheKey_Type_NodeName new_key;
         public static object New(this Type type, XmlElement elem = null) {
             if (FEZMod.OverrideCulturueManualyBecauseMonoIsA_____) {
                 Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            }
+
+            if (type == typeof(VertexPositionNormalTextureInstance)) {
+                //TODO make this method automatically pass the child nodes when needed
+                return new VertexPositionNormalTextureInstance(
+                    (Vector3) elem.ChildNodes[0].FirstChild.Deserialize(),
+                    byte.Parse(elem.ChildNodes[1].InnerText),
+                    (Vector2) elem.ChildNodes[2].FirstChild.Deserialize()
+                );
+            }
+
+            ConstructorInfo constructor_ = null;
+            new_key.Type = type;
+            new_key.NodeName = elem.Name;
+            if (CacheConstructors.TryGetValue(new_key, out constructor_)) {
+                ParameterInfo[] parameters = CacheConstructorsParameters[constructor_];
+                if (parameters == null || parameters.Length == 0) {
+                    return constructor_.Invoke(new object[0]);
+                }
+
+                XmlAttributeCollection attribs_ = elem.Attributes;
+
+                object[] objs = new object[parameters.Length];
+                int i = 0;
+                foreach (ParameterInfo parameter in parameters) {
+                    objs[i] = parameter.ParameterType.Parse(attribs_[i].InnerText);
+                    if (objs[i] == null) {
+                        //TODO the result of parsing the string can be null...
+                        break;
+                    }
+                    i++;
+                }
+                if (i >= objs.Length) {
+                    return constructor_.Invoke(objs);
+                }
             }
 
             if (type.IsArray) {
@@ -606,21 +677,17 @@ namespace FezGame.Mod {
                     continue;
                 }
 
+                CacheConstructors[new_key] = constructor;
+                CacheConstructorsParameters[constructor] = parameters;
                 return constructor.Invoke(objs);
             }
 
-            ConstructorInfo constructor_ = type.GetDefaultConstructor();
-            if (constructor_ != null) {
-                return constructor_.Invoke(new object[0]);
-            }
+            ConstructorInfo constructorDefault = type.GetDefaultConstructor();
+            if (constructorDefault != null) {
+                CacheConstructors[new_key] = constructorDefault;
+                CacheConstructorsParameters[constructorDefault] = null;
 
-            if (type == typeof(VertexPositionNormalTextureInstance)) {
-                //TODO make this method automatically pass the child nodes when needed
-                return new VertexPositionNormalTextureInstance(
-                    (Vector3) elem.ChildNodes[0].FirstChild.Deserialize(),
-                    byte.Parse(elem.ChildNodes[1].InnerText),
-                    (Vector2) elem.ChildNodes[2].FirstChild.Deserialize()
-                );
+                return constructorDefault.Invoke(new object[0]);
             }
 
             ModLogger.Log("FEZMod", "XmlHelper can't find a constructor for element " + elem.Name + " of type " + type.FullName);
