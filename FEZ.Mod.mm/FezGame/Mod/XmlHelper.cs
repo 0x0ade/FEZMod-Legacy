@@ -59,7 +59,8 @@ namespace FezGame.Mod {
         };
         public static List<Type> HatedTypesNew = new List<Type>() {
             typeof(VertexPositionNormalTextureInstance), //Thanks parameter Normal being of type Vector3, but being a byte in XML...
-            typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>) //Thanks for your children causing typecast exceptions...
+            typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>), //Thanks for your children causing typecast exceptions...
+            typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Vector4>) //Also for your children for not knowing where to be assigned to...
         };
         public static List<Type> HatedTypesSpecial = new List<Type>() {
             typeof(AnimatedTexture), //Thanks for Frames requiring to be specially parsed...
@@ -505,16 +506,11 @@ namespace FezGame.Mod {
                 ao.Name = elem.GetAttribute("name");
                 ao.Cubemap = cm.Load<Texture2D>(elem.OwnerDocument.DocumentElement.GetAttribute("assetName") + "-fm-Texture2D").MixAlpha(cm.Load<Texture2D>(elem.OwnerDocument.DocumentElement.GetAttribute("assetName") + "_alpha"));
                 ao.Size = (Vector3) elem.ChildNodes[0].FirstChild.Deserialize();
-                XmlNode geometryNode = null;
                 foreach (XmlNode childNode in elem.ChildNodes) {
                     if (childNode.Name == "ShaderInstancedIndexedPrimitives") {
-                        geometryNode = childNode;
+                        ao.Geometry = (ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>) childNode.Deserialize(typeof(ArtObject));
                         break;
                     }
-                }
-                if (geometryNode != null) {
-                    XmlElement geometryElem = (XmlElement) geometryNode;
-                    ao.Geometry = (ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>) geometryNode.Deserialize();
                 }
                 ao.ActorType = (ActorType) typeof(ActorType).Parse(elem.GetAttribute("actorType"));
                 ao.NoSihouette = bool.Parse(elem.GetAttribute("noSilhouette"));
@@ -641,8 +637,12 @@ namespace FezGame.Mod {
                 return CacheTypesSpecial[findSpecialType_key] = typeof(FrameContent);
             }
 
-            if (name == "ShaderInstancedIndexedPrimitives") {
+            if (typeof(ArtObject).IsAssignableFrom(parent) && name == "ShaderInstancedIndexedPrimitives") {
                 return CacheTypesSpecial[findSpecialType_key] = typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>);
+            }
+
+            if (typeof(Trile).IsAssignableFrom(parent) && name == "ShaderInstancedIndexedPrimitives") {
+                return CacheTypesSpecial[findSpecialType_key] = typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Vector4>);
             }
 
             return name.FindType();
@@ -665,12 +665,25 @@ namespace FezGame.Mod {
 
             if (type == typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>)) {
                 //PrimitiveType type = (PrimitiveType) typeof(PrimitiveType).Parse(geometryElem.GetAttribute("type"));
-                //Let's just assume all art objects and trile sets use TriangleLists.
+                //Let's just assume all art objects use TriangleLists.
                 //Note the suffix s in TriangleLists...
                 ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix> geometry = new ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>(PrimitiveType.TriangleList, 60);
+                XmlNode geometryNode = elem.Name == "Geometry" ? elem.FirstChild : elem;
                 geometry.NeedsEffectCommit = true;
-                geometry.Vertices = (VertexPositionNormalTextureInstance[]) elem.ChildNodes[0].Deserialize(typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>));
-                geometry.Indices = (int[]) elem.ChildNodes[1].Deserialize(typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>));
+                geometry.Vertices = (VertexPositionNormalTextureInstance[]) geometryNode.ChildNodes[0].Deserialize(typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>));
+                geometry.Indices = (int[]) geometryNode.ChildNodes[1].Deserialize(typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>));
+                return geometry;
+            }
+
+            if (type == typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Vector4>)) {
+                //PrimitiveType type = (PrimitiveType) typeof(PrimitiveType).Parse(geometryElem.GetAttribute("type"));
+                //Let's just assume all trile sets use TriangleLists.
+                //Note the suffix s in TriangleLists...
+                ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Vector4> geometry = new ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Vector4>(PrimitiveType.TriangleList, 220);
+                XmlNode geometryNode = elem.Name == "Geometry" ? elem.FirstChild : elem;
+                geometry.NeedsEffectCommit = true;
+                geometry.Vertices = (VertexPositionNormalTextureInstance[]) geometryNode.ChildNodes[0].Deserialize(typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Vector4>));
+                geometry.Indices = (int[]) geometryNode.ChildNodes[1].Deserialize(typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Vector4>));
                 return geometry;
             }
 
