@@ -16,11 +16,12 @@ using EasyStorage;
 using System.Globalization;
 using System.Threading;
 using System.Diagnostics;
+using FezEngine.Structure.Scripting;
 
 namespace FezGame.Mod {
     public static class FEZMod {
         //FEZMod metadata
-        public static string Version = "0.2";
+        public static string Version = "0.3a3";
 
         //FEZMod static configuration
         public static string LevelFileFormat = "fml";
@@ -376,6 +377,10 @@ namespace FezGame.Mod {
 
         public static void ProcessLevelData(Level levelData) {
             CallInEachModule("ProcessLevelData", new object[] {levelData});
+        }
+
+        public static void HandleCrash(Exception e) {
+            CallInEachModule("HandleCrash", new object[] {e});
         }
 
         private static void CallInEachModule(string methodName, object[] args) {

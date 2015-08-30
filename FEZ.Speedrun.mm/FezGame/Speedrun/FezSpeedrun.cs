@@ -16,7 +16,7 @@ namespace FezGame.Speedrun {
     public class FezSpeedrun : FezModule {
 
         public override string Name { get { return "JAFM.Speedrun"; } }
-        public override string Author { get { return "AngelDE98 & JAFM contributors"; } }
+        public override string Author { get { return "AngelDE98 & FEZMod contributors"; } }
         public override string Version { get { return FEZMod.Version; } }
 
         public static bool SpeedrunMode = false;
@@ -34,9 +34,9 @@ namespace FezGame.Speedrun {
         public override void ParseArgs(string[] args) {
             for (int i = 0; i < args.Length; i++) {
                 if (args[i] == "-sr" || args[i] == "--speedrun") {
-                    ModLogger.Log("JAFM", "Found -sr / --speedrun");
+                    ModLogger.Log("FEZMod", "Found -sr / --speedrun");
                     if (i + 1 < args.Length && !args[i+1].StartsWith("-")) {
-                        ModLogger.Log("JAFM", "Connecting to LiveSplit on port " + args[i + 1] + "...");
+                        ModLogger.Log("FEZMod", "Connecting to LiveSplit on port " + args[i + 1] + "...");
                         LiveSplitClock lsClock = new LiveSplitClock("localhost", int.Parse(args[i + 1]));
                         lsClock.Clock = Clock;
                         Clock = lsClock;
@@ -47,15 +47,15 @@ namespace FezGame.Speedrun {
                     FEZMod.EnableBugfixes = false;
                 }
                 if (Clock is LiveSplitClock && (args[i] == "-lss" || args[i] == "--livesplit-sync")) {
-                    ModLogger.Log("JAFM", "Found -lss / --livesplit-sync");
+                    ModLogger.Log("FEZMod", "Found -lss / --livesplit-sync");
                     ((LiveSplitClock) Clock).Sync = true;
                 }
                 if (Clock != null && (args[i] == "-prt" || args[i] == "--per-room-time")) {
-                    ModLogger.Log("JAFM", "Found -prt / --per-room-time");
+                    ModLogger.Log("FEZMod", "Found -prt / --per-room-time");
                     PerRoomTime = true;
                 }
                 if (Clock != null && (args[i] == "-tas" || args[i] == "--tool-assisted-speedrun")) {
-                    ModLogger.Log("JAFM", "Found -tas / --tool-assisted-speedrun");
+                    ModLogger.Log("FEZMod", "Found -tas / --tool-assisted-speedrun");
                     ToolAssistedSpeedrun = true;
                 }
             }
@@ -75,6 +75,10 @@ namespace FezGame.Speedrun {
                 Clock.Running = false;
                 Clock.Dispose();
             }
+        }
+
+        public override void HandleCrash(Exception e) {
+            Exit();
         }
 
     }

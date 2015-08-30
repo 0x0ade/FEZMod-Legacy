@@ -11,9 +11,22 @@ namespace FezGame {
 		public static void Main(string[] args) {
             FEZMod.PreInitialize(args);
 
-			ModLogger.Log("JAFM", "Passing to FEZ...");
+			ModLogger.Log("FEZMod", "Passing to FEZ...");
 			orig_Main(args);
 		}
+
+        private static void orig_MainInternal() {
+        }
+
+        private static void MainInternal() {
+            try {
+                orig_MainInternal();
+            } catch (Exception e) {
+                ModLogger.Log("FEZMod", "Handling crash...");
+                ModLogger.Log("FEZMod", e.ToString());
+                FEZMod.HandleCrash(e);
+            }
+        }
 
 	}
 }

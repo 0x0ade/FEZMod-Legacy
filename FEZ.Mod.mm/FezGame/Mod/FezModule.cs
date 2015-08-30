@@ -18,6 +18,7 @@ namespace FezGame.Mod {
         public virtual void Initialize() {}
         public virtual void LoadComponents(Fez game) {}
         public virtual void Exit() {}
+        public virtual void HandleCrash(Exception e) {}
         public virtual void LoadEssentials() {}
         public virtual void Preload() {}
         public virtual void SaveClear(SaveData saveData) {}
