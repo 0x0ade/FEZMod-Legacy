@@ -9,7 +9,13 @@ namespace FezGame {
 		}
 
 		public static void Main(string[] args) {
-            FEZMod.PreInitialize(args);
+            try {
+                FEZMod.PreInitialize(args);
+            } catch (Exception e) {
+                ModLogger.Log("FEZMod", "Handling FEZMod PreInitialize crash...");
+                ModLogger.Log("FEZMod", e.ToString());
+                FEZMod.HandleCrash(e);
+            }
 
 			ModLogger.Log("FEZMod", "Passing to FEZ...");
 			orig_Main(args);
@@ -22,7 +28,7 @@ namespace FezGame {
             try {
                 orig_MainInternal();
             } catch (Exception e) {
-                ModLogger.Log("FEZMod", "Handling crash...");
+                ModLogger.Log("FEZMod", "Handling FEZ crash...");
                 ModLogger.Log("FEZMod", e.ToString());
                 FEZMod.HandleCrash(e);
             }
