@@ -16,6 +16,7 @@ namespace FezGame {
                     ModLogger.Log("FEZMod", e_.ToString());
                 }
                 FEZMod.HandleCrash(e);
+                return;
             }
 
 			ModLogger.Log("FEZMod", "Passing to FEZ...");
