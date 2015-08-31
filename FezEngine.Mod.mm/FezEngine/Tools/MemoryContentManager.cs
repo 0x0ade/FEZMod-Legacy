@@ -1,9 +1,7 @@
 ﻿using System;
 using FezGame.Mod;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Reflection;
 using FezEngine.Structure;
 using FezEngine.Services;
 using FezGame.Mod;

@@ -1,6 +1,5 @@
 ﻿using System;
 using FezGame.Mod;
-using FezGame.Mod;
 
 namespace FezGame {
 	public class Program {
@@ -13,7 +12,9 @@ namespace FezGame {
                 FEZMod.PreInitialize(args);
             } catch (Exception e) {
                 ModLogger.Log("FEZMod", "Handling FEZMod PreInitialize crash...");
-                ModLogger.Log("FEZMod", e.ToString());
+                for (Exception e_ = e; e_ != null; e_ = e_.InnerException) {
+                    ModLogger.Log("FEZMod", e_.ToString());
+                }
                 FEZMod.HandleCrash(e);
             }
 
@@ -29,7 +30,9 @@ namespace FezGame {
                 orig_MainInternal();
             } catch (Exception e) {
                 ModLogger.Log("FEZMod", "Handling FEZ crash...");
-                ModLogger.Log("FEZMod", e.ToString());
+                for (Exception e_ = e; e_ != null; e_ = e_.InnerException) {
+                    ModLogger.Log("FEZMod", e_.ToString());
+                }
                 FEZMod.HandleCrash(e);
             }
         }
