@@ -21,10 +21,7 @@ using FezEngine.Structure.Scripting;
 namespace FezGame.Mod {
     public static class FEZMod {
         //FEZMod metadata
-        public static string Version = "0.3aEMERGENCY";
-
-        //FEZMod static configuration
-        public static string LevelFileFormat = "fml";
+        public static string Version = "0.3a6";
 
         //FEZ version-dependent reflection
         public static FieldInfo DisableCloudSaves;

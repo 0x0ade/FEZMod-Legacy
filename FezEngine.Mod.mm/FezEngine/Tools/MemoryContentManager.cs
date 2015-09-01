@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using FezEngine.Structure;
 using FezEngine.Services;
-using FezGame.Mod;
 
 namespace FezEngine.Tools {
     public class MemoryContentManager {
