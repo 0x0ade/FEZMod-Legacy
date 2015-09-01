@@ -56,13 +56,13 @@ namespace FezGame.Services {
 
             string filePath_ = ("Resources\\levels\\"+(levelName.ToLower())).Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString())+".";
 
-            string filePathFML = filePath_ + FEZMod.LevelFileFormat;
-            FileInfo fileFML = new FileInfo(filePathFML);
-            if (fileFML.Exists) {
-                ModLogger.Log("FEZMod", "Loading level from FML: "+levelName);
+            string filePathFMB = filePath_ + "fmb";
+            FileInfo fileFMB = new FileInfo(filePathFMB);
+            if (fileFMB.Exists) {
+                ModLogger.Log("FEZMod", "Loading level from FMB: "+levelName);
 
-                using (FileStream fs = new FileStream(fileFML.FullName, FileMode.Open)) {
-                    throw new FormatException("FEZMod can't load FML files yet.");
+                using (FileStream fs = new FileStream(fileFMB.FullName, FileMode.Open)) {
+                    throw new FormatException("FEZMod can't load FMB files yet.");
                 }
 
                 return;
@@ -110,7 +110,7 @@ namespace FezGame.Services {
         }
 
         public void Save(string levelName, bool binary = false) {
-            string filePath = ("Resources\\levels\\"+(levelName.ToLower())).Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString())+"."+(binary?FEZMod.LevelFileFormat:"xml");
+            string filePath = ("Resources\\levels\\"+(levelName.ToLower())).Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString())+"."+(binary?"fmb":"xml");
             FileInfo file = new FileInfo(filePath);
             if (file.Exists) {
                 return;
@@ -122,7 +122,7 @@ namespace FezGame.Services {
                 //TODO use custom writer instead of quickly and dirtily serializing the level
                 //FYI: Levels are not serializable.
                 using (FileStream fs = new FileStream(filePath, FileMode.CreateNew)) {
-                    throw new FormatException("FEZMod can't save FML files yet.");
+                    throw new FormatException("FEZMod can't save FMB files yet.");
                 }
 
                 return;

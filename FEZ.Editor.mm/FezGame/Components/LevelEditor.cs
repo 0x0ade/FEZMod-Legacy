@@ -2306,7 +2306,7 @@ namespace FezGame.Components {
             WindowHeaderWidget windowHeader = null;
 
             string filePath_ = ("levels\\" + LevelManager.Name).Externalize() + ".";
-            string fileExtension = (binary ? FEZMod.LevelFileFormat : "xml");
+            string fileExtension = (binary ? "fmb" : "xml");
             string filePath = filePath_ + fileExtension;
             FileInfo file = new FileInfo(filePath);
 
