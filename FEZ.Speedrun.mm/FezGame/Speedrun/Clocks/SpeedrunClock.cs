@@ -98,15 +98,15 @@ namespace FezGame.Speedrun.Clocks {
 
         protected void ClockThreadLoop() {
             TimeSpan diff;
-            timePrev = timeNow;
+            timePrev = DateTime.Now;
             while (running_) {
+                timeNow = DateTime.Now;
                 if (Paused || GameState == null) {
                     Thread.Sleep(0);
                     timePrev = timeNow;
                     continue;
                 }
 
-                timeNow = DateTime.Now;
                 diff = timeNow - timePrev;
                 diff = TimeSpan.FromTicks((long) (diff.Ticks * Direction));
 

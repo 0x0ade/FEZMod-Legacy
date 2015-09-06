@@ -102,16 +102,16 @@ namespace FezGame.Components {
                 QuickSavesWidget.Position.Y = BottomBarWidget.Position.Y - QuickSavesWidget.Size.Y;
                 return;
             }
-            FezSpeedrun.Clock.Strict = false;
 
             //Freeze and rewind
             if (InputManager.OpenInventory == FezButtonState.Pressed) {
                 Frozen = !Frozen;
+                GameState.InMenuCube = Frozen;
             }
             if (Frozen) {
-                GameState.InMenuCube = InputManager.CancelTalk == FezButtonState.Up;
+                FezSpeedrun.Clock.Strict = InputManager.CancelTalk == FezButtonState.Down;
             } else {
-                GameState.InMenuCube = false;
+                FezSpeedrun.Clock.Strict = false;
             }
             if (Frozen && InputManager.CancelTalk == FezButtonState.Down && GomezPositions.Count > 0) {
                 PlayerManager.Position = GomezPositions[GomezPositions.Count-1];
@@ -156,72 +156,20 @@ namespace FezGame.Components {
             //Quicksave
             if (KeyboardState.GetKeyState(Keys.F6) == FezButtonState.Pressed) {
                 //Save
-                QuickSave qs = new QuickSave();
-
-                GameState.SaveData.CloneInto(qs.SaveData);
-                ThumbnailScheduled = qs;
-                ThumbnailRT = TRM.TakeTarget();
-                TRM.ScheduleHook(DrawOrder, ThumbnailRT.Target);
-
-                qs.Time = FezSpeedrun.Clock.Time;
-                qs.TimeLoading = FezSpeedrun.Clock.TimeLoading;
-
-                qs.GomezPositions.AddRange(GomezPositions);
-                qs.GomezVelocities.AddRange(GomezVelocities);
-                qs.GomezActions.AddRange(GomezActions);
-                qs.GomezRotations.AddRange(GomezRotations);
-                qs.GomezCamPositions.AddRange(GomezCamPositions);
-                QuickSaves.Add(qs);
+                QuickSave();
             }
 
             if (KeyboardState.GetKeyState(Keys.F9) == FezButtonState.Pressed && QuickSaves.Count > 0) {
                 //Load
-                QuickSave qs = QuickSaves[QuickSaves.Count - 1];
-
-                qs.SaveData.CloneInto(GameState.SaveData);
-                GameState.Loading = true;
-                LevelManager.ChangeLevel(LevelManager.Name);
-                GameState.ScheduleLoadEnd = true;
-                PlayerManager.RespawnAtCheckpoint();
-                LevelMaterializer.ForceCull();
-
-                FezSpeedrun.Clock.Time = qs.Time;
-                FezSpeedrun.Clock.TimeLoading = qs.TimeLoading;
-
-                GomezPositions.Clear();
-                GomezPositions.AddRange(qs.GomezPositions);
-                GomezVelocities.Clear();
-                GomezVelocities.AddRange(qs.GomezVelocities);
-                GomezActions.Clear();
-                GomezActions.AddRange(qs.GomezActions);
-                GomezRotations.Clear();
-                GomezRotations.AddRange(qs.GomezRotations);
-                GomezCamPositions.Clear();
-                GomezCamPositions.AddRange(qs.GomezCamPositions);
-
-                PlayerManager.Position = GomezPositions[GomezPositions.Count-1];
-                GomezPositions.RemoveAt(GomezPositions.Count-1);
-
-                PlayerManager.Velocity = GomezVelocities[GomezVelocities.Count-1];
-                GomezVelocities.RemoveAt(GomezVelocities.Count-1);
-
-                PlayerManager.Action = GomezActions[GomezActions.Count-1];
-                PlayerManager.LastAction = PlayerManager.Action;
-                PlayerManager.NextAction = PlayerManager.Action;
-                GomezActions.RemoveAt(GomezActions.Count-1);
-
-                CameraManager.ChangeViewpoint(GomezRotations[GomezRotations.Count-1]);
-                GomezRotations.RemoveAt(GomezRotations.Count-1);
-
-                CameraManager.InterpolatedCenter = GomezCamPositions[GomezCamPositions.Count-1];
-                GomezCamPositions.RemoveAt(GomezCamPositions.Count-1);
+                QuickLoad();
             }
 
             //Add quicksaves to the GUI
-            if (QuickSavesWidget.Widgets.Count != QuickSaves.Count) {
+            if (QuickSavesWidget.Widgets.Count != QuickSaves.Count || (ThumbnailScheduled == null && ThumbnailRT != null)) {
+                ThumbnailRT = null;
                 QuickSavesWidget.Widgets.Clear();
                 for (int i = 0; i < QuickSaves.Count; i++) {
-                    QuickSavesWidget.Widgets.Add(new QuickSaveWidget(Game, QuickSaves[i], QuickSavesWidget.Size.X));
+                    QuickSavesWidget.Widgets.Insert(0, new QuickSaveWidget(Game, QuickSaves[i], QuickSavesWidget.Size.X));
                 }
             }
 
@@ -237,6 +185,8 @@ namespace FezGame.Components {
             if (ThumbnailScheduled != null) {
                 if (ThumbnailRT == null) {
                     base.Draw(gameTime);
+                    ThumbnailRT = TRM.TakeTarget();
+                    TRM.ScheduleHook(DrawOrder, ThumbnailRT.Target);
                     return;
                 }
 
@@ -244,10 +194,70 @@ namespace FezGame.Components {
                 //TRM.ReturnTarget(ThumbnailRT);//?
                 ThumbnailScheduled.Thumbnail = ThumbnailRT.Target;
                 ThumbnailScheduled = null;
-                ThumbnailRT = null;
             }
 
             base.Draw(gameTime);
+        }
+
+        public void QuickSave() {
+            QuickSave qs = new QuickSave();
+
+            GameState.SaveData.CloneInto(qs.SaveData);
+            ThumbnailScheduled = qs;
+
+            qs.Time = FezSpeedrun.Clock.Time;
+            qs.TimeLoading = FezSpeedrun.Clock.TimeLoading;
+
+            qs.GomezPositions.AddRange(GomezPositions);
+            qs.GomezVelocities.AddRange(GomezVelocities);
+            qs.GomezActions.AddRange(GomezActions);
+            qs.GomezRotations.AddRange(GomezRotations);
+            qs.GomezCamPositions.AddRange(GomezCamPositions);
+            QuickSaves.Add(qs);
+        }
+
+        public void QuickLoad(QuickSave qs = null) {
+            if (qs == null) {
+                qs = QuickSaves[QuickSaves.Count - 1];
+            }
+
+            qs.SaveData.CloneInto(GameState.SaveData);
+            GameState.Loading = true;
+            LevelManager.ChangeLevel(LevelManager.Name);
+            GameState.ScheduleLoadEnd = true;
+            PlayerManager.RespawnAtCheckpoint();
+            LevelMaterializer.ForceCull();
+
+            FezSpeedrun.Clock.Time = qs.Time;
+            FezSpeedrun.Clock.TimeLoading = qs.TimeLoading;
+
+            GomezPositions.Clear();
+            GomezPositions.AddRange(qs.GomezPositions);
+            GomezVelocities.Clear();
+            GomezVelocities.AddRange(qs.GomezVelocities);
+            GomezActions.Clear();
+            GomezActions.AddRange(qs.GomezActions);
+            GomezRotations.Clear();
+            GomezRotations.AddRange(qs.GomezRotations);
+            GomezCamPositions.Clear();
+            GomezCamPositions.AddRange(qs.GomezCamPositions);
+
+            PlayerManager.Position = GomezPositions[GomezPositions.Count-1];
+            GomezPositions.RemoveAt(GomezPositions.Count-1);
+
+            PlayerManager.Velocity = GomezVelocities[GomezVelocities.Count-1];
+            GomezVelocities.RemoveAt(GomezVelocities.Count-1);
+
+            PlayerManager.Action = GomezActions[GomezActions.Count-1];
+            PlayerManager.LastAction = PlayerManager.Action;
+            PlayerManager.NextAction = PlayerManager.Action;
+            GomezActions.RemoveAt(GomezActions.Count-1);
+
+            CameraManager.ChangeViewpoint(GomezRotations[GomezRotations.Count-1]);
+            GomezRotations.RemoveAt(GomezRotations.Count-1);
+
+            CameraManager.InterpolatedCenter = GomezCamPositions[GomezCamPositions.Count-1];
+            GomezCamPositions.RemoveAt(GomezCamPositions.Count-1);
         }
 
     }

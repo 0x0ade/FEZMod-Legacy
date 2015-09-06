@@ -29,11 +29,12 @@ namespace FezGame.Mod.Gui {
             : base(game) {
             Widgets.Add(TimeWidget = new ButtonWidget(Game, "00:00:00.0000") {
                 Position = new Vector2(0f, 0f),
-                UpdateBounds = true
+                Size = new Vector2(256f, 24f),
+                UpdateBounds = false
             });
             Widgets.Add(ProgressWidget = new ButtonWidget(Game) {
                 Position = new Vector2(0f, 0f),
-                Size = new Vector2(GraphicsDevice.Viewport.Width, 24f),
+                Size = new Vector2(GraphicsDevice.Viewport.Width - 256f, 24f),
                 Background = Color.White,
                 UpdateBounds = false
             });

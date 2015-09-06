@@ -35,16 +35,20 @@ namespace FezGame.Mod.Gui {
                 thumbnailShrinkedWidth = (Size.Y / qs.Thumbnail.Height) * qs.Thumbnail.Width;
             }
 
-            Widgets.Add(new ButtonWidget(Game, "Time: " + SpeedrunInfo.FormatTime(qs.Time.ToString())) {
+            Widgets.Add(new ButtonWidget(Game, "Time: " + SpeedrunInfo.FormatTime(qs.Time.ToString(), true), OnClick) {
                 Position = new Vector2(0, 0f),
                 UpdateBounds = true
             });
-            Widgets.Add(new ButtonWidget(Game, qs.SaveData.Level) {
+            Widgets.Add(new ButtonWidget(Game, "Frames: " + qs.GomezPositions.Count, OnClick) {
                 Position = new Vector2(0, 24f),
                 UpdateBounds = true
             });
-            Widgets.Add(new ButtonWidget(Game, qs.SaveData.CubeShards + "/" + qs.SaveData.SecretCubes + "/" + qs.SaveData.CollectedParts + "/" + qs.SaveData.PiecesOfHeart) {
+            Widgets.Add(new ButtonWidget(Game, qs.SaveData.Level, OnClick) {
                 Position = new Vector2(0, 48f),
+                UpdateBounds = true
+            });
+            Widgets.Add(new ButtonWidget(Game, qs.SaveData.CubeShards + "/" + qs.SaveData.SecretCubes + "/" + qs.SaveData.CollectedParts + "/" + qs.SaveData.PiecesOfHeart, OnClick) {
+                Position = new Vector2(0, 72f),
                 UpdateBounds = true
             });
 
@@ -57,6 +61,10 @@ namespace FezGame.Mod.Gui {
             }
 
             base.Update(gameTime);
+
+            for (int i = 0; i < Widgets.Count; i++) {
+                Widgets[i].Position.X = Size.X - Widgets[i].Size.X;
+            }
         }
 
         public override void DrawBackground(GameTime gameTime) {
@@ -71,6 +79,20 @@ namespace FezGame.Mod.Gui {
                 (int) (Position.Y + Offset.Y),
                 (int) thumbnailShrinkedWidth, DefaultHeight
             ), null, Color.White);
+        }
+
+        public override void Click(GameTime gameTime, int mb) {
+            if (mb == 1) {
+                GuiHandler.Scheduled.Add(OnClick);
+            }
+        }
+
+        public void OnClick() {
+            if (QuickSave == null) {
+                return;
+            }
+
+            ((TASComponent) GuiHandler).QuickLoad(QuickSave);
         }
 
     }
