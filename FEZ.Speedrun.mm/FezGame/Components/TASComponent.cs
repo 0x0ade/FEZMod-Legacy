@@ -95,7 +95,7 @@ namespace FezGame.Components {
             if (FezSpeedrun.Clock != null) {
                 FezSpeedrun.Clock.InGame = false;
             }
-            if (FezSpeedrun.Clock == null || !FezSpeedrun.Clock.Running) {
+            if (FezSpeedrun.Clock == null || !FezSpeedrun.Clock.Running || GameState.Loading) {
                 base.Update(gameTime);
                 BottomBarWidget.Position.Y = GraphicsDevice.Viewport.Height - BottomBarWidget.Size.Y;
                 QuickSavesWidget.Position.X = GraphicsDevice.Viewport.Width - QuickSavesWidget.Size.X;
@@ -133,6 +133,7 @@ namespace FezGame.Components {
 
                 //TODO make something automate this
 
+                DefaultCameraManager.NoInterpolation = true;
                 FezSpeedrun.Clock.Direction = -1D;
             } else if (!GameState.InMenuCube) {
                 GomezPositions.Add(PlayerManager.Position);
@@ -146,8 +147,8 @@ namespace FezGame.Components {
                 GomezCamPositions.Add(CameraManager.InterpolatedCenter);
                 //TODO make something automate this
 
+                DefaultCameraManager.NoInterpolation = false;
                 FezSpeedrun.Clock.Direction = 1D;
-
                 if (FezSpeedrun.Clock.Time > MaxTime) {
                     MaxTime = FezSpeedrun.Clock.Time;
                 }
@@ -221,10 +222,9 @@ namespace FezGame.Components {
                 qs = QuickSaves[QuickSaves.Count - 1];
             }
 
-            qs.SaveData.CloneInto(GameState.SaveData);
             GameState.Loading = true;
-            LevelManager.ChangeLevel(LevelManager.Name);
-            GameState.ScheduleLoadEnd = true;
+            qs.SaveData.CloneInto(GameState.SaveData);
+            LevelManager.ChangeLevel(GameState.SaveData.Level);
             PlayerManager.RespawnAtCheckpoint();
             LevelMaterializer.ForceCull();
 
@@ -258,6 +258,7 @@ namespace FezGame.Components {
 
             CameraManager.InterpolatedCenter = GomezCamPositions[GomezCamPositions.Count-1];
             GomezCamPositions.RemoveAt(GomezCamPositions.Count-1);
+            GameState.ScheduleLoadEnd = true;
         }
 
     }
