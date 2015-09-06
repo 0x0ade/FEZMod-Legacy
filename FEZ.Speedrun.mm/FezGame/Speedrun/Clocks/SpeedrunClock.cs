@@ -28,8 +28,8 @@ namespace FezGame.Speedrun.Clocks {
             }
         }
 
-        public TimeSpan Time { get; protected set; }
-        public TimeSpan TimeLoading { get; protected set; }
+        public TimeSpan Time { get; set; }
+        public TimeSpan TimeLoading { get; set; }
         public List<Split> Splits { get; set; }
         public double Direction { get; set; }
         protected DateTime timeNow = new DateTime(0);
@@ -98,6 +98,7 @@ namespace FezGame.Speedrun.Clocks {
 
         protected void ClockThreadLoop() {
             TimeSpan diff;
+            timePrev = timeNow;
             while (running_) {
                 if (Paused || GameState == null) {
                     Thread.Sleep(0);

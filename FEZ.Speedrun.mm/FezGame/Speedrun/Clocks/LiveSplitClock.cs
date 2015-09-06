@@ -41,11 +41,19 @@ namespace FezGame.Speedrun.Clocks {
             get {
                 return Clock.Time;
             }
+            set {
+                //TODO send new time to LiveSplit
+                Clock.Time = value;
+            }
         }
 
         public TimeSpan TimeLoading {
             get {
                 return Clock.TimeLoading;
+            }
+            set {
+                //TODO send new time to LiveSplit
+                Clock.TimeLoading = value;
             }
         }
 

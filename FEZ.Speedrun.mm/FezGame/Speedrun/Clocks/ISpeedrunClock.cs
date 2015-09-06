@@ -10,8 +10,8 @@ namespace FezGame.Speedrun.Clocks {
 
         bool InGame { get; set; }
 
-        TimeSpan Time { get; }
-        TimeSpan TimeLoading { get; }
+        TimeSpan Time { get; set; }
+        TimeSpan TimeLoading { get; set; }
         List<Split> Splits { get; set; }
         double Direction { get; set; }
         bool Strict { get; set; }

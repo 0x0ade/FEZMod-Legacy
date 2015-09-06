@@ -77,6 +77,8 @@
     <Compile Include="FezGame\Components\TASComponent.cs" />
     <Compile Include="FezGame\Services\patch_GameStateManager.cs" />
     <Compile Include="FezGame\Mod\Gui\BottomBarWidget.cs" />
+    <Compile Include="FezGame\Speedrun\QuickSave.cs" />
+    <Compile Include="FezGame\Mod\Gui\QuickSaveWidget.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
