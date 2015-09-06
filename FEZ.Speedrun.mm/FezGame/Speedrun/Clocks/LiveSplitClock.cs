@@ -13,6 +13,9 @@ namespace FezGame.Speedrun.Clocks {
             get {
                 return false;
             }
+            set {
+                //LiveSplit is not in-game.
+            }
         }
 
         public ISpeedrunClock Clock;
@@ -52,6 +55,15 @@ namespace FezGame.Speedrun.Clocks {
             }
             set {
                 Clock.Splits = value;
+            }
+        }
+
+        public double Direction {
+            get {
+                return 1D;
+            }
+            set {
+                //LiveSplit can only run in one direction.
             }
         }
 

@@ -76,6 +76,7 @@
     <Compile Include="MonoMod\MonoModIgnore.cs" />
     <Compile Include="FezGame\Components\TASComponent.cs" />
     <Compile Include="FezGame\Services\patch_GameStateManager.cs" />
+    <Compile Include="FezGame\Mod\Gui\BottomBarWidget.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -85,6 +86,8 @@
     <Folder Include="MonoMod\" />
     <Folder Include="FezGame\Speedrun\Clocks\" />
     <Folder Include="FezGame\Services\" />
+    <Folder Include="FezGame\Mod\" />
+    <Folder Include="FezGame\Mod\Gui\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FEZ.Mod.mm\FEZ.Mod.mm.csproj">

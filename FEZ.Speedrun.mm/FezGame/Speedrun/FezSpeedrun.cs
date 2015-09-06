@@ -15,7 +15,7 @@ using System.Threading;
 namespace FezGame.Speedrun {
     public class FezSpeedrun : FezModule {
 
-        public override string Name { get { return "JAFM.Speedrun"; } }
+        public override string Name { get { return "FEZMod.Speedrun"; } }
         public override string Author { get { return "AngelDE98 & FEZMod contributors"; } }
         public override string Version { get { return FEZMod.Version; } }
 

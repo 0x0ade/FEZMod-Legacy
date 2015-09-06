@@ -15,11 +15,7 @@ using FezEngine.Components.Scripting;
 namespace FezGame.Speedrun.Clocks {
     public class SpeedrunClock : ISpeedrunClock {
 
-        public bool InGame {
-            get {
-                return true;
-            }
-        }
+        public bool InGame { get; set; }
 
         protected IGameStateManager gameState_;
         protected IGameStateManager GameState {
@@ -35,6 +31,7 @@ namespace FezGame.Speedrun.Clocks {
         public TimeSpan Time { get; protected set; }
         public TimeSpan TimeLoading { get; protected set; }
         public List<Split> Splits { get; set; }
+        public double Direction { get; set; }
         protected DateTime timeNow = new DateTime(0);
         protected DateTime timePrev = new DateTime(0);
         protected readonly DateTime timeNull = new DateTime(0);
@@ -78,9 +75,11 @@ namespace FezGame.Speedrun.Clocks {
         protected List<string> scheduledSplits = new List<string>();
 
         public SpeedrunClock() {
+            InGame = true;
             Time = new TimeSpan();
             TimeLoading = new TimeSpan();
             Splits = new List<Split>();
+            Direction = 1D;
             Strict = true;
             Running = false;
             SplitCases = new List<SplitCase>();
@@ -98,19 +97,23 @@ namespace FezGame.Speedrun.Clocks {
         }
 
         protected void ClockThreadLoop() {
+            TimeSpan diff;
             while (running_) {
                 if (Paused || GameState == null) {
                     Thread.Sleep(0);
+                    timePrev = timeNow;
                     continue;
                 }
 
                 timeNow = DateTime.Now;
+                diff = timeNow - timePrev;
+                diff = TimeSpan.FromTicks((long) (diff.Ticks * Direction));
 
                 if (GameState.Loading) {
                     if (timePrev == timeNull) {
                         timePrev = timeNow;
                     }
-                    TimeLoading += timeNow - timePrev;
+                    TimeLoading += diff;
                     timePrev = timeNow;
                     continue;
                 }
@@ -127,9 +130,9 @@ namespace FezGame.Speedrun.Clocks {
                 if (timePrev == timeNull) {
                     timePrev = timeNow;
                 }
-                Time += timeNow - timePrev;
+                Time += diff;
                 if (Splits.Count > 0) {
-                    Splits[Splits.Count-1].Time += timeNow - timePrev;
+                    Splits[Splits.Count-1].Time += diff;
                 }
                 timePrev = timeNow;
 

@@ -68,7 +68,7 @@ namespace FezGame.Components {
             FontBigFactor = 1.5f;
 
             FezSpeedrun.DefaultSplitCases.Add(delegate(ISpeedrunClock clock) {
-                if (LevelManager == null) {
+                if (LevelManager == null || LevelManager.Name == null) {
                     return null;
                 }
                 if (LevelManager.Name.StartsWith("VILLAGEVILLE_3D_END_")) {

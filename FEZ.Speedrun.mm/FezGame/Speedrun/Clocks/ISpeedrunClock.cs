@@ -8,11 +8,12 @@ namespace FezGame.Speedrun.Clocks {
     public delegate string SplitCase(ISpeedrunClock clock);
     public interface ISpeedrunClock : IDisposable {
 
-        bool InGame { get; }
+        bool InGame { get; set; }
 
         TimeSpan Time { get; }
         TimeSpan TimeLoading { get; }
         List<Split> Splits { get; set; }
+        double Direction { get; set; }
         bool Strict { get; set; }
         bool Running { get; set; }
         bool Paused { get; set; }
