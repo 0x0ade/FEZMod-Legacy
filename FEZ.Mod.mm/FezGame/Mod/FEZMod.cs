@@ -22,6 +22,8 @@ namespace FezGame.Mod {
     public static class FEZMod {
         //FEZMod metadata
         public static string Version = "0.3a6";
+        public static Version MODVersion = new Version(Version);
+        public static Version FEZVersion;
 
         //FEZ version-dependent reflection
         public static FieldInfo DisableCloudSaves;
@@ -68,6 +70,7 @@ namespace FezGame.Mod {
             ModLogger.Clear();
             ModLogger.Log("FEZMod", "JustAnotherFEZMod (FEZMod) "+FEZMod.Version);
 
+            FEZVersion = new Version(Fez.Version);
             Fez.Version = Fez.Version + " | " + FEZMod.Version;
 
             DisableCloudSaves = typeof(PCSaveDevice).GetField("DisableCloudSaves");

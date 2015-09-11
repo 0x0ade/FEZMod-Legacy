@@ -70,6 +70,7 @@
     <Compile Include="MonoMod\MonoModIgnore.cs" />
     <Compile Include="FezEngine\Services\SoundManager.cs" />
     <Compile Include="FezEngine\Tools\SharedContentManager.cs" />
+    <Compile Include="FezEngine\Structure\Geometry\ShaderInstancedIndexedPrimitives.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -77,6 +78,7 @@
     <Folder Include="FezEngine\Tools\" />
     <Folder Include="FezEngine\Structure\" />
     <Folder Include="FezEngine\Services\" />
+    <Folder Include="FezEngine\Structure\Geometry\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FEZ.Mod.mm\FEZ.Mod.mm.csproj">
