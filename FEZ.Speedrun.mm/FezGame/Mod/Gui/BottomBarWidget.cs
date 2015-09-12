@@ -60,7 +60,7 @@ namespace FezGame.Mod.Gui {
 
             ProgressWidget.Position.X = TimeWidget.Size.X;
             ProgressWidget.Position.Y = 0f;
-            ProgressWidget.Size.X = (Size.X - TimeWidget.Size.X) * (((float) FezSpeedrun.Clock.Time.Ticks) / ((float) ((TASComponent) GuiHandler).MaxTime.Ticks));
+            ProgressWidget.Size.X = (Size.X - TimeWidget.Size.X) * (((float) ((TASComponent) GuiHandler).RewindPosition) / ((float) ((TASComponent) GuiHandler).RewindData.Count));
             ProgressWidget.Size.Y = Size.Y;
         }
 

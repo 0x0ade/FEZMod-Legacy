@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using FezEngine;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace FezGame.Speedrun {
     public class QuickSave {
@@ -14,11 +15,7 @@ namespace FezGame.Speedrun {
         public TimeSpan Time = new TimeSpan(0);
         public TimeSpan TimeLoading = new TimeSpan(0);
 
-        public List<Vector3> GomezPositions = new List<Vector3>();
-        public List<Vector3> GomezVelocities = new List<Vector3>();
-        public List<ActionType> GomezActions = new List<ActionType>();
-        public List<Viewpoint> GomezRotations = new List<Viewpoint>();
-        public List<Vector3> GomezCamPositions = new List<Vector3>();
+        public List<CacheKey_Info_Value[]> RewindData = new List<CacheKey_Info_Value[]>();
 
     }
 }

@@ -39,7 +39,7 @@ namespace FezGame.Mod.Gui {
                 Position = new Vector2(0, 0f),
                 UpdateBounds = true
             });
-            Widgets.Add(new ButtonWidget(Game, "Frames: " + qs.GomezPositions.Count, OnClick) {
+            Widgets.Add(new ButtonWidget(Game, "Frames: " + qs.RewindData.Count, OnClick) {
                 Position = new Vector2(0, 24f),
                 UpdateBounds = true
             });

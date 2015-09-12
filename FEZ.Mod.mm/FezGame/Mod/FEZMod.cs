@@ -22,7 +22,7 @@ namespace FezGame.Mod {
     public static class FEZMod {
         //FEZMod metadata
         public static string Version = "0.3a6";
-        public static Version MODVersion = new Version(Version);
+        public static Version MODVersion = new Version(Version.Substring(0, Version.IndexOf('a')));
         public static Version FEZVersion;
 
         //FEZ version-dependent reflection

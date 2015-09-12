@@ -63,6 +63,9 @@
     <Reference Include="mscorlib">
       <HintPath>..\libs\mscorlib.dll</HintPath>
     </Reference>
+    <Reference Include="Common">
+      <HintPath>..\libs\Common.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -79,6 +82,8 @@
     <Compile Include="FezGame\Mod\Gui\BottomBarWidget.cs" />
     <Compile Include="FezGame\Speedrun\QuickSave.cs" />
     <Compile Include="FezGame\Mod\Gui\QuickSaveWidget.cs" />
+    <Compile Include="FezGame\Speedrun\RewindInfo.cs" />
+    <Compile Include="FezGame\Speedrun\RewindInfoHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

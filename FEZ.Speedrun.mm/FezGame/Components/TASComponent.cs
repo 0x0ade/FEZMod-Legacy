@@ -27,9 +27,17 @@ using Microsoft.Xna.Framework.Input;
 using FezGame.Components.Actions;
 using FezGame.Mod.Gui;
 using System.Drawing;
+using System.Reflection;
 
 namespace FezGame.Components {
     public class TASComponent : AGuiHandler {
+
+        //TO-DO list created when watching MistahKurtz7
+        //TODO start timer when continuing old save
+        //TODO add level chooser
+        //TODO fix ledge saving
+        //TODO save cycle-based stuff
+        //TODO fix font sizes
 
         [ServiceDependency]
         public IGameLevelManager LevelManager { get; set; }
@@ -46,6 +54,21 @@ namespace FezGame.Components {
 
         public static TASComponent Instance;
 
+        public static List<RewindInfo> RewindListening = new List<RewindInfo>() {
+            new RewindInfo(typeof(IPlayerManager).GetFieldOrProperty("Position")),
+            new RewindInfo(typeof(PlayerManager).GetFieldOrProperty("Velocity")) {
+                InstanceGetter = () => ServiceHelper.Get<IPlayerManager>()
+            },
+            new RewindInfo(typeof(IPlayerManager).GetFieldOrProperty("Action")),
+            new RewindInfo(typeof(IPlayerManager).GetFieldOrProperty("LastAction")),
+            new RewindInfo(typeof(IPlayerManager).GetFieldOrProperty("NextAction")),
+            new RewindInfo(typeof(IDefaultCameraManager).GetFieldOrProperty("Viewpoint")) {
+                Setter = (obj_, value_) => ((IGameCameraManager) obj_).ChangeViewpoint((Viewpoint) value_)
+            },
+            new RewindInfo(typeof(IDefaultCameraManager).GetFieldOrProperty("Center")),
+            //TODO make something automate this
+        };
+
         public ContainerWidget QuickSavesWidget;
 
         public BottomBarWidget BottomBarWidget;
@@ -53,11 +76,8 @@ namespace FezGame.Components {
         public bool Frozen = false;
         public TimeSpan MaxTime = new TimeSpan(0);
 
-        public List<Vector3> GomezPositions = new List<Vector3>();
-        public List<Vector3> GomezVelocities = new List<Vector3>();
-        public List<ActionType> GomezActions = new List<ActionType>();
-        public List<Viewpoint> GomezRotations = new List<Viewpoint>();
-        public List<Vector3> GomezCamPositions = new List<Vector3>();
+        public int RewindPosition = 0;
+        public List<CacheKey_Info_Value[]> RewindData = new List<CacheKey_Info_Value[]>();
 
         public List<QuickSave> QuickSaves = new List<QuickSave>();
 
@@ -113,39 +133,13 @@ namespace FezGame.Components {
             } else {
                 FezSpeedrun.Clock.Strict = false;
             }
-            if (Frozen && InputManager.CancelTalk == FezButtonState.Down && GomezPositions.Count > 0) {
-                PlayerManager.Position = GomezPositions[GomezPositions.Count-1];
-                GomezPositions.RemoveAt(GomezPositions.Count-1);
-
-                PlayerManager.Velocity = GomezVelocities[GomezVelocities.Count-1];
-                GomezVelocities.RemoveAt(GomezVelocities.Count-1);
-
-                PlayerManager.Action = GomezActions[GomezActions.Count-1];
-                PlayerManager.LastAction = PlayerManager.Action;
-                PlayerManager.NextAction = PlayerManager.Action;
-                GomezActions.RemoveAt(GomezActions.Count-1);
-
-                CameraManager.ChangeViewpoint(GomezRotations[GomezRotations.Count-1]);
-                GomezRotations.RemoveAt(GomezRotations.Count-1);
-
-                CameraManager.InterpolatedCenter = GomezCamPositions[GomezCamPositions.Count-1];
-                GomezCamPositions.RemoveAt(GomezCamPositions.Count-1);
-
-                //TODO make something automate this
+            if (Frozen && InputManager.CancelTalk == FezButtonState.Down && RewindData.Count > 0) {
+                RewindFrame();
 
                 DefaultCameraManager.NoInterpolation = true;
                 FezSpeedrun.Clock.Direction = -1D;
             } else if (!GameState.InMenuCube) {
-                GomezPositions.Add(PlayerManager.Position);
-
-                GomezVelocities.Add(PlayerManager.Velocity);
-
-                GomezActions.Add(PlayerManager.Action);
-
-                GomezRotations.Add(CameraManager.Viewpoint);
-
-                GomezCamPositions.Add(CameraManager.InterpolatedCenter);
-                //TODO make something automate this
+                RecordFrame();
 
                 DefaultCameraManager.NoInterpolation = false;
                 FezSpeedrun.Clock.Direction = 1D;
@@ -209,11 +203,7 @@ namespace FezGame.Components {
             qs.Time = FezSpeedrun.Clock.Time;
             qs.TimeLoading = FezSpeedrun.Clock.TimeLoading;
 
-            qs.GomezPositions.AddRange(GomezPositions);
-            qs.GomezVelocities.AddRange(GomezVelocities);
-            qs.GomezActions.AddRange(GomezActions);
-            qs.GomezRotations.AddRange(GomezRotations);
-            qs.GomezCamPositions.AddRange(GomezCamPositions);
+            qs.RewindData.AddRange(RewindData);
             QuickSaves.Add(qs);
         }
 
@@ -231,34 +221,59 @@ namespace FezGame.Components {
             FezSpeedrun.Clock.Time = qs.Time;
             FezSpeedrun.Clock.TimeLoading = qs.TimeLoading;
 
-            GomezPositions.Clear();
-            GomezPositions.AddRange(qs.GomezPositions);
-            GomezVelocities.Clear();
-            GomezVelocities.AddRange(qs.GomezVelocities);
-            GomezActions.Clear();
-            GomezActions.AddRange(qs.GomezActions);
-            GomezRotations.Clear();
-            GomezRotations.AddRange(qs.GomezRotations);
-            GomezCamPositions.Clear();
-            GomezCamPositions.AddRange(qs.GomezCamPositions);
+            RewindData.Clear();
+            RewindData.AddRange(qs.RewindData);
 
-            PlayerManager.Position = GomezPositions[GomezPositions.Count-1];
-            GomezPositions.RemoveAt(GomezPositions.Count-1);
-
-            PlayerManager.Velocity = GomezVelocities[GomezVelocities.Count-1];
-            GomezVelocities.RemoveAt(GomezVelocities.Count-1);
-
-            PlayerManager.Action = GomezActions[GomezActions.Count-1];
-            PlayerManager.LastAction = PlayerManager.Action;
-            PlayerManager.NextAction = PlayerManager.Action;
-            GomezActions.RemoveAt(GomezActions.Count-1);
-
-            CameraManager.ChangeViewpoint(GomezRotations[GomezRotations.Count-1]);
-            GomezRotations.RemoveAt(GomezRotations.Count-1);
-
-            CameraManager.InterpolatedCenter = GomezCamPositions[GomezCamPositions.Count-1];
-            GomezCamPositions.RemoveAt(GomezCamPositions.Count-1);
+            RewindPosition = RewindData.Count - 1;
+            RewindFrame();
             GameState.ScheduleLoadEnd = true;
+        }
+
+        public void RewindFrame() {
+            if (RewindPosition <= 0 || RewindPosition > RewindData.Count) {
+                return;
+            }
+
+            RewindPosition--;
+            CacheKey_Info_Value[] frame = RewindData[RewindPosition];
+
+            for (int i = 0; i < frame.Length; i++) {
+                CacheKey_Info_Value data = frame[i];
+                RewindInfo info = data.Key;
+
+                info.Set(data.Value);
+            }
+        }
+
+        public void RecordFrame() {
+            if (RewindPosition < 0 || RewindPosition > RewindData.Count) {
+                return;
+            }
+
+            CacheKey_Info_Value[] frame;
+            if (RewindPosition == RewindData.Count) {
+                frame = new CacheKey_Info_Value[RewindListening.Count];
+                RewindData.Add(frame);
+            } else {
+                frame = RewindData[RewindPosition];
+            }
+            RewindPosition++;
+
+            for (int i = 0; i < RewindListening.Count; i++) {
+                CacheKey_Info_Value data = new CacheKey_Info_Value();
+                RewindInfo info = RewindListening[i];
+
+                if (info.Instance == null) {
+                    info.Instance = ServiceHelper.Get(info.Member.DeclaringType);
+                }
+                if (info.Instance == null) {
+                    //other cases?
+                }
+
+                data.Key = info;
+                data.Value = info.Get();
+                frame[i] = data;
+            }
         }
 
     }

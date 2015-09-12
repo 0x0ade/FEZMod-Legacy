@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define COMPILE_SIIP
+#if COMPILE_SIIP
+using System;
 using FezEngine.Effects;
 using Microsoft.Xna.Framework.Graphics;
 using MonoMod;
@@ -66,4 +68,4 @@ namespace FezEngine.Structure.Geometry {
 
     }
 }
-
+#endif
