@@ -84,6 +84,7 @@
     <Compile Include="FezGame\Mod\Gui\QuickSaveWidget.cs" />
     <Compile Include="FezGame\Speedrun\RewindInfo.cs" />
     <Compile Include="FezGame\Speedrun\RewindInfoHelper.cs" />
+    <Compile Include="FezGame\Components\MainMenu.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
