@@ -33,7 +33,6 @@ namespace FezGame.Components {
     public class TASComponent : AGuiHandler {
 
         //TO-DO list created when watching MistahKurtz7
-        //TODO start timer when continuing old save
         //TODO add level chooser
         //TODO save cycle-based stuff
         //TODO fix font sizes
@@ -220,7 +219,7 @@ namespace FezGame.Components {
             RewindData.Clear();
             RewindData.AddRange(qs.RewindData);
 
-            RewindPosition = RewindData.Count - 1;
+            RewindPosition = RewindData.Count;
             RewindFrame();
             GameState.ScheduleLoadEnd = true;
         }

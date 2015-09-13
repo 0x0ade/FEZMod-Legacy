@@ -125,6 +125,10 @@ namespace FezGame.Components {
         protected static readonly char[] FormatTime_zero = new char[] {'0'};
         public static string FormatTime(string time, bool cutoffDots = false) {
             if (cutoffDots) {
+                int dotIndex = time.IndexOf('.');
+                if (dotIndex < 0) {
+                    return time;
+                }
                 return time.Substring(0, time.IndexOf('.'));
             }
             time = time.TrimEnd(FormatTime_zero);
