@@ -6,6 +6,7 @@ using FezEngine;
 using System.Collections.Generic;
 using System.Reflection;
 using Common;
+using FezGame.Mod;
 
 namespace FezGame.Speedrun {
     public class RewindInfo {
@@ -16,8 +17,18 @@ namespace FezGame.Speedrun {
         public Func<object, object> Getter;
         public Action<object, object> Setter;
 
-        public RewindInfo(MemberInfo member) {
+        public RewindInfo() {
+        }
+
+        public RewindInfo(MemberInfo member)
+            : this() {
             Member = member;
+        }
+
+        public RewindInfo(Func<object, object> getter, Action<object, object> setter)
+            : this() {
+            Getter = getter;
+            Setter = setter;
         }
 
         public object Get() {
@@ -29,7 +40,21 @@ namespace FezGame.Speedrun {
                 return Getter(Instance);
             }
 
-            return ReflectionHelper.GetValue(Member, Instance);
+            if (Member == null) {
+                return null;
+            }
+            if (Member is PropertyInfo && ((PropertyInfo) Member).GetGetMethod() == null) {
+                return null;
+            }
+            if (Member is PropertyInfo && ((PropertyInfo) Member).GetSetMethod() == null && Setter == null) {
+                return null;
+            }
+
+            if (Instance != null) {
+                return ReflectionHelper.GetValue(Member, Instance);
+            }
+
+            return null;
         }
 
         public void Set(object value) {
@@ -42,7 +67,20 @@ namespace FezGame.Speedrun {
                 return;
             }
 
-            ReflectionHelper.SetValue(Member, Instance, value);
+            if (Member == null) {
+                return;
+            }
+            if (Member is PropertyInfo && ((PropertyInfo) Member).GetSetMethod() == null) {
+                return;
+            }
+            if (Member is PropertyInfo && ((PropertyInfo) Member).GetGetMethod() == null && Getter == null) {
+                return;
+            }
+            
+            if (Instance != null) {
+                ReflectionHelper.SetValue(Member, Instance, value);
+                return;
+            }
         }
 
     }

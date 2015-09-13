@@ -35,7 +35,6 @@ namespace FezGame.Components {
         //TO-DO list created when watching MistahKurtz7
         //TODO start timer when continuing old save
         //TODO add level chooser
-        //TODO fix ledge saving
         //TODO save cycle-based stuff
         //TODO fix font sizes
 
@@ -54,19 +53,10 @@ namespace FezGame.Components {
 
         public static TASComponent Instance;
 
-        public static List<RewindInfo> RewindListening = new List<RewindInfo>() {
-            new RewindInfo(typeof(IPlayerManager).GetFieldOrProperty("Position")),
-            new RewindInfo(typeof(PlayerManager).GetFieldOrProperty("Velocity")) {
-                InstanceGetter = () => ServiceHelper.Get<IPlayerManager>()
-            },
-            new RewindInfo(typeof(IPlayerManager).GetFieldOrProperty("Action")),
-            new RewindInfo(typeof(IPlayerManager).GetFieldOrProperty("LastAction")),
-            new RewindInfo(typeof(IPlayerManager).GetFieldOrProperty("NextAction")),
+        public List<RewindInfo> RewindListening = new List<RewindInfo>() {
             new RewindInfo(typeof(IDefaultCameraManager).GetFieldOrProperty("Viewpoint")) {
-                Setter = (obj_, value_) => ((IGameCameraManager) obj_).ChangeViewpoint((Viewpoint) value_)
+                Setter = (obj_, value_) => ((IDefaultCameraManager) obj_).ChangeViewpoint((Viewpoint) value_)
             },
-            new RewindInfo(typeof(IDefaultCameraManager).GetFieldOrProperty("Center")),
-            //TODO make something automate this
         };
 
         public ContainerWidget QuickSavesWidget;
@@ -108,6 +98,12 @@ namespace FezGame.Components {
                 Size = new Vector2(256f, 300f),
                 UpdateBounds = true
             });
+            
+            FillRewindListening<IPlayerManager>();
+            FillRewindListening<PlayerManager>(delegate(RewindInfo info) {
+                info.InstanceGetter = () => ServiceHelper.Get<IPlayerManager>();
+            });
+            FillRewindListening<IDefaultCameraManager>();
         }
 
         public override void Update(GameTime gameTime) {
@@ -274,6 +270,35 @@ namespace FezGame.Components {
                 data.Value = info.Get();
                 frame[i] = data;
             }
+        }
+        
+        public void FillRewindListening<T>(Action<RewindInfo> onCreate = null) {
+            FillRewindListening(typeof(T), onCreate);
+        }
+        
+        public void FillRewindListening(Type type, Action<RewindInfo> onCreate = null) {
+            FieldInfo[] fields = type.GetFields();
+            for (int i = 0; i < fields.Length; i++) {
+              AddRewindListening(fields[i], onCreate);
+            }
+            PropertyInfo[] properties = type.GetProperties();
+            for (int i = 0; i < properties.Length; i++) {
+              AddRewindListening(properties[i], onCreate);
+            }
+        }
+        
+        public void AddRewindListening(MemberInfo member, Action<RewindInfo> onCreate = null) {
+            for (int i = 0; i < RewindListening.Count; i++) {
+                if (member.Equals(RewindListening[i].Member)) {
+                    return;
+                }
+            }
+
+            RewindInfo info = new RewindInfo(member);
+            if (onCreate != null) {
+                onCreate(info);
+            }
+            RewindListening.Add(info);
         }
 
     }
