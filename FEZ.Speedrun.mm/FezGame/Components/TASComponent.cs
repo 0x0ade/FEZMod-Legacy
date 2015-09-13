@@ -35,7 +35,6 @@ namespace FezGame.Components {
         //TO-DO list created when watching MistahKurtz7
         //TODO add level chooser
         //TODO save cycle-based stuff
-        //TODO fix font sizes
 
         [ServiceDependency]
         public IGameLevelManager LevelManager { get; set; }
@@ -102,7 +101,15 @@ namespace FezGame.Components {
             FillRewindListening<PlayerManager>(delegate(RewindInfo info) {
                 info.InstanceGetter = () => ServiceHelper.Get<IPlayerManager>();
             });
+            FillRewindListening<ITimeManager>();
             FillRewindListening<IDefaultCameraManager>();
+
+            //DEBUG
+            ModLogger.Log("FEZMod.TAS", "Listening to the following ");
+            for (int i = 0; i < RewindListening.Count; i++) {
+                RewindInfo info = RewindListening[i];
+                ModLogger.Log("FEZMod.TAS", i + ": " + info.Member.DeclaringType.FullName + "." + info.Member.Name);
+            }
         }
 
         public override void Update(GameTime gameTime) {
@@ -288,9 +295,13 @@ namespace FezGame.Components {
         
         public void AddRewindListening(MemberInfo member, Action<RewindInfo> onCreate = null) {
             for (int i = 0; i < RewindListening.Count; i++) {
-                if (member.Equals(RewindListening[i].Member)) {
+                if (member.DeclaringType == RewindListening[i].Member.DeclaringType && member.Name == RewindListening[i].Member.Name) {
                     return;
                 }
+            }
+
+            if (member is PropertyInfo && (((PropertyInfo) member).GetGetMethod() == null || ((PropertyInfo) member).GetSetMethod() == null)) {
+                return;
             }
 
             RewindInfo info = new RewindInfo(member);

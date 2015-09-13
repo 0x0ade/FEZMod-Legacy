@@ -45,6 +45,18 @@ namespace FezGame.Mod {
         public static bool GetComponentsAsServices = false;
         public static bool HandleComponents = false;
         public static bool CreatingThumbnail = false;
+        private static string loadingLevel = null;
+        public static string LoadingLevel {
+            get {
+                return loadingLevel;
+            }
+            set {
+                if (value != null) {
+                    ServiceHelper.Get<IGameStateManager>().Loading = true;
+                }
+                loadingLevel = value;
+            }
+        }
         public static bool OverrideCulturueManualyBecauseMonoIsA_____ = false;
 
         //Other configuration
@@ -316,6 +328,7 @@ namespace FezGame.Mod {
             CallInEachModule("Initialize", new object[0]);
         }
 
+        //Hooked FEZ methods or calls in each module
         public static void LoadComponents(Fez game) {
             ServiceHelper.AddComponent(new FEZModComponent(ServiceHelper.Game));
 
@@ -383,6 +396,10 @@ namespace FezGame.Mod {
             CallInEachModule("HandleCrash", new object[] {e});
         }
 
+        //Additional methods
+        //...
+
+        //Helper methods
         private static void CallInEachModule(string methodName, object[] args) {
             Type[] argsTypes = Type.GetTypeArray(args);
             foreach (FezModule module in Modules) {

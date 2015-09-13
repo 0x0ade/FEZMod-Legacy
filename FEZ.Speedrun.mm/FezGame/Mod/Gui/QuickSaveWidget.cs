@@ -29,7 +29,7 @@ namespace FezGame.Mod.Gui {
 
         public QuickSaveWidget(Game game, QuickSave qs, float width = 256f) 
             : base(game) {
-            Size = new Vector2(width, DefaultHeight);
+            Size = new Vector2(width, DefaultHeight * GraphicsDevice.GetViewScale());
 
             if (qs.Thumbnail != null) {
                 thumbnailShrinkedWidth = (Size.Y / qs.Thumbnail.Height) * qs.Thumbnail.Width;
@@ -40,15 +40,15 @@ namespace FezGame.Mod.Gui {
                 UpdateBounds = true
             });
             Widgets.Add(new ButtonWidget(Game, "Frames: " + qs.RewindData.Count, OnClick) {
-                Position = new Vector2(0, 24f),
+                Position = new Vector2(0, GraphicsDevice.GetViewScale()),
                 UpdateBounds = true
             });
             Widgets.Add(new ButtonWidget(Game, qs.SaveData.Level, OnClick) {
-                Position = new Vector2(0, 48f),
+                Position = new Vector2(0, GraphicsDevice.GetViewScale()),
                 UpdateBounds = true
             });
             Widgets.Add(new ButtonWidget(Game, qs.SaveData.CubeShards + "/" + qs.SaveData.SecretCubes + "/" + qs.SaveData.CollectedParts + "/" + qs.SaveData.PiecesOfHeart, OnClick) {
-                Position = new Vector2(0, 72f),
+                Position = new Vector2(0, GraphicsDevice.GetViewScale()),
                 UpdateBounds = true
             });
 
@@ -64,6 +64,7 @@ namespace FezGame.Mod.Gui {
 
             for (int i = 0; i < Widgets.Count; i++) {
                 Widgets[i].Position.X = Size.X - Widgets[i].Size.X;
+                Widgets[i].Position.Y = i * 24f * GraphicsDevice.GetViewScale();
             }
         }
 
@@ -77,7 +78,7 @@ namespace FezGame.Mod.Gui {
             GuiHandler.SpriteBatch.Draw(QuickSave.Thumbnail, new Rectangle(
                 (int) (Position.X + Offset.X),
                 (int) (Position.Y + Offset.Y),
-                (int) thumbnailShrinkedWidth, DefaultHeight
+                (int) thumbnailShrinkedWidth, (int) Size.Y
             ), null, Color.White);
         }
 

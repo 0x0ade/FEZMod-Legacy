@@ -19,12 +19,15 @@ namespace FezGame.Components {
         public static string HighlightLevel;
 
         public MapNode FocusNode;
-        public bool QuickWarping = false;
 
         public IGameLevelManager LevelManager { [MonoModIgnore] get; [MonoModIgnore] set; }
         public IGameStateManager GameState { [MonoModIgnore] get; [MonoModIgnore] set; }
         public IInputManager InputManager { [MonoModIgnore] get; [MonoModIgnore] set; }
         public IPlayerManager PlayerManager { [MonoModIgnore] get; [MonoModIgnore] set; }
+
+        [MonoModIgnore]
+        private void Exit() {
+        }
 
         public void orig_Update(GameTime gameTime) {
         }
@@ -41,20 +44,13 @@ namespace FezGame.Components {
             }
 
             if (FEZMod.EnableQuickWarp && InputManager.Jump == FezButtonState.Pressed && levelName != null) {
-                ModLogger.Log("JAFM", "Warping to " + levelName);
-                QuickWarping = true;
-                GameState.Loading = true;
+                ModLogger.Log("FEZMod", "Warping to " + levelName);
                 GameState.InMap = false;
-                LevelManager.ChangeLevel(levelName);
-            }
-
-            if (FEZMod.EnableQuickWarp && InputManager.Jump == FezButtonState.Released && QuickWarping) {
-                GameState.Loading = false;
-                QuickWarping = false;
+                FEZMod.LoadingLevel = levelName;
             }
 
             if (FEZMod.EnableFEZometric && InputManager.OpenInventory == FezButtonState.Pressed) {
-                ModLogger.Log("JAFM", "Switching to FEZometric mode");
+                ModLogger.Log("FEZMod", "Switching to FEZometric mode");
                 GameState.InMap = false;
                 PlayerCameraControl.FEZometric = true;
             }

@@ -40,6 +40,12 @@ namespace FezGame.Mod {
                 CameraManager.PixelsPerTrixel = FEZMod.OverridePixelsPerTrixel;
             }
 
+            if (FEZMod.LoadingLevel != null) {
+                LevelManager.ChangeLevel(FEZMod.LoadingLevel);
+                GameState.ScheduleLoadEnd = true;
+                FEZMod.LoadingLevel = null;
+            }
+
         }
 
     }

@@ -57,6 +57,8 @@ namespace FezGame.Speedrun {
                 if (Clock != null && (args[i] == "-tas" || args[i] == "--tool-assisted-speedrun")) {
                     ModLogger.Log("FEZMod", "Found -tas / --tool-assisted-speedrun");
                     ToolAssistedSpeedrun = true;
+                    FEZMod.EnableFEZometric = true;
+                    FEZMod.EnableQuickWarp = true;
                 }
             }
         }

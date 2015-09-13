@@ -53,16 +53,20 @@ namespace FezGame.Mod.Gui {
                 } else {
                     Size.X = GraphicsDevice.Viewport.Width;
                 }
-                Size.Y = 24;
+                Size.Y = 24f * GraphicsDevice.GetViewScale();
             }
 
             ProgressWidget.Background = GuiHandler.DefaultForeground;
 
             TimeWidget.Label = "T: " + SpeedrunInfo.FormatTime(FezSpeedrun.Clock.Time.ToString());
+            TimeWidget.Size.X = 192f * GraphicsDevice.GetViewScale();
+            TimeWidget.Size.Y = 24f * GraphicsDevice.GetViewScale();
             TimeWidget.Position.X = 0f;
             TimeWidget.Position.Y = 0f;
 
             FramesWidget.Label = " F: " + ((TASComponent) GuiHandler).RewindPosition;
+            FramesWidget.Size.X = 192f * GraphicsDevice.GetViewScale();
+            FramesWidget.Size.Y = 24f * GraphicsDevice.GetViewScale();
             FramesWidget.Position.X = Size.X - FramesWidget.Size.X;
             FramesWidget.Position.Y = 0f;
 
