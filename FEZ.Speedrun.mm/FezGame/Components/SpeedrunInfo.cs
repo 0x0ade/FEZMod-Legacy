@@ -36,6 +36,8 @@ namespace FezGame.Components {
         public IGameLevelManager LevelManager { get; set; }
         [ServiceDependency]
         public ILevelMaterializer LevelMaterializer { get; set; }
+        [ServiceDependency]
+        public IPlayerManager PlayerManager { get; set; }
 
         public static SpeedrunInfo Instance;
 
@@ -71,9 +73,9 @@ namespace FezGame.Components {
                 if (LevelManager == null || LevelManager.Name == null) {
                     return null;
                 }
-                if (LevelManager.Name.StartsWith("VILLAGEVILLE_3D_END_")) {
+                if (LevelManager.Name.StartsWith("GOMEZ_HOUSE_END_") && (PlayerManager.Action == ActionType.EnterDoorSpin || PlayerManager.Action == ActionType.EnteringDoor)) {
                     clock.Running = false;
-                    return "VILLAGEVILLE_3D_END";
+                    return "ZE_DOOR_AT_ZE_END";
                 }
                 if (LevelManager.Name != PrevLevel) {
                     PrevLevel = LevelManager.Name;

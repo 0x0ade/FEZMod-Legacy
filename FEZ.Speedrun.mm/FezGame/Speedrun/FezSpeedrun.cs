@@ -59,6 +59,9 @@ namespace FezGame.Speedrun {
                     ToolAssistedSpeedrun = true;
                     FEZMod.EnableFEZometric = true;
                     FEZMod.EnableQuickWarp = true;
+                    //Currently reqired unless someone hooks MovingGroupsHost and others to give a public instance
+                    FEZMod.GetComponentsAsServices = true;
+                    FEZMod.HandleComponents = true;
                 }
             }
         }

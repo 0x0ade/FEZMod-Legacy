@@ -6,7 +6,7 @@ using FezEngine;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace FezGame.Speedrun {
+namespace FezGame.Speedrun.TAS {
     public class QuickSave {
 
         public SaveData SaveData = new SaveData();

@@ -4,10 +4,15 @@ using System.Collections.Generic;
 using FezGame.Structure;
 using FezGame.Mod;
 
-namespace FezGame.Speedrun {
+namespace FezGame.Speedrun.TAS {
     public struct CacheKey_Info_Value {
         public RewindInfo Key;
         public object Value;
+    }
+
+    public struct RewindValue_CurrentSegmentIndex_sinceSegmentStarted {
+        public object CurrentSegmentIndex; //originally int, but typecasting is useless
+        public object sinceSegmentStarted; //originally TimeSpan, but typecasting is useless
     }
 
     public static class RewindInfoHelper {

@@ -8,7 +8,7 @@ using System.Reflection;
 using Common;
 using FezGame.Mod;
 
-namespace FezGame.Speedrun {
+namespace FezGame.Speedrun.TAS {
     public class RewindInfo {
 
         public object Instance;
@@ -31,7 +31,7 @@ namespace FezGame.Speedrun {
             Setter = setter;
         }
 
-        public object Get() {
+        public virtual object Get() {
             if (Instance == null && InstanceGetter != null) {
                 Instance = InstanceGetter();
             }
@@ -57,7 +57,7 @@ namespace FezGame.Speedrun {
             return null;
         }
 
-        public void Set(object value) {
+        public virtual void Set(object value) {
             if (Instance == null && InstanceGetter != null) {
                 Instance = InstanceGetter();
             }

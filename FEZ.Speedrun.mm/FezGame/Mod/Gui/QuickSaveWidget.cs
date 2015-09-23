@@ -18,6 +18,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using FezGame.Components;
 using FezGame.Speedrun;
+using FezGame.Speedrun.TAS;
 
 namespace FezGame.Mod.Gui {
     public class QuickSaveWidget : GuiWidget {

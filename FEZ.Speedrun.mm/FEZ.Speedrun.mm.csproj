@@ -80,11 +80,12 @@
     <Compile Include="FezGame\Components\TASComponent.cs" />
     <Compile Include="FezGame\Services\patch_GameStateManager.cs" />
     <Compile Include="FezGame\Mod\Gui\BottomBarWidget.cs" />
-    <Compile Include="FezGame\Speedrun\QuickSave.cs" />
     <Compile Include="FezGame\Mod\Gui\QuickSaveWidget.cs" />
-    <Compile Include="FezGame\Speedrun\RewindInfo.cs" />
-    <Compile Include="FezGame\Speedrun\RewindInfoHelper.cs" />
     <Compile Include="FezGame\Components\MainMenu.cs" />
+    <Compile Include="FezGame\Speedrun\TAS\QuickSave.cs" />
+    <Compile Include="FezGame\Speedrun\TAS\RewindInfo.cs" />
+    <Compile Include="FezGame\Speedrun\TAS\RewindInfoHelper.cs" />
+    <Compile Include="FezGame\Speedrun\TAS\MovingGroupsRewindInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -96,6 +97,7 @@
     <Folder Include="FezGame\Services\" />
     <Folder Include="FezGame\Mod\" />
     <Folder Include="FezGame\Mod\Gui\" />
+    <Folder Include="FezGame\Speedrun\TAS\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FEZ.Mod.mm\FEZ.Mod.mm.csproj">

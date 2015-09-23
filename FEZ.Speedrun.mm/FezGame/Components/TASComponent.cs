@@ -28,6 +28,9 @@ using FezGame.Components.Actions;
 using FezGame.Mod.Gui;
 using System.Drawing;
 using System.Reflection;
+using Common;
+using System.Collections;
+using FezGame.Speedrun.TAS;
 
 namespace FezGame.Components {
     public class TASComponent : AGuiHandler {
@@ -51,11 +54,7 @@ namespace FezGame.Components {
 
         public static TASComponent Instance;
 
-        public List<RewindInfo> RewindListening = new List<RewindInfo>() {
-            new RewindInfo(typeof(IDefaultCameraManager).GetFieldOrProperty("Viewpoint")) {
-                Setter = (obj_, value_) => ((IDefaultCameraManager) obj_).ChangeViewpoint((Viewpoint) value_)
-            },
-        };
+        public List<RewindInfo> RewindListening = new List<RewindInfo>();
 
         public ContainerWidget QuickSavesWidget;
 
@@ -96,7 +95,15 @@ namespace FezGame.Components {
                 Size = new Vector2(256f, 300f),
                 UpdateBounds = true
             });
-            
+
+            /*
+            RewindListening.Add(new RewindInfo(typeof(IDefaultCameraManager).GetFieldOrProperty("Viewpoint")) {
+                Setter = (obj_, value_) => ((IDefaultCameraManager) obj_).ChangeViewpoint((Viewpoint) value_)
+            });
+            */
+
+            RewindListening.Add(new MovingGroupsRewindInfo());
+
             FillRewindListening<IPlayerManager>();
             FillRewindListening<PlayerManager>(delegate(RewindInfo info) {
                 info.InstanceGetter = () => ServiceHelper.Get<IPlayerManager>();
@@ -108,7 +115,11 @@ namespace FezGame.Components {
             ModLogger.Log("FEZMod.TAS", "Listening to the following ");
             for (int i = 0; i < RewindListening.Count; i++) {
                 RewindInfo info = RewindListening[i];
-                ModLogger.Log("FEZMod.TAS", i + ": " + info.Member.DeclaringType.FullName + "." + info.Member.Name);
+                if (info.Member != null) {
+                    ModLogger.Log("FEZMod.TAS", i + ": " + info.Member.DeclaringType.FullName + "." + info.Member.Name);
+                } else {
+                    ModLogger.Log("FEZMod.TAS", i + ": black magic - " + info.GetType().Name);
+                }
             }
         }
 
@@ -265,11 +276,13 @@ namespace FezGame.Components {
                 CacheKey_Info_Value data = new CacheKey_Info_Value();
                 RewindInfo info = RewindListening[i];
 
-                if (info.Instance == null) {
-                    info.Instance = ServiceHelper.Get(info.Member.DeclaringType);
-                }
-                if (info.Instance == null) {
-                    //other cases?
+                if (info.Member != null) {
+                    if (info.Instance == null) {
+                        info.Instance = ServiceHelper.Get(info.Member.DeclaringType);
+                    }
+                    if (info.Instance == null) {
+                        //other cases?
+                    }
                 }
 
                 data.Key = info;
@@ -295,7 +308,7 @@ namespace FezGame.Components {
         
         public void AddRewindListening(MemberInfo member, Action<RewindInfo> onCreate = null) {
             for (int i = 0; i < RewindListening.Count; i++) {
-                if (member.DeclaringType == RewindListening[i].Member.DeclaringType && member.Name == RewindListening[i].Member.Name) {
+                if (RewindListening[i].Member != null && member.DeclaringType == RewindListening[i].Member.DeclaringType && member.Name == RewindListening[i].Member.Name) {
                     return;
                 }
             }

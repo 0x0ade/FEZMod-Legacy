@@ -110,6 +110,7 @@
     <Compile Include="FezGame\Mod\FEZModContentHelper.cs" />
     <Compile Include="FezGame\ModLogger.cs" />
     <Compile Include="FezGame\Mod\Gui\AGuiHandler.cs" />
+    <Compile Include="FezGame\Mod\FEZModReflectionHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
