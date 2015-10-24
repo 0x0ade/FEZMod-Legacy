@@ -31,6 +31,7 @@ using System.Reflection;
 using Common;
 using System.Collections;
 using FezGame.Speedrun.TAS;
+using FezGame.Speedrun.BOT;
 
 namespace FezGame.Components {
     public class TASComponent : AGuiHandler {
@@ -67,6 +68,8 @@ namespace FezGame.Components {
         public List<CacheKey_Info_Value[]> RewindData = new List<CacheKey_Info_Value[]>();
 
         public List<QuickSave> QuickSaves = new List<QuickSave>();
+        
+        public BOT BOT;
 
         protected QuickSave ThumbnailScheduled;
         protected RenderTargetHandle ThumbnailRT;
@@ -84,6 +87,11 @@ namespace FezGame.Components {
             //Register keys
             KeyboardState.RegisterKey(Keys.F6); //Quicksave
             KeyboardState.RegisterKey(Keys.F9); //Quickload
+            
+            //Initialize BOT if needed
+            if (FezSpeedrun.BOTEnabled) {
+                BOT = new BOT(this);
+            }
 
             //Add GUI
 
@@ -134,6 +142,11 @@ namespace FezGame.Components {
                 QuickSavesWidget.Position.X = GraphicsDevice.Viewport.Width - QuickSavesWidget.Size.X;
                 QuickSavesWidget.Position.Y = BottomBarWidget.Position.Y - QuickSavesWidget.Size.Y;
                 return;
+            }
+            
+            //Schedule a BOT call
+            if (BOT != null) {
+                BOT.Update(gameTime);
             }
 
             //Freeze and rewind

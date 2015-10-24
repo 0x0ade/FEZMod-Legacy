@@ -8,6 +8,10 @@ using FezEngine.Services;
 using FezEngine.Services.Scripting;
 using FezGame.Services;
 using FezEngine.Structure.Input;
+#if FNA
+using Microsoft.Xna.Framework.Input;
+using SDL2;
+#endif
 
 namespace FezGame.Mod.Gui {
     public abstract class AGuiHandler : DrawableGameComponent, IGuiHandler {
@@ -53,16 +57,28 @@ namespace FezGame.Mod.Gui {
             DefaultForeground = Color.White;
         }
 
+        #if FNA
+        public void OnTextInput(char c) {
+        #else
+        public void OnTextInput(Object sender, TextInputEventArgs e) {
+        char c = e.Character;
+        #endif
+            if (FocusedWidget != null) {
+                FocusedWidget.TextInput(c);
+            }
+        }
+
         public override void Initialize() {
             base.Initialize();
 
             Scheduled = new List<Action>();
 
-            Game.Window.TextInput += delegate(Object sender, TextInputEventArgs e) {
-                if (FocusedWidget != null) {
-                    FocusedWidget.TextInput(e.Character);
-                }
-            };
+            #if FNA
+            TextInputEXT.TextInput += OnTextInput;
+            SDL.SDL_StartTextInput();
+            #else
+            Game.Window.TextInput += OnTextInput;
+            #endif
 
             Widgets = new List<GuiWidget>();
         }

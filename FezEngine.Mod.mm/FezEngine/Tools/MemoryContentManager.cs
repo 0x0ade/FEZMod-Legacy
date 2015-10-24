@@ -73,7 +73,14 @@ namespace FezEngine.Tools {
             for (int i = 0; i < count; i++) {
                 byte[] bytes = cachedAssets[assetNames_[i]];
                 string assetName = assetNames_[i].ToLower();
-                string filePath = assetName.Externalize() + ".xnb";
+                string extension = ".xnb";
+                #if FNA
+                //The FEZ 1.12 .pak files store the raw fxb files
+                if (assetName.StartsWith("effects")) {
+                    extension = ".fxb";
+                }
+                #endif
+                string filePath = assetName.Externalize() + extension;
                 FileInfo file = new FileInfo(filePath);
                 if (!file.Exists) {
                     file.Directory.Create();
@@ -97,7 +104,14 @@ namespace FezEngine.Tools {
                 DumpAll();
             }
 
-            string filePath = assetName.Externalize() + ".xnb";
+            string extension = ".xnb";
+            #if FNA
+            //The FEZ 1.12 .pak files store the raw fxb files, which are dumped as fxbs
+            if (assetName.ToLower().StartsWith("effects")) {
+                extension = ".fxb";
+            }
+            #endif
+            string filePath = assetName.Externalize() + extension;
             FileInfo file = new FileInfo(filePath);
             if (file.Exists) {
                 FileStream fis = new FileStream(filePath, FileMode.Open);
@@ -145,6 +159,9 @@ namespace FezEngine.Tools {
             }
 
             if (File.Exists(assetName.Externalize() + ".xnb")) {
+                return true;
+            }
+            if (File.Exists(assetName.Externalize() + ".fxb")) {
                 return true;
             }
             if (File.Exists(assetName.Externalize() + ".ogg")) {

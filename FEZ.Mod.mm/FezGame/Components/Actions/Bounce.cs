@@ -1,4 +1,6 @@
-﻿using System;
+﻿//Fixed in the FNA update / 1.12
+#if !FNA
+using System;
 using FezGame;
 using FezGame.Mod;
 using FezGame.Structure;
@@ -7,8 +9,8 @@ using FezEngine.Tools;
 
 namespace FezGame.Components.Actions {
     public class Bounce : PlayerAction {
-
         public void orig_TestConditions() {
+
         }
 
         public void TestConditions() {
@@ -23,4 +25,4 @@ namespace FezGame.Components.Actions {
 
     }
 }
-
+#endif

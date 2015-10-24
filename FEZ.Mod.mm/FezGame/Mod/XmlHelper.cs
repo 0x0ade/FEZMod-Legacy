@@ -669,7 +669,9 @@ namespace FezGame.Mod {
                 //Note the suffix s in TriangleLists...
                 ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix> geometry = new ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>(PrimitiveType.TriangleList, 60);
                 XmlNode geometryNode = elem.Name == "Geometry" ? elem.FirstChild : elem;
+                #if !FNA
                 geometry.NeedsEffectCommit = true;
+                #endif
                 geometry.Vertices = (VertexPositionNormalTextureInstance[]) geometryNode.ChildNodes[0].Deserialize(typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>));
                 geometry.Indices = (int[]) geometryNode.ChildNodes[1].Deserialize(typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>));
                 return geometry;
@@ -681,7 +683,9 @@ namespace FezGame.Mod {
                 //Note the suffix s in TriangleLists...
                 ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Vector4> geometry = new ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Vector4>(PrimitiveType.TriangleList, 220);
                 XmlNode geometryNode = elem.Name == "Geometry" ? elem.FirstChild : elem;
+                #if !FNA
                 geometry.NeedsEffectCommit = true;
+                #endif
                 geometry.Vertices = (VertexPositionNormalTextureInstance[]) geometryNode.ChildNodes[0].Deserialize(typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Vector4>));
                 geometry.Indices = (int[]) geometryNode.ChildNodes[1].Deserialize(typeof(ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Vector4>));
                 return geometry;
@@ -729,7 +733,7 @@ namespace FezGame.Mod {
             }
 
             if (elem == null) {
-                ConstructorInfo constructor = type.GetDefaultConstructor();
+                ConstructorInfo constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[0], null);
                 if (constructor != null) {
                     return constructor.Invoke(ArrayObject());
                 } else {
@@ -773,7 +777,7 @@ namespace FezGame.Mod {
                 return constructor_(null, objs);
             }
 
-            ConstructorInfo constructorDefault = type.GetDefaultConstructor();
+            ConstructorInfo constructorDefault = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[0], null);
             if (constructorDefault != null) {
                 CacheConstructors[new_key] = constructor_ = ReflectionHelper.CreateDelegate(constructorDefault);
                 CacheConstructorsParameters[constructor_] = null;

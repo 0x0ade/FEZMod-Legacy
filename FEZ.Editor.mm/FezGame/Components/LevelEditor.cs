@@ -24,6 +24,10 @@ using FezGame.Components.Actions;
 using System.Reflection;
 using FezGame.Mod.Gui;
 using System.Drawing.Imaging;
+#if FNA
+using Microsoft.Xna.Framework.Input;
+using SDL2;
+#endif
 
 namespace FezGame.Components {
     public class LevelEditor : DrawableGameComponent, ILevelEditor, IGuiHandler {
@@ -124,6 +128,17 @@ namespace FezGame.Components {
             Instance = this;
         }
 
+        #if FNA
+        public void OnTextInput(char c) {
+        #else
+        public void OnTextInput(Object sender, TextInputEventArgs e) {
+        char c = e.Character;
+        #endif
+            if (FocusedWidget != null) {
+                FocusedWidget.TextInput(c);
+            }
+        }
+
         public override void Initialize() {
             base.Initialize();
 
@@ -131,11 +146,12 @@ namespace FezGame.Components {
 
             Scheduled = new List<Action>();
 
-            Game.Window.TextInput += delegate(Object sender, TextInputEventArgs e) {
-                if (FocusedWidget != null) {
-                    FocusedWidget.TextInput(e.Character);
-                }
-            };
+            #if FNA
+            TextInputEXT.TextInput += OnTextInput;
+            SDL.SDL_StartTextInput();
+            #else
+            Game.Window.TextInput += OnTextInput;
+            #endif
 
             Widgets = new List<GuiWidget>();
 

@@ -6,6 +6,7 @@ using System.Threading;
 using Microsoft.Xna.Framework.Audio;
 using FezEngine.Tools;
 using FezGame.Mod;
+using FezEngine.Structure;
 
 namespace FezEngine.Services {
     public class SoundManager {
@@ -108,12 +109,19 @@ namespace FezEngine.Services {
             if (File.Exists(oggFile)) {
                 OggStream oggStream = (OggStream) null;
                 try {
+                    //TODO use the MusicCache - maybe use the already existing one for FNA
+                    #if FNA
+                    oggStream = new OggStream(oggFile) {
+                    #else
                     oggStream = new OggStream(oggFile, 6) {
+                    #endif
                         Category = isAmbience ? "Ambience" : "Music",
                         IsLooped = isAmbience
                     };
                     oggStream.RealName = name;
+                    #if !FNA
                     oggStream.Prepare(asyncPrecache);
+                    #endif
                     if (name.Contains("Gomez")) {
                         oggStream.LowPass = false;
                     }

@@ -7,6 +7,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>FEZ.Mod.mm</RootNamespace>
     <AssemblyName>FEZ.Mod.mm</AssemblyName>
+    <XnaType>MonoGame</XnaType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -26,6 +27,27 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug - FNA|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\DebugFNA</OutputPath>
+    <DefineConstants>DEBUG;FNA;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <XnaType>FNA</XnaType>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release - FNA|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\ReleaseFNA</OutputPath>
+    <DefineConstants>FNA;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <XnaType>FNA</XnaType>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System">
       <HintPath>..\libs\System.dll</HintPath>
@@ -33,17 +55,26 @@
     <Reference Include="System.Xml">
       <HintPath>..\libs\System.Xml.dll</HintPath>
     </Reference>
-    <Reference Include="MonoGame.Framework">
+    <Reference Include="MonoGame.Framework" Condition=" '$(XnaType)' == 'MonoGame' ">
       <HintPath>..\libs\MonoGame.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="FNA" Condition=" '$(XnaType)' == 'FNA' ">
+      <HintPath>..\libs\FNA.dll</HintPath>
     </Reference>
     <Reference Include="ContentSerialization">
       <HintPath>..\libs\ContentSerialization.dll</HintPath>
     </Reference>
-    <Reference Include="FezEngine">
+    <Reference Include="FEZ" Condition=" '$(XnaType)' == 'MonoGame' ">
+      <HintPath>..\libs\FEZ.exe</HintPath>
+    </Reference>
+    <Reference Include="FEZ" Condition=" '$(XnaType)' == 'FNA' ">
+      <HintPath>..\libs\FEZ.fna.exe</HintPath>
+    </Reference>
+    <Reference Include="FezEngine" Condition=" '$(XnaType)' == 'MonoGame' ">
       <HintPath>..\libs\FezEngine.orig.dll</HintPath>
     </Reference>
-    <Reference Include="FEZ">
-      <HintPath>..\libs\FEZ.exe</HintPath>
+    <Reference Include="FezEngine" Condition=" '$(XnaType)' == 'FNA' ">
+      <HintPath>..\libs\FezEngine.fna.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>..\libs\mscorlib.dll</HintPath>
@@ -60,14 +91,17 @@
     <Reference Include="System.Security">
       <HintPath>..\libs\System.Security.dll</HintPath>
     </Reference>
-    <Reference Include="System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-      <HintPath>..\libs\System.Core.dll</HintPath>
-    </Reference>
     <Reference Include="EasyStorage">
       <HintPath>..\libs\EasyStorage.dll</HintPath>
     </Reference>
     <Reference Include="Common">
       <HintPath>..\libs\Common.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core">
+      <HintPath>..\libs\System.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMod">
+      <HintPath>..\libs\MonoMod.exe</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -98,6 +132,7 @@
     <Compile Include="FezGame\Structure\NetworkGomezData.cs" />
     <Compile Include="FezGame\Components\NetworkUpdateDelegates.cs" />
     <Compile Include="FezGame\Mod\XmlHelper.cs" />
+    <Compile Include="FezGame\Mod\FakeInputHelper.cs" />
     <Compile Include="FezGame\Mod\Gui\IGuiHandler.cs" />
     <Compile Include="FezGame\Mod\Gui\ButtonWidget.cs" />
     <Compile Include="FezGame\Mod\Gui\CheckboxWidget.cs" />
@@ -111,6 +146,8 @@
     <Compile Include="FezGame\ModLogger.cs" />
     <Compile Include="FezGame\Mod\Gui\AGuiHandler.cs" />
     <Compile Include="FezGame\Mod\FEZModReflectionHelper.cs" />
+    <Compile Include="FezGame\Tools\StaticText.cs" />
+    <Compile Include="FezGame\Tools\GameText.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

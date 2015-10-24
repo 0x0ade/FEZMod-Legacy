@@ -6,10 +6,8 @@ using FezGame.Services;
 using MonoMod;
 using FezGame.Structure;
 using FezGame.Mod;
-using FezGame.Mod;
 using FezEngine.Tools;
 using FezEngine.Services;
-using Microsoft.Xna.Framework.Net;
 
 namespace FezGame.Components {
     public class GomezHost {

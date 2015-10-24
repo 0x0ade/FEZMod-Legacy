@@ -17,12 +17,13 @@ using System.Globalization;
 using System.Threading;
 using System.Diagnostics;
 using FezEngine.Structure.Scripting;
+using MonoMod.JIT;
 
 namespace FezGame.Mod {
     public static class FEZMod {
         //FEZMod metadata
-        public static string Version = "0.3a6";
-        public static Version MODVersion = new Version(Version.Substring(0, Version.IndexOf('a')));
+        public static string Version = "0.3a7";
+        public static Version MODVersion = new Version(Version.IndexOf('a') == -1 ? Version : Version.Substring(0, Version.IndexOf('a')));
         public static Version FEZVersion;
 
         //FEZ version-dependent reflection
@@ -78,12 +79,40 @@ namespace FezGame.Mod {
             ParseArgs(args);
         }
 
+        private static int TestMonoModJIT(string test) {
+            Console.WriteLine("Calling something unpatched.");
+            Console.WriteLine("Assembly: " + Assembly.GetExecutingAssembly().FullName);
+            Console.WriteLine("Passed arg: " + test);
+
+            try {
+                MonoModJITHandler.MMRun(null, test);
+            } catch (MonoModJITPseudoException e) {
+                return (int) e.Value;
+            }
+
+            Console.WriteLine("Calling something only when patched.");
+
+            return -42;
+        }
+
         public static void PreInitialize() {
             ModLogger.Clear();
             ModLogger.Log("FEZMod", "JustAnotherFEZMod (FEZMod) "+FEZMod.Version);
 
-            FEZVersion = new Version(Fez.Version);
+            try {
+                FEZVersion = new Version(Fez.Version.IndexOf('a') == -1 ? Fez.Version : Fez.Version.Substring(0, Fez.Version.IndexOf('a')));
+            } catch (Exception e) {
+                ModLogger.Log("FEZMod", "Unknown FEZ version: " + Fez.Version);
+                ModLogger.Log("FEZMod", "Exception: " + e);
+                #if !FNA
+                FEZVersion = new Version(1, 11); //Last non-FNA
+                #else
+                FEZVersion = new Version(1, 12); //First FNA
+                #endif
+            }
             Fez.Version = Fez.Version + " | " + FEZMod.Version;
+
+            //Console.WriteLine("JIT test return: " + TestMonoModJIT("Hello, World!"));
 
             DisableCloudSaves = typeof(PCSaveDevice).GetField("DisableCloudSaves");
 
@@ -294,12 +323,22 @@ namespace FezGame.Mod {
                 List<DisplayMode> allModes = new List<DisplayMode>();
                 allModes.AddRange(supportedModes);
 
-                ConstructorInfo dmConst = typeof(DisplayMode).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, 
+                ConstructorInfo dmConst = typeof(DisplayMode).GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, 
+                #if FNA
+                    new Type[] {typeof(int), typeof(int), typeof(SurfaceFormat)}, null);
+                allModes.Add((DisplayMode) dmConst.Invoke(new object[] {1280, 720, SurfaceFormat.Color}));
+                allModes.Add((DisplayMode) dmConst.Invoke(new object[] {1920, 1080, SurfaceFormat.Color}));
+                #else
                     new Type[] {typeof(int), typeof(int), typeof(int), typeof(SurfaceFormat)}, null);
                 allModes.Add((DisplayMode) dmConst.Invoke(new object[] {1280, 720, 60, SurfaceFormat.Color}));
                 allModes.Add((DisplayMode) dmConst.Invoke(new object[] {1920, 1080, 60, SurfaceFormat.Color}));
+                #endif
                 foreach (int[] resolution in CustomResolutions) {
+                    #if FNA
+                    allModes.Add((DisplayMode) dmConst.Invoke(new object[] {resolution[0], resolution[1], SurfaceFormat.Color}));
+                    #else
                     allModes.Add((DisplayMode) dmConst.Invoke(new object[] {resolution[0], resolution[1], 60, SurfaceFormat.Color}));
+                    #endif
                 }
 
                 foreach (DisplayMode mode in allModes) {
@@ -313,11 +352,15 @@ namespace FezGame.Mod {
                     if (added) {
                         continue;
                     }
+                    #if !FNA
                     if (mode.RefreshRate == 60) {
+                    #endif
                         SettingsManager.Resolutions.Add(mode);
+                    #if !FNA
                     } else {
                         SettingsManager.Resolutions.Add((DisplayMode) dmConst.Invoke(new object[] {mode.Width, mode.Height, 60, SurfaceFormat.Color}));
                     }
+                    #endif
                 }
 
                 SettingsManager.Resolutions.Sort(new Comparison<DisplayMode>((x, y) => x.Width * x.Height - y.Width * y.Height));

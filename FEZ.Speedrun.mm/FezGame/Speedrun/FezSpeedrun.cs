@@ -23,6 +23,7 @@ namespace FezGame.Speedrun {
         public static bool PerRoomTime = false;
 
         public static bool ToolAssistedSpeedrun = false;
+        public static bool BOTEnabled = false;//Broken Optimizing Thing
 
         public static ISpeedrunClock Clock = new SpeedrunClock();
 
@@ -62,6 +63,10 @@ namespace FezGame.Speedrun {
                     //Currently reqired unless someone hooks MovingGroupsHost and others to give a public instance
                     FEZMod.GetComponentsAsServices = true;
                     FEZMod.HandleComponents = true;
+                }
+                if (Clock != null && (args[i] == "-bot" || args[i] == "--bot")) {
+                    ModLogger.Log("FEZMod", "Found -bot / --bot");
+                    BOTEnabled = true;
                 }
             }
         }

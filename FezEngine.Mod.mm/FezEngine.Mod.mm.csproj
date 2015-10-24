@@ -7,6 +7,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>FezEngine.Mod.mm</RootNamespace>
     <AssemblyName>FezEngine.Mod.mm</AssemblyName>
+    <XnaType>MonoGame</XnaType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -26,15 +27,42 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug - FNA|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\DebugFNA</OutputPath>
+    <DefineConstants>DEBUG;FNA;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <XnaType>FNA</XnaType>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release - FNA|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\ReleaseFNA</OutputPath>
+    <DefineConstants>FNA;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <XnaType>FNA</XnaType>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System">
       <HintPath>..\libs\System.dll</HintPath>
     </Reference>
-    <Reference Include="FezEngine">
+    <Reference Include="FezEngine" Condition=" '$(XnaType)' == 'MonoGame' ">
       <HintPath>..\libs\FezEngine.orig.dll</HintPath>
     </Reference>
-    <Reference Include="MonoGame.Framework">
+    <Reference Include="FezEngine" Condition=" '$(XnaType)' == 'FNA' ">
+      <HintPath>..\libs\FezEngine.fna.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Framework" Condition=" '$(XnaType)' == 'MonoGame' ">
       <HintPath>..\libs\MonoGame.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="FNA" Condition=" '$(XnaType)' == 'FNA' ">
+      <HintPath>..\libs\FNA.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml">
       <HintPath>..\libs\System.Xml.dll</HintPath>
@@ -71,6 +99,8 @@
     <Compile Include="FezEngine\Services\SoundManager.cs" />
     <Compile Include="FezEngine\Tools\SharedContentManager.cs" />
     <Compile Include="FezEngine\Structure\Geometry\ShaderInstancedIndexedPrimitives.cs" />
+    <Compile Include="FezEngine\Structure\Geometry\IndexedVector4.cs" />
+    <Compile Include="FezEngine\Components\InputManager.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

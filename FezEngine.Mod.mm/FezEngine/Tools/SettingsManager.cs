@@ -11,12 +11,12 @@ namespace FezEngine.Tools {
         public static void SetupViewport(this GraphicsDevice device, bool forceLetterbox = false) {
             int backBufferWidth = device.PresentationParameters.BackBufferWidth;
             int backBufferHeight = device.PresentationParameters.BackBufferHeight;
-            if (!forceLetterbox) {
+            /*if (!forceLetterbox) {
                 RenderTargetBinding[] renderTargets = device.GetRenderTargets();
                 if (renderTargets.Length > 0 && renderTargets[0].RenderTarget is Texture2D) {
                     return;
                 }
-            }
+            }*/
             device.ScissorRectangle = new Rectangle(0, 0, backBufferWidth, backBufferHeight);
             device.Viewport = new Viewport {
                 X = 0,

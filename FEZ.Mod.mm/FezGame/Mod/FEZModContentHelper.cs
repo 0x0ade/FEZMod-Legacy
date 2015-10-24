@@ -16,6 +16,41 @@ namespace FezGame.Mod {
 
     public static class FEZModContentHelper {
 
+        #if FNA
+        public static int Size(this SurfaceFormat surfaceFormat) {
+            switch (surfaceFormat) {
+            case SurfaceFormat.Dxt1:
+                return 8;
+            case SurfaceFormat.Dxt3:
+            case SurfaceFormat.Dxt5:
+                return 16;
+            case SurfaceFormat.Alpha8:
+                return 1;
+            case SurfaceFormat.Bgr565:
+            case SurfaceFormat.Bgra4444:
+            case SurfaceFormat.Bgra5551:
+            case SurfaceFormat.HalfSingle:
+            case SurfaceFormat.NormalizedByte2:
+                return 2;
+            case SurfaceFormat.Color:
+            case SurfaceFormat.Single:
+            case SurfaceFormat.Rg32:
+            case SurfaceFormat.HalfVector2:
+            case SurfaceFormat.NormalizedByte4:
+            case SurfaceFormat.Rgba1010102:
+                return 4;
+            case SurfaceFormat.HalfVector4:
+            case SurfaceFormat.Rgba64:
+            case SurfaceFormat.Vector2:
+                return 8;
+            case SurfaceFormat.Vector4:
+                return 16;
+            default:
+                return 0;
+            }
+        }
+        #endif
+
         private readonly static Dictionary<CacheKey_RGB_A, Texture2D> CacheMixAlpha = new Dictionary<CacheKey_RGB_A, Texture2D>();
 
         public static string Externalize(this string assetName) {
