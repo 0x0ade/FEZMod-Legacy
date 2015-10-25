@@ -23,6 +23,7 @@ namespace FezGame.Speedrun.BOT {
         public double villageClimbedNextToLadder;
         public bool villageClimbWasJumping;
         public int villageClimbJumpedTime;
+        public bool villageChestJumpedToDeath;
         
         private GameTime gameTime;
         private Dictionary<CodeInput, double> keyTimes = new Dictionary<CodeInput, double>();
@@ -134,7 +135,6 @@ namespace FezGame.Speedrun.BOT {
                         KeepHolding(CodeInput.Jump);
                         if (!villageClimbWasJumping) {
                             villageClimbJumpedTime++;
-                            ModLogger.Log("FEZMod.BOT", "villageClimbJumpedTime: " + villageClimbJumpedTime);
                         }
                         villageClimbWasJumping = true;
                     } else {
@@ -147,10 +147,24 @@ namespace FezGame.Speedrun.BOT {
                     return;
                 }
                 
-                //now on the same level as the chest
-                if (5 == villageLandedTime) {
+                //move to the left (ledge to chest)
+                if (5 == villageLandedTime && !villageChestJumpedToDeath) {
+                    if (TAS.PlayerManager.Position.X <= 17f) {
+                        Press(CodeInput.Down);
+                    }
+                    if (TAS.PlayerManager.Action == ActionType.GrabCornerLedge && TAS.PlayerManager.Animation.Timing.Ended) {
+                        //TODO even when waiting for the animation to end, Gomez doesn't respawn hanging
+                        Press(CodeInput.Jump);
+                        villageChestJumpedToDeath = true;
+                    }
                     Hold(CodeInput.Left);
-                    //TODO stop as soon as reaching the edge
+                    return;
+                }
+                //hold left and jump frame-perfectly
+                if (5 == villageLandedTime && villageChestJumpedToDeath) {
+                    //TODO time the jump
+                    Press(CodeInput.Jump);
+                    Hold(CodeInput.Left);
                     return;
                 }
             }
