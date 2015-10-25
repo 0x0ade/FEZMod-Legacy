@@ -22,7 +22,7 @@ using MonoMod.JIT;
 namespace FezGame.Mod {
     public static class FEZMod {
         //FEZMod metadata
-        public static string Version = "0.3a7";
+        public static string Version = "0.3a8";
         public static Version MODVersion = new Version(Version.IndexOf('a') == -1 ? Version : Version.Substring(0, Version.IndexOf('a')));
         public static Version FEZVersion;
 

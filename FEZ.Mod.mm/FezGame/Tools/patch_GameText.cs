@@ -5,7 +5,7 @@ using FezEngine.Tools;
 using FezEngine.Services;
 
 namespace FezGame.Tools {
-    public static class GameText {
+    public static class patch_GameText {
         private const string MISSING_TEXT = "[MISSING TEXT]";
         
         public static string orig_GetString(string tag) {

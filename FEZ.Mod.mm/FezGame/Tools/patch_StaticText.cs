@@ -5,7 +5,7 @@ using FezEngine.Tools;
 using FezEngine.Services;
 
 namespace FezGame.Tools {
-    public static class StaticText {
+    public static class patch_StaticText {
         public static string orig_GetString(string tag) {
             return null;
         }

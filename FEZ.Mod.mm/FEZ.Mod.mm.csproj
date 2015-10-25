@@ -146,8 +146,8 @@
     <Compile Include="FezGame\ModLogger.cs" />
     <Compile Include="FezGame\Mod\Gui\AGuiHandler.cs" />
     <Compile Include="FezGame\Mod\FEZModReflectionHelper.cs" />
-    <Compile Include="FezGame\Tools\StaticText.cs" />
-    <Compile Include="FezGame\Tools\GameText.cs" />
+    <Compile Include="FezGame\Tools\patch_StaticText.cs" />
+    <Compile Include="FezGame\Tools\patch_GameText.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

@@ -20,6 +20,7 @@ namespace FezGame.Speedrun.BOT {
         public double villageTime;
         public int villageLandedTime;
         public bool villageLandedWasGrounded;
+        public double villageClimbedNextToLadder;
         
         private GameTime gameTime;
         private Dictionary<CodeInput, double> keyTimes = new Dictionary<CodeInput, double>();
@@ -79,55 +80,77 @@ namespace FezGame.Speedrun.BOT {
                 
                 villageTime += gameTime.ElapsedGameTime.TotalSeconds;
                 
-                //Jump in front of Gomez's door
+                //jump in front of Gomez's door
                 if (villageTime < 0.5d) {
                     Hold(CodeInput.Jump);
                 }
-                //Climb on top of Gomez's house
-                if (villageTime < 0.6d/* && CanClimb()*/) {
+                //climb on top of Gomez's house
+                if (villageTime < 0.6d) {
                     //TODO fix CanClimb() for ledges. Currently even untested for ladders and vines.
                     Press(CodeInput.Up);
                 }
                 
+                //grounding code
                 if (villageTime > 0.2d && TAS.PlayerManager.Grounded & !villageLandedWasGrounded) {
                     villageLandedTime++;
                 }
                 villageLandedWasGrounded = TAS.PlayerManager.Grounded;
                 
-                if (villageTime > 0.4d && 1 <= villageLandedTime && villageLandedTime <= 3) {
-                    //TODO jumps once too often, can climb second time
+                //Jumping to the house next to the ladder, with the one platform in between
+                if (villageTime > 0.4d && 1 <= villageLandedTime && villageLandedTime <= 2) {
                     Hold(CodeInput.Right);
                     if (TAS.PlayerManager.Grounded) {
                         Hold(CodeInput.Jump, 0.5d);
                     }
                     KeepHolding(CodeInput.Jump, 0.5d);
                 }
-                
-                /*
-                if (villageLandedTime == 1 && CanClimb()) {
+                //Climbing the house with the ladder
+                if (villageLandedTime == 2) {
                     Press(CodeInput.Up);
-                    villageClimbedNextToLadder = gameTime.TotalGameTime.TotalSeconds;
+                    villageClimbedNextToLadder = villageTime;
                     return;
                 }
                 
-                if (gameTime.TotalGameTime.TotalSeconds - villageClimbedNextToLadder < 0.5d && TAS.PlayerManager.Action == ActionType.Idle) {
+                //the house above the house with the ladder
+                if (3 == villageLandedTime && Delta(villageTime - villageClimbedNextToLadder) < 0.5d) {
                     Hold(CodeInput.Jump);
-                }
-                
-                if (gameTime.TotalGameTime.TotalSeconds - villageClimbedNextToLadder > 0.5d && (TAS.PlayerManager.Action == ActionType.Idle || TAS.PlayerManager.Action == ActionType.BackClimbingVine || TAS.PlayerManager.Action == ActionType.FrontClimbingVine)) {
-                    Hold(CodeInput.Jump);
-                }
-                
-                if (gameTime.TotalGameTime.TotalSeconds - villageClimbedNextToLadder > 0.5d && CanClimb()) {
                     Press(CodeInput.Up);
                 }
-                */
                 
+                //going to the vines
+                if (4 == villageLandedTime && Delta(villageTime - villageClimbedNextToLadder) < 1.47d) {
+                    //TODO for this, use position instead
+                    Hold(CodeInput.Right);
+                    Hold(CodeInput.Jump);
+                    return;
+                }
+                //climbing up the vines
+                if (4 == villageLandedTime) {
+                    if (TAS.PlayerManager.Velocity.Y < 0.03f && TAS.PlayerManager.Action == ActionType.Jumping) {
+                        Press(CodeInput.Up);
+                    } else if (TAS.PlayerManager.Action == ActionType.Jumping) {
+                        KeepHolding(CodeInput.Jump);
+                    } else {
+                        Press(CodeInput.Jump);
+                    }
+                    return;
+                }
+                
+                //now on the same level as the chest
+                if (5 == villageLandedTime) {
+                    Hold(CodeInput.Left);
+                    //TODO stop as soon as reaching the edge
+                    return;
+                }
             }
         }
         
         //FakeInputHelper helpers
         //TODO maybe move some of them to FakeInputHepler?
+        
+        public double Delta(double d) {
+            return Math.Max(0, d);
+        }
         
         public bool Timed(CodeInput key, double max, bool apply = true) {
             if (max <= 0d) {
@@ -194,6 +217,7 @@ namespace FezGame.Speedrun.BOT {
         
         //Logic helpers
         
+        /*
         public bool CanClimb() {
             return TAS.PlayerManager.Action.IsOnLedge() ||
                 TAS.PlayerManager.Action.IsClimbingLadder() ||
@@ -244,6 +268,7 @@ namespace FezGame.Speedrun.BOT {
 			Axis axis = FezMath.AxisFromPhi(combinedPhi);
 			return ((actorSettings.Type == ActorType.Vine || actorSettings.Type == ActorType.Ladder) && axis == TAS.CameraManager.Viewpoint.VisibleAxis() == onAxis) || instance.GetRotatedFace(TAS.CameraManager.VisibleOrientation) == CollisionType.TopOnly;
 		}
+        */
         
     }
 }
