@@ -21,6 +21,8 @@ namespace FezGame.Speedrun.BOT {
         public int villageLandedTime;
         public bool villageLandedWasGrounded;
         public double villageClimbedNextToLadder;
+        public bool villageClimbWasJumping;
+        public int villageClimbJumpedTime;
         
         private GameTime gameTime;
         private Dictionary<CodeInput, double> keyTimes = new Dictionary<CodeInput, double>();
@@ -126,12 +128,21 @@ namespace FezGame.Speedrun.BOT {
                 }
                 //climbing up the vines
                 if (4 == villageLandedTime) {
-                    if (TAS.PlayerManager.Velocity.Y < 0.03f && TAS.PlayerManager.Action == ActionType.Jumping) {
+                    if (TAS.PlayerManager.Action == ActionType.Falling) {
                         Press(CodeInput.Up);
                     } else if (TAS.PlayerManager.Action == ActionType.Jumping) {
                         KeepHolding(CodeInput.Jump);
+                        if (!villageClimbWasJumping) {
+                            villageClimbJumpedTime++;
+                            ModLogger.Log("FEZMod.BOT", "villageClimbJumpedTime: " + villageClimbJumpedTime);
+                        }
+                        villageClimbWasJumping = true;
                     } else {
                         Press(CodeInput.Jump);
+                        villageClimbWasJumping = false;
+                    }
+                    if (villageClimbJumpedTime == 4) {
+                        Hold(CodeInput.Left);
                     }
                     return;
                 }
