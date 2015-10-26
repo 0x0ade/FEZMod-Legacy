@@ -165,7 +165,7 @@ namespace FezGame.Speedrun.BOT {
                     return;
                 }
                 //wait until jumping to death (store respawn information)
-                if (5 == villageLandedTime && !villageChestJumpedToDeath && Delta(villageTime, villageChestCanJumpToDeath) >= 0.3d) {
+                if (5 == villageLandedTime && !villageChestJumpedToDeath && Delta(villageTime, villageChestCanJumpToDeath) >= 0.05d) {
                     Press(CodeInput.Jump);
                     Hold(CodeInput.Left);
                     villageChestJumpedToDeath = true;
