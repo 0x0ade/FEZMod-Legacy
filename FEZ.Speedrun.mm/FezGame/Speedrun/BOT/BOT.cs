@@ -23,6 +23,7 @@ namespace FezGame.Speedrun.BOT {
         public double villageClimbedNextToLadder;
         public bool villageClimbWasJumping;
         public int villageClimbJumpedTime;
+        public double villageChestCanJumpToDeath;
         public bool villageChestJumpedToDeath;
         
         private GameTime gameTime;
@@ -115,13 +116,13 @@ namespace FezGame.Speedrun.BOT {
                 }
                 
                 //the house above the house with the ladder
-                if (3 == villageLandedTime && Delta(villageTime - villageClimbedNextToLadder) < 0.5d) {
+                if (3 == villageLandedTime && Delta(villageTime, villageClimbedNextToLadder) < 0.5d) {
                     Hold(CodeInput.Jump);
                     Press(CodeInput.Up);
                 }
                 
                 //going to the vines
-                if (4 == villageLandedTime && Delta(villageTime - villageClimbedNextToLadder) < 1.47d) {
+                if (4 == villageLandedTime && Delta(villageTime, villageClimbedNextToLadder) < 1.47d) {
                     //TODO for this, use position instead
                     Hold(CodeInput.Right);
                     Hold(CodeInput.Jump);
@@ -148,23 +149,40 @@ namespace FezGame.Speedrun.BOT {
                 }
                 
                 //move to the left (ledge to chest)
-                if (5 == villageLandedTime && !villageChestJumpedToDeath) {
-                    if (TAS.PlayerManager.Position.X <= 17f) {
-                        Press(CodeInput.Down);
-                    }
+                if (5 == villageLandedTime && TAS.PlayerManager.Position.X > 17.5f) {
+                    Hold(CodeInput.Left);
+                    return;
+                }
+                //climb down
+                if (5 == villageLandedTime && TAS.PlayerManager.Position.X <= 17.5f && Delta(villageTime, villageChestCanJumpToDeath) < 0.1d) {
+                    Press(CodeInput.Down);
                     if (TAS.PlayerManager.Action == ActionType.GrabCornerLedge && TAS.PlayerManager.Animation.Timing.Ended) {
                         //TODO even when waiting for the animation to end, Gomez doesn't respawn hanging
-                        Press(CodeInput.Jump);
-                        villageChestJumpedToDeath = true;
+                        villageChestCanJumpToDeath = villageTime;
                     }
                     Hold(CodeInput.Left);
                     return;
                 }
+                if (5 == villageLandedTime && !villageChestJumpedToDeath && Delta(villageTime, villageChestCanJumpToDeath) < 1d) {
+                    Hold(CodeInput.Left);
+                    return;
+                }
+                //wait until jumping to death (store respawn information)
+                if (5 == villageLandedTime && !villageChestJumpedToDeath && Delta(villageTime, villageChestCanJumpToDeath) >= 1d) {
+                    Press(CodeInput.Jump);
+                    Hold(CodeInput.Left);
+                    villageChestJumpedToDeath = true;
+                    return;
+                }
                 //hold left and jump frame-perfectly
-                if (5 == villageLandedTime && villageChestJumpedToDeath) {
+                //TODO doesn't do the first jump on its own; works after doing the first jump
+                if (villageChestJumpedToDeath) {
                     //TODO time the jump
                     Press(CodeInput.Jump);
                     Hold(CodeInput.Left);
+                    return;
+                }
+                if (!villageChestJumpedToDeath) {
                     return;
                 }
             }
@@ -173,8 +191,9 @@ namespace FezGame.Speedrun.BOT {
         //FakeInputHelper helpers
         //TODO maybe move some of them to FakeInputHepler?
         
-        public double Delta(double d) {
-            return Math.Max(0, d);
+        public double Delta(double oldt, double newt) {
+            double d = oldt - newt;
+            return d == oldt ? 0f : Math.Max(0d, d);
         }
         
         public bool Timed(CodeInput key, double max, bool apply = true) {
