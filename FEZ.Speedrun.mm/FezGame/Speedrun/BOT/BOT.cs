@@ -154,21 +154,18 @@ namespace FezGame.Speedrun.BOT {
                     return;
                 }
                 //climb down
-                if (5 == villageLandedTime && TAS.PlayerManager.Position.X <= 17.5f && Delta(villageTime, villageChestCanJumpToDeath) < 0.1d) {
+                if (5 == villageLandedTime && TAS.PlayerManager.Position.X <= 17.5f && Delta(villageTime, villageChestCanJumpToDeath) <= 0d) {
                     Press(CodeInput.Down);
-                    if (TAS.PlayerManager.Action == ActionType.GrabCornerLedge && TAS.PlayerManager.Animation.Timing.Ended) {
-                        //TODO even when waiting for the animation to end, Gomez doesn't respawn hanging
+                    if (TAS.PlayerManager.Animation.Timing.Ended) {
+                        //TODO which animation?
+                        //if it would set it if it ended, it would never leave this branch
                         villageChestCanJumpToDeath = villageTime;
                     }
                     Hold(CodeInput.Left);
                     return;
                 }
-                if (5 == villageLandedTime && !villageChestJumpedToDeath && Delta(villageTime, villageChestCanJumpToDeath) < 1d) {
-                    Hold(CodeInput.Left);
-                    return;
-                }
                 //wait until jumping to death (store respawn information)
-                if (5 == villageLandedTime && !villageChestJumpedToDeath && Delta(villageTime, villageChestCanJumpToDeath) >= 1d) {
+                if (5 == villageLandedTime && !villageChestJumpedToDeath && Delta(villageTime, villageChestCanJumpToDeath) >= 0.3d) {
                     Press(CodeInput.Jump);
                     Hold(CodeInput.Left);
                     villageChestJumpedToDeath = true;
@@ -193,7 +190,7 @@ namespace FezGame.Speedrun.BOT {
         
         public double Delta(double oldt, double newt) {
             double d = oldt - newt;
-            return d == oldt ? 0f : Math.Max(0d, d);
+            return d == oldt ? 0d : Math.Max(0d, d);
         }
         
         public bool Timed(CodeInput key, double max, bool apply = true) {
