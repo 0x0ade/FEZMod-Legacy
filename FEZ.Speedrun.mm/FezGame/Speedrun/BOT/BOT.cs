@@ -48,13 +48,13 @@ namespace FezGame.Speedrun.BOT {
                     }
                 }
                 if (!gomezHouseDoored) {
-                    FakeInputHelper.Hold(CodeInput.Right);
+                    CodeInput.Right.Hold();
                     return;
                 }
                 
                 //FakeInputHelper.Press up as soon as Gomez is grounded (may be falling from bed)
                 if (TAS.PlayerManager.Grounded) {
-                    FakeInputHelper.Press(CodeInput.Up);
+                    CodeInput.Up.Press();
                 }
             }
             
@@ -73,12 +73,12 @@ namespace FezGame.Speedrun.BOT {
                 
                 //jump in front of Gomez's door
                 if (villageTime < 0.5d) {
-                    FakeInputHelper.Hold(CodeInput.Jump);
+                    CodeInput.Jump.Hold();
                 }
                 //climb on top of Gomez's house
                 if (villageTime < 0.6d) {
                     //TODO fix CanClimb() for ledges. Currently even untested for ladders and vines.
-                    FakeInputHelper.Press(CodeInput.Up);
+                    CodeInput.Up.Press();
                 }
                 
                 //grounding code
@@ -89,79 +89,79 @@ namespace FezGame.Speedrun.BOT {
                 
                 //Jumping to the house next to the ladder, with the one platform in between
                 if (villageTime > 0.4d && 1 <= villageLandedTime && villageLandedTime <= 2) {
-                    FakeInputHelper.Hold(CodeInput.Right);
+                    CodeInput.Right.Hold();
                     if (TAS.PlayerManager.Grounded) {
-                        FakeInputHelper.Hold(CodeInput.Jump, 0.5d);
+                        CodeInput.Jump.Hold(0.5d);
                     }
-                    FakeInputHelper.KeepHolding(CodeInput.Jump, 0.5d);
+                    CodeInput.Jump.KeepHolding(0.5d);
                 }
                 //Climbing the house with the ladder
                 if (villageLandedTime == 2) {
-                    FakeInputHelper.Press(CodeInput.Up);
+                    CodeInput.Up.Press();
                     villageClimbedNextToLadder = villageTime;
                     return;
                 }
                 
                 //the house above the house with the ladder
                 if (3 == villageLandedTime && Delta(villageTime, villageClimbedNextToLadder) < 0.5d) {
-                    FakeInputHelper.Hold(CodeInput.Jump);
-                    FakeInputHelper.Press(CodeInput.Up);
+                    CodeInput.Jump.Hold();
+                    CodeInput.Up.Press();
                 }
                 
                 //going to the vines
                 if (4 == villageLandedTime && Delta(villageTime, villageClimbedNextToLadder) < 1.47d) {
                     //TODO for this, use position instead
-                    FakeInputHelper.Hold(CodeInput.Right);
-                    FakeInputHelper.Hold(CodeInput.Jump);
+                    CodeInput.Right.Hold();
+                    CodeInput.Jump.Hold();
                     return;
                 }
                 //climbing up the vines
                 if (4 == villageLandedTime) {
                     if (TAS.PlayerManager.Action == ActionType.Falling) {
-                        FakeInputHelper.Press(CodeInput.Up);
+                        CodeInput.Up.Press();
                     } else if (TAS.PlayerManager.Action == ActionType.Jumping) {
-                        FakeInputHelper.KeepHolding(CodeInput.Jump);
+                        CodeInput.Jump.KeepHolding();
                         if (!villageClimbWasJumping) {
                             villageClimbJumpedTime++;
                         }
                         villageClimbWasJumping = true;
                     } else {
-                        FakeInputHelper.Press(CodeInput.Jump);
+                        CodeInput.Jump.Press();
                         villageClimbWasJumping = false;
                     }
                     if (villageClimbJumpedTime == 4) {
-                        FakeInputHelper.Hold(CodeInput.Left);
+                        CodeInput.Left.Hold();
                     }
                     return;
                 }
                 
                 //move to the left (ledge to chest)
                 if (5 == villageLandedTime && TAS.PlayerManager.Position.X > 17.5f) {
-                    FakeInputHelper.Hold(CodeInput.Left);
+                    CodeInput.Left.Hold();
                     return;
                 }
                 //climb down
                 if (5 == villageLandedTime && TAS.PlayerManager.Position.X <= 17.5f && Delta(villageTime, villageChestCanJumpToDeath) <= 0d) {
-                    FakeInputHelper.Press(CodeInput.Down);
+                    CodeInput.Down.Press();
                     if (TAS.PlayerManager.Animation.Timing.Ended) {
                         //TODO which animation?
                         villageChestCanJumpToDeath = villageTime;
                     }
-                    FakeInputHelper.Hold(CodeInput.Left);
+                    CodeInput.Left.Hold();
                     return;
                 }
                 //wait until jumping to death (store respawn information)
                 if (5 == villageLandedTime && !villageChestJumpedToDeath && Delta(villageTime, villageChestCanJumpToDeath) >= 0.05d) {
-                    FakeInputHelper.Press(CodeInput.Jump);
-                    FakeInputHelper.Hold(CodeInput.Left);
+                    CodeInput.Jump.Press();
+                    CodeInput.Left.Hold();
                     villageChestJumpedToDeath = true;
                     return;
                 }
                 //FakeInputHelper.Hold left and jump frame-perfectly
                 if (villageChestJumpedToDeath && TAS.PlayerManager.LastAction == ActionType.Dying) {
                     //TODO time the jump
-                    FakeInputHelper.Press(CodeInput.Jump);
-                    FakeInputHelper.Hold(CodeInput.Left);
+                    CodeInput.Jump.Press();
+                    CodeInput.Left.Hold();
                     return;
                 }
                 if (!villageChestJumpedToDeath) {
