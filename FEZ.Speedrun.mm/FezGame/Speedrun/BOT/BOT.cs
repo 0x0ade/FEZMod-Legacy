@@ -109,14 +109,13 @@ namespace FezGame.Speedrun.BOT {
                 }
                 
                 //going to the vines
-                if (4 == villageLandedTime && Delta(villageTime, villageClimbedNextToLadder) < 1.47d) {
-                    //TODO for this, use position instead
-                    CodeInput.Right.Hold();
-                    CodeInput.Jump.Hold();
-                    return;
-                }
-                //climbing up the vines
                 if (4 == villageLandedTime) {
+					if (Delta (villageTime, villageClimbedNextToLadder) < 1.47d) {
+						//TODO for this, use position instead
+						CodeInput.Right.Hold ();
+						CodeInput.Jump.Hold ();
+						return;
+					}
                     if (TAS.PlayerManager.Action == ActionType.Falling) {
                         CodeInput.Up.Press();
                     } else if (TAS.PlayerManager.Action == ActionType.Jumping) {
@@ -135,38 +134,56 @@ namespace FezGame.Speedrun.BOT {
                     return;
                 }
                 
-                //move to the left (ledge to chest)
-                if (5 == villageLandedTime && TAS.PlayerManager.Position.X > 17.5f) {
-                    CodeInput.Left.Hold();
-                    return;
-                }
-                //climb down
-                if (5 == villageLandedTime && TAS.PlayerManager.Position.X <= 17.5f && Delta(villageTime, villageChestCanJumpToDeath) <= 0d) {
-                    CodeInput.Down.Press();
-                    if (TAS.PlayerManager.Animation.Timing.Ended) {
-                        //TODO which animation?
-                        villageChestCanJumpToDeath = villageTime;
-                    }
-                    CodeInput.Left.Hold();
-                    return;
-                }
-                //wait until jumping to death (store respawn information)
-                if (5 == villageLandedTime && !villageChestJumpedToDeath && Delta(villageTime, villageChestCanJumpToDeath) >= 0.05d) {
-                    CodeInput.Jump.Press();
-                    CodeInput.Left.Hold();
-                    villageChestJumpedToDeath = true;
-                    return;
-                }
-                //FakeInputHelper.Hold left and jump frame-perfectly
-                if (villageChestJumpedToDeath && TAS.PlayerManager.LastAction == ActionType.Dying) {
-                    //TODO time the jump
-                    CodeInput.Jump.Press();
-                    CodeInput.Left.Hold();
-                    return;
-                }
-                if (!villageChestJumpedToDeath) {
-                    return;
-                }
+				//move to the left (ledge to chest). Grab the corner to start longjump sequence with a jump to avoid grabbing cutscene
+				if (5 == villageLandedTime) {
+					if (TAS.PlayerManager.Position.X > 20f) {
+						CodeInput.Left.Hold ();
+						return;
+					}
+					if (20f >= TAS.PlayerManager.Position.X && TAS.PlayerManager.Position.X > 18.2f) {
+						if (TAS.PlayerManager.AirTime.TotalSeconds == 0.0)
+							CodeInput.Jump.Press ();
+						CodeInput.Left.Hold ();
+						return;
+					}
+					if (18.2f >= TAS.PlayerManager.Position.X && TAS.PlayerManager.Position.X > 16.5f) {
+						CodeInput.Right.Hold ();
+						return;
+					}
+					if (TAS.PlayerManager.Action.IsOnLedge ()) {
+						// TODO Does not work
+						villageLandedTime++;
+						return;
+					}
+				}
+				// Longjump sequence after the ledge is grabbed
+				if (6 == villageLandedTime){
+					if (TAS.PlayerManager.Position.X <= 17.2f && Delta (villageTime, villageChestCanJumpToDeath) <= 0d) {
+						if (TAS.PlayerManager.Animation.Timing.Ended) {
+							//TODO which animation?
+							villageChestCanJumpToDeath = villageTime;
+						}
+						CodeInput.Left.Hold ();
+						return;
+					}
+					//wait until jumping to death (store respawn information)
+					if (!villageChestJumpedToDeath && Delta (villageTime, villageChestCanJumpToDeath) >= 0.05d) {
+						CodeInput.Jump.Press ();
+						CodeInput.Left.Hold ();
+						villageChestJumpedToDeath = true;
+						return;
+					}
+					//FakeInputHelper.Hold left and jump frame-perfectly
+					if (villageChestJumpedToDeath && TAS.PlayerManager.LastAction == ActionType.Dying) {
+						//TODO time the jump
+						CodeInput.Jump.Press ();
+						CodeInput.Left.Hold ();
+						return;
+					}
+					if (!villageChestJumpedToDeath) {
+						return;
+					}
+				}
             }
         }
         
