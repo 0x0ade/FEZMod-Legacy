@@ -9,8 +9,14 @@ using FezEngine.Tools;
 
 namespace FezGame.Mod {
     
+    public struct Sequential_Key_Duration {
+        public CodeInput Key;
+        public double Duration;
+    }
+    
     public static class FakeInputHelper {
         
+        //key hooks
         public static Func<ControllerIndex> get_ActiveControllers;
         public static Action<ControllerIndex> set_ActiveControllers;
         public static Func<FezButtonState> get_GrabThrow;
@@ -52,18 +58,35 @@ namespace FezGame.Mod {
         public static Func<FezButtonState> get_MapZoomOut;
         public static Action<FezButtonState> set_MapZoomOut;
         
+        //fake input overrides
         public readonly static List<CodeInput> PressedOverrides = new List<CodeInput>();
         public readonly static List<CodeInput> ReleasedOverrides = new List<CodeInput>();
         public readonly static Dictionary<CodeInput, FezButtonState> Overrides = new Dictionary<CodeInput, FezButtonState>();
         
+        //other fields / properties
         public static bool Updating;
         
+        //fake input timing helper
         private static Dictionary<CodeInput, double> keyTimes = new Dictionary<CodeInput, double>();
         private static List<CodeInput> keyTimesApplied = new List<CodeInput>();
         
-        //Hooks
+        //fake input sequential helper
+        private static List<Sequential_Key_Duration> keysHold = new List<Sequential_Key_Duration>();
+        private static List<Sequential_Key_Duration> tmpKeysHold = new List<Sequential_Key_Duration>();
+        private static Sequential_Key_Duration tmpKeyHold = new Sequential_Key_Duration();
+        
+        //hooks
         public static void PreUpdate(GameTime gameTime) {
             //TODO handle sequential key input (what Gyoo wants)
+            
+            tmpKeysHold.Clear();
+            tmpKeysHold.AddRange(keysHold);
+            keysHold.Clear();
+            for (int i = 0; i < tmpKeysHold.Count; i++) {
+                Sequential_Key_Duration keyHold = tmpKeysHold[i];
+                keyHold.Key.Hold(keyHold.Duration);
+            }
+            
             keyTimesApplied.Clear();
             
             foreach (CodeInput key in ReleasedOverrides) {
@@ -93,10 +116,10 @@ namespace FezGame.Mod {
             Overrides.Clear();
         }
         
-        //Input helpers
-        public static bool Timed(this CodeInput key, double max, bool apply = true) {
+        //fake input helpers
+        public static int Timed(this CodeInput key, double max, bool apply = true) {
             if (max <= 0d) {
-                return true;
+                return 0;
             }
             
             double time;
@@ -107,7 +130,7 @@ namespace FezGame.Mod {
                     keyTimes[key] = 0d;
                     keyTimesApplied.Add(key);
                 }
-                return true;
+                return 1;
             }
             
             if (apply) {
@@ -116,22 +139,30 @@ namespace FezGame.Mod {
             }
             
             if (time < max) {
-                return true;
+                return 0;
             } else {
                 if (apply) {
                     keyTimes.Remove(key);
                     keyTimesApplied.Add(key);
                 }
-                return false;
+                return 2;
             }
         }
         
         public static void Hold(this CodeInput key, double time = 0d) {
-            if (!Timed(key, time)) {
-                return;
+            int timed = Timed(key, time);
+            if (timed < 2 && time > 0d) {
+                tmpKeyHold.Key = key;
+                tmpKeyHold.Duration = time;
+                if (!keysHold.Contains(tmpKeyHold)) {
+                    keysHold.Add(new Sequential_Key_Duration() {
+                       Key = key,
+                       Duration = time 
+                    });
+                }
             }
-            if (time >= 0d) {
-                //TODO add to list of Hold keys (sequential input)
+            if (timed != 0) {
+                return;
             }
             FakeInputHelper.Overrides[key] = FezButtonState.Pressed;
         }
@@ -141,11 +172,12 @@ namespace FezGame.Mod {
                 //Only keep holding when already pressed.
                 return;
             }
-            if (!Timed(key, time)) {
-                return;
-            }
-            if (time >= 0d) {
+            int timed = Timed(key, time);
+            if (timed < 2 && time > 0d) {
                 //TODO add to list of KeepHolding keys (sequential input)
+            }
+            if (Timed(key, time) != 0) {
+                return;
             }
             FakeInputHelper.Overrides[key] = FezButtonState.Pressed;
         }
