@@ -17,6 +17,7 @@ namespace FezGame.Speedrun.BOT {
         public TASComponent TAS;
         
         public bool gomezHouseDoored;
+        
         public double villageTime;
         public int villageLandedTime;
         public bool villageLandedWasGrounded;
@@ -26,18 +27,15 @@ namespace FezGame.Speedrun.BOT {
         public double villageChestCanJumpToDeath;
         public bool villageChestJumpedToDeath;
         
+        public bool parlorCodeInput;
+        
         public BOT(TASComponent tas) {
             TAS = tas;
         }
         
         public void Update(GameTime gameTime) {
-            /*
-            Gomez's house
-            Every house is the same:
-            - go right until door (volume n (2D: 1))
-            - FakeInputHelper.Press up
-            */
-            if (TAS.LevelManager.Name.StartsWith("GOMEZ_HOUSE_")) {
+            //Gomez's house
+            if (TAS.LevelManager.Name.StartsWith("GOMEZ_HOUSE")) {
                 //go right until door
                 if (!gomezHouseDoored) {
                     foreach (Volume vol in TAS.PlayerManager.CurrentVolumes) {
@@ -58,11 +56,7 @@ namespace FezGame.Speedrun.BOT {
                 }
             }
             
-            /*
-            Villageville 2D:
-            - wait until can move
-            - jump up
-            */
+            //Villageville 2D
             else if (TAS.LevelManager.Name == "VILLAGEVILLE_2D") {
                 if (!TAS.PlayerManager.CanControl || TAS.PlayerManager.Action == ActionType.ExitDoor) {
                     //wait until player can control Gomez
@@ -185,6 +179,20 @@ namespace FezGame.Speedrun.BOT {
                 
                 if (!villageChestJumpedToDeath) {
                     return;
+                }
+            }
+            
+            //Monocle room
+            //Currently only to debug sequences
+            if (TAS.LevelManager.Name == "PARLOR") {
+                if (!TAS.PlayerManager.CanControl || TAS.PlayerManager.Action == ActionType.ExitDoor) {
+                    //wait until player can control Gomez
+                    return;
+                }
+                
+                if (!parlorCodeInput) {
+                    FakeInputHelper.Sequences.Add(ControllerCodeHelper.MonoclePainting);
+                    parlorCodeInput = true;
                 }
             }
         }

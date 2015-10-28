@@ -14,7 +14,7 @@ namespace FezGame.Mod {
         public double Duration;
     }
     
-    public struct KeySequence {
+    public class KeySequence {
         public List<List<CodeInput>> Keys;
         public int Current;
         private int frame;
@@ -30,7 +30,8 @@ namespace FezGame.Mod {
         }
         
         public KeySequence AddFrame(CodeInput key) {
-            return Add(key, Keys.Count);
+            Add(key, frame);
+            return AddFrame();
         }
         
         public KeySequence Add(CodeInput key) {
@@ -46,6 +47,7 @@ namespace FezGame.Mod {
         public KeySequence Add(CodeInput key, int frame) {
             FillKeys(frame);
             Keys[frame].Add(key);
+            this.frame = frame;
             return this;
         }
     }
@@ -126,6 +128,7 @@ namespace FezGame.Mod {
                 seq.Current++;
                 if (seq.Keys.Count <= seq.Current) {
                     Sequences.RemoveAt(i);
+                    seq.Current = 0;
                     i--;
                 }
             }
