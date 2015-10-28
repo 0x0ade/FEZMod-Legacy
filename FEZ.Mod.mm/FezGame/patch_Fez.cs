@@ -42,14 +42,14 @@ namespace FezGame {
         }
         
         public void Update(GameTime gameTime) {
-            orig_Update(mul(gameTime, FEZMod.GameSpeed));
+            orig_Update(FEZMod.UpdateGameTime = mul(gameTime, FEZMod.GameSpeed));
         }
         
         public void orig_Draw(GameTime gameTime) {
         }
         
         public void Draw(GameTime gameTime) {
-            orig_Draw(mul(gameTime, FEZMod.GameSpeed));
+            orig_Draw(FEZMod.DrawGameTime = mul(gameTime, FEZMod.GameSpeed));
         }
         
         public static void orig_LoadComponents(Fez game) {

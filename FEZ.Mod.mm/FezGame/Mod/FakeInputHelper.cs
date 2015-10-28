@@ -5,6 +5,7 @@ using FezEngine;
 using FezGame.Components;
 using FezEngine.Structure.Input;
 using System.Collections.Generic;
+using FezEngine.Tools;
 
 namespace FezGame.Mod {
     
@@ -57,7 +58,14 @@ namespace FezGame.Mod {
         
         public static bool Updating;
         
+        private static Dictionary<CodeInput, double> keyTimes = new Dictionary<CodeInput, double>();
+        private static List<CodeInput> keyTimesApplied = new List<CodeInput>();
+        
+        //Hooks
         public static void PreUpdate(GameTime gameTime) {
+            //TODO handle sequential key input (what Gyoo wants)
+            keyTimesApplied.Clear();
+            
             foreach (CodeInput key in ReleasedOverrides) {
                 Overrides.Remove(key);
                 PressedOverrides.Remove(key);
@@ -83,6 +91,79 @@ namespace FezGame.Mod {
             }
             
             Overrides.Clear();
+        }
+        
+        //Input helpers
+        public static bool Timed(this CodeInput key, double max, bool apply = true) {
+            if (max <= 0d) {
+                return true;
+            }
+            
+            double time;
+            apply = apply && !keyTimesApplied.Contains(key);
+            
+            if (!keyTimes.TryGetValue(key, out time)) {
+                if (apply) {
+                    keyTimes[key] = 0d;
+                    keyTimesApplied.Add(key);
+                }
+                return true;
+            }
+            
+            if (apply) {
+                time = keyTimes[key] = time + FEZMod.UpdateGameTime.ElapsedGameTime.TotalSeconds;
+                keyTimesApplied.Add(key);
+            }
+            
+            if (time < max) {
+                return true;
+            } else {
+                if (apply) {
+                    keyTimes.Remove(key);
+                    keyTimesApplied.Add(key);
+                }
+                return false;
+            }
+        }
+        
+        public static void Hold(this CodeInput key, double time = 0d) {
+            if (!Timed(key, time)) {
+                return;
+            }
+            if (time >= 0d) {
+                //TODO add to list of Hold keys (sequential input)
+            }
+            FakeInputHelper.Overrides[key] = FezButtonState.Pressed;
+        }
+        
+        public static void KeepHolding(this CodeInput key, double time = 0d) {
+            if (!FakeInputHelper.PressedOverrides.Contains(key)) {
+                //Only keep holding when already pressed.
+                return;
+            }
+            if (!Timed(key, time)) {
+                return;
+            }
+            if (time >= 0d) {
+                //TODO add to list of KeepHolding keys (sequential input)
+            }
+            FakeInputHelper.Overrides[key] = FezButtonState.Pressed;
+        }
+        
+        public static void Press(this CodeInput key) {
+            if (FakeInputHelper.PressedOverrides.Contains(key)) {
+                //Wait until released
+                //add to    -> IM; rov   -> FIH, accessible  -> FIH + IM        -> FIH, acc.-> FIH + IM
+                //Overrides -> Set Value -> PressedOverrides -> (down not here) -> Released -> RemovedOverrides
+                //Released overrides were in the "Released" state already but need to be removed from Overrides
+                //It's the perfect time to resume pressing, but... what about the "first press" when mashing?
+                return;
+            }
+            FakeInputHelper.Overrides[key] = FezButtonState.Pressed;
+        }
+        
+        public static void Sequential(this List<CodeInput[]> seq) {
+            //TODO implement
         }
         
     }

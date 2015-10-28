@@ -120,6 +120,7 @@
     <Compile Include="FezGame\Speedrun\TAS\RewindInfoHelper.cs" />
     <Compile Include="FezGame\Speedrun\TAS\MovingGroupsRewindInfo.cs" />
     <Compile Include="FezGame\Speedrun\BOT\BOT.cs" />
+    <Compile Include="FezGame\Speedrun\BOT\ControllerCodeHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

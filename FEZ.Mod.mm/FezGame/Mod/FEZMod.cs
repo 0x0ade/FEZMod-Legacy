@@ -59,6 +59,8 @@ namespace FezGame.Mod {
             }
         }
         public static double GameSpeed = 1d;
+        public static GameTime UpdateGameTime;
+        public static GameTime DrawGameTime;
         public static bool OverrideCultureManuallyBecauseMonoIsA_____ = false;
 
         //Other configuration

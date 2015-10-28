@@ -26,29 +26,16 @@ namespace FezGame.Speedrun.BOT {
         public double villageChestCanJumpToDeath;
         public bool villageChestJumpedToDeath;
         
-        private GameTime gameTime;
-        private Dictionary<CodeInput, double> keyTimes = new Dictionary<CodeInput, double>();
-        private List<CodeInput> keyTimesApplied = new List<CodeInput>();
-        
         public BOT(TASComponent tas) {
             TAS = tas;
         }
         
         public void Update(GameTime gameTime) {
-            this.gameTime = gameTime;
-            keyTimesApplied.Clear();
-            /*
-            if (LevelManager.Name.StartsWith("GOMEZ_HOUSE_END_") && (PlayerManager.Action == ActionType.EnterDoorSpin || PlayerManager.Action == ActionType.EnteringDoor)) {
-                clock.Running = false;
-                return "ZE_DOOR_AT_ZE_END";
-            }
-            */
-            
             /*
             Gomez's house
             Every house is the same:
             - go right until door (volume n (2D: 1))
-            - press up
+            - FakeInputHelper.Press up
             */
             if (TAS.LevelManager.Name.StartsWith("GOMEZ_HOUSE_")) {
                 //go right until door
@@ -61,13 +48,13 @@ namespace FezGame.Speedrun.BOT {
                     }
                 }
                 if (!gomezHouseDoored) {
-                    Hold(CodeInput.Right);
+                    FakeInputHelper.Hold(CodeInput.Right);
                     return;
                 }
                 
-                //press up as soon as Gomez is grounded (may be falling from bed)
+                //FakeInputHelper.Press up as soon as Gomez is grounded (may be falling from bed)
                 if (TAS.PlayerManager.Grounded) {
-                    Press(CodeInput.Up);
+                    FakeInputHelper.Press(CodeInput.Up);
                 }
             }
             
@@ -86,12 +73,12 @@ namespace FezGame.Speedrun.BOT {
                 
                 //jump in front of Gomez's door
                 if (villageTime < 0.5d) {
-                    Hold(CodeInput.Jump);
+                    FakeInputHelper.Hold(CodeInput.Jump);
                 }
                 //climb on top of Gomez's house
                 if (villageTime < 0.6d) {
                     //TODO fix CanClimb() for ledges. Currently even untested for ladders and vines.
-                    Press(CodeInput.Up);
+                    FakeInputHelper.Press(CodeInput.Up);
                 }
                 
                 //grounding code
@@ -102,79 +89,79 @@ namespace FezGame.Speedrun.BOT {
                 
                 //Jumping to the house next to the ladder, with the one platform in between
                 if (villageTime > 0.4d && 1 <= villageLandedTime && villageLandedTime <= 2) {
-                    Hold(CodeInput.Right);
+                    FakeInputHelper.Hold(CodeInput.Right);
                     if (TAS.PlayerManager.Grounded) {
-                        Hold(CodeInput.Jump, 0.5d);
+                        FakeInputHelper.Hold(CodeInput.Jump, 0.5d);
                     }
-                    KeepHolding(CodeInput.Jump, 0.5d);
+                    FakeInputHelper.KeepHolding(CodeInput.Jump, 0.5d);
                 }
                 //Climbing the house with the ladder
                 if (villageLandedTime == 2) {
-                    Press(CodeInput.Up);
+                    FakeInputHelper.Press(CodeInput.Up);
                     villageClimbedNextToLadder = villageTime;
                     return;
                 }
                 
                 //the house above the house with the ladder
                 if (3 == villageLandedTime && Delta(villageTime, villageClimbedNextToLadder) < 0.5d) {
-                    Hold(CodeInput.Jump);
-                    Press(CodeInput.Up);
+                    FakeInputHelper.Hold(CodeInput.Jump);
+                    FakeInputHelper.Press(CodeInput.Up);
                 }
                 
                 //going to the vines
                 if (4 == villageLandedTime && Delta(villageTime, villageClimbedNextToLadder) < 1.47d) {
                     //TODO for this, use position instead
-                    Hold(CodeInput.Right);
-                    Hold(CodeInput.Jump);
+                    FakeInputHelper.Hold(CodeInput.Right);
+                    FakeInputHelper.Hold(CodeInput.Jump);
                     return;
                 }
                 //climbing up the vines
                 if (4 == villageLandedTime) {
                     if (TAS.PlayerManager.Action == ActionType.Falling) {
-                        Press(CodeInput.Up);
+                        FakeInputHelper.Press(CodeInput.Up);
                     } else if (TAS.PlayerManager.Action == ActionType.Jumping) {
-                        KeepHolding(CodeInput.Jump);
+                        FakeInputHelper.KeepHolding(CodeInput.Jump);
                         if (!villageClimbWasJumping) {
                             villageClimbJumpedTime++;
                         }
                         villageClimbWasJumping = true;
                     } else {
-                        Press(CodeInput.Jump);
+                        FakeInputHelper.Press(CodeInput.Jump);
                         villageClimbWasJumping = false;
                     }
                     if (villageClimbJumpedTime == 4) {
-                        Hold(CodeInput.Left);
+                        FakeInputHelper.Hold(CodeInput.Left);
                     }
                     return;
                 }
                 
                 //move to the left (ledge to chest)
                 if (5 == villageLandedTime && TAS.PlayerManager.Position.X > 17.5f) {
-                    Hold(CodeInput.Left);
+                    FakeInputHelper.Hold(CodeInput.Left);
                     return;
                 }
                 //climb down
                 if (5 == villageLandedTime && TAS.PlayerManager.Position.X <= 17.5f && Delta(villageTime, villageChestCanJumpToDeath) <= 0d) {
-                    Press(CodeInput.Down);
+                    FakeInputHelper.Press(CodeInput.Down);
                     if (TAS.PlayerManager.Animation.Timing.Ended) {
                         //TODO which animation?
                         villageChestCanJumpToDeath = villageTime;
                     }
-                    Hold(CodeInput.Left);
+                    FakeInputHelper.Hold(CodeInput.Left);
                     return;
                 }
                 //wait until jumping to death (store respawn information)
                 if (5 == villageLandedTime && !villageChestJumpedToDeath && Delta(villageTime, villageChestCanJumpToDeath) >= 0.05d) {
-                    Press(CodeInput.Jump);
-                    Hold(CodeInput.Left);
+                    FakeInputHelper.Press(CodeInput.Jump);
+                    FakeInputHelper.Hold(CodeInput.Left);
                     villageChestJumpedToDeath = true;
                     return;
                 }
-                //hold left and jump frame-perfectly
+                //FakeInputHelper.Hold left and jump frame-perfectly
                 if (villageChestJumpedToDeath && TAS.PlayerManager.LastAction == ActionType.Dying) {
                     //TODO time the jump
-                    Press(CodeInput.Jump);
-                    Hold(CodeInput.Left);
+                    FakeInputHelper.Press(CodeInput.Jump);
+                    FakeInputHelper.Hold(CodeInput.Left);
                     return;
                 }
                 if (!villageChestJumpedToDeath) {
@@ -183,76 +170,10 @@ namespace FezGame.Speedrun.BOT {
             }
         }
         
-        //FakeInputHelper helpers
-        //TODO maybe move some of them to FakeInputHepler?
-        
         public double Delta(double oldt, double newt) {
             double d = oldt - newt;
             return d == oldt ? 0d : Math.Max(0d, d);
         }
-        
-        public bool Timed(CodeInput key, double max, bool apply = true) {
-            if (max <= 0d) {
-                return true;
-            }
-            
-            double time;
-            apply = apply && !keyTimesApplied.Contains(key);
-            
-            if (!keyTimes.TryGetValue(key, out time)) {
-                if (apply) {
-                    keyTimes[key] = 0d;
-                    keyTimesApplied.Add(key);
-                }
-                return true;
-            }
-            
-            if (apply) {
-                time = keyTimes[key] = time + gameTime.ElapsedGameTime.TotalSeconds;
-                keyTimesApplied.Add(key);
-            }
-            
-            if (time < max) {
-                return true;
-            } else {
-                if (apply) {
-                    keyTimes.Remove(key);
-                    keyTimesApplied.Add(key);
-                }
-                return false;
-            }
-        }
-        
-        public void Hold(CodeInput key, double time = 0d) {
-            if (!Timed(key, time)) {
-                return;
-            }
-            FakeInputHelper.Overrides[key] = FezButtonState.Pressed;
-        }
-        
-        public void KeepHolding(CodeInput key, double time = 0d) {
-            if (!FakeInputHelper.PressedOverrides.Contains(key)) {
-                //Only keep holding when already pressed.
-                return;
-            }
-            if (!Timed(key, time)) {
-                return;
-            }
-            FakeInputHelper.Overrides[key] = FezButtonState.Pressed;
-        }
-        
-        public void Press(CodeInput key) {
-            if (FakeInputHelper.PressedOverrides.Contains(key)) {
-                //Wait until released
-                //add to    -> IM; rov   -> FIH, accessible  -> FIH + IM        -> FIH, acc.-> FIH + IM
-                //Overrides -> Set Value -> PressedOverrides -> (down not here) -> Released -> RemovedOverrides
-                //Released overrides were in the "Released" state already but need to be removed from Overrides
-                //It's the perfect time to resume pressing, but... what about the "first press" when mashing?
-                return;
-            }
-            FakeInputHelper.Overrides[key] = FezButtonState.Pressed;
-        }
-        
         
         //Logic helpers
         

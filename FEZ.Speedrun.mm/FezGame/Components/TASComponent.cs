@@ -95,7 +95,9 @@ namespace FezGame.Components {
             };
             FakeInputHelper.set_FreeLook = delegate(Vector2 value) {
                 //Set game speed
-                FEZMod.GameSpeed = 1d + 0.5d * ((double) value.X) + 0.5d * ((double) value.Y);
+                if (FakeInputHelper.Updating) {
+                    FEZMod.GameSpeed = 1d + 0.5d * ((double) value.X) + 0.5d * ((double) value.Y);
+                }
                 tmpFreeLook = value;
             };
             
