@@ -14,6 +14,42 @@ namespace FezGame.Mod {
         public double Duration;
     }
     
+    public struct KeySequence {
+        public List<List<CodeInput>> Keys;
+        public int Current;
+        private int frame;
+        
+        public KeySequence FillKeys(int frames) {
+            if (Keys == null) {
+                Keys = new List<List<CodeInput>>(Math.Max(16, frames));
+            }
+            while ((Keys.Count - 1) < frames) {
+                Keys.Add(new List<CodeInput>(4));
+            }
+            return this;
+        }
+        
+        public KeySequence AddFrame(CodeInput key) {
+            return Add(key, Keys.Count);
+        }
+        
+        public KeySequence Add(CodeInput key) {
+            return Add(key, frame);
+        }
+        
+        public KeySequence AddFrame() {
+            frame++;
+            FillKeys(frame);
+            return this;
+        }
+        
+        public KeySequence Add(CodeInput key, int frame) {
+            FillKeys(frame);
+            Keys[frame].Add(key);
+            return this;
+        }
+    }
+    
     public static class FakeInputHelper {
         
         //key hooks
@@ -66,18 +102,33 @@ namespace FezGame.Mod {
         //other fields / properties
         public static bool Updating;
         
-        //fake input timing helper
+        //fake input timing helpers
         private static Dictionary<CodeInput, double> keyTimes = new Dictionary<CodeInput, double>();
         private static List<CodeInput> keyTimesApplied = new List<CodeInput>();
         
-        //fake input sequential helper
+        //fake input sequential helpers
         private static List<Sequential_Key_Duration> keysHold = new List<Sequential_Key_Duration>();
         private static List<Sequential_Key_Duration> tmpKeysHold = new List<Sequential_Key_Duration>();
         private static Sequential_Key_Duration tmpKeyHold = new Sequential_Key_Duration();
         
+        public static List<KeySequence> Sequences = new List<KeySequence>();
+        
         //hooks
         public static void PreUpdate(GameTime gameTime) {
-            //TODO handle sequential key input (what Gyoo wants)
+            for (int i = 0; i < Sequences.Count; i++) {
+                KeySequence seq = Sequences[i];
+                List<CodeInput> current = seq.Keys[seq.Current];
+                
+                for (int ki = 0; ki < current.Count; ki++) {
+                    current[ki].Hold(-1d);
+                }
+                
+                seq.Current++;
+                if (seq.Keys.Count <= seq.Current) {
+                    Sequences.RemoveAt(i);
+                    i--;
+                }
+            }
             
             tmpKeysHold.Clear();
             tmpKeysHold.AddRange(keysHold);
@@ -192,10 +243,6 @@ namespace FezGame.Mod {
                 return;
             }
             FakeInputHelper.Overrides[key] = FezButtonState.Pressed;
-        }
-        
-        public static void Sequential(this List<CodeInput[]> seq) {
-            //TODO implement
         }
         
     }
