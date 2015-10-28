@@ -88,6 +88,17 @@ namespace FezGame.Components {
             KeyboardState.RegisterKey(Keys.F6); //Quicksave
             KeyboardState.RegisterKey(Keys.F9); //Quickload
             
+            //Register special key hooks
+            Vector2 tmpFreeLook = new Vector2(0f, 0f);
+            FakeInputHelper.get_FreeLook = delegate() {
+                return FakeInputHelper.Updating ? tmpFreeLook : new Vector2(0f, 0f);
+            };
+            FakeInputHelper.set_FreeLook = delegate(Vector2 value) {
+                //Set game speed
+                FEZMod.GameSpeed = 1d + 0.5d * ((double) value.X) + 0.5d * ((double) value.Y);
+                tmpFreeLook = value;
+            };
+            
             //Initialize BOT if needed
             if (FezSpeedrun.BOTEnabled) {
                 BOT = new BOT(this);
@@ -99,10 +110,13 @@ namespace FezGame.Components {
             Widgets.Add(BottomBarWidget = new BottomBarWidget(Game));
 
             //Quicksaves
-            Widgets.Add(QuickSavesWidget = new ContainerWidget(Game) {
+            QuickSavesWidget = new ContainerWidget(Game) {
                 Size = new Vector2(256f, 300f),
                 UpdateBounds = true
-            });
+            };
+            if (!FezSpeedrun.BOTEnabled) {
+                Widgets.Add(QuickSavesWidget);
+            }
 
             /*
             RewindListening.Add(new RewindInfo(typeof(IDefaultCameraManager).GetFieldOrProperty("Viewpoint")) {

@@ -58,7 +58,8 @@ namespace FezGame.Mod {
                 loadingLevel = value;
             }
         }
-        public static bool OverrideCulturueManualyBecauseMonoIsA_____ = false;
+        public static double GameSpeed = 1d;
+        public static bool OverrideCultureManuallyBecauseMonoIsA_____ = false;
 
         //Other configuration
         public static bool LoadedEssentials { get; private set; }
@@ -146,7 +147,7 @@ namespace FezGame.Mod {
                     ModLogger.Log("FEZMod", "This message will always appear to remind the authors of FEZMod to find another workaround.");
                     ModLogger.Log("FEZMod", "Also, Mono sucks at .NET accuracy.");
 
-                    OverrideCulturueManualyBecauseMonoIsA_____ = true;
+                    OverrideCultureManuallyBecauseMonoIsA_____ = true;
                     Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
                 }
             }

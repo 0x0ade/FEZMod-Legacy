@@ -158,7 +158,6 @@ namespace FezGame.Speedrun.BOT {
                     Press(CodeInput.Down);
                     if (TAS.PlayerManager.Animation.Timing.Ended) {
                         //TODO which animation?
-                        //if it would set it if it ended, it would never leave this branch
                         villageChestCanJumpToDeath = villageTime;
                     }
                     Hold(CodeInput.Left);
@@ -172,8 +171,7 @@ namespace FezGame.Speedrun.BOT {
                     return;
                 }
                 //hold left and jump frame-perfectly
-                //TODO doesn't do the first jump on its own; works after doing the first jump
-                if (villageChestJumpedToDeath) {
+                if (villageChestJumpedToDeath && TAS.PlayerManager.LastAction == ActionType.Dying) {
                     //TODO time the jump
                     Press(CodeInput.Jump);
                     Hold(CodeInput.Left);

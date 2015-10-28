@@ -70,7 +70,7 @@ namespace FezGame.Mod {
         private static CacheKey_Type_NodeName deserialize_key;
         private static CacheKey_NodeName_AttribName deserialize_key_attrib;
         public static object Deserialize(this XmlNode node, Type parent = null, ContentManager cm = null, bool descend = true) {
-            if (FEZMod.OverrideCulturueManualyBecauseMonoIsA_____) {
+            if (FEZMod.OverrideCultureManuallyBecauseMonoIsA_____) {
                 Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             }
 
@@ -416,7 +416,7 @@ namespace FezGame.Mod {
         }
 
         public static void HandleSpecialDataDeserialize(this object obj, XmlElement elem, ContentManager cm) {
-            if (FEZMod.OverrideCulturueManualyBecauseMonoIsA_____) {
+            if (FEZMod.OverrideCultureManuallyBecauseMonoIsA_____) {
                 Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             }
 
@@ -650,7 +650,7 @@ namespace FezGame.Mod {
 
         private static CacheKey_Type_NodeName new_key;
         public static object New(this Type type, XmlElement elem = null) {
-            if (FEZMod.OverrideCulturueManualyBecauseMonoIsA_____) {
+            if (FEZMod.OverrideCultureManuallyBecauseMonoIsA_____) {
                 Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             }
 
@@ -789,7 +789,7 @@ namespace FezGame.Mod {
         }
 
         public static object Parse(this Type type, string str) {
-            if (FEZMod.OverrideCulturueManualyBecauseMonoIsA_____) {
+            if (FEZMod.OverrideCultureManuallyBecauseMonoIsA_____) {
                 Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             }
 
@@ -826,7 +826,7 @@ namespace FezGame.Mod {
         }
 
         public static XmlNode Serialize(this object obj, XmlDocument document, string name = null) {
-            if (FEZMod.OverrideCulturueManualyBecauseMonoIsA_____) {
+            if (FEZMod.OverrideCultureManuallyBecauseMonoIsA_____) {
                 Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             }
 
@@ -1026,7 +1026,7 @@ namespace FezGame.Mod {
         }
 
         public static XmlElement HandleSpecialDataPreSerialize(this XmlElement elem, object obj) {
-            if (FEZMod.OverrideCulturueManualyBecauseMonoIsA_____) {
+            if (FEZMod.OverrideCultureManuallyBecauseMonoIsA_____) {
                 Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             }
 
@@ -1042,7 +1042,7 @@ namespace FezGame.Mod {
         }
 
         public static XmlElement HandleSpecialDataPostSerialize(this XmlElement elem, object obj) {
-            if (FEZMod.OverrideCulturueManualyBecauseMonoIsA_____) {
+            if (FEZMod.OverrideCultureManuallyBecauseMonoIsA_____) {
                 Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             }
 
