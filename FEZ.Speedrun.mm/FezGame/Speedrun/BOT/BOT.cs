@@ -85,7 +85,7 @@ namespace FezGame.Speedrun.BOT {
                 if (villageTime > 0.4d && 1 <= villageLandedTime && villageLandedTime <= 2) {
                     CodeInput.Right.Hold();
                     if (TAS.PlayerManager.Grounded) {
-                        CodeInput.Jump.Hold(0.5d);
+                        CodeInput.Jump.Press();
                     }
                     CodeInput.Jump.KeepHolding(0.5d);
                 }
@@ -97,13 +97,13 @@ namespace FezGame.Speedrun.BOT {
                 }
                 
                 //the house above the house with the ladder
-                if (3 == villageLandedTime && Delta(villageTime, villageClimbedNextToLadder) < 0.5d) {
+                if (villageLandedTime == 3 && Delta(villageTime, villageClimbedNextToLadder) < 0.5d) {
                     CodeInput.Jump.Hold();
                     CodeInput.Up.Press();
                 }
                 
                 //going to the vines
-                if (4 == villageLandedTime) {
+                if (villageLandedTime == 4) {
                     if (Delta(villageTime, villageClimbedNextToLadder) < 1.47d) {
                         //TODO for this, use position instead
                         CodeInput.Right.Hold();
@@ -129,18 +129,18 @@ namespace FezGame.Speedrun.BOT {
                 }
                 
 				//move to the left (ledge to chest). Grab the corner to start longjump sequence with a jump to avoid grabbing cutscene
-                if (5 == villageLandedTime) {
-                    if (TAS.PlayerManager.Position.X > 20f) {
+                if (villageLandedTime == 5) {
+                    if (20f < TAS.PlayerManager.Position.X) {
                         CodeInput.Left.Hold();
                         return;
                     }
-                    if (20f >= TAS.PlayerManager.Position.X && TAS.PlayerManager.Position.X > 18.2f) {
-                        if (TAS.PlayerManager.AirTime.TotalSeconds == 0.0)
+                    if (18.2f < TAS.PlayerManager.Position.X && TAS.PlayerManager.Position.X <= 20f) {
+                        if (TAS.PlayerManager.AirTime.TotalSeconds <= 0d)
                             CodeInput.Jump.Press();
                         CodeInput.Left.Hold();
                         return;
                     }
-                    if (18.2f >= TAS.PlayerManager.Position.X && TAS.PlayerManager.Position.X > 16.5f) {
+                    if (16.5f < TAS.PlayerManager.Position.X && TAS.PlayerManager.Position.X <= 18.2f) {
                         CodeInput.Right.Hold();
                         return;
                     }
@@ -152,7 +152,7 @@ namespace FezGame.Speedrun.BOT {
                 }
                 
                 // Longjump sequence after the ledge is grabbed
-                if (6 == villageLandedTime) {
+                if (villageLandedTime == 6) {
                     if (TAS.PlayerManager.Position.X <= 17.2f && Delta(villageTime, villageChestCanJumpToDeath) <= 0d) {
                         if (TAS.PlayerManager.Animation.Timing.Ended) {
                             //TODO which animation?

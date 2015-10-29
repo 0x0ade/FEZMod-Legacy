@@ -30,8 +30,7 @@ namespace FezGame.Mod {
         }
         
         public KeySequence AddFrame(CodeInput key) {
-            Add(key, frame);
-            return AddFrame();
+            return AddFrame().Add(key, frame);
         }
         
         public KeySequence Add(CodeInput key) {
@@ -40,8 +39,7 @@ namespace FezGame.Mod {
         
         public KeySequence AddFrame() {
             frame++;
-            FillKeys(frame);
-            return this;
+            return FillKeys(frame);
         }
         
         public KeySequence Add(CodeInput key, int frame) {
@@ -117,6 +115,7 @@ namespace FezGame.Mod {
         
         //hooks
         public static void PreUpdate(GameTime gameTime) {
+            //sequential input
             for (int i = 0; i < Sequences.Count; i++) {
                 KeySequence seq = Sequences[i];
                 List<CodeInput> current = seq.Keys[seq.Current];
@@ -133,6 +132,7 @@ namespace FezGame.Mod {
                 }
             }
             
+            //extended hold
             tmpKeysHold.Clear();
             tmpKeysHold.AddRange(keysHold);
             keysHold.Clear();
@@ -142,12 +142,6 @@ namespace FezGame.Mod {
             }
             
             keyTimesApplied.Clear();
-            
-            foreach (CodeInput key in ReleasedOverrides) {
-                Overrides.Remove(key);
-                PressedOverrides.Remove(key);
-            }
-            ReleasedOverrides.Clear();
             
             foreach (CodeInput key in PressedOverrides) {
                 FezButtonState value;
@@ -161,6 +155,12 @@ namespace FezGame.Mod {
         }
         
         public static void PostUpdate(GameTime gameTime) {
+            foreach (CodeInput key in ReleasedOverrides) {
+                PressedOverrides.Remove(key);
+            }
+            ReleasedOverrides.Clear();
+
+            
             foreach (KeyValuePair<CodeInput, FezButtonState> pair in Overrides) {
                 if (pair.Value == FezButtonState.Pressed && !PressedOverrides.Contains(pair.Key)) {
                     PressedOverrides.Add(pair.Key);
@@ -228,7 +228,7 @@ namespace FezGame.Mod {
             }
             int timed = Timed(key, time);
             if (timed < 2 && time > 0d) {
-                //TODO add to list of KeepHolding keys (sequential input)
+                //TODO decide whether to add to a list of KeepHolding keys (sequential input) or not
             }
             if (Timed(key, time) != 0) {
                 return;

@@ -14,18 +14,14 @@ namespace FezGame.Speedrun.BOT {
     public static class ControllerCodeHelper {
         
         public static KeySequence MonoclePainting = new KeySequence()
-            .AddFrame(CodeInput.SpinRight)
-            .AddFrame()
-            .AddFrame()
-            .AddFrame(CodeInput.SpinRight)
-            .AddFrame(CodeInput.SpinLeft)
+            .Add(CodeInput.SpinRight)
             .AddFrame()
             .AddFrame(CodeInput.SpinRight)
             .AddFrame(CodeInput.SpinLeft)
-            .AddFrame()
-            .AddFrame()
+            .AddFrame(CodeInput.SpinRight)
             .AddFrame(CodeInput.SpinLeft)
             .AddFrame()
+            .AddFrame(CodeInput.SpinLeft)
             .AddFrame()
             .AddFrame(CodeInput.SpinLeft)
             .AddFrame(CodeInput.SpinRight);
