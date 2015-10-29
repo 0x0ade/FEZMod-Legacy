@@ -130,49 +130,47 @@ namespace FezGame.Speedrun.BOT {
                 
 				//move to the left (ledge to chest). Grab the corner to start longjump sequence with a jump to avoid grabbing cutscene
                 if (villageLandedTime == 5) {
-                    if (20f < TAS.PlayerManager.Position.X) {
-                        CodeInput.Left.Hold();
-                        return;
-                    }
-                    if (18.2f < TAS.PlayerManager.Position.X && TAS.PlayerManager.Position.X <= 20f) {
-                        if (TAS.PlayerManager.AirTime.TotalSeconds <= 0d)
-                            CodeInput.Jump.Press();
-                        CodeInput.Left.Hold();
-                        return;
-                    }
-                    if (16.5f < TAS.PlayerManager.Position.X && TAS.PlayerManager.Position.X <= 18.2f) {
-                        CodeInput.Right.Hold();
-                        return;
-                    }
                     if (TAS.PlayerManager.Action.IsOnLedge()) {
-                        // TODO Does not work
                         villageLandedTime++;
-                        return;
+                        //don't return to instantly go to the villageLandedTime == 6 branch
+                    } else {
+                        //instead else so the other branches don't run
+                        if (20f < TAS.PlayerManager.Position.X) {
+                            CodeInput.Left.Hold();
+                            return;
+                        }
+                        if (18.2f < TAS.PlayerManager.Position.X && TAS.PlayerManager.Position.X <= 20f) {
+                            if (TAS.PlayerManager.Grounded)
+                                CodeInput.Jump.Press();
+                            CodeInput.Left.Hold();
+                            return;
+                        }
+                        if (16.5f < TAS.PlayerManager.Position.X && TAS.PlayerManager.Position.X <= 18.2f) {
+                            CodeInput.Right.Hold();
+                            return;
+                        }
                     }
                 }
                 
                 // Longjump sequence after the ledge is grabbed
                 if (villageLandedTime == 6) {
+                    CodeInput.Left.Hold();
                     if (TAS.PlayerManager.Position.X <= 17.2f && Delta(villageTime, villageChestCanJumpToDeath) <= 0d) {
                         if (TAS.PlayerManager.Animation.Timing.Ended) {
                             //TODO which animation?
                             villageChestCanJumpToDeath = villageTime;
                         }
-                        CodeInput.Left.Hold();
                         return;
                     }
                     //wait until jumping to death (store respawn information)
                     if (!villageChestJumpedToDeath && Delta(villageTime, villageChestCanJumpToDeath) >= 0.05d) {
                         CodeInput.Jump.Press();
-                        CodeInput.Left.Hold();
                         villageChestJumpedToDeath = true;
                         return;
                     }
                     //FakeInputHelper.Hold left and jump frame-perfectly
-                    if (villageChestJumpedToDeath && TAS.PlayerManager.LastAction == ActionType.Dying) {
-                        //TODO time the jump
+                    if (villageChestJumpedToDeath && TAS.PlayerManager.LastAction == ActionType.FreeFalling) {
                         CodeInput.Jump.Press();
-                        CodeInput.Left.Hold();
                         return;
                     }
                 }
