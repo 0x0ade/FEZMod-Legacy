@@ -156,10 +156,10 @@ namespace FezGame.Speedrun.BOT {
                 if (villageLandedTime == 6) {
                     CodeInputAll.Left.Hold();
                     if (TAS.PlayerManager.Position.X <= 17.2f && Delta(villageTime, villageChestCanJumpToDeath) <= 0d) {
-                        if (TAS.PlayerManager.Animation.Timing.Ended) {
-                            //TODO which animation?
+//                        if (TAS.PlayerManager.Animation.Timing.Ended) {
+//                            //TODO which animation?
                             villageChestCanJumpToDeath = villageTime;
-                        }
+//                        }
                         return;
                     }
                     //wait until jumping to death (store respawn information)
@@ -170,10 +170,18 @@ namespace FezGame.Speedrun.BOT {
                     }
                     //FakeInputHelper.Hold left and jump frame-perfectly
                     if (villageChestJumpedToDeath && TAS.PlayerManager.LastAction == ActionType.FreeFalling) {
-                        CodeInputAll.Jump.Press();
-                        return;
+                        CodeInputAll.Jump.Hold(0.14d);
+						return;
                     }
+					if (villageChestJumpedToDeath && TAS.PlayerManager.Grounded)
+						villageLandedTime++;
+
                 }
+
+				// Open chest and leave the platform
+				if (villageLandedTime == 7) {
+					CodeInputAll.GrabThrow.Press ();
+				}
                 
                 if (!villageChestJumpedToDeath) {
                     return;
