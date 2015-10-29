@@ -170,10 +170,18 @@ namespace FezGame.Speedrun.BOT {
                     }
                     //FakeInputHelper.Hold left and jump frame-perfectly
                     if (villageChestJumpedToDeath && TAS.PlayerManager.LastAction == ActionType.FreeFalling) {
-                        CodeInput.Jump.Hold(0.14d);
+                        CodeInputAll.Jump.Hold(0.14d);
 						return;
                     }
+					if (villageChestJumpedToDeath && TAS.PlayerManager.Grounded)
+						villageLandedTime++;
+
                 }
+
+				// Open chest and leave the platform
+				if (villageLandedTime == 7) {
+					CodeInputAll.GrabThrow.Press ();
+				}
                 
                 if (!villageChestJumpedToDeath) {
                     return;
