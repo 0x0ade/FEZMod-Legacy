@@ -10,30 +10,30 @@ using FezEngine.Tools;
 namespace FezGame.Mod {
     
     public struct Sequential_Key_Duration {
-        public CodeInput Key;
+        public CodeInputAll Key;
         public double Duration;
     }
     
     public class KeySequence {
-        public List<List<CodeInput>> Keys;
+        public List<List<CodeInputAll>> Keys;
         public int Current;
         private int frame;
         
         public KeySequence FillKeys(int frames) {
             if (Keys == null) {
-                Keys = new List<List<CodeInput>>(Math.Max(16, frames));
+                Keys = new List<List<CodeInputAll>>(Math.Max(16, frames));
             }
             while ((Keys.Count - 1) < frames) {
-                Keys.Add(new List<CodeInput>(4));
+                Keys.Add(new List<CodeInputAll>(4));
             }
             return this;
         }
         
-        public KeySequence AddFrame(CodeInput key) {
+        public KeySequence AddFrame(CodeInputAll key) {
             return AddFrame().Add(key, frame);
         }
         
-        public KeySequence Add(CodeInput key) {
+        public KeySequence Add(CodeInputAll key) {
             return Add(key, frame);
         }
         
@@ -42,7 +42,7 @@ namespace FezGame.Mod {
             return FillKeys(frame);
         }
         
-        public KeySequence Add(CodeInput key, int frame) {
+        public KeySequence Add(CodeInputAll key, int frame) {
             FillKeys(frame);
             Keys[frame].Add(key);
             this.frame = frame;
@@ -95,16 +95,16 @@ namespace FezGame.Mod {
         public static Action<FezButtonState> set_MapZoomOut;
         
         //fake input overrides
-        public readonly static List<CodeInput> PressedOverrides = new List<CodeInput>();
-        public readonly static List<CodeInput> ReleasedOverrides = new List<CodeInput>();
-        public readonly static Dictionary<CodeInput, FezButtonState> Overrides = new Dictionary<CodeInput, FezButtonState>();
+        public readonly static List<CodeInputAll> PressedOverrides = new List<CodeInputAll>();
+        public readonly static List<CodeInputAll> ReleasedOverrides = new List<CodeInputAll>();
+        public readonly static Dictionary<CodeInputAll, FezButtonState> Overrides = new Dictionary<CodeInputAll, FezButtonState>();
         
         //other fields / properties
         public static bool Updating;
         
         //fake input timing helpers
-        private static Dictionary<CodeInput, double> keyTimes = new Dictionary<CodeInput, double>();
-        private static List<CodeInput> keyTimesApplied = new List<CodeInput>();
+        private static Dictionary<CodeInputAll, double> keyTimes = new Dictionary<CodeInputAll, double>();
+        private static List<CodeInputAll> keyTimesApplied = new List<CodeInputAll>();
         
         //fake input sequential helpers
         private static List<Sequential_Key_Duration> keysHold = new List<Sequential_Key_Duration>();
@@ -118,7 +118,7 @@ namespace FezGame.Mod {
             //sequential input
             for (int i = 0; i < Sequences.Count; i++) {
                 KeySequence seq = Sequences[i];
-                List<CodeInput> current = seq.Keys[seq.Current];
+                List<CodeInputAll> current = seq.Keys[seq.Current];
                 
                 for (int ki = 0; ki < current.Count; ki++) {
                     current[ki].Hold(-1d);
@@ -143,7 +143,7 @@ namespace FezGame.Mod {
             
             keyTimesApplied.Clear();
             
-            foreach (CodeInput key in PressedOverrides) {
+            foreach (CodeInputAll key in PressedOverrides) {
                 FezButtonState value;
                 if (!Overrides.TryGetValue(key, out value) || value == FezButtonState.Released) {
                     Overrides[key] = FezButtonState.Released;
@@ -155,13 +155,13 @@ namespace FezGame.Mod {
         }
         
         public static void PostUpdate(GameTime gameTime) {
-            foreach (CodeInput key in ReleasedOverrides) {
+            foreach (CodeInputAll key in ReleasedOverrides) {
                 PressedOverrides.Remove(key);
             }
             ReleasedOverrides.Clear();
 
             
-            foreach (KeyValuePair<CodeInput, FezButtonState> pair in Overrides) {
+            foreach (KeyValuePair<CodeInputAll, FezButtonState> pair in Overrides) {
                 if (pair.Value == FezButtonState.Pressed && !PressedOverrides.Contains(pair.Key)) {
                     PressedOverrides.Add(pair.Key);
                 }
@@ -171,7 +171,7 @@ namespace FezGame.Mod {
         }
         
         //fake input helpers
-        public static int Timed(this CodeInput key, double max, bool apply = true) {
+        public static int Timed(this CodeInputAll key, double max, bool apply = true) {
             if (max <= 0d) {
                 return 0;
             }
@@ -203,7 +203,7 @@ namespace FezGame.Mod {
             }
         }
         
-        public static void Hold(this CodeInput key, double time = 0d) {
+        public static void Hold(this CodeInputAll key, double time = 0d) {
             int timed = Timed(key, time);
             if (timed < 2 && time > 0d) {
                 tmpKeyHold.Key = key;
@@ -221,7 +221,7 @@ namespace FezGame.Mod {
             FakeInputHelper.Overrides[key] = FezButtonState.Pressed;
         }
         
-        public static void KeepHolding(this CodeInput key, double time = 0d) {
+        public static void KeepHolding(this CodeInputAll key, double time = 0d) {
             if (!FakeInputHelper.PressedOverrides.Contains(key)) {
                 //Only keep holding when already pressed.
                 return;
@@ -236,7 +236,7 @@ namespace FezGame.Mod {
             FakeInputHelper.Overrides[key] = FezButtonState.Pressed;
         }
         
-        public static void Press(this CodeInput key) {
+        public static void Press(this CodeInputAll key) {
             if (FakeInputHelper.PressedOverrides.Contains(key)) {
                 //Wait until released
                 //add to    -> IM; rov   -> FIH, accessible  -> FIH + IM        -> FIH, acc.-> FIH + IM
