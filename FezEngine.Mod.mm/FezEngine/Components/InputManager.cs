@@ -360,36 +360,67 @@ namespace FezEngine.Components {
             
             FakeInputHelper.PreUpdate(gameTime);
             
-            foreach (KeyValuePair<CodeInput, FezButtonState> pair in FakeInputHelper.Overrides) {
+            foreach (KeyValuePair<CodeInputAll, FezButtonState> pair in FakeInputHelper.Overrides) {
                 switch (pair.Key) {
-                    case CodeInput.None:
-                        throw new InvalidOperationException("Can't set button state of no button!");
-                        //TODO make "none" refer to something like grabthrow or canceltalk
+                    case CodeInputAll.Back:
+                        Back = pair.Value;
                         break;
-                    case CodeInput.Up:
-                        ExactUp = Up = pair.Value;
-                        Movement = new Vector2(Movement.X, 1f);
+                    case CodeInputAll.Start:
+                        Start = pair.Value;
                         break;
-                    case CodeInput.Down:
+                    case CodeInputAll.Jump:
+                        Jump = pair.Value;
+                        break;
+                    case CodeInputAll.GrabThrow:
+                        GrabThrow = pair.Value;
+                        break;
+                    case CodeInputAll.CancelTalk:
+                        CancelTalk = pair.Value;
+                        break;
+                    case CodeInputAll.Down:
                         Down = pair.Value;
-                        Movement = new Vector2(Movement.X, -1f);
+                        if (pair.Value.IsDown()) {
+                            Movement = new Vector2(Movement.X, -1f);
+                        }
                         break;
-                    case CodeInput.Left:
+                    case CodeInputAll.Up:
+                        ExactUp = Up = pair.Value;
+                        if (pair.Value.IsDown()) {
+                            Movement = new Vector2(Movement.X, 1f);
+                        }
+                        break;
+                    case CodeInputAll.Left:
                         Left = pair.Value;
-                        Movement = new Vector2(-1f, Movement.Y);
+                        if (pair.Value.IsDown()) {
+                            Movement = new Vector2(-1f, Movement.Y);
+                        }
                         break;
-                    case CodeInput.Right:
+                    case CodeInputAll.Right:
                         Right = pair.Value;
-                        Movement = new Vector2(1f, Movement.Y);
+                        if (pair.Value.IsDown()) {
+                            Movement = new Vector2(1f, Movement.Y);
+                        }
                         break;
-                    case CodeInput.SpinLeft:
+                    case CodeInputAll.OpenInventory:
+                        OpenInventory = pair.Value;
+                        break;
+                    case CodeInputAll.RotateLeft:
                         RotateLeft = pair.Value;
                         break;
-                    case CodeInput.SpinRight:
+                    case CodeInputAll.RotateRight:
                         RotateRight = pair.Value;
                         break;
-                    case CodeInput.Jump:
-                        Jump = pair.Value;
+                    case CodeInputAll.MapZoomIn:
+                        MapZoomIn = pair.Value;
+                        break;
+                    case CodeInputAll.MapZoomOut:
+                        MapZoomOut = pair.Value;
+                        break;
+                    case CodeInputAll.FpsToggle:
+                        FpsToggle = pair.Value;
+                        break;
+                    case CodeInputAll.ClampLook:
+                        ClampLook = pair.Value;
                         break;
                     default:
                         //TODO get int value and do something special
