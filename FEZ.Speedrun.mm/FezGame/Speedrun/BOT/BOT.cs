@@ -17,6 +17,7 @@ namespace FezGame.Speedrun.BOT {
         public TASComponent TAS;
         
         public bool gomezHouseDoored;
+        
         public double villageTime;
         public int villageLandedTime;
         public bool villageLandedWasGrounded;
@@ -26,18 +27,15 @@ namespace FezGame.Speedrun.BOT {
         public double villageChestCanJumpToDeath;
         public bool villageChestJumpedToDeath;
         
+        public bool parlorCodeInput;
+        
         public BOT(TASComponent tas) {
             TAS = tas;
         }
         
         public void Update(GameTime gameTime) {
-            /*
-            Gomez's house
-            Every house is the same:
-            - go right until door (volume n (2D: 1))
-            - FakeInputHelper.Press up
-            */
-            if (TAS.LevelManager.Name.StartsWith("GOMEZ_HOUSE_")) {
+            //Gomez's house
+            if (TAS.LevelManager.Name.StartsWith("GOMEZ_HOUSE")) {
                 //go right until door
                 if (!gomezHouseDoored) {
                     foreach (Volume vol in TAS.PlayerManager.CurrentVolumes) {
@@ -58,11 +56,7 @@ namespace FezGame.Speedrun.BOT {
                 }
             }
             
-            /*
-            Villageville 2D:
-            - wait until can move
-            - jump up
-            */
+            //Villageville 2D
             else if (TAS.LevelManager.Name == "VILLAGEVILLE_2D") {
                 if (!TAS.PlayerManager.CanControl || TAS.PlayerManager.Action == ActionType.ExitDoor) {
                     //wait until player can control Gomez
@@ -91,7 +85,7 @@ namespace FezGame.Speedrun.BOT {
                 if (villageTime > 0.4d && 1 <= villageLandedTime && villageLandedTime <= 2) {
                     CodeInput.Right.Hold();
                     if (TAS.PlayerManager.Grounded) {
-                        CodeInput.Jump.Hold(0.5d);
+                        CodeInput.Jump.Press();
                     }
                     CodeInput.Jump.KeepHolding(0.5d);
                 }
@@ -103,19 +97,19 @@ namespace FezGame.Speedrun.BOT {
                 }
                 
                 //the house above the house with the ladder
-                if (3 == villageLandedTime && Delta(villageTime, villageClimbedNextToLadder) < 0.5d) {
+                if (villageLandedTime == 3 && Delta(villageTime, villageClimbedNextToLadder) < 0.5d) {
                     CodeInput.Jump.Hold();
                     CodeInput.Up.Press();
                 }
                 
                 //going to the vines
-                if (4 == villageLandedTime) {
-					if (Delta (villageTime, villageClimbedNextToLadder) < 1.47d) {
-						//TODO for this, use position instead
-						CodeInput.Right.Hold ();
-						CodeInput.Jump.Hold ();
-						return;
-					}
+                if (villageLandedTime == 4) {
+                    if (Delta(villageTime, villageClimbedNextToLadder) < 1.47d) {
+                        //TODO for this, use position instead
+                        CodeInput.Right.Hold();
+                        CodeInput.Jump.Hold();
+                        return;
+                    }
                     if (TAS.PlayerManager.Action == ActionType.Falling) {
                         CodeInput.Up.Press();
                     } else if (TAS.PlayerManager.Action == ActionType.Jumping) {
@@ -135,55 +129,71 @@ namespace FezGame.Speedrun.BOT {
                 }
                 
 				//move to the left (ledge to chest). Grab the corner to start longjump sequence with a jump to avoid grabbing cutscene
-				if (5 == villageLandedTime) {
-					if (TAS.PlayerManager.Position.X > 20f) {
-						CodeInput.Left.Hold ();
-						return;
-					}
-					if (20f >= TAS.PlayerManager.Position.X && TAS.PlayerManager.Position.X > 18.2f) {
-						if (TAS.PlayerManager.AirTime.TotalSeconds == 0.0)
-							CodeInput.Jump.Press ();
-						CodeInput.Left.Hold ();
-						return;
-					}
-					if (18.2f >= TAS.PlayerManager.Position.X && TAS.PlayerManager.Position.X > 16.5f) {
-						CodeInput.Right.Hold ();
-						return;
-					}
-					if (TAS.PlayerManager.Action.IsOnLedge ()) {
-						// TODO Does not work
-						villageLandedTime++;
-						return;
-					}
-				}
-				// Longjump sequence after the ledge is grabbed
-				if (6 == villageLandedTime){
-					if (TAS.PlayerManager.Position.X <= 17.2f && Delta (villageTime, villageChestCanJumpToDeath) <= 0d) {
-						if (TAS.PlayerManager.Animation.Timing.Ended) {
-							//TODO which animation?
-							villageChestCanJumpToDeath = villageTime;
-						}
-						CodeInput.Left.Hold ();
-						return;
-					}
-					//wait until jumping to death (store respawn information)
-					if (!villageChestJumpedToDeath && Delta (villageTime, villageChestCanJumpToDeath) >= 0.05d) {
-						CodeInput.Jump.Press ();
-						CodeInput.Left.Hold ();
-						villageChestJumpedToDeath = true;
-						return;
-					}
-					//FakeInputHelper.Hold left and jump frame-perfectly
-					if (villageChestJumpedToDeath && TAS.PlayerManager.LastAction == ActionType.Dying) {
-						//TODO time the jump
-						CodeInput.Jump.Press ();
-						CodeInput.Left.Hold ();
-						return;
-					}
-					if (!villageChestJumpedToDeath) {
-						return;
-					}
-				}
+                if (villageLandedTime == 5) {
+                    if (20f < TAS.PlayerManager.Position.X) {
+                        CodeInput.Left.Hold();
+                        return;
+                    }
+                    if (18.2f < TAS.PlayerManager.Position.X && TAS.PlayerManager.Position.X <= 20f) {
+                        if (TAS.PlayerManager.AirTime.TotalSeconds <= 0d)
+                            CodeInput.Jump.Press();
+                        CodeInput.Left.Hold();
+                        return;
+                    }
+                    if (16.5f < TAS.PlayerManager.Position.X && TAS.PlayerManager.Position.X <= 18.2f) {
+                        CodeInput.Right.Hold();
+                        return;
+                    }
+                    if (TAS.PlayerManager.Action.IsOnLedge()) {
+                        // TODO Does not work
+                        villageLandedTime++;
+                        return;
+                    }
+                }
+                
+                // Longjump sequence after the ledge is grabbed
+                if (villageLandedTime == 6) {
+                    if (TAS.PlayerManager.Position.X <= 17.2f && Delta(villageTime, villageChestCanJumpToDeath) <= 0d) {
+                        if (TAS.PlayerManager.Animation.Timing.Ended) {
+                            //TODO which animation?
+                            villageChestCanJumpToDeath = villageTime;
+                        }
+                        CodeInput.Left.Hold();
+                        return;
+                    }
+                    //wait until jumping to death (store respawn information)
+                    if (!villageChestJumpedToDeath && Delta(villageTime, villageChestCanJumpToDeath) >= 0.05d) {
+                        CodeInput.Jump.Press();
+                        CodeInput.Left.Hold();
+                        villageChestJumpedToDeath = true;
+                        return;
+                    }
+                    //FakeInputHelper.Hold left and jump frame-perfectly
+                    if (villageChestJumpedToDeath && TAS.PlayerManager.LastAction == ActionType.Dying) {
+                        //TODO time the jump
+                        CodeInput.Jump.Press();
+                        CodeInput.Left.Hold();
+                        return;
+                    }
+                }
+                
+                if (!villageChestJumpedToDeath) {
+                    return;
+                }
+            }
+            
+            //Monocle room
+            //Currently only to debug sequences
+            if (TAS.LevelManager.Name == "PARLOR") {
+                if (!TAS.PlayerManager.CanControl || TAS.PlayerManager.Action == ActionType.ExitDoor) {
+                    //wait until player can control Gomez
+                    return;
+                }
+                
+                if (!parlorCodeInput) {
+                    FakeInputHelper.Sequences.Add(ControllerCodeHelper.MonoclePainting);
+                    parlorCodeInput = true;
+                }
             }
         }
         

@@ -126,14 +126,16 @@ namespace FezGame.Components {
             });
             */
 
-            RewindListening.Add(new MovingGroupsRewindInfo());
-
-            FillRewindListening<IPlayerManager>();
-            FillRewindListening<PlayerManager>(delegate(RewindInfo info) {
-                info.InstanceGetter = () => ServiceHelper.Get<IPlayerManager>();
-            });
-            FillRewindListening<ITimeManager>();
-            FillRewindListening<IDefaultCameraManager>();
+            if (!FezSpeedrun.BOTEnabled) {
+                RewindListening.Add(new MovingGroupsRewindInfo());
+    
+                FillRewindListening<IPlayerManager>();
+                FillRewindListening<PlayerManager>(delegate(RewindInfo info) {
+                    info.InstanceGetter = () => ServiceHelper.Get<IPlayerManager>();
+                });
+                FillRewindListening<ITimeManager>();
+                FillRewindListening<IDefaultCameraManager>();
+            }
 
             //DEBUG
             ModLogger.Log("FEZMod.TAS", "Listening to the following ");
@@ -180,7 +182,7 @@ namespace FezGame.Components {
 
                 DefaultCameraManager.NoInterpolation = true;
                 FezSpeedrun.Clock.Direction = -1D;
-            } else if (!GameState.InMenuCube) {
+            } else if (!GameState.InMenuCube && !FezSpeedrun.BOTEnabled) {
                 RecordFrame();
 
                 DefaultCameraManager.NoInterpolation = false;
@@ -272,7 +274,7 @@ namespace FezGame.Components {
         }
 
         public void RewindFrame() {
-            if (RewindPosition <= 0 || RewindPosition > RewindData.Count) {
+            if (RewindPosition <= 0 || RewindPosition > RewindData.Count | FezSpeedrun.BOTEnabled) {
                 return;
             }
 
@@ -288,7 +290,7 @@ namespace FezGame.Components {
         }
 
         public void RecordFrame() {
-            if (RewindPosition < 0 || RewindPosition > RewindData.Count) {
+            if (RewindPosition < 0 || RewindPosition > RewindData.Count || FezSpeedrun.BOTEnabled) {
                 return;
             }
 
