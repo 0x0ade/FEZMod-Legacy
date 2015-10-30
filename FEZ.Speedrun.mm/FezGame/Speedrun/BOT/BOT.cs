@@ -187,7 +187,12 @@ namespace FezGame.Speedrun.BOT {
 
                 // Open chest and leave the platform
                 if (villageLandedTime == 8) {
-                    //CodeInputAll.Left.Hold();//For when BOT jumps too short on 0x0ade's PC (thanks FPSus)
+                    if (TAS.PlayerManager.Position.X > 7f) {
+                        CodeInputAll.Left.Hold();//For when BOT jumps too short on 0x0ade's PC (thanks FPSus)
+                    }
+                    if (TAS.PlayerManager.Position.X < 7f) {
+                        CodeInputAll.Right.Hold();//For when BOT jumps too far on someone else's PC (thanks FPSus)
+                    }
                     CodeInputAll.GrabThrow.Press();
                     if (TAS.PlayerManager.LastAction == ActionType.OpeningTreasure) {
                         villageLandedTime++;
