@@ -133,6 +133,7 @@
     <Compile Include="FezGame\Components\NetworkUpdateDelegates.cs" />
     <Compile Include="FezGame\Mod\XmlHelper.cs" />
     <Compile Include="FezGame\Mod\FakeInputHelper.cs" />
+    <Compile Include="FezGame\Mod\CodeInputAll.cs" />
     <Compile Include="FezGame\Mod\Gui\IGuiHandler.cs" />
     <Compile Include="FezGame\Mod\Gui\ButtonWidget.cs" />
     <Compile Include="FezGame\Mod\Gui\CheckboxWidget.cs" />

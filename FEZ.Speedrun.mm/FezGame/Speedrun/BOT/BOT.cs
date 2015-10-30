@@ -46,13 +46,13 @@ namespace FezGame.Speedrun.BOT {
                     }
                 }
                 if (!gomezHouseDoored) {
-                    CodeInput.Right.Hold();
+                    CodeInputAll.Right.Hold();
                     return;
                 }
                 
                 //FakeInputHelper.Press up as soon as Gomez is grounded (may be falling from bed)
                 if (TAS.PlayerManager.Grounded) {
-                    CodeInput.Up.Press();
+                    CodeInputAll.Up.Press();
                 }
             }
             
@@ -67,12 +67,12 @@ namespace FezGame.Speedrun.BOT {
                 
                 //jump in front of Gomez's door
                 if (villageTime < 0.5d) {
-                    CodeInput.Jump.Hold();
+                    CodeInputAll.Jump.Hold();
                 }
                 //climb on top of Gomez's house
                 if (villageTime < 0.6d) {
                     //TODO fix CanClimb() for ledges. Currently even untested for ladders and vines.
-                    CodeInput.Up.Press();
+                    CodeInputAll.Up.Press();
                 }
                 
                 //grounding code
@@ -83,31 +83,31 @@ namespace FezGame.Speedrun.BOT {
                 
                 //Jumping to the house next to the ladder, with the one platform in between
                 if (villageTime > 0.4d && 1 <= villageLandedTime && villageLandedTime <= 2) {
-                    CodeInput.Right.Hold();
+                    CodeInputAll.Right.Hold();
                     if (TAS.PlayerManager.Grounded) {
-                        CodeInput.Jump.Press();
+                        CodeInputAll.Jump.Press();
                     }
                     CodeInput.Jump.KeepHolding(0.2d);
                 }
                 //Climbing the house with the ladder
                 if (villageLandedTime == 2) {
-                    CodeInput.Up.Press();
+                    CodeInputAll.Up.Press();
                     villageClimbedNextToLadder = villageTime;
                     return;
                 }
                 
                 //the house above the house with the ladder
                 if (villageLandedTime == 3 && Delta(villageTime, villageClimbedNextToLadder) < 0.5d) {
-                    CodeInput.Jump.Hold();
-                    CodeInput.Up.Press();
+                    CodeInputAll.Jump.Hold();
+                    CodeInputAll.Up.Press();
                 }
                 
                 //going to the vines
                 if (villageLandedTime == 4) {
 					if (TAS.PlayerManager.Position.X < 22.85f) {
                         //TODO for this, use position instead
-                        CodeInput.Right.Hold();
-                        CodeInput.Jump.Hold();
+                        CodeInputAll.Right.Hold();
+                        CodeInputAll.Jump.Hold();
                         return;
                     }
 					if (TAS.PlayerManager.Position.Y >= 34f) {
@@ -119,23 +119,23 @@ namespace FezGame.Speedrun.BOT {
                 
 				if (villageLandedTime == 5) {
 					if (TAS.PlayerManager.Action == ActionType.Falling) {
-						CodeInput.Up.Press();
+                        CodeInputAll.Up.Press();
 					} else if (TAS.PlayerManager.Action == ActionType.Jumping) {
-						CodeInput.Jump.KeepHolding();
+                        CodeInputAll.Jump.KeepHolding();
 						if (!villageClimbWasJumping) {
 							villageClimbJumpedTime++;
 						}
 						villageClimbWasJumping = true;
 					} else {
-						CodeInput.Jump.Press();
+                        CodeInputAll.Jump.Press();
 						villageClimbWasJumping = false;
 					}
 					if (villageClimbJumpedTime == 3) {
-						CodeInput.Left.Hold();
+                        CodeInputAll.Left.Hold();
 					}
 				}
 
-				//move to the left (ledge to chest). Grab the corner to start longjump sequence with a jump to avoid grabbing cutscene
+                //move to the left (ledge to chest). Grab the corner to start longjump sequence with a jump to avoid grabbing cutscene
                 if (villageLandedTime == 6) {
                     if (TAS.PlayerManager.Action.IsOnLedge()) {
                         villageLandedTime++;
@@ -143,17 +143,17 @@ namespace FezGame.Speedrun.BOT {
                     } else {
                         //instead else so the other branches don't run
                         if (20f < TAS.PlayerManager.Position.X) {
-                            CodeInput.Left.Hold();
+                            CodeInputAll.Left.Hold();
                             return;
                         }
                         if (18.2f < TAS.PlayerManager.Position.X && TAS.PlayerManager.Position.X <= 20f) {
                             if (TAS.PlayerManager.Grounded)
-                                CodeInput.Jump.Press();
-                            CodeInput.Left.Hold();
+                                CodeInputAll.Jump.Press();
+                            CodeInputAll.Left.Hold();
                             return;
                         }
                         if (16.5f < TAS.PlayerManager.Position.X && TAS.PlayerManager.Position.X <= 18.2f) {
-                            CodeInput.Right.Hold();
+                            CodeInputAll.Right.Hold();
                             return;
                         }
                     }
@@ -161,29 +161,57 @@ namespace FezGame.Speedrun.BOT {
                 
                 // Longjump sequence after the ledge is grabbed
                 if (villageLandedTime == 7) {
-                    CodeInput.Left.Hold();
+                    CodeInputAll.Left.Hold();
                     if (TAS.PlayerManager.Position.X <= 17.2f && Delta(villageTime, villageChestCanJumpToDeath) <= 0d) {
-//                        if (TAS.PlayerManager.Animation.Timing.Ended) {
-//                            //TODO which animation?
-                            villageChestCanJumpToDeath = villageTime;
-//                        }
+                        villageChestCanJumpToDeath = villageTime;
                         return;
                     }
                     //wait until jumping to death (store respawn information)
                     if (!villageChestJumpedToDeath && Delta(villageTime, villageChestCanJumpToDeath) >= 0.05d) {
-                        CodeInput.Jump.Press();
+                        CodeInputAll.Jump.Press();
                         villageChestJumpedToDeath = true;
                         return;
                     }
                     //FakeInputHelper.Hold left and jump frame-perfectly
                     if (villageChestJumpedToDeath && TAS.PlayerManager.LastAction == ActionType.FreeFalling) {
-                        CodeInput.Jump.Hold(0.14d);
-						return;
+                        //FIXME Results differ between runs, most probably due to the FPS on 0x0ade's PC...
+                        CodeInputAll.Jump.Hold(0.15d);
+                        return;
                     }
+
                 }
                 
                 if (!villageChestJumpedToDeath) {
                     return;
+                }
+
+                // Open chest and leave the platform
+                if (villageLandedTime == 7) {
+                    CodeInputAll.Left.Hold();//For when BOT jumps too short on 0x0ade's PC (thanks FPSus)
+                    CodeInputAll.GrabThrow.Press();
+                    if (TAS.PlayerManager.LastAction == ActionType.OpeningTreasure) {
+                        villageLandedTime++;
+                    }
+                }
+                if (villageLandedTime == 8) {
+                    if (TAS.PlayerManager.Grounded) {
+                        CodeInputAll.Right.Hold();
+                    } else {
+                        CodeInputAll.Jump.Hold();
+                    }
+                }
+                
+                //on the wooden platform down-right to the chest island
+                if (villageLandedTime == 9) {
+                    CodeInputAll.Right.Hold();
+                    if (21f < TAS.PlayerManager.Position.X) {
+                        CodeInputAll.Jump.Hold();
+                    }
+                }
+                
+                //on the boiler thing right to the previous thing (selfnote: naming conventions)
+                if (villageLandedTime == 10) {
+                    //TODO test and continue; optimize path (landing on the boiler thing is just guessed)
                 }
             }
             
@@ -198,6 +226,11 @@ namespace FezGame.Speedrun.BOT {
                 if (!parlorCodeInput) {
                     FakeInputHelper.Sequences.Add(ControllerCodeHelper.MonoclePainting);
                     parlorCodeInput = true;
+                    return;
+                }
+                
+                if (ControllerCodeHelper.MonoclePainting.Current == 0 /*finished, thus reset*/ && parlorCodeInput) {
+                    //TODO do stuff in PARLOR
                 }
             }
         }
@@ -220,46 +253,46 @@ namespace FezGame.Speedrun.BOT {
         private bool IsOnClimb() {
             //Decompiled code; hnnnnnnng
             Vector3 vector = TAS.CameraManager.Viewpoint.ForwardVector();
-			Vector3 vector2 = TAS.CameraManager.Viewpoint.RightVector();
-			float num = float.MaxValue; //3,402823E+38; //?
-			bool flag = false;
-			TrileInstance trileInstance = null;
+            Vector3 vector2 = TAS.CameraManager.Viewpoint.RightVector();
+            float num = float.MaxValue; //3,402823E+38; //?
+            bool flag = false;
+            TrileInstance trileInstance = null;
             NearestTriles nearestTriles = TAS.LevelManager.NearestTrile(TAS.PlayerManager.Position - 0.002f * Vector3.UnitY);
             bool flag2 = (nearestTriles.Surface != null && nearestTriles.Surface.Trile.ActorSettings.Type == ActorType.Vine);
-			PointCollision[] cornerCollision = TAS.PlayerManager.CornerCollision;
-			for (int i = 0; i < cornerCollision.Length; i++) {
-				PointCollision pointCollision = cornerCollision[i];
-				if (pointCollision.Instances.Surface != null && TestClimbCollision(pointCollision.Instances.Surface, true)) {
-					TrileInstance surface = pointCollision.Instances.Surface;
-					float num2 = surface.Position.Dot(vector);
-					if (flag2 && num2 < num && TestClimbCollision(pointCollision.Instances.Surface, true)) {
-						num = num2;
-						trileInstance = surface;
-					}
-				}
-			}
-			foreach (NearestTriles current in TAS.PlayerManager.AxisCollision.Values) {
-				if (current.Surface != null && TestClimbCollision(current.Surface, false)) {
-					TrileInstance surface2 = current.Surface;
-					float num3 = surface2.Position.Dot(vector);
-					if (flag2 && num3 < num) {
-						flag = true;
-						num = num3;
-						trileInstance = surface2;
-					}
-				}
-			}
+            PointCollision[] cornerCollision = TAS.PlayerManager.CornerCollision;
+            for (int i = 0; i < cornerCollision.Length; i++) {
+                PointCollision pointCollision = cornerCollision[i];
+                if (pointCollision.Instances.Surface != null && TestClimbCollision(pointCollision.Instances.Surface, true)) {
+                    TrileInstance surface = pointCollision.Instances.Surface;
+                    float num2 = surface.Position.Dot(vector);
+                    if (flag2 && num2 < num && TestClimbCollision(pointCollision.Instances.Surface, true)) {
+                        num = num2;
+                        trileInstance = surface;
+                    }
+                }
+            }
+            foreach (NearestTriles current in TAS.PlayerManager.AxisCollision.Values) {
+                if (current.Surface != null && TestClimbCollision(current.Surface, false)) {
+                    TrileInstance surface2 = current.Surface;
+                    float num3 = surface2.Position.Dot(vector);
+                    if (flag2 && num3 < num) {
+                        flag = true;
+                        num = num3;
+                        trileInstance = surface2;
+                    }
+                }
+            }
             
             return trileInstance != null;
-		}
+        }
         
         private bool TestClimbCollision(TrileInstance instance, bool onAxis) {
             //Yet again decompiler code. Hnnnng
-			TrileActorSettings actorSettings = instance.Trile.ActorSettings;
-			float combinedPhi = FezMath.WrapAngle(actorSettings.Face.ToPhi() + instance.Phi);
-			Axis axis = FezMath.AxisFromPhi(combinedPhi);
-			return ((actorSettings.Type == ActorType.Vine || actorSettings.Type == ActorType.Ladder) && axis == TAS.CameraManager.Viewpoint.VisibleAxis() == onAxis) || instance.GetRotatedFace(TAS.CameraManager.VisibleOrientation) == CollisionType.TopOnly;
-		}
+            TrileActorSettings actorSettings = instance.Trile.ActorSettings;
+            float combinedPhi = FezMath.WrapAngle(actorSettings.Face.ToPhi() + instance.Phi);
+            Axis axis = FezMath.AxisFromPhi(combinedPhi);
+            return ((actorSettings.Type == ActorType.Vine || actorSettings.Type == ActorType.Ladder) && axis == TAS.CameraManager.Viewpoint.VisibleAxis() == onAxis) || instance.GetRotatedFace(TAS.CameraManager.VisibleOrientation) == CollisionType.TopOnly;
+        }
         */
         
     }
