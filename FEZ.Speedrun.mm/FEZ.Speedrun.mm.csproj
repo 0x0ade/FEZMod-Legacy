@@ -18,7 +18,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <XnaType>MonoGame</XnaType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -27,7 +26,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <XnaType>MonoGame</XnaType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug - FNA|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -121,6 +119,7 @@
     <Compile Include="FezGame\Speedrun\TAS\MovingGroupsRewindInfo.cs" />
     <Compile Include="FezGame\Speedrun\BOT\BOT.cs" />
     <Compile Include="FezGame\Speedrun\BOT\ControllerCodeHelper.cs" />
+    <Compile Include="FezGame\Speedrun\BOT\TricksHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
