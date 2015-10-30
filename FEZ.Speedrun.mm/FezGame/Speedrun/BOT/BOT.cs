@@ -87,7 +87,7 @@ namespace FezGame.Speedrun.BOT {
                     if (TAS.PlayerManager.Grounded) {
                         CodeInputAll.Jump.Press();
                     }
-                    CodeInput.Jump.KeepHolding(0.2d);
+                    CodeInputAll.Jump.KeepHolding(0.2d);
                 }
                 //Climbing the house with the ladder
                 if (villageLandedTime == 2) {
@@ -111,7 +111,7 @@ namespace FezGame.Speedrun.BOT {
                         return;
                     }
 					if (TAS.PlayerManager.Position.Y >= 34f) {
-						CodeInput.Up.Press ();
+						CodeInputAll.Up.Press ();
 						villageLandedTime++;
 					}
                     return;
@@ -186,14 +186,14 @@ namespace FezGame.Speedrun.BOT {
                 }
 
                 // Open chest and leave the platform
-                if (villageLandedTime == 7) {
-                    CodeInputAll.Left.Hold();//For when BOT jumps too short on 0x0ade's PC (thanks FPSus)
+                if (villageLandedTime == 8) {
+                    //CodeInputAll.Left.Hold();//For when BOT jumps too short on 0x0ade's PC (thanks FPSus)
                     CodeInputAll.GrabThrow.Press();
                     if (TAS.PlayerManager.LastAction == ActionType.OpeningTreasure) {
                         villageLandedTime++;
                     }
                 }
-                if (villageLandedTime == 8) {
+                if (villageLandedTime == 9) {
                     if (TAS.PlayerManager.Grounded) {
                         CodeInputAll.Right.Hold();
                     } else {
@@ -202,7 +202,7 @@ namespace FezGame.Speedrun.BOT {
                 }
                 
                 //on the wooden platform down-right to the chest island
-                if (villageLandedTime == 9) {
+                if (villageLandedTime == 10) {
                     CodeInputAll.Right.Hold();
                     if (21f < TAS.PlayerManager.Position.X) {
                         CodeInputAll.Jump.Hold();
@@ -210,8 +210,26 @@ namespace FezGame.Speedrun.BOT {
                 }
                 
                 //on the boiler thing right to the previous thing (selfnote: naming conventions)
-                if (villageLandedTime == 10) {
-                    //TODO test and continue; optimize path (landing on the boiler thing is just guessed)
+                if (villageLandedTime == 11) {
+					if (TAS.PlayerManager.Action.IsOnLedge ()) {
+						FakeInputHelper.Sequences.Add (TricksHelper.CornerKick_Right);
+						return;
+					} else {
+						if (TAS.PlayerManager.Position.X < 26f) {
+							CodeInputAll.Right.Hold ();
+							return;
+						}
+						if (TAS.PlayerManager.Position.X >= 26f && TAS.PlayerManager.Position.X < 26.9f) {
+							CodeInputAll.Right.Hold ();
+							CodeInputAll.Jump.Hold (0.5);
+							return;
+						}
+						if (TAS.PlayerManager.Position.X >= 26.9f && !TAS.PlayerManager.Action.IsOnLedge ()) {
+							CodeInputAll.Left.Press ();
+							return;
+						}
+					}
+						
                 }
             }
             
