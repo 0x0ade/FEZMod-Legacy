@@ -1,5 +1,8 @@
 ﻿using System;
 using FezEngine.Effects;
+#if FNA
+using Microsoft.Xna.Framework;
+#endif
 using Microsoft.Xna.Framework.Graphics;
 using MonoMod;
 using FezGame.Mod;

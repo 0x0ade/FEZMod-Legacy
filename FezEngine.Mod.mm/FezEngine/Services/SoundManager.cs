@@ -4,6 +4,9 @@ using System.IO;
 using System.Collections.Generic;
 using System.Threading;
 using Microsoft.Xna.Framework.Audio;
+#if FNA
+using FezEngine.Structure;
+#endif
 
 namespace FezEngine.Services {
     public class SoundManager {
