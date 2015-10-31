@@ -59,6 +59,10 @@ namespace FezGame.Mod {
             }
         }
         public static double GameSpeed = 1d;
+        #if FNA
+        public static TimeSpan? ForceTimestep = null;
+        public static bool Smooth = false;
+        #endif
         public static GameTime UpdateGameTime;
         public static GameTime DrawGameTime;
         public static bool OverrideCultureManuallyBecauseMonoIsA_____ = false;
@@ -305,6 +309,23 @@ namespace FezGame.Mod {
                     ModLogger.Log("FEZMod.Engine", "Found -nme / --no-music-extract");
                     MemoryContentManager.AssetExists("FEZMOD_WORKAROUND_NOMUSICEXTRACT");
                 }
+                //Version-dependant options
+                #if FNA
+                //Hurtz options missing in FEZ 1.12 devbuilds (or I can't find them)
+                if (args[i] == "-60hz" || args[i] == "--force-60hz") {
+                    ModLogger.Log("FEZMod", "Found -60hz / --force-60hz");
+                    ForceTimestep = TimeSpan.FromSeconds(1d / 60d);
+                }
+                if (args[i] == "-120hz" || args[i] == "--force-120hz") {
+                    ModLogger.Log("FEZMod", "Found -120hz / --force-120hz");
+                    ForceTimestep = TimeSpan.FromSeconds(1d / 120d);
+                }
+                //The FEZ 1.12 devbuilds seem to forcibly tick at 60hz
+                if (args[i] == "-s" || args[i] == "--smooth") {
+                    ModLogger.Log("FEZMod", "Found -s / --smooth");
+                    Smooth = true;
+                }
+                #endif
             }
 
             if (InAndroid || runningInAndroid) {

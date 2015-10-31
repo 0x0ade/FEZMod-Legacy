@@ -119,6 +119,7 @@
     <Compile Include="FezGame\Mod\FEZModSaveHelper.cs" />
     <Compile Include="FezGame\Structure\patch_SaveData.cs" />
     <Compile Include="MonoMod\MonoModIgnore.cs" />
+    <Compile Include="MonoMod\MonoModLinkTo.cs" />
     <Compile Include="FezGame\Tools\SaveFileOperations.cs" />
     <Compile Include="FezGame\Components\Actions\Bounce.cs" />
     <Compile Include="FezGame\Components\Actions\PlayerAction.cs" />
