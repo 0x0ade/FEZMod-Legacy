@@ -1,12 +1,9 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using FezEngine.Tools;
 using FezEngine.Services;
 using FezEngine.Services.Scripting;
 using FezGame.Services;
-using FezGame.Structure;
 using FezEngine.Components;
-using FezEngine.Structure.Input;
 
 namespace FezGame.Mod {
     public class FEZModComponent : GameComponent {

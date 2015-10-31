@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Reflection;
 using System.Collections.Generic;
-using FezGame.Structure;
-using FezGame.Mod;
 
 namespace FezGame.Speedrun.TAS {
     public struct CacheKey_Info_Value {

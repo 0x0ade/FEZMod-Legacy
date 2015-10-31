@@ -1,16 +1,9 @@
 ﻿using System;
 using FezGame.Mod;
-using FezGame.Mod;
 using FezEngine.Tools;
 using FezGame.Components;
-using Microsoft.Xna.Framework;
-using FezGame.Structure;
 using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Text;
 using FezGame.Speedrun.Clocks;
-using FezEngine.Structure;
-using System.Threading;
 
 namespace FezGame.Speedrun {
     public class FezSpeedrun : FezModule {

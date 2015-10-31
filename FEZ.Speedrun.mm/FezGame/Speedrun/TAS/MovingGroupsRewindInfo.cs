@@ -4,7 +4,6 @@ using FezEngine.Components;
 using System.Collections;
 using System.Reflection;
 using Common;
-using FezGame.Mod;
 
 namespace FezGame.Speedrun.TAS {
     public class MovingGroupsRewindInfo : RewindInfo {

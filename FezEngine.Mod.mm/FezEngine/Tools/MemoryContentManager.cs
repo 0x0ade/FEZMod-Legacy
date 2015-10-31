@@ -1,4 +1,5 @@
-﻿using System;
+﻿#pragma warning disable 436
+using System;
 using FezGame.Mod;
 using System.Collections.Generic;
 using System.IO;

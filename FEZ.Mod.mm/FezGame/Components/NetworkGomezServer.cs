@@ -4,12 +4,7 @@ using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Net;
-using Microsoft.Xna.Framework.Media;
-using System.ComponentModel;
-
-
 using System.IO;
-using FezGame.Mod;
 using FezEngine.Components;
 
 namespace FezGame.Components {
@@ -66,7 +61,7 @@ namespace FezGame.Components {
 
         public void StartListening() {
             if (ManagementListener == null) {
-                ManagementListener = new TcpListener(Port);
+                ManagementListener = new TcpListener(Port); //FIXME find out which address to use for the non-obsolete constructor
                 ManagementListener.Start();
             }
 

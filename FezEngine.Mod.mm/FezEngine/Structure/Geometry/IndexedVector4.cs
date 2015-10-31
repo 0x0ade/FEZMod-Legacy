@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using MonoMod;
 
 namespace FezEngine.Structure.Geometry {

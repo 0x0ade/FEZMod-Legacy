@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.Serialization;
 using Microsoft.Xna.Framework;
 using FezEngine;
 

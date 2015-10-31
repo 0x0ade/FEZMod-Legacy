@@ -1,27 +1,16 @@
 ﻿using FezGame.Mod;
 using System;
 using System.Collections.Generic;
-using FezEngine;
 using FezEngine.Components;
-using FezEngine.Effects;
 using FezEngine.Services;
 using FezEngine.Services.Scripting;
-using FezEngine.Structure;
-using FezEngine.Structure.Geometry;
-using FezEngine.Structure.Input;
 using FezEngine.Tools;
 using FezGame.Services;
 using FezGame.Structure;
-using FezGame.Tools;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
-using System.IO;
-using FezGame.Mod;
 using FezGame.Speedrun;
-using System.Text;
 using FezGame.Speedrun.Clocks;
-using System.Runtime.Remoting.Contexts;
 
 namespace FezGame.Components {
     public class SpeedrunInfo : DrawableGameComponent {

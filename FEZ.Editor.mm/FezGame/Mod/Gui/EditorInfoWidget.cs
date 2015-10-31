@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using FezGame.Components;
 
 namespace FezGame.Mod.Gui {

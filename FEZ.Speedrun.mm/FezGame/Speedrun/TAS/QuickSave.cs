@@ -1,10 +1,7 @@
 ﻿using System;
 using FezGame.Structure;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
-using FezEngine;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace FezGame.Speedrun.TAS {
     public class QuickSave {

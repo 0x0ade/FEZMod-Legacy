@@ -1,7 +1,4 @@
-﻿using System;
-using FezEngine.Services;
-
-namespace FezGame.Services {
+﻿namespace FezGame.Services {
     public class GameCameraManager {
 
         public float orig_get_InterpolationSpeed() {

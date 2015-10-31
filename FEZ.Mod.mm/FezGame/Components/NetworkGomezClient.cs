@@ -1,17 +1,9 @@
-﻿using System;
-using System.Net.Sockets;
+﻿using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Net;
-using FezGame.Structure;
 using System.IO;
-using System.Runtime.Remoting.Lifetime;
-using FezGame.Components;
-
-
 using FezGame.Mod;
-using FezGame.Mod;
-using FezEngine.Components;
 
 namespace FezGame.Components {
     public class NetworkGomezClient {

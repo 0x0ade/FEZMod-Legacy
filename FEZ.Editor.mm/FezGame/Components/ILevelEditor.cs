@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using FezEngine;
+﻿using FezEngine;
 using FezEngine.Structure;
-using FezEngine.Components;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace FezGame.Components {
     public interface ILevelEditor {

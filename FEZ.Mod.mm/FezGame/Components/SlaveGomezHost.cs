@@ -1,6 +1,4 @@
-﻿using System;
-using FezGame.Components.Actions;
-using FezEngine;
+﻿using FezEngine;
 using FezEngine.Components;
 using FezEngine.Effects;
 using FezEngine.Services;
@@ -10,8 +8,6 @@ using FezGame.Services;
 using FezGame.Structure;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using FezGame.Mod;
-
 
 namespace FezGame.Components {
     public class SlaveGomezHost : DrawableGameComponent {

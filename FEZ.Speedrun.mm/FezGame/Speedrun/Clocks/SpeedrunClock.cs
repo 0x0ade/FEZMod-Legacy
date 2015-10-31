@@ -2,15 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
-using FezGame.Speedrun.Clocks;
 using FezGame.Services;
 using FezEngine.Tools;
-
-
-using FezEngine.Tools;
-using FezEngine.Services;
-using FezGame.Mod;
-using FezEngine.Components.Scripting;
 
 namespace FezGame.Speedrun.Clocks {
     public class SpeedrunClock : ISpeedrunClock {

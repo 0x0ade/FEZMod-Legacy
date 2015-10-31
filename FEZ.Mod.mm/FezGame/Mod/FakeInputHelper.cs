@@ -1,11 +1,7 @@
 using System;
-using FezGame.Structure;
 using Microsoft.Xna.Framework;
-using FezEngine;
-using FezGame.Components;
 using FezEngine.Structure.Input;
 using System.Collections.Generic;
-using FezEngine.Tools;
 
 namespace FezGame.Mod {
     

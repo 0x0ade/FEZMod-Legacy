@@ -1,7 +1,6 @@
 ﻿//Fixed in the FNA update / 1.12
 #if !FNA
-using System;
-using FezGame;
+#pragma warning disable 436
 using FezGame.Mod;
 using FezGame.Structure;
 using FezGame.Services;

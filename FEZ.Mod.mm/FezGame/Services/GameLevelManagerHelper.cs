@@ -1,5 +1,4 @@
-﻿using System;
-using FezEngine.Tools;
+﻿using FezEngine.Tools;
 using FezEngine.Services;
 using FezEngine.Structure;
 

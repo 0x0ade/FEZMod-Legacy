@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using FezGame.Services;
-using FezEngine.Services;
 
 namespace FezGame.Speedrun.Clocks {
     public delegate string SplitCase(ISpeedrunClock clock);

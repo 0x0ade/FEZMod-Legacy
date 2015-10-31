@@ -1,5 +1,4 @@
-﻿using System;
-using MonoMod;
+﻿using MonoMod;
 using FezGame.Services;
 
 namespace FezGame.Components.Actions {

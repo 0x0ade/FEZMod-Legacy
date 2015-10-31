@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
 using FezGame.Mod;
 using Microsoft.Xna.Framework;
@@ -57,7 +56,7 @@ namespace FezGame {
         public void game_Update(GameTime gameTime) {
         }
         
-        public void Update(GameTime gameTime) {
+        protected override void Update(GameTime gameTime) {
             #if FNA
             if (FEZMod.ForceTimestep != null) {
                 gameTime = setElapsed(gameTime, FEZMod.ForceTimestep.Value);
@@ -80,7 +79,7 @@ namespace FezGame {
         }
         
         
-        public void Draw(GameTime gameTime) {
+        protected override void Draw(GameTime gameTime) {
             #if FNA
             if (FEZMod.ForceTimestep != null) {
                 gameTime = setElapsed(gameTime, FEZMod.ForceTimestep.Value);

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework.Content;
-using FezEngine.Tools;
-using FezEngine.Services;
-
-namespace FezGame.Tools {
+﻿namespace FezGame.Tools {
     public static class patch_GameText {
         private const string MISSING_TEXT = "[MISSING TEXT]";
         

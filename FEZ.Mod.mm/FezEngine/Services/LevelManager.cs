@@ -1,6 +1,4 @@
-﻿using System;
-using FezEngine.Services;
-using FezEngine.Structure;
+﻿using FezEngine.Structure;
 using MonoMod;
 
 namespace FezEngine.Services {

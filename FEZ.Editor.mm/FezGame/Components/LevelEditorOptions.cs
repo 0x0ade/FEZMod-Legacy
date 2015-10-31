@@ -1,7 +1,5 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using System.IO;
-using ContentSerialization.Attributes;
 using System.Xml;
 using FezGame.Mod;
 

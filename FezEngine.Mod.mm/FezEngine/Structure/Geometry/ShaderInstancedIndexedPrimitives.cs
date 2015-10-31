@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using FezEngine.Effects;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoMod;
 using FezGame.Mod;

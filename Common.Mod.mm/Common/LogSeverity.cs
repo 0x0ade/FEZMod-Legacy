@@ -1,5 +1,4 @@
-﻿using System;
-using MonoMod;
+﻿using MonoMod;
 
 namespace Common {
     [MonoModIgnore]

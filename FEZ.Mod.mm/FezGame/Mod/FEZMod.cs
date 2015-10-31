@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using FezGame.Mod;
-using FezGame;
 using FezEngine.Tools;
 using FezEngine.Services;
 using FezGame.Services;
@@ -15,8 +13,6 @@ using FezEngine.Structure;
 using EasyStorage;
 using System.Globalization;
 using System.Threading;
-using System.Diagnostics;
-using FezEngine.Structure.Scripting;
 using MonoMod.JIT;
 
 namespace FezGame.Mod {

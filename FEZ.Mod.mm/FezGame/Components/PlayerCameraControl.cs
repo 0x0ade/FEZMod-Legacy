@@ -1,12 +1,7 @@
-﻿using System;
-using FezGame;
-using FezGame.Components;
-using FezGame.Services;
-using FezGame.Structure;
+﻿using FezGame.Services;
 using FezEngine;
 using FezEngine.Components;
 using FezEngine.Services;
-using FezEngine.Structure;
 using FezEngine.Structure.Input;
 using FezEngine.Tools;
 using Microsoft.Xna.Framework;

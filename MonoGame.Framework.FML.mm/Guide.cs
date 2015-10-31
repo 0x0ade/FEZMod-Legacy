@@ -1,4 +1,5 @@
-﻿using System;
+﻿#pragma warning disable 436
+using System;
 using MonoMod;
 using Microsoft.Xna.Framework.Net;
 

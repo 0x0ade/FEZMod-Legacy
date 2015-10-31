@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using FezGame.Mod;
+﻿using FezGame.Mod;
 
 namespace FezGame.Structure {
     public class patch_SaveData : SaveData {
@@ -8,7 +6,7 @@ namespace FezGame.Structure {
         public void orig_Clear() {
         }
 
-        public void Clear() {
+        public new void Clear() {
             orig_Clear();
             FEZMod.SaveClear(this);
         }
@@ -16,7 +14,7 @@ namespace FezGame.Structure {
         public void orig_CloneInto(SaveData d) {
         }
 
-        public void CloneInto(SaveData d) {
+        public new void CloneInto(SaveData d) {
             orig_CloneInto(d);
             FEZMod.SaveClone(this, d);
         }

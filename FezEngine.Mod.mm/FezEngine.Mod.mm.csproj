@@ -88,6 +88,9 @@
     <Reference Include="System.Configuration">
       <HintPath>..\libs\System.Configuration.dll</HintPath>
     </Reference>
+    <Reference Include="MonoMod">
+      <HintPath>..\libs\MonoMod.exe</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -95,7 +98,6 @@
     <Compile Include="FezEngine\Structure\Level.cs" />
     <Compile Include="FezEngine\Tools\ServiceHelper.cs" />
     <Compile Include="FezEngine\Tools\SettingsManager.cs" />
-    <Compile Include="MonoMod\MonoModIgnore.cs" />
     <Compile Include="FezEngine\Services\SoundManager.cs" />
     <Compile Include="FezEngine\Tools\SharedContentManager.cs" />
     <Compile Include="FezEngine\Structure\Geometry\ShaderInstancedIndexedPrimitives.cs" />

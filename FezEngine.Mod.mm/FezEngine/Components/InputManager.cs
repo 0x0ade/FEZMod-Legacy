@@ -1,9 +1,9 @@
+#pragma warning disable 626
 using System;
 using System.Collections.Generic;
 using FezGame.Mod;
 using FezEngine.Structure.Input;
 using Microsoft.Xna.Framework;
-using MonoMod;
 
 namespace FezEngine.Components {
     public class InputManager {

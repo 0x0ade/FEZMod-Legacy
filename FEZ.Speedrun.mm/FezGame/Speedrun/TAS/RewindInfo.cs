@@ -1,12 +1,6 @@
 ﻿using System;
-using FezGame.Structure;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
-using FezEngine;
-using System.Collections.Generic;
 using System.Reflection;
 using Common;
-using FezGame.Mod;
 
 namespace FezGame.Speedrun.TAS {
     public class RewindInfo {

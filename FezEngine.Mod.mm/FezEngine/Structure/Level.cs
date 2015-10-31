@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace FezEngine.Structure {
+﻿namespace FezEngine.Structure {
     public class Level {
 
         public static bool FlatDisabled = false;

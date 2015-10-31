@@ -1,5 +1,4 @@
-﻿using System;
-using FezGame.Speedrun;
+﻿using FezGame.Speedrun;
 
 namespace FezGame.Services {
     public class patch_GameStateManager {

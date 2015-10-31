@@ -1,15 +1,10 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using FezGame.Components;
-using FezEngine.Tools;
-using FezGame.Services;
 using FezEngine.Structure.Input;
 
 namespace FezGame.Mod.Gui {
     public class ThumbnailCreatorWidget : GuiWidget {
-
-        [ServiceDependency]
-        public IGameCameraManager CameraManager { get; set; }
 
         protected Vector2 PreDrag;
 

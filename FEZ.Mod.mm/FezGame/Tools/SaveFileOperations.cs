@@ -1,5 +1,4 @@
-﻿using System;
-using FezGame.Mod;
+﻿using FezGame.Mod;
 using FezGame.Structure;
 using FezEngine.Tools;
 

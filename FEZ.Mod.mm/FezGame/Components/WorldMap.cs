@@ -1,12 +1,10 @@
-﻿using FezGame.Mod;
-using System;
+﻿#pragma warning disable 436
+using FezGame.Mod;
 using FezGame.Services;
 using FezEngine.Components;
 using FezEngine.Structure;
 using FezEngine.Structure.Input;
 using Microsoft.Xna.Framework;
-using FezGame;
-using FezGame.Mod;
 using MonoMod;
 using System.Collections.Generic;
 

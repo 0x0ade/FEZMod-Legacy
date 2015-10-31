@@ -1,4 +1,5 @@
-﻿using System;
+﻿#pragma warning disable 436
+using System;
 using Microsoft.Xna.Framework;
 using FezEngine.Effects;
 using FezEngine.Structure;
@@ -6,7 +7,6 @@ using FezGame.Services;
 using MonoMod;
 using FezGame.Structure;
 using FezGame.Mod;
-using FezEngine.Tools;
 using FezEngine.Services;
 
 namespace FezGame.Components {

@@ -96,6 +96,9 @@
     <Reference Include="System.Xml">
       <HintPath>..\libs\System.Xml.dll</HintPath>
     </Reference>
+    <Reference Include="MonoMod">
+      <HintPath>..\libs\MonoMod.exe</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />

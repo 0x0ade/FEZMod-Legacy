@@ -75,12 +75,14 @@
     <Reference Include="mscorlib">
       <HintPath>..\libs\mscorlib.dll</HintPath>
     </Reference>
+    <Reference Include="MonoMod">
+      <HintPath>..\libs\MonoMod.exe</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Common\Logger.cs" />
     <Compile Include="Common\LogSeverity.cs" />
-    <Compile Include="MonoMod\MonoModIgnore.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

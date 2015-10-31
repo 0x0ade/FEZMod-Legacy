@@ -1,6 +1,4 @@
-﻿using System;
-using FezEngine.Structure;
-using FezGame;
+﻿using FezEngine.Structure;
 using Microsoft.Xna.Framework;
 using FezGame.Mod;
 

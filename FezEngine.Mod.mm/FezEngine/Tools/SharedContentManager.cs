@@ -1,4 +1,4 @@
-﻿using System;
+﻿#pragma warning disable 436
 using Microsoft.Xna.Framework.Graphics;
 using System.IO;
 using System.Xml;

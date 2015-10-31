@@ -1,22 +1,14 @@
-﻿using System;
+﻿#pragma warning disable 436
+using System;
 using FezGame.Mod;
-using FezEngine;
 using FezEngine.Services;
 using FezEngine.Structure;
-using FezEngine.Structure.Scripting;
 using FezEngine.Tools;
-using FezGame.Services;
 using FezGame.Structure;
-using FezGame.Mod;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
-using System.Collections.Generic;
 using System.IO;
 using System.Xml;
-using System.Reflection;
 using MonoMod;
-using System.Xml.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 
 namespace FezGame.Services {
 	public class GameLevelManager : LevelManager {

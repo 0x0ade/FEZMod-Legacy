@@ -1,5 +1,3 @@
-using System;
-
 namespace FezEngine.Structure.Input {
     public enum CodeInputAll {
         

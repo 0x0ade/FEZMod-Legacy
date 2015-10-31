@@ -1,8 +1,4 @@
-﻿using FezGame.Mod;
-using System;
-using FezGame.Speedrun;
-
-namespace FezGame.Components {
+﻿namespace FezGame.Components {
     public class MainMenu {
 
         public void orig_ContinueGame() {
