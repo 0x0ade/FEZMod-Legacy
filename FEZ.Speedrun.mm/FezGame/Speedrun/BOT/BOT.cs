@@ -20,8 +20,7 @@ namespace FezGame.Speedrun.BOT {
         public double villageClimbedNextToLadder;
         public bool villageClimbWasJumping;
         public int villageClimbJumpedTime;
-        public double villageChestCanJumpToDeath;
-        public bool villageChestJumpedToDeath;
+        public bool villageChestCanJumpToDeath = true;
         
         public bool parlorCodeInput;
         
@@ -157,30 +156,9 @@ namespace FezGame.Speedrun.BOT {
                 
                 // Longjump sequence after the ledge is grabbed
                 if (villageLandedTime == 7) {
-                    CodeInputAll.Left.Hold();
-                    if (TAS.PlayerManager.Position.X <= 17.2f && Delta(villageTime, villageChestCanJumpToDeath) <= 0d) {
-                        villageChestCanJumpToDeath = villageTime;
-                        return;
-                    }
-                    //wait until jumping to death (store respawn information)
-                    if (!villageChestJumpedToDeath && Delta(villageTime, villageChestCanJumpToDeath) >= 0.05d) {
-                        CodeInputAll.Jump.Press();
-                        villageChestJumpedToDeath = true;
-                        return;
-                    }
-                    //FakeInputHelper.Hold left and jump frame-perfectly
-                    if (villageChestJumpedToDeath && TAS.PlayerManager.LastAction == ActionType.FreeFalling) {
-                        //FIXME Results differ between runs, most probably due to the FPS on 0x0ade's PC...
-                        CodeInputAll.Jump.Hold(0.15d);
-                        return;
-                    }
-
+                    this.LongCliffjump(0.15d);
                 }
                 
-                if (!villageChestJumpedToDeath) {
-                    return;
-                }
-
                 // Open chest and leave the platform
                 if (villageLandedTime == 8) {
                     if (TAS.PlayerManager.Action == ActionType.OpeningTreasure) {
