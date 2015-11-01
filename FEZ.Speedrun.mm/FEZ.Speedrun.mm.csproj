@@ -122,6 +122,9 @@
     <Compile Include="FezGame\Speedrun\BOT\BOT.cs" />
     <Compile Include="FezGame\Speedrun\BOT\ControllerCodeHelper.cs" />
     <Compile Include="FezGame\Speedrun\BOT\TricksHelper.cs" />
+    <Compile Include="FezGame\Speedrun\BOT\Levels\BOT_GOMEZ_HOUSE.cs" />
+    <Compile Include="FezGame\Speedrun\BOT\Levels\BOT_VILLAGEVILLE_2D.cs" />
+    <Compile Include="FezGame\Speedrun\BOT\Levels\BOT_PARLOR.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
