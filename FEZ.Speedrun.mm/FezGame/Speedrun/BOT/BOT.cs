@@ -183,7 +183,7 @@ namespace FezGame.Speedrun.BOT {
 
                 // Open chest and leave the platform
                 if (villageLandedTime == 8) {
-                    if (TAS.PlayerManager.LastAction == ActionType.OpeningTreasure) {
+                    if (TAS.PlayerManager.Action == ActionType.OpeningTreasure) {
                         villageLandedTime++;
                     } else {
                         if (TAS.PlayerManager.Position.X > 7f) {
