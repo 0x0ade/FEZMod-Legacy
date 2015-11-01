@@ -214,8 +214,8 @@ namespace FezGame.Speedrun.BOT {
                 //on the boiler thing right to the previous thing (selfnote: naming conventions)
                 if (villageLandedTime == 11) {
 					if (TAS.PlayerManager.Action.IsOnLedge ()) {
-						FakeInputHelper.Sequences.Add (TricksHelper.CornerKick_Right);
-						return;
+						CodeInputAll.Right.Hold();
+                        CodeInputAll.Jump.Press();
 					} else {
 						if (TAS.PlayerManager.Position.X < 26f) {
 							CodeInputAll.Right.Hold ();
