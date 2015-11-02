@@ -3,6 +3,8 @@ using FezGame.Mod;
 using FezGame.Components;
 using FezEngine;
 using FezGame.Structure;
+using System.Collections.Generic;
+using FezEngine.Structure;
 
 namespace FezGame.Speedrun.BOT {
 	/*
@@ -47,6 +49,21 @@ namespace FezGame.Speedrun.BOT {
                 //FIXME Results differ between runs, most probably due to the FPS on 0x0ade's PC...
                 CodeInputAll.Jump.Hold(time);
             }
+        }
+        
+        public static bool CancelTalk(this BOT BOT) {
+            return CancelTalk(BOT.TAS);
+        }
+        public static bool CancelTalk(TASComponent TAS) {
+            IDictionary<int, NpcInstance> npcs = TAS.LevelManager.NonPlayerCharacters;
+            foreach (NpcInstance npc in npcs.Values) {
+                if (npc.Talking) {
+                    CodeInputAll.CancelTalk.Press();
+                    return true;
+                }
+            }
+            //TODO check for non-NPCs talking
+            return false;
         }
         
 	}
