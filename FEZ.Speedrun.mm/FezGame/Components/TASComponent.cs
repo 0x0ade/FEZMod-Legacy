@@ -82,11 +82,6 @@ namespace FezGame.Components {
                 tmpFreeLook = value;
             };
             
-            //Initialize BOT if needed
-            if (FezSpeedrun.BOTEnabled) {
-                BOT = new BOT(this);
-            }
-
             //Add GUI
 
             //Bottom / progress bar

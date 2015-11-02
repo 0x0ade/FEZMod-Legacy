@@ -18,34 +18,50 @@ namespace FezGame.Speedrun.BOT {
         public TASComponent TAS;
         
         public List<BOT_LEVEL> Levels = new List<BOT_LEVEL>();
+        public List<ConstructorInfo> LevelConstructors = new List<ConstructorInfo>();
         public BOT_LEVEL Level;
         
         public BOT(TASComponent tas) {
             TAS = tas;
-            
-            //TODO remove it somewhen? (dispose BOT)
+        }
+        
+        public virtual void Initialize() {
             TAS.LevelManager.LevelChanged += LevelChanged;
             
             object[] levelConstructorParams = {this};
-            Assembly[] asms = AppDomain.CurrentDomain.GetAssemblies();
-            for (int ai = 0; ai < asms.Length; ai++) {
-                Assembly asm = asms[ai];
-                if (!asm.GetName().Name.EndsWith(".mm")) {
-                    continue;
-                }
-                Type[] types = asm.GetTypes();
-                for (int ti = 0; ti < types.Length; ti++) {
-                    Type type = types[ti];
-                    if (type.Namespace != "FezGame.Speedrun.BOT.Levels" || type.IsAbstract) {
+            if (LevelConstructors.Count == 0) {
+                Assembly[] asms = AppDomain.CurrentDomain.GetAssemblies();
+                for (int ai = 0; ai < asms.Length; ai++) {
+                    Assembly asm = asms[ai];
+                    if (!asm.GetName().Name.EndsWith(".mm")) {
                         continue;
                     }
-                    //TODO maybe check more exactly whether to create an instance or not...
-                    Levels.Add((BOT_LEVEL) type.GetConstructor(levelConstructorParamTypes).Invoke(levelConstructorParams));
+                    Type[] types = asm.GetTypes();
+                    for (int ti = 0; ti < types.Length; ti++) {
+                        Type type = types[ti];
+                        if (type.Namespace != "FezGame.Speedrun.BOT.Levels" || type.IsAbstract) {
+                            continue;
+                        }
+                        //TODO maybe check more exactly whether to create an instance or not...
+                        ConstructorInfo constructor = type.GetConstructor(levelConstructorParamTypes);
+                        LevelConstructors.Add(constructor);
+                        Levels.Add((BOT_LEVEL) constructor.Invoke(levelConstructorParams));
+                    }
+                }
+            } else {
+                for (int ci = 0; ci < LevelConstructors.Count; ci++) {
+                    Levels.Add((BOT_LEVEL) LevelConstructors[ci].Invoke(levelConstructorParams));
                 }
             }
         }
         
-        public void LevelChanged() {
+        public virtual void Dispose() {
+            TAS.LevelManager.LevelChanged -= LevelChanged;
+            
+            Levels.Clear();
+        }
+        
+        public virtual void LevelChanged() {
             for (int li = 0; li < Levels.Count; li++) {
                 BOT_LEVEL level = Levels[li];
                 for (int ni = 0; ni < level.Levels.Length; ni++) {
@@ -60,7 +76,11 @@ namespace FezGame.Speedrun.BOT {
             Level = null;
         }
         
-        public void Update(GameTime gameTime) {
+        public virtual void Update(GameTime gameTime) {
+            if (TAS.GameState.Paused) {
+                //TODO discuss with Gyoo whether TASes should be pausable to interrupt them
+                return;
+            }
             if (Level != null) {
                 Level.Update(gameTime);
             }

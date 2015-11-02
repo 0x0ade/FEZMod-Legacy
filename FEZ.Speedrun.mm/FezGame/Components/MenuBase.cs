@@ -1,4 +1,5 @@
 ﻿using FezGame.Speedrun;
+using FezGame.Speedrun.BOT;
 
 namespace FezGame.Components {
     public class MenuBase {
@@ -25,6 +26,15 @@ namespace FezGame.Components {
                     FezSpeedrun.Clock.Running = false; //Forces the clock to reset.
                 }
                 FezSpeedrun.Clock.Running = true;
+                //Initialize BOT if needed
+                if (FezSpeedrun.BOTEnabled) {
+                    if (TASComponent.Instance.BOT == null) {
+                        TASComponent.Instance.BOT = new BOT(TASComponent.Instance);
+                    } else {
+                        TASComponent.Instance.BOT.Dispose();
+                    }
+                    TASComponent.Instance.BOT.Initialize();
+                }
             }
         }
 
