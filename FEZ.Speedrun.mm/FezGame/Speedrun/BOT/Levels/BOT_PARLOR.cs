@@ -7,11 +7,17 @@ using FezGame.Mod;
 using FezEngine.Structure;
 
 namespace FezGame.Speedrun.BOT.Levels {
-    public static class BOT_PARLOR {
+    public class BOT_PARLOR : BOT_LEVEL {
         
-        public static bool parlorCodeInput;
+        public bool parlorCodeInput;
         
-        public static void Update(BOT BOT, GameTime gameTime) {
+        public BOT_PARLOR(BOT bot)
+            : base(bot, new string[] {
+                "PARLOR"
+            }) {
+        }
+        
+        public override void Update(GameTime gameTime) {
             if (!BOT.TAS.PlayerManager.CanControl || BOT.TAS.PlayerManager.Action == ActionType.ExitDoor) {
                 //wait until player can control Gomez
                 return;

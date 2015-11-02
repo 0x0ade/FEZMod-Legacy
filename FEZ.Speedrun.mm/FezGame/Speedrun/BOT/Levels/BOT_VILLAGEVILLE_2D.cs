@@ -7,17 +7,23 @@ using FezGame.Mod;
 using FezEngine.Structure;
 
 namespace FezGame.Speedrun.BOT.Levels {
-    public static class BOT_VILLAGEVILLE_2D {
+    public class BOT_VILLAGEVILLE_2D : BOT_LEVEL {
         
-        public static double villageTime;
-        public static int villageLandedTime;
-        public static bool villageLandedWasGrounded;
-        public static double villageClimbedNextToLadder;
-        public static bool villageClimbWasJumping;
-        public static int villageClimbJumpedTime;
-        public static bool villageChestCanJumpToDeath = true;
+        public double villageTime;
+        public int villageLandedTime;
+        public bool villageLandedWasGrounded;
+        public double villageClimbedNextToLadder;
+        public bool villageClimbWasJumping;
+        public int villageClimbJumpedTime;
+        public bool villageChestCanJumpToDeath = true;
         
-        public static void Update(BOT BOT, GameTime gameTime) {
+        public BOT_VILLAGEVILLE_2D(BOT bot)
+            : base(bot, new string[] {
+                "VILLAGEVILLE_2D"
+            }) {
+        }
+        
+        public override void Update(GameTime gameTime) {
             if (!BOT.TAS.PlayerManager.CanControl || BOT.TAS.PlayerManager.Action == ActionType.ExitDoor) {
                     //wait until player can control Gomez
                     return;
