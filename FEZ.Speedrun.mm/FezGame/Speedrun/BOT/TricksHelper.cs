@@ -57,7 +57,7 @@ namespace FezGame.Speedrun.BOT {
         public static bool CancelTalk(TASComponent TAS) {
             IDictionary<int, NpcInstance> npcs = TAS.LevelManager.NonPlayerCharacters;
             foreach (NpcInstance npc in npcs.Values) {
-                if (npc.Talking) {
+                if (npc.State.CurrentAction == NpcAction.Talk) {
                     CodeInputAll.CancelTalk.Press();
                     return true;
                 }

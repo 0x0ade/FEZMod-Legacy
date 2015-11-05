@@ -329,6 +329,9 @@ namespace FezGame.Mod {
                 InAndroid = true;
                 Fez.SkipIntro = true;
                 Fez.SkipLogos = true;
+                #if FNA
+                ForceTimestep = TimeSpan.FromSeconds(1d / 60d);
+                #endif
                 MemoryContentManager.AssetExists("FEZMOD_WORKAROUND_NOCACHE");
             }
 

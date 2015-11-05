@@ -78,10 +78,13 @@ namespace FezGame.Speedrun.BOT {
         
         public virtual void Update(GameTime gameTime) {
             if (TAS.GameState.Paused) {
-                //TODO discuss with Gyoo whether TASes should be pausable to interrupt them
                 return;
             }
             if (Level != null) {
+                if (TAS.PlayerManager.CanControl && TAS.PlayerManager.Action != ActionType.ExitDoor) {
+                    Level.Time += gameTime.ElapsedGameTime.TotalSeconds;
+                }
+                
                 Level.Update(gameTime);
             }
         }

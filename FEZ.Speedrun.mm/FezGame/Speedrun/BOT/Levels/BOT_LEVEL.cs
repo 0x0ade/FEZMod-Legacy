@@ -5,7 +5,8 @@ namespace FezGame.Speedrun.BOT.Levels {
         
         public string[] Levels;
         public BOT BOT;
-        public int Time;
+        public int EnteredTime;
+        public double Time;
         
         public BOT_LEVEL(BOT bot, string[] levels) {
             BOT = bot;
