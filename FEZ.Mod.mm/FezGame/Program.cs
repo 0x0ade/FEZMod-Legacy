@@ -31,8 +31,14 @@ namespace FezGame {
                 orig_MainInternal();
             } catch (Exception e) {
                 ModLogger.Log("FEZMod", "Handling FEZ crash...");
-                for (Exception e_ = e; e_ != null; e_ = e_.InnerException) {
-                    ModLogger.Log("FEZMod", e_.ToString());
+                if (!FEZMod.InAndroid) {
+                    for (Exception e_ = e; e_ != null; e_ = e_.InnerException) {
+                        ModLogger.Log("FEZMod", e_.ToString());
+                    }
+                } else {
+                    for (Exception e_ = e; e_ != null; e_ = e_.InnerException) {
+                        ModLogger.Log("FEZMod", e_.ToString() + " @ " + e_.StackTrace);
+                    }
                 }
                 FEZMod.HandleCrash(e);
             }
