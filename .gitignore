@@ -22,5 +22,9 @@ MonoGame.Framework.FML.mm/bin/
 MonoGame.Framework.FML.mm/obj/
 MonoGame.Framework.FML.mm/*.sln
 MonoGame.Framework.FML.mm/*.userprefs
+EasyStorage.Mod.mm/bin/
+EasyStorage.Mod.mm/obj/
+EasyStorage.Mod.mm/*.sln
+EasyStorage.Mod.mm/*.userprefs
 
 FEZ.Secret.mm/*

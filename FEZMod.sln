@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.FML.mm",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FEZ.Secret.mm", "FEZ.Secret.mm\FEZ.Secret.mm.csproj", "{36FFEB4F-BF3A-43FA-95A4-34EF21C125C6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyStorage.Mod.mm", "EasyStorage.Mod.mm\EasyStorage.Mod.mm.csproj", "{9BB7A555-019B-4B26-A9B6-16D9B5B6249E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,14 @@ Global
 		{678C8F90-55B3-4887-83CC-57186092D674}.Release - FNA|Any CPU.Build.0 = Release - FNA|Any CPU
 		{678C8F90-55B3-4887-83CC-57186092D674}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{678C8F90-55B3-4887-83CC-57186092D674}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BB7A555-019B-4B26-A9B6-16D9B5B6249E}.Debug - FNA|Any CPU.ActiveCfg = Debug - FNA|Any CPU
+		{9BB7A555-019B-4B26-A9B6-16D9B5B6249E}.Debug - FNA|Any CPU.Build.0 = Debug - FNA|Any CPU
+		{9BB7A555-019B-4B26-A9B6-16D9B5B6249E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BB7A555-019B-4B26-A9B6-16D9B5B6249E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BB7A555-019B-4B26-A9B6-16D9B5B6249E}.Release - FNA|Any CPU.ActiveCfg = Release - FNA|Any CPU
+		{9BB7A555-019B-4B26-A9B6-16D9B5B6249E}.Release - FNA|Any CPU.Build.0 = Release - FNA|Any CPU
+		{9BB7A555-019B-4B26-A9B6-16D9B5B6249E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BB7A555-019B-4B26-A9B6-16D9B5B6249E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AC0D05EF-9F94-4DE4-AB2A-D416BF28E292}.Debug - FNA|Any CPU.ActiveCfg = Debug - FNA|Any CPU
 		{AC0D05EF-9F94-4DE4-AB2A-D416BF28E292}.Debug - FNA|Any CPU.Build.0 = Debug - FNA|Any CPU
 		{AC0D05EF-9F94-4DE4-AB2A-D416BF28E292}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

@@ -3,11 +3,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{AC0D05EF-9F94-4DE4-AB2A-D416BF28E292}</ProjectGuid>
+    <ProjectGuid>{9BB7A555-019B-4B26-A9B6-16D9B5B6249E}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>Common.Mod.mm</RootNamespace>
-    <AssemblyName>Common.Mod.mm</AssemblyName>
-    <XnaType>MonoGame</XnaType>
+    <RootNamespace>EasyStorage.Mod.mm</RootNamespace>
+    <AssemblyName>EasyStorage.Mod.mm</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -27,7 +27,7 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug - FNA|AnyCPU' ">
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug - FNA|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -49,45 +49,14 @@
     <XnaType>FNA</XnaType>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System">
-      <HintPath>..\libs\System.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml">
-      <HintPath>..\libs\System.Xml.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Core">
-      <HintPath>..\libs\System.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Data">
-      <HintPath>..\libs\System.Data.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Drawing">
-      <HintPath>..\libs\System.Drawing.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Security">
-      <HintPath>..\libs\System.Security.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Configuration">
-      <HintPath>..\libs\System.Configuration.dll</HintPath>
-    </Reference>
-    <Reference Include="mscorlib">
-      <HintPath>..\libs\mscorlib.dll</HintPath>
-    </Reference>
-    <Reference Include="MonoMod">
-      <HintPath>..\libs\MonoMod.exe</HintPath>
-    </Reference>
+    <Reference Include="System" />
     <Reference Include="FNA" Condition=" '$(XnaType)' == 'FNA' ">
       <HintPath>..\libs\FNA.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Common\Logger.cs" />
-    <Compile Include="Common\LogSeverity.cs" />
-    <Compile Include="Common\Util.cs" />
+    <Compile Include="EasyStorage\PCSaveDevice.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <Folder Include="Common\" />
-  </ItemGroup>
 </Project>

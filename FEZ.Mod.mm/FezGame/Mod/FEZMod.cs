@@ -101,6 +101,10 @@ namespace FezGame.Mod {
         public static void PreInitialize() {
             ModLogger.Clear();
             ModLogger.Log("FEZMod", "JustAnotherFEZMod (FEZMod) "+FEZMod.Version);
+            
+            if (runningInAndroid) {
+                EngageFEZDroid();
+            }
 
             try {
                 FEZVersion = new Version(Fez.Version.IndexOf('a') == -1 ? Fez.Version : Fez.Version.Substring(0, Fez.Version.IndexOf('a')));
@@ -271,7 +275,7 @@ namespace FezGame.Mod {
                 }
                 //TODO extract FEZDroid from core
                 if (args[i] == "--android") {
-                    InAndroid = true;
+                    EngageFEZDroid();
                 }
                 /*
                 Explaination as of why the workaround still is required:
@@ -322,19 +326,6 @@ namespace FezGame.Mod {
                     Smooth = true;
                 }
                 #endif
-            }
-
-            if (InAndroid || runningInAndroid) {
-                ModLogger.Log("FEZDroid", "Android mode engaged!");
-                InAndroid = true;
-                Fez.SkipIntro = true;
-                Fez.SkipLogos = true;
-                Fez.NoLighting = true;
-                Fez.NoSteamworks = true;
-                if (DisableCloudSaves != null) {
-                    DisableCloudSaves.SetValue(null, false);
-                }
-                MemoryContentManager.AssetExists("FEZMOD_WORKAROUND_NOCACHE");
             }
 
             CallInEachModule("ParseArgs", new object[] {args});
@@ -394,6 +385,25 @@ namespace FezGame.Mod {
             ServiceHelper.Game.Exiting += (sender, e) => Exit();
 
             CallInEachModule("Initialize", new object[0]);
+        }
+        
+        //FEZDroid special methods
+        public static void EngageFEZDroid() {
+            if (InAndroid) {
+                return;
+            }
+            ModLogger.Log("FEZDroid", "Android mode engaged!");
+            InAndroid = true;
+            Fez.SkipIntro = true;
+            Fez.SkipLogos = true;
+            #if !FNA
+            Fez.NoLighting = true;
+            #endif
+            Fez.NoSteamworks = true;
+            if (DisableCloudSaves != null) {
+                DisableCloudSaves.SetValue(null, false);
+            }
+            MemoryContentManager.AssetExists("FEZMOD_WORKAROUND_NOCACHE");
         }
 
         //Hooked FEZ methods or calls in each module

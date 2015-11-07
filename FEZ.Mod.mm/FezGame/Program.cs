@@ -13,10 +13,10 @@ namespace FezGame {
             } catch (Exception e) {
                 ModLogger.Log("FEZMod", "Handling FEZMod PreInitialize crash...");
                 for (Exception e_ = e; e_ != null; e_ = e_.InnerException) {
-                    ModLogger.Log("FEZMod", e_.ToString());
+                    ModLogger.Log("FEZMod", e_.GetType().FullName + ": " + e_.Message + "\n" + e_.StackTrace);
                 }
                 FEZMod.HandleCrash(e);
-                return;
+                throw e;
             }
 
 			ModLogger.Log("FEZMod", "Passing to FEZ...");
@@ -37,10 +37,11 @@ namespace FezGame {
                     }
                 } else {
                     for (Exception e_ = e; e_ != null; e_ = e_.InnerException) {
-                        ModLogger.Log("FEZMod", e_.ToString() + " @ " + e_.StackTrace);
+                        ModLogger.Log("FEZMod", e_.GetType().FullName + ": " + e_.Message + "\n" + e_.StackTrace);
                     }
                 }
                 FEZMod.HandleCrash(e);
+                throw e;
             }
         }
 

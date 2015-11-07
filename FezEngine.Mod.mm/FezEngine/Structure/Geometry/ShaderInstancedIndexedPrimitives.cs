@@ -116,14 +116,14 @@ namespace FezEngine.Structure.Geometry {
         //Version-dependant drawing code
         #if !FNA
         
-        //Not even tested in 1.11
+        //Tested successfully.
         public void Draw_1_11(BaseEffect effect) {
             device.SetVertexBuffer(vertexBuffer);
             
             device.Indices = indexBuffer;
             
             //The 1.12 and 1.11 software code doesn't seem to differ too much
-            //TODO test if it also works in 1.09 (drm) / 1.07 (speedrun) just because
+            //TODO test if it also works in 1.07 (speedrun) just because
             DrawInstances(effect);
         }
         

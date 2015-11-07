@@ -1,10 +1,11 @@
 ﻿<Properties StartupItem="Common.Mod.mm/Common.Mod.mm.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug - FNA" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="FezEngine.Mod.mm/FezEngine/Structure/Geometry/ShaderInstancedIndexedPrimitives.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="EasyStorage.Mod.mm/MyClass.cs">
     <Files>
-      <File FileName="FEZ.Mod.mm/FezGame/Mod/FEZMod.cs" Line="86" Column="13" />
-      <File FileName="FEZ.Secret.mm/FezGame/Components/WarpGateHost.cs" Line="26" Column="24" />
-      <File FileName="FezEngine.Mod.mm/FezEngine/Structure/Geometry/ShaderInstancedIndexedPrimitives.cs" Line="126" Column="25" />
+      <File FileName="FEZ.Mod.mm/FezGame/Mod/FEZMod.cs" Line="1" Column="1" />
+      <File FileName="FEZ.Secret.mm/FezGame/Components/WarpGateHost.cs" Line="1" Column="1" />
+      <File FileName="FezEngine.Mod.mm/FezEngine/Structure/Geometry/ShaderInstancedIndexedPrimitives.cs" Line="123" Column="42" />
+      <File FileName="EasyStorage.Mod.mm/MyClass.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

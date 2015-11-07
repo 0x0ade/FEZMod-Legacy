@@ -5,6 +5,8 @@ env:
        - "BUILD_NUMBER=$TRAVIS_BUILD_NUMBER"
        - "BUILD_DIR=$TRAVIS_BUILD_DIR"
 script:
+    - ./build_common.sh
+    - ./build_easystorage.sh
     - ./build_main.sh
     - ./build_engine.sh
     - ./build_editor.sh
