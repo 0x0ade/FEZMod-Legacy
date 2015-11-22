@@ -4,6 +4,7 @@ using FezEngine.Services;
 using FezEngine.Services.Scripting;
 using FezGame.Services;
 using FezEngine.Components;
+using FezEngine.Structure.Input;
 
 namespace FezGame.Mod {
     public class FEZModComponent : GameComponent {
@@ -24,6 +25,8 @@ namespace FezGame.Mod {
         public IInputManager InputManager { get; set; }
         [ServiceDependency]
         public IContentManagerProvider CMProvider { private get; set; }
+        
+        public bool WasPaused;
 
         public FEZModComponent(Game game) 
             : base(game) {
@@ -33,6 +36,14 @@ namespace FezGame.Mod {
         }
 
         public override void Update(GameTime gameTime) {
+            if (FEZMod.InAndroid && !WasPaused) {
+                if (!GameState.Paused) {
+                    CodeInputAll.Start.Press();
+                } else {
+                    WasPaused = true;
+                }
+            }
+            
             if (FEZMod.OverridePixelsPerTrixel != 0) {
                 CameraManager.PixelsPerTrixel = FEZMod.OverridePixelsPerTrixel;
             }

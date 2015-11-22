@@ -14,6 +14,9 @@ using EasyStorage;
 using System.Globalization;
 using System.Threading;
 using MonoMod.JIT;
+#if FNA
+using SDL2;
+#endif
 
 namespace FezGame.Mod {
     public static class FEZMod {
@@ -105,7 +108,7 @@ namespace FezGame.Mod {
             if (runningInAndroid) {
                 EngageFEZDroid();
             }
-
+            
             try {
                 FEZVersion = new Version(Fez.Version.IndexOf('a') == -1 ? Fez.Version : Fez.Version.Substring(0, Fez.Version.IndexOf('a')));
             } catch (Exception e) {
@@ -381,6 +384,38 @@ namespace FezGame.Mod {
 
                 SettingsManager.Resolutions.Sort(new Comparison<DisplayMode>((x, y) => x.Width * x.Height - y.Width * y.Height));
             }
+            
+            #if FNA
+            int numJoysticks = SDL.SDL_NumJoysticks();
+            ModLogger.Log("FEZMod", "Joysticks found: "+numJoysticks);
+            byte[] guidb = new byte[256];
+            for (int i = 0; i < numJoysticks; i++) {
+                IntPtr joy = SDL.SDL_JoystickOpen(i);
+                
+                if (joy != IntPtr.Zero) {
+                    ModLogger.Log("FEZMod", "Opened Joystick "+i);
+                    ModLogger.Log("FEZMod", "Name: "+SDL.SDL_JoystickNameForIndex(i));
+                    ModLogger.Log("FEZMod", "Number of Axes: "+SDL.SDL_JoystickNumAxes(joy));
+                    ModLogger.Log("FEZMod", "Number of Buttons: "+SDL.SDL_JoystickNumButtons(joy));
+                    ModLogger.Log("FEZMod", "Number of Balls: "+SDL.SDL_JoystickNumBalls(joy));
+                    Guid guid = SDL.SDL_JoystickGetGUID(joy);
+                    SDL.SDL_JoystickGetGUIDString(guid, guidb, guidb.Length);
+                    string guids = "";
+                    for (int ii = 0; ii < guidb.Length; ii++) {
+                        guids += (char) guidb[ii];
+                    }
+                    ModLogger.Log("FEZMod", "GUID: "+guids);
+                    ModLogger.Log("FEZMod", "Mapping: "+SDL.SDL_GameControllerMappingForGUID(guid));
+                } else {
+                    ModLogger.Log("FEZMod", "Couldn't open Joystick "+i+"\n");
+                }
+            
+                // Close if opened
+                if (SDL.SDL_JoystickGetAttached(joy) == SDL.SDL_bool.SDL_TRUE) {
+                    SDL.SDL_JoystickClose(joy);
+                }
+            }
+            #endif
             
             ServiceHelper.Game.Exiting += (sender, e) => Exit();
 
