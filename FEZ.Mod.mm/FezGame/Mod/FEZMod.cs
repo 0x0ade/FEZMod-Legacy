@@ -30,6 +30,8 @@ namespace FezGame.Mod {
 
         //Modules and configuration
         public static List<FezModule> Modules = new List<FezModule>();
+        private static Type[] ModuleTypes;
+        private static Dictionary<string, MethodInfo>[] ModuleMethods;
 
         public static bool IsAlwaysTurnable = false;
         public static float OverridePixelsPerTrixel = 0f;
@@ -74,7 +76,7 @@ namespace FezGame.Mod {
         private static bool runningInAndroid {
             get {
                 ModLogger.Log("FEZDroid", "Checking if running in Android");
-                return Directory.Exists("/system/app");
+                return Directory.Exists("/system/app") && Directory.Exists("/data") && Directory.Exists("/sdcard");
             }
         }
 
@@ -169,6 +171,14 @@ namespace FezGame.Mod {
             foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies()) {
                 PreInitializeModules(assembly);
             }
+            
+            ModuleTypes = new Type[Modules.Count];
+            ModuleMethods = new Dictionary<string, MethodInfo>[ModuleTypes.Length];
+            for (int i = 0; i < ModuleTypes.Length; i++) {
+                FezModule module = Modules[i];
+                ModuleTypes[i] = module.GetType();
+                ModuleMethods[i] = new Dictionary<string, MethodInfo>();
+            }
         }
 
         public static void PreInitializeModules(Assembly assembly) {
@@ -194,7 +204,7 @@ namespace FezGame.Mod {
         }
 
         public static void PreInitializeModule(Type type) {
-            FezModule module = (FezModule) type.GetConstructor(new Type[0]).Invoke(new object[0]);
+            FezModule module = (FezModule) type.GetConstructor(Garbage.a_Type_0).Invoke(Garbage.a_object_0);
             ModLogger.Log("FEZMod", "Pre-Initializing "+module.Name);
             module.PreInitialize();
             Modules.Add(module);
@@ -345,19 +355,15 @@ namespace FezGame.Mod {
                 ConstructorInfo dmConst = typeof(DisplayMode).GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, 
                 #if FNA
                     new Type[] {typeof(int), typeof(int), typeof(SurfaceFormat)}, null);
-                allModes.Add((DisplayMode) dmConst.Invoke(new object[] {1280, 720, SurfaceFormat.Color}));
-                allModes.Add((DisplayMode) dmConst.Invoke(new object[] {1920, 1080, SurfaceFormat.Color}));
+                object[] args = {0, 0, SurfaceFormat.Color};
                 #else
                     new Type[] {typeof(int), typeof(int), typeof(int), typeof(SurfaceFormat)}, null);
-                allModes.Add((DisplayMode) dmConst.Invoke(new object[] {1280, 720, 60, SurfaceFormat.Color}));
-                allModes.Add((DisplayMode) dmConst.Invoke(new object[] {1920, 1080, 60, SurfaceFormat.Color}));
+                object[] args = {0, 0, 60, SurfaceFormat.Color};
                 #endif
+                args[0] = 1280; args[1] = 720; allModes.Add((DisplayMode) dmConst.Invoke(args));
+                args[0] = 1280; args[1] = 720; allModes.Add((DisplayMode) dmConst.Invoke(args));
                 foreach (int[] resolution in CustomResolutions) {
-                    #if FNA
-                    allModes.Add((DisplayMode) dmConst.Invoke(new object[] {resolution[0], resolution[1], SurfaceFormat.Color}));
-                    #else
-                    allModes.Add((DisplayMode) dmConst.Invoke(new object[] {resolution[0], resolution[1], 60, SurfaceFormat.Color}));
-                    #endif
+                    args[0] = resolution[0]; args[1] = resolution[1]; allModes.Add((DisplayMode) dmConst.Invoke(args));
                 }
 
                 foreach (DisplayMode mode in allModes) {
@@ -377,7 +383,7 @@ namespace FezGame.Mod {
                         SettingsManager.Resolutions.Add(mode);
                     #if !FNA
                     } else {
-                        SettingsManager.Resolutions.Add((DisplayMode) dmConst.Invoke(new object[] {mode.Width, mode.Height, 60, SurfaceFormat.Color}));
+                        args[0] = mode.Width; args[1] = mode.Height; SettingsManager.Resolutions.Add((DisplayMode) dmConst.Invoke(args));
                     }
                     #endif
                 }
@@ -385,41 +391,9 @@ namespace FezGame.Mod {
                 SettingsManager.Resolutions.Sort(new Comparison<DisplayMode>((x, y) => x.Width * x.Height - y.Width * y.Height));
             }
             
-            #if FNA
-            int numJoysticks = SDL.SDL_NumJoysticks();
-            ModLogger.Log("FEZMod", "Joysticks found: "+numJoysticks);
-            byte[] guidb = new byte[256];
-            for (int i = 0; i < numJoysticks; i++) {
-                IntPtr joy = SDL.SDL_JoystickOpen(i);
-                
-                if (joy != IntPtr.Zero) {
-                    ModLogger.Log("FEZMod", "Opened Joystick "+i);
-                    ModLogger.Log("FEZMod", "Name: "+SDL.SDL_JoystickNameForIndex(i));
-                    ModLogger.Log("FEZMod", "Number of Axes: "+SDL.SDL_JoystickNumAxes(joy));
-                    ModLogger.Log("FEZMod", "Number of Buttons: "+SDL.SDL_JoystickNumButtons(joy));
-                    ModLogger.Log("FEZMod", "Number of Balls: "+SDL.SDL_JoystickNumBalls(joy));
-                    Guid guid = SDL.SDL_JoystickGetGUID(joy);
-                    SDL.SDL_JoystickGetGUIDString(guid, guidb, guidb.Length);
-                    string guids = "";
-                    for (int ii = 0; ii < guidb.Length; ii++) {
-                        guids += (char) guidb[ii];
-                    }
-                    ModLogger.Log("FEZMod", "GUID: "+guids);
-                    ModLogger.Log("FEZMod", "Mapping: "+SDL.SDL_GameControllerMappingForGUID(guid));
-                } else {
-                    ModLogger.Log("FEZMod", "Couldn't open Joystick "+i+"\n");
-                }
-            
-                // Close if opened
-                if (SDL.SDL_JoystickGetAttached(joy) == SDL.SDL_bool.SDL_TRUE) {
-                    SDL.SDL_JoystickClose(joy);
-                }
-            }
-            #endif
-            
             ServiceHelper.Game.Exiting += (sender, e) => Exit();
 
-            CallInEachModule("Initialize", new object[0]);
+            CallInEachModule("Initialize", Garbage.a_object_0);
         }
         
         //FEZDroid special methods
@@ -460,33 +434,33 @@ namespace FezGame.Mod {
                 }
             }
 
-            CallInEachModule("LoadComponents", new object[1] {game});
+            CallInEachModule("LoadComponents", Garbage.GetObjectArray(game));
         }
 
         public static void Exit() {
-            CallInEachModule("Exit", new object[0]);
+            CallInEachModule("Exit", Garbage.a_object_0);
         }
 
         public static void LoadEssentials() {
-            CallInEachModule("LoadEssentials", new object[0]);
+            CallInEachModule("LoadEssentials", Garbage.a_object_0);
             LoadedEssentials = true;
         }
 
         public static void Preload() {
-            CallInEachModule("Preload", new object[0]);
+            CallInEachModule("Preload", Garbage.a_object_0);
             Preloaded = true;
         }
 
         public static void SaveClear(SaveData saveData) {
-            CallInEachModule("SaveClear", new object[] {saveData});
+            CallInEachModule("SaveClear", Garbage.GetObjectArray(saveData));
         }
 
         public static void SaveClone(SaveData source, SaveData dest) {
-            CallInEachModule("SaveClone", new object[] {source, dest});
+            CallInEachModule("SaveClone", Garbage.GetObjectArray(source, dest));
         }
 
         public static void SaveRead(SaveData saveData, CrcReader reader) {
-            CallInEachModule("SaveRead", new object[] {saveData, reader});
+            CallInEachModule("SaveRead", Garbage.GetObjectArray(saveData, reader));
 
             if (EnableBugfixes) {
                 saveData.HasFPView = saveData.HasFPView || saveData.HasStereo3D;
@@ -494,7 +468,7 @@ namespace FezGame.Mod {
         }
 
         public static void SaveWrite(SaveData saveData, CrcWriter writer) {
-            CallInEachModule("SaveWrite", new object[] {saveData, writer});
+            CallInEachModule("SaveWrite", Garbage.GetObjectArray(saveData, writer));
         }
 
         public static string ProcessLevelName(string levelName) {
@@ -502,11 +476,11 @@ namespace FezGame.Mod {
         }
 
         public static void ProcessLevelData(Level levelData) {
-            CallInEachModule("ProcessLevelData", new object[] {levelData});
+            CallInEachModule("ProcessLevelData", Garbage.GetObjectArray(levelData));
         }
 
         public static void HandleCrash(Exception e) {
-            CallInEachModule("HandleCrash", new object[] {e});
+            CallInEachModule("HandleCrash", Garbage.GetObjectArray(e));
         }
 
         //Additional methods
@@ -514,17 +488,31 @@ namespace FezGame.Mod {
 
         //Helper methods
         private static void CallInEachModule(string methodName, object[] args) {
-            Type[] argsTypes = Type.GetTypeArray(args);
-            foreach (FezModule module in Modules) {
-                module.GetType().GetMethod(methodName, argsTypes).Invoke(module, args);
+            Type[] argsTypes = null;
+            for (int i = 0; i < ModuleTypes.Length; i++) {
+                Dictionary<string, MethodInfo> moduleMethods = ModuleMethods[i];
+                MethodInfo method;
+                if (moduleMethods.TryGetValue(methodName, out method)) {
+                    Common.ReflectionHelper.InvokeMethod(method, Modules[i], args);
+                    continue;
+                }
+                
+                if (argsTypes == null) {
+                    argsTypes = Type.GetTypeArray(args);
+                }
+                method = ModuleTypes[i].GetMethod(methodName, argsTypes);
+                moduleMethods[methodName] = method;
+                Common.ReflectionHelper.InvokeMethod(method, Modules[i], args);
             }
         }
 
         private static T CallInEachModule<T>(string methodName, T arg) {
             Type[] argsTypes = { typeof(T) };
             object[] args = { arg };
-            foreach (FezModule module in Modules) {
-                arg = (T) module.GetType().GetMethod(methodName, argsTypes).Invoke(module, args);
+            for (int i = 0; i < Modules.Count; i++) {
+                FezModule module = Modules[i];
+                //TODO use module method cache
+                arg = (T) Common.ReflectionHelper.InvokeMethod(module.GetType().GetMethod(methodName, argsTypes), module, args);
             }
             return arg;
         }

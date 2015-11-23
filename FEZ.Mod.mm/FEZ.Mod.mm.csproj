@@ -111,6 +111,8 @@
     <Compile Include="FezEngine\Services\LevelManager.cs" />
     <Compile Include="FezGame\Components\WorldMap.cs" />
     <Compile Include="FezGame\Components\DotHost.cs" />
+    <Compile Include="FezGame\Mod\Garbage.cs" />
+    <Compile Include="FezGame\Mod\Cache.cs" />
     <Compile Include="FezGame\Mod\FEZMod.cs" />
     <Compile Include="FezGame\Mod\FezModule.cs" />
     <Compile Include="FezGame\Mod\FEZModComponent.cs" />
