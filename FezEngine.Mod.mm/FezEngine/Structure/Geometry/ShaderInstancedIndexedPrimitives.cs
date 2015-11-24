@@ -89,9 +89,7 @@ namespace FezEngine.Structure.Geometry {
             return null;
         }
 
-        public void orig_Draw(BaseEffect effect) {
-        }
-
+        public extern void orig_Draw(BaseEffect effect);
         public override void Draw(BaseEffect effect) {
             if (device == null || primitiveCount == 0 || vertices == null || vertices.Length == 0 || indexBuffer == null || vertexBuffer == null || Instances == null || InstanceCount <= 0) {
                 return;
@@ -104,6 +102,7 @@ namespace FezEngine.Structure.Geometry {
             }
             #else
             //FNA is used by 1.12+ anyways, so avoid errors when calling / patching this method.
+            //Also, FEZ 1.12+ fixes the Intel bug. Custom SIIP code shouldn't be required anymore.
             if (FEZMod.FEZVersion == V_1_12) {
                 Draw_1_12(effect);
                 return;
@@ -138,6 +137,7 @@ namespace FezEngine.Structure.Geometry {
                 }
                 //Re-use the same array every call (useless microoptimization)
                 tmpVertexBufferBindingArray[0] = vertexBuffer;
+                //TODO for yet another useless microoptimization, reuse [1]
                 tmpVertexBufferBindingArray[1] = new VertexBufferBinding(instanceBuffer, 0, 1);
                 device.SetVertexBuffers(tmpVertexBufferBindingArray);
             } else {
@@ -167,7 +167,6 @@ namespace FezEngine.Structure.Geometry {
                         //instance count mismatch or too small buffer on draw
                         ModLogger.Log("FEZMod.SIIP", "Forcibly updating instance buffer...");
                         UpdateBuffers(true);
-                        //TODO decide whether to cancel rendering current draw call / frame or not.
                         return;
                     }
                     

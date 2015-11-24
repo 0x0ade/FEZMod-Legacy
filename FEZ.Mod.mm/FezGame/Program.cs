@@ -2,11 +2,9 @@
 using FezGame.Mod;
 
 namespace FezGame {
-	public class Program {
+	public static class Program {
 
-		public static void orig_Main(string[] args) {
-		}
-
+		public static extern void orig_Main(string[] args);
 		public static void Main(string[] args) {
             try {
                 FEZMod.PreInitialize(args);
@@ -23,9 +21,7 @@ namespace FezGame {
 			orig_Main(args);
 		}
 
-        private static void orig_MainInternal() {
-        }
-
+        private static extern void orig_MainInternal();
         private static void MainInternal() {
             try {
                 orig_MainInternal();

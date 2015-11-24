@@ -7,7 +7,7 @@ using MonoMod;
 namespace FezEngine.Tools {
     public static class ServiceHelper {
 
-        public static Game Game { get; set; }
+        public static Game Game { [MonoModIgnore] get; [MonoModIgnore] set; }
 
         private static List<object> services = new List<object>();
         private static readonly List<IGameComponent> components = new List<IGameComponent>();
@@ -15,12 +15,9 @@ namespace FezEngine.Tools {
         private static readonly Dictionary<IGameComponent, List<Type>> componentMapReverse = new Dictionary<IGameComponent, List<Type>>();
 
         [MonoModIgnore]
-        public static void InjectServices(object service) {
-        }
+        public static extern void InjectServices(object service);
 
-        public static void orig_InitializeServices() {
-        }
-
+        public static extern void orig_InitializeServices();
         public static void InitializeServices() {
             int oldCount = services.Count;
             orig_InitializeServices();
@@ -30,10 +27,7 @@ namespace FezEngine.Tools {
             }
         }
 
-        public static T orig_Get<T>() where T : class {
-            return null;
-        }
-
+        public static extern T orig_Get<T>() where T : class;
         public static T Get<T>() where T : class {
             T obj = orig_Get<T>();
             if (obj != null || !FEZMod.GetComponentsAsServices) {
@@ -45,10 +39,7 @@ namespace FezEngine.Tools {
             return null;
         }
 
-        public static object orig_Get(Type type) {
-            return null;
-        }
-
+        public static extern object orig_Get(Type type);
         public static object Get(Type type) {
             object obj = orig_Get(type);
             if (obj != null || !FEZMod.GetComponentsAsServices) {
@@ -60,9 +51,7 @@ namespace FezEngine.Tools {
             return null;
         }
 
-        public static void orig_AddComponent(IGameComponent component, bool addServices) {
-        }
-
+        public static extern void orig_AddComponent(IGameComponent component, bool addServices);
         public static void AddComponent(IGameComponent component, bool addServices) {
             orig_AddComponent(component, addServices);
 
@@ -72,9 +61,7 @@ namespace FezEngine.Tools {
             }
         }
 
-        public static void orig_RemoveComponent<T>(T component) where T : IGameComponent {
-        }
-
+        public static extern void orig_RemoveComponent<T>(T component) where T : IGameComponent;
         public static void RemoveComponent<T>(T component) where T : IGameComponent {
             if (!FEZMod.HandleComponents) {
                 orig_RemoveComponent(component);

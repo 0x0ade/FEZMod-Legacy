@@ -20,9 +20,7 @@ namespace FezGame.Components {
         public IGameCameraManager CameraManager { [MonoModIgnore] get { return null; } }
         public GraphicsDevice GraphicsDevice { [MonoModIgnore] get { return null; } }
 
-        public void orig_Update(GameTime gameTime) {
-        }
-
+        public extern void orig_Update(GameTime gameTime);
         public void Update(GameTime gameTime) {
             if (!FEZMod.EnableFEZometric) {
                 orig_Update(gameTime);

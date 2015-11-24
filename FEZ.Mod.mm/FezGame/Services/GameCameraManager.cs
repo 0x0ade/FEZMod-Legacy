@@ -1,10 +1,7 @@
 ﻿namespace FezGame.Services {
     public class GameCameraManager {
 
-        public float orig_get_InterpolationSpeed() {
-            return 1f;
-        }
-
+        public extern float orig_get_InterpolationSpeed();
         public float get_InterpolationSpeed() {
             if (Fez.LongScreenshot) {
                 return 0.06f;
@@ -13,10 +10,7 @@
             }
         }
 
-        public float orig_get_Radius() {
-            return 1f;
-        }
-
+        public extern float orig_get_Radius();
         public float get_Radius() {
             if (Fez.LongScreenshot) {
                 return 90f;

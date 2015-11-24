@@ -350,9 +350,7 @@ namespace FezEngine.Components {
             }
         }
         
-        public void orig_Update(GameTime gameTime) {
-        }
-        
+        public extern void orig_Update(GameTime gameTime);
         public void Update(GameTime gameTime) {
             FakeInputHelper.Updating = true;
             
@@ -423,33 +421,11 @@ namespace FezEngine.Components {
                         ClampLook = pair.Value;
                         break;
                     default:
-                        //TODO get int value and do something special
                         throw new ArgumentOutOfRangeException();
                 }
             }
             
             FakeInputHelper.PostUpdate(gameTime);
-            
-            /*
-            Movement = new Vector2(FezButtonStateExtensions.IsDown(KeyboardState.Right) ? 1f : (FezButtonStateExtensions.IsDown(KeyboardState.Left) ? -1f : 0.0f), FezButtonStateExtensions.IsDown(KeyboardState.Up) ? 1f : (FezButtonStateExtensions.IsDown(KeyboardState.Down) ? -1f : 0.0f));
-            FreeLook = new Vector2(FezButtonStateExtensions.IsDown(KeyboardState.LookRight) ? 1f : (FezButtonStateExtensions.IsDown(KeyboardState.LookLeft) ? -1f : 0.0f), FezButtonStateExtensions.IsDown(KeyboardState.LookUp) ? 1f : (FezButtonStateExtensions.IsDown(KeyboardState.LookDown) ? -1f : 0.0f));
-            Back = KeyboardState.OpenMap;
-            Start = KeyboardState.Pause;
-            Jump = KeyboardState.Jump;
-            GrabThrow = KeyboardState.GrabThrow;
-            CancelTalk = KeyboardState.CancelTalk;
-            Down = KeyboardState.Down;
-            ExactUp = Up = KeyboardState.Up;
-            Left = KeyboardState.Left;
-            Right = KeyboardState.Right;
-            OpenInventory = KeyboardState.OpenInventory;
-            RotateLeft = KeyboardState.RotateLeft;
-            RotateRight = KeyboardState.RotateRight;
-            MapZoomIn = KeyboardState.MapZoomIn;
-            MapZoomOut = KeyboardState.MapZoomOut;
-            FpsToggle = KeyboardState.FpViewToggle;
-            ClampLook = KeyboardState.ClampLook;
-            */
             
             FakeInputHelper.Updating = false;
         }

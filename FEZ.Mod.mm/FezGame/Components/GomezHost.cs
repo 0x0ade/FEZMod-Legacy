@@ -28,9 +28,7 @@ namespace FezGame.Components {
 
         protected NetworkGomezData networkData;
 
-        public void orig_Update(GameTime gameTime) {
-        }
-
+        public extern void orig_Update(GameTime gameTime);
         public void Update(GameTime gameTime) {
             orig_Update(gameTime);
             if (NetworkGomezServer.Instance != null) {
@@ -83,9 +81,7 @@ namespace FezGame.Components {
             return networkData;
         }
 
-        public void orig_Draw(GameTime gameTime) {
-        }
-
+        public extern void orig_Draw(GameTime gameTime);
         public void Draw(GameTime gameTime) {
             if (FEZMod.CreatingThumbnail) {
                 return;

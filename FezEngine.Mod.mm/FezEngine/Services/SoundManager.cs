@@ -18,9 +18,7 @@ namespace FezEngine.Services {
         private string MusicTempDir;
         private Dictionary<string, string> MusicAliases;
 
-        public void orig_InitializeLibrary() {
-        }
-
+        public extern void orig_InitializeLibrary();
         public void InitializeLibrary() {
             if (!ExtractDisabled && !ExtractCustom) {
                 orig_InitializeLibrary();
@@ -98,10 +96,7 @@ namespace FezEngine.Services {
             }
         }
 
-        public OggStream orig_GetCue(string name, bool asyncPrecache = false) {
-            return null;
-        }
-
+        public extern OggStream orig_GetCue(string name, bool asyncPrecache = false);
         public OggStream GetCue(string name, bool asyncPrecache = false) {
             bool isAmbience = name.Contains("Ambience");
 

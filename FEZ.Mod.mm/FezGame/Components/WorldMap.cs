@@ -24,12 +24,9 @@ namespace FezGame.Components {
         public IPlayerManager PlayerManager { [MonoModIgnore] get; [MonoModIgnore] set; }
 
         [MonoModIgnore]
-        private void Exit() {
-        }
+        private extern void Exit();
 
-        public void orig_Update(GameTime gameTime) {
-        }
-
+        public extern void orig_Update(GameTime gameTime);
         public void Update(GameTime gameTime) {
             orig_Update(gameTime);
 
@@ -54,9 +51,7 @@ namespace FezGame.Components {
             }
         }
 
-        private static void orig_DoSpecial(MapNode.Connection c, Vector3 offset, Vector3 faceVector, float sizeFactor, List<Matrix> instances) {
-        }
-
+        private static extern void orig_DoSpecial(MapNode.Connection c, Vector3 offset, Vector3 faceVector, float sizeFactor, List<Matrix> instances);
         private static void DoSpecial(MapNode.Connection c, Vector3 offset, Vector3 faceVector, float sizeFactor, List<Matrix> instances) {
             orig_DoSpecial(c, offset, faceVector, sizeFactor, instances);
             if (HighlightLevel == null) {

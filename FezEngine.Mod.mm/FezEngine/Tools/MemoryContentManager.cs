@@ -96,10 +96,7 @@ namespace FezEngine.Tools {
             ModLogger.Log("FEZMod.Engine", "Dumped: "+dumped+" / "+count);
         }
 
-        protected Stream orig_OpenStream(string assetName) {
-            return null;
-        }
-
+        protected extern Stream orig_OpenStream(string assetName);
         protected Stream OpenStream(string assetName) {
             if (DumpAllResources) {
                 DumpAll();
@@ -129,10 +126,7 @@ namespace FezEngine.Tools {
             return orig_OpenStream(assetName);
         }
 
-        public static bool orig_AssetExists(string assetName) {
-            return false;
-        }
-
+        public static extern bool orig_AssetExists(string assetName);
         public static bool AssetExists(string assetName) {
             if (assetName == "FEZMOD_WORKAROUND_DUMP") {
                 DumpResources = true;
@@ -159,34 +153,21 @@ namespace FezEngine.Tools {
                 return true;
             }
 
-            if (File.Exists(assetName.Externalize() + ".xnb")) {
-                return true;
-            }
-            if (File.Exists(assetName.Externalize() + ".fxb")) {
-                return true;
-            }
-            if (File.Exists(assetName.Externalize() + ".ogg")) {
-                return true;
-            }
-            if (File.Exists(assetName.Externalize() + ".png")) {
-                return true;
-            }
-            if (File.Exists(assetName.Externalize() + ".jpg")) {
-                return true;
-            }
-            if (File.Exists(assetName.Externalize() + ".jpeg")) {
-                return true;
-            }
-            if (File.Exists(assetName.Externalize() + ".gif")) {
+            string assetPath = assetName.Externalize();
+            if (File.Exists(assetPath + ".xnb") ||
+                File.Exists(assetPath + ".fxb") ||
+                File.Exists(assetPath + ".ogg") ||
+                File.Exists(assetPath + ".png") ||
+                File.Exists(assetPath + ".jpg") ||
+                File.Exists(assetPath + ".jpeg") ||
+                File.Exists(assetPath + ".gif")) {
                 return true;
             }
 
             return orig_AssetExists(assetName);
         }
 
-        public void orig_LoadEssentials() {
-        }
-
+        public extern void orig_LoadEssentials();
         public void LoadEssentials() {
             if (!CacheDisabled) {
                 orig_LoadEssentials();
@@ -196,9 +177,7 @@ namespace FezEngine.Tools {
             FEZMod.LoadEssentials();
         }
 
-        public void orig_Preload() {
-        }
-
+        public void orig_Preload();
         public void Preload() {
             if (!CacheDisabled) {
                 orig_Preload();

@@ -19,9 +19,7 @@ namespace FezGame.Services {
 
         protected Level tmpLevel;
 
-        public void orig_Load(string levelName) {
-        }
-
+        public extern void orig_Load(string levelName);
         public void Load(string levelName) {
             if (levelName.StartsWith("JAFM_WORKAROUND_SAVE:")) {
                 string[] split = levelName.Split(new char[] {':'});
@@ -139,9 +137,7 @@ namespace FezGame.Services {
         }
 
         [MonoModIgnore]
-        public void ChangeLevel(string levelName) {
-        }
-
+        public extern void ChangeLevel(string levelName);
         public void ChangeLevel(Level level) {
             ContentManager cm = CMProvider.GetForLevel(level.Name);
             if (level.SkyName != null) {

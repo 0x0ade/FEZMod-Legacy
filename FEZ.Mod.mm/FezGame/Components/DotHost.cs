@@ -7,9 +7,7 @@ namespace FezGame.Components {
 
         public SoundEmitter eIdle;
 
-        public void orig_Draw(GameTime gameTime) {
-        }
-
+        public extern void orig_Draw(GameTime gameTime);
         public void Draw(GameTime gameTime) {
             //Fixes NPE as eIdle may be null.
             if (Fez.LongScreenshot) {
