@@ -177,7 +177,7 @@ namespace FezEngine.Tools {
             FEZMod.LoadEssentials();
         }
 
-        public void orig_Preload();
+        public extern void orig_Preload();
         public void Preload() {
             if (!CacheDisabled) {
                 orig_Preload();

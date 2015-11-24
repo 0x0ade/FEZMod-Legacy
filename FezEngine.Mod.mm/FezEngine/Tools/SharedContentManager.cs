@@ -9,10 +9,7 @@ namespace FezEngine.Tools {
 
         private class CommonContentManager {
 
-            private T orig_ReadAsset<T>(string assetName) {
-                return default(T);
-            }
-
+            private extern T orig_ReadAsset<T>(string assetName) ;
             private T ReadAsset<T>(string assetName) where T : class {
                 if (assetName.Contains("-fm-")) {
                     assetName = assetName.Substring(0, assetName.IndexOf("-fm-"));
