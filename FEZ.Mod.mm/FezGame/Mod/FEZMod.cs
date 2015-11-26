@@ -14,6 +14,7 @@ using EasyStorage;
 using System.Globalization;
 using System.Threading;
 using MonoMod.JIT;
+using FezEngine.Mod;
 #if FNA
 using SDL2;
 #endif
@@ -89,8 +90,10 @@ namespace FezGame.Mod {
 
         private static int TestMonoModJIT(string test) {
             Console.WriteLine("Calling something unpatched.");
-            Console.WriteLine("Assembly: " + Assembly.GetExecutingAssembly().FullName);
-            Console.WriteLine("Passed arg: " + test);
+            Console.Write("Assembly: ");
+            Console.WriteLine(Assembly.GetExecutingAssembly().FullName);
+            Console.Write("Passed arg: ");
+            Console.WriteLine(test);
 
             try {
                 MonoModJITHandler.MMRun(null, test);
@@ -290,38 +293,6 @@ namespace FezGame.Mod {
                 if (args[i] == "--android") {
                     EngageFEZDroid();
                 }
-                /*
-                Explaination as of why the workaround still is required:
-                A module type won't be copied to the patched DLL, which means the
-                references to MCM will not be touched at all. These references
-                will point to the patch DLL, not the patchED DLL. AssetExists on the
-                other hand is inside the patchED DLL and thus has got the correct
-                references.
-                */
-                if (args[i] == "-d" || args[i] == "--dump") {
-                    ModLogger.Log("FEZMod.Engine", "Found -d / --dump");
-                    MemoryContentManager.AssetExists("FEZMOD_WORKAROUND_DUMP");
-                }
-                if (args[i] == "-da" || args[i] == "--dump-all") {
-                    ModLogger.Log("FEZMod.Engine", "Found -da / --dump-all");
-                    MemoryContentManager.AssetExists("FEZMOD_WORKAROUND_DUMPALL");
-                }
-                if (args[i] == "-nf" || args[i] == "--no-flat") {
-                    ModLogger.Log("FEZMod.Engine", "Found -nf / --no-flat");
-                    MemoryContentManager.AssetExists("FEZMOD_WORKAROUND_NOFLAT");
-                }
-                if (args[i] == "-nc" || args[i] == "--no-cache") {
-                    ModLogger.Log("FEZMod.Engine", "Found -nc / --no-cache");
-                    MemoryContentManager.AssetExists("FEZMOD_WORKAROUND_NOCACHE");
-                }
-                if (args[i] == "-cme" || args[i] == "--custom-music-extract") {
-                    ModLogger.Log("FEZMod.Engine", "Found -cme / --custom-music-extract");
-                    MemoryContentManager.AssetExists("FEZMOD_WORKAROUND_CUSTOMMUSICEXTRACT");
-                }
-                if (args[i] == "-nme" || args[i] == "--no-music-extract") {
-                    ModLogger.Log("FEZMod.Engine", "Found -nme / --no-music-extract");
-                    MemoryContentManager.AssetExists("FEZMOD_WORKAROUND_NOMUSICEXTRACT");
-                }
                 //Version-dependant options
                 #if FNA
                 //Hurtz options missing in FEZ 1.12 devbuilds (or I can't find them)
@@ -412,7 +383,8 @@ namespace FezGame.Mod {
             if (DisableCloudSaves != null) {
                 DisableCloudSaves.SetValue(null, false);
             }
-            MemoryContentManager.AssetExists("FEZMOD_WORKAROUND_NOCACHE");
+            FezEngineMod.CacheDisabled = true;
+            FezEngineMod.MusicCache = MusicCacheMode.Disabled;
         }
 
         //Hooked FEZ methods or calls in each module

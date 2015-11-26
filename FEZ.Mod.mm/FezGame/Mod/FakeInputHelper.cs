@@ -139,7 +139,8 @@ namespace FezGame.Mod {
             
             keyTimesApplied.Clear();
             
-            foreach (CodeInputAll key in PressedOverrides) {
+            for (int i = 0; i < PressedOverrides.Count; i++) {
+                CodeInputAll key = PressedOverrides[i];
                 FezButtonState value;
                 if (!Overrides.TryGetValue(key, out value) || value == FezButtonState.Released) {
                     Overrides[key] = FezButtonState.Released;
@@ -151,7 +152,8 @@ namespace FezGame.Mod {
         }
         
         public static void PostUpdate(GameTime gameTime) {
-            foreach (CodeInputAll key in ReleasedOverrides) {
+            for (int i = 0; i < ReleasedOverrides.Count; i++) {
+                CodeInputAll key = ReleasedOverrides[i];
                 PressedOverrides.Remove(key);
             }
             ReleasedOverrides.Clear();

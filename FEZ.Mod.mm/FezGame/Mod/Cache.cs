@@ -37,6 +37,8 @@ namespace FezGame.Mod {
             cache = new T[amount];
             this.args = args;
             this.types = types;
+            //Combat memory fragmentation by filling the cache on initialization
+            FillAll();
         }
     
         public Cache<T> Previous() {
@@ -82,6 +84,14 @@ namespace FezGame.Mod {
             }
             return this;
         }
+        
+        public Cache<T> FillAll() {
+            for (int i = 0; i < cache.Length; i++) {
+                Position(i);
+                Fill();
+            }
+            return this;
+        }
     
         public Cache<T> Set(T obj) {
             cache[pos] = obj;
@@ -117,9 +127,13 @@ namespace FezGame.Mod {
         public ArrayCache(int amount, object[] args, Type[] types, int arrsize)
             : base(amount, args, types) {
                 this.arrsize = arrsize;
+                FillAll();
         }
         
         public override Cache<T[]> Fill() {
+            if (arrsize <= 0) {
+                return this;
+            }
             if (cache[pos] == null) {
                 cache[pos] = new T[arrsize];
             }

@@ -5,19 +5,21 @@ using System.Collections.Generic;
 using System.IO;
 using FezEngine.Structure;
 using FezEngine.Services;
+using FezEngine.Mod;
 
 namespace FezEngine.Tools {
     public class MemoryContentManager {
 
         private static IEnumerable<string> assetNames;
         public static IEnumerable<string> get_AssetNames() {
-            if (!CacheDisabled) {
+            if (!FezEngineMod.CacheDisabled) {
                 return MemoryContentManager.cachedAssets.Keys;
             } else {
                 if (assetNames == null) {
                     List<string> files = TraverseThrough("Resources");
                     List<string> assets = new List<string>(files.Count);
-                    foreach (string file in files) {
+                    for (int i = 0; i < files.Count; i++) {
+                        string file = files[i];
                         assets.Add(file.Substring(10, file.Length-14).Replace("/", "\\"));
                     }
                     assetNames = assets;
@@ -26,21 +28,23 @@ namespace FezEngine.Tools {
             }
         }
 
-        private static List<string> TraverseThrough(string dir) {
-            return TraverseThrough(new List<string>(), dir);
-        }
-
-        private static List<string> TraverseThrough(List<string> list, string dir) {
+        private static List<string> TraverseThrough(string dir, List<string> list = null) {
             if (!Directory.Exists(dir)) {
                 return list;
             }
-
-            foreach (string subdir in Directory.GetDirectories(dir)) {
-                list = TraverseThrough(list, subdir);
+            
+            if (list == null) {
+                list = new List<string>();
             }
 
-            foreach (string file in Directory.GetFiles(dir)) {
-                list.Add(file);
+            string[] dirs = Directory.GetDirectories(dir);
+            for (int i = 0; i < dirs.Length; i++) {
+                list = TraverseThrough(dirs[i], list);
+            }
+            
+            string[] files = Directory.GetFiles(dir);
+            for (int i = 0; i < files.Length; i++) {
+                list.Add(files[i]);
             }
 
             return list;
@@ -48,11 +52,7 @@ namespace FezEngine.Tools {
 
         private static Dictionary<String, byte[]> cachedAssets;
 
-        public static bool DumpResources = false;
-        public static bool DumpAllResources = false;
         private static int DumpAllResourcesCount = 0;
-
-        public static bool CacheDisabled = false;
 
         public static void DumpAll() {
             if (cachedAssets == null) {
@@ -98,7 +98,7 @@ namespace FezEngine.Tools {
 
         protected extern Stream orig_OpenStream(string assetName);
         protected Stream OpenStream(string assetName) {
-            if (DumpAllResources) {
+            if (FezEngineMod.DumpAllResources) {
                 DumpAll();
             }
 
@@ -114,7 +114,7 @@ namespace FezEngine.Tools {
             if (file.Exists) {
                 FileStream fis = new FileStream(filePath, FileMode.Open);
                 return fis;
-            } else if (DumpResources) {
+            } else if (FezEngineMod.DumpResources) {
                 file.Directory.Create();
                 ModLogger.Log("FEZMod.Engine", assetName+" -> "+filePath);
                 Stream ois = orig_OpenStream(assetName);
@@ -128,31 +128,6 @@ namespace FezEngine.Tools {
 
         public static extern bool orig_AssetExists(string assetName);
         public static bool AssetExists(string assetName) {
-            if (assetName == "FEZMOD_WORKAROUND_DUMP") {
-                DumpResources = true;
-                return true;
-            }
-            if (assetName == "FEZMOD_WORKAROUND_DUMPALL") {
-                DumpAllResources = true;
-                return true;
-            }
-            if (assetName == "FEZMOD_WORKAROUND_NOCACHE") {
-                CacheDisabled = true;
-                return true;
-            }
-            if (assetName == "FEZMOD_WORKAROUND_NOFLAT") {
-                Level.FlatDisabled = true;
-                return true;
-            }
-            if (assetName == "FEZMOD_WORKAROUND_CUSTOMMUSICEXTRACT") {
-                SoundManager.ExtractCustom = true;
-                return true;
-            }
-            if (assetName == "FEZMOD_WORKAROUND_NOMUSICEXTRACT") {
-                SoundManager.ExtractDisabled = true;
-                return true;
-            }
-
             string assetPath = assetName.Externalize();
             if (File.Exists(assetPath + ".xnb") ||
                 File.Exists(assetPath + ".fxb") ||
@@ -169,7 +144,7 @@ namespace FezEngine.Tools {
 
         public extern void orig_LoadEssentials();
         public void LoadEssentials() {
-            if (!CacheDisabled) {
+            if (!FezEngineMod.CacheDisabled) {
                 orig_LoadEssentials();
             } else {
                 cachedAssets = new Dictionary<string, byte[]>(0);
@@ -179,7 +154,7 @@ namespace FezEngine.Tools {
 
         public extern void orig_Preload();
         public void Preload() {
-            if (!CacheDisabled) {
+            if (!FezEngineMod.CacheDisabled) {
                 orig_Preload();
             }
             FEZMod.Preload();

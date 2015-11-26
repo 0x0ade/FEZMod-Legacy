@@ -1,11 +1,11 @@
-﻿namespace FezEngine.Structure {
-    public class Level {
+﻿using FezEngine.Mod;
 
-        public static bool FlatDisabled = false;
+namespace FezEngine.Structure {
+    public class Level {
 
         public extern bool orig_get_Flat();
         public bool get_Flat() {
-            return orig_get_Flat() && !FlatDisabled;
+            return orig_get_Flat() && !FezEngineMod.FlatDisabled;
         }
 
     }

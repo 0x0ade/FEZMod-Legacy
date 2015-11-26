@@ -113,6 +113,8 @@
     <Compile Include="FezGame\Components\DotHost.cs" />
     <Compile Include="FezGame\Mod\Garbage.cs" />
     <Compile Include="FezGame\Mod\Cache.cs" />
+    <Compile Include="FezEngine\Mod\FezEngineMod.cs" />
+    <Compile Include="FezEngine\Mod\MusicCacheMode.cs" />
     <Compile Include="FezGame\Mod\FEZMod.cs" />
     <Compile Include="FezGame\Mod\FezModule.cs" />
     <Compile Include="FezGame\Mod\FEZModComponent.cs" />
@@ -148,6 +150,7 @@
     <Compile Include="FezGame\ModLogger.cs" />
     <Compile Include="FezGame\Mod\Gui\AGuiHandler.cs" />
     <Compile Include="FezGame\Mod\FEZModReflectionHelper.cs" />
+    <Compile Include="FezGame\Mod\LimitedStream.cs" />
     <Compile Include="FezGame\Tools\patch_StaticText.cs" />
     <Compile Include="FezGame\Tools\patch_GameText.cs" />
   </ItemGroup>
