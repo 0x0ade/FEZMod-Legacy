@@ -58,7 +58,7 @@ namespace FezGame.Mod {
         }
         
         public LimitedStream(Stream stream, long offset, long length)
-            : base((int) Math.Max(length, int.MaxValue)) {
+            : base(0) {
             LimitStream = stream;
             LimitOffset = offset;
             LimitLength = length;
