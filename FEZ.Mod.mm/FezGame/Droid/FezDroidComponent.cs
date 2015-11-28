@@ -104,7 +104,7 @@ namespace FezGame.Droid {
             //TODO reimplement / rename
             Vector3 vector3 = Vector3.Transform(CameraManager.OriginalDirection, Matrix.CreateFromAxisAngle(Vector3.Up, 1.570796f));
             Vector3 to1 = Vector3.Transform(CameraManager.OriginalDirection, Matrix.CreateFromAxisAngle(vector3, -1.570796f));
-            Vector2 vector2 = InputManager.FreeLook / (GameState.MenuCubeIsZoomed ? 1.75f : 6.875f);
+            Vector2 vector2 = new Vector2(turnOffset, 0f) / (GameState.MenuCubeIsZoomed ? 1.75f : 6.875f);
             float step = 0.1f;
             if (!turnReleased) {
               vector2 = Vector2.Clamp(new Vector2(turnOffset, 0f) / (300f * SettingsManager.GetViewScale(GraphicsDevice)), -Vector2.One, Vector2.One) / (55.0f / 16.0f);

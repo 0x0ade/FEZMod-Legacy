@@ -315,8 +315,10 @@ namespace FezGame.Mod {
                     new Type[] {typeof(int), typeof(int), typeof(int), typeof(SurfaceFormat)}, null);
                 object[] args = {0, 0, 60, SurfaceFormat.Color};
                 #endif
+                args[0] = 640; args[1] = 360; allModes.Add((DisplayMode) dmConst.Invoke(args));
+                args[0] = 920; args[1] = 540; allModes.Add((DisplayMode) dmConst.Invoke(args));
                 args[0] = 1280; args[1] = 720; allModes.Add((DisplayMode) dmConst.Invoke(args));
-                args[0] = 1280; args[1] = 720; allModes.Add((DisplayMode) dmConst.Invoke(args));
+                args[0] = 1920; args[1] = 1080; allModes.Add((DisplayMode) dmConst.Invoke(args));
                 foreach (int[] resolution in CustomResolutions) {
                     args[0] = resolution[0]; args[1] = resolution[1]; allModes.Add((DisplayMode) dmConst.Invoke(args));
                 }
