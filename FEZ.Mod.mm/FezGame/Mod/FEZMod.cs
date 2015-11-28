@@ -73,14 +73,6 @@ namespace FezGame.Mod {
         public static bool LoadedEssentials { get; private set; }
         public static bool Preloaded { get; private set; }
 
-        public static bool InAndroid = false;
-        private static bool runningInAndroid {
-            get {
-                ModLogger.Log("FEZDroid", "Checking if running in Android");
-                return Directory.Exists("/system/app") && Directory.Exists("/data") && Directory.Exists("/sdcard");
-            }
-        }
-
         public static List<Assembly> LoadedAssemblies = new List<Assembly>();
 
         public static void PreInitialize(string[] args) {
@@ -109,10 +101,6 @@ namespace FezGame.Mod {
         public static void PreInitialize() {
             ModLogger.Clear();
             ModLogger.Log("FEZMod", "JustAnotherFEZMod (FEZMod) "+FEZMod.Version);
-            
-            if (runningInAndroid) {
-                EngageFEZDroid();
-            }
             
             try {
                 FEZVersion = new Version(Fez.Version.IndexOf('a') == -1 ? Fez.Version : Fez.Version.Substring(0, Fez.Version.IndexOf('a')));
@@ -289,10 +277,6 @@ namespace FezGame.Mod {
                     ModLogger.Log("FEZMod", "Found -mpl / --multiplayer-localhost");
                     EnableMultiplayerLocalhost = true;
                 }
-                //TODO extract FEZDroid from core
-                if (args[i] == "--android") {
-                    EngageFEZDroid();
-                }
                 //Version-dependant options
                 #if FNA
                 //Hurtz options missing in FEZ 1.12 devbuilds (or I can't find them)
@@ -367,26 +351,6 @@ namespace FezGame.Mod {
             CallInEachModule("Initialize", Garbage.a_object_0);
         }
         
-        //FEZDroid special methods
-        public static void EngageFEZDroid() {
-            if (InAndroid) {
-                return;
-            }
-            ModLogger.Log("FEZDroid", "Android mode engaged!");
-            InAndroid = true;
-            Fez.SkipIntro = true;
-            Fez.SkipLogos = true;
-            #if !FNA
-            Fez.NoLighting = true;
-            #endif
-            Fez.NoSteamworks = true;
-            if (DisableCloudSaves != null) {
-                DisableCloudSaves.SetValue(null, false);
-            }
-            FezEngineMod.CacheDisabled = true;
-            FezEngineMod.MusicCache = MusicCacheMode.Disabled;
-        }
-
         //Hooked FEZ methods or calls in each module
         public static void LoadComponents(Fez game) {
             ServiceHelper.AddComponent(new FEZModComponent(ServiceHelper.Game));

@@ -7,6 +7,7 @@ using FezEngine.Tools;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using FezGame.Mod;
+using FezGame.Droid;
 using MonoMod;
 
 namespace FezGame.Components {
@@ -22,6 +23,11 @@ namespace FezGame.Components {
 
         public extern void orig_Update(GameTime gameTime);
         public void Update(GameTime gameTime) {
+            if (FezDroid.InAndroid) {
+                //FEZDroid player camera control is being handled in FezDroidComponent.
+                return;
+            }
+            
             if (!FEZMod.EnableFEZometric) {
                 orig_Update(gameTime);
                 return;

@@ -153,6 +153,8 @@
     <Compile Include="FezGame\Mod\LimitedStream.cs" />
     <Compile Include="FezGame\Tools\patch_StaticText.cs" />
     <Compile Include="FezGame\Tools\patch_GameText.cs" />
+    <Compile Include="FezGame\Droid\FezDroid.cs" />
+    <Compile Include="FezGame\Droid\FezDroidComponent.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
