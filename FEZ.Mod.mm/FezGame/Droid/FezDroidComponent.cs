@@ -67,8 +67,8 @@ namespace FezGame.Droid {
             new Vector2(-2f, -1f),
             new Vector2(-4f, -2f),
             new Vector2(-2f, 2f),
-            new Vector2(-1f, -1f),
-            new Vector2(1f, -1f)
+            new Vector2(1f, -1f),
+            new Vector2(-1f, -1f)
         };
         private Vector2[] buttonPre = {
             new Vector2(1f, 1f),
