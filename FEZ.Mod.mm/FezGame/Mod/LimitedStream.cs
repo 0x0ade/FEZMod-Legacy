@@ -62,6 +62,7 @@ namespace FezGame.Mod {
             LimitStream = stream;
             LimitOffset = offset;
             LimitLength = length;
+            LimitStream.Seek(offset, SeekOrigin.Begin);
         }
 
         public override void Flush() {
@@ -86,7 +87,7 @@ namespace FezGame.Mod {
                     if (LimitOffset + LimitLength <= Position + offset) {
                         throw new Exception("out of something");
                     }
-                    return LimitStream.Seek(offset, origin);
+                    return LimitStream.Seek(offset, SeekOrigin.Current);
                 case SeekOrigin.End:
                     if (LimitLength - offset < 0) {
                         throw new Exception("out of something");
@@ -127,6 +128,7 @@ namespace FezGame.Mod {
                 return buffer;
             }
             
+            cachedBuffer = buffer;
             cachedOffset = LimitOffset;
             cachedLength = LimitLength;
             return buffer;
