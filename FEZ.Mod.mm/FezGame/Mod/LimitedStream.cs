@@ -76,10 +76,25 @@ namespace FezGame.Mod {
         }
 
         public override long Seek(long offset, SeekOrigin origin) {
-            if (LimitOffset + LimitLength <= Position + offset) {
-                throw new Exception("out of something");
+            switch (origin) {
+                case SeekOrigin.Begin:
+                    if (LimitOffset + LimitLength <= offset) {
+                        throw new Exception("out of something");
+                    }
+                    return LimitStream.Seek(LimitOffset + offset, SeekOrigin.Begin);
+                case SeekOrigin.Current:
+                    if (LimitOffset + LimitLength <= Position + offset) {
+                        throw new Exception("out of something");
+                    }
+                    return LimitStream.Seek(offset, origin);
+                case SeekOrigin.End:
+                    if (LimitLength - offset < 0) {
+                        throw new Exception("out of something");
+                    }
+                    return LimitStream.Seek(LimitOffset + LimitLength - offset, SeekOrigin.Begin);
+                default:
+                    return 0;
             }
-            return LimitStream.Seek(offset, origin);
         }
 
         public override void SetLength(long value) {
@@ -101,10 +116,12 @@ namespace FezGame.Mod {
             byte[] buffer = new byte[LimitLength];
             int read;
             int readCompletely = 0;
+            long origPosition = LimitStream.Position;
             while (readCompletely < buffer.Length) {
                 read = LimitStream.Read(buffer, readCompletely, buffer.Length - readCompletely);
                 readCompletely += read;
             }
+            LimitStream.Seek(origPosition, SeekOrigin.Begin);
             
             if (!cacheBuffer_) {
                 return buffer;
