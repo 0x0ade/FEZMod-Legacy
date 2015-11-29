@@ -3,6 +3,7 @@ using System.IO;
 using FezGame.Mod;
 using FezEngine.Mod;
 using FezEngine.Tools;
+using Microsoft.Xna.Framework;
 
 namespace FezGame.Droid {
     public class FezDroid : FezModule {
@@ -48,13 +49,16 @@ namespace FezGame.Droid {
             }
             ModLogger.Log("FEZDroid", "Android mode engaged!");
             InAndroid = true;
+            
             #if !FNA
+            //FIXME Use newest 1.12 binaries
             Fez.NoLighting = true;
             #endif
             Fez.NoSteamworks = true;
             if (FEZMod.DisableCloudSaves != null) {
                 FEZMod.DisableCloudSaves.SetValue(null, false);
             }
+            
             FezEngineMod.CacheDisabled = true;
             FezEngineMod.MusicCache = MusicCacheMode.Disabled;
         }

@@ -17,6 +17,8 @@ using System.Collections.Generic;
 
 namespace FezGame.Droid {
     public class FezDroidComponent : DrawableGameComponent {
+        
+        public static FezDroidComponent Instance;
 
         [ServiceDependency]
         public ISoundManager SoundManager { get; set; }
@@ -45,25 +47,38 @@ namespace FezGame.Droid {
         public Dictionary<int, Vector2> TouchOrigins = new Dictionary<int, Vector2>();
         public Dictionary<int, double> TouchTimes = new Dictionary<int, double>();
         
-        private int turnTouchId;
-        private float turnOffset;
-        private Vector2 turnLastFactors;
+        public Vector2 Drag = Vector2.Zero;
+        public bool Dragging = true;
+        private int dragTouchId = -1;
         
         public FezDroidComponent(Game game) 
             : base(game) {
+            UpdateOrder = 10;
+            DrawOrder = 4001;//One above editor
+            Instance = this;
         }
 
         public override void Initialize() {
             base.Initialize();
+            
+            Vector2 tmpFreeLook = new Vector2(0f, 0f);
+            FakeInputHelper.get_FreeLook = delegate() {
+                return FakeInputHelper.Updating ? tmpFreeLook : new Vector2(0f, 0f);
+            };
+            FakeInputHelper.set_FreeLook = delegate(Vector2 value) {
+                if (FakeInputHelper.Updating) {
+                }
+                tmpFreeLook = value;
+            };
         }
         
         protected override void LoadContent() {
+            base.LoadContent();
+            
             swooshLeft = CMProvider.Global.Load<SoundEffect>("Sounds/Ui/RotateLeft");
             swooshRight = CMProvider.Global.Load<SoundEffect>("Sounds/Ui/RotateRight");
             slowSwooshLeft = CMProvider.Global.Load<SoundEffect>("Sounds/Ui/RotateLeftHalfSpeed");
             slowSwooshRight = CMProvider.Global.Load<SoundEffect>("Sounds/Ui/RotateRightHalfSpeed");
-            
-            base.LoadContent();
         }
 
         public override void Update(GameTime gameTime) {
@@ -73,63 +88,34 @@ namespace FezGame.Droid {
             //TODO implement gestures when they work
             //TODO use screen-space touch coordinates (not 0f - 1f) when they work
             
-            bool turnReleased = false;
-
             for (int i = 0; i < touches.Count; i++) {
                 TouchLocation tl = touches[i];
                 if (tl.State == TouchLocationState.Pressed && (!TouchOrigins.ContainsKey(tl.Id) || TouchOrigins[tl.Id] != tl.Position)) {
                     TouchOrigins[tl.Id] = tl.Position;
-                    TouchTimes[tl.Id] = 0d;
-                    if (turnTouchId == -1) {
-                        turnTouchId = tl.Id;
-                        turnReleased = true;
+                    TouchTimes[tl.Id] = gameTime.TotalGameTime.TotalSeconds;
+                    bool button = HandleButtonAt(tl);
+                    if (dragTouchId == -1 && !button) {
+                        dragTouchId = tl.Id;
+                        Dragging = true;
                     }
-                    HandleButtonAt(tl.Position);
                 }
                 if (tl.State == TouchLocationState.Released) {
-                    if (turnTouchId == tl.Id) {
-                        turnTouchId = -1;
+                    if (dragTouchId == tl.Id) {
+                        dragTouchId = -1;
+                        //PlayerCameraControl resets Drag
+                        Dragging = false;
                     }
                     continue;
                 }
                 
-                if (turnTouchId == tl.Id) {
-                    turnOffset = TouchOrigins[tl.Id].X;
+                if (dragTouchId == tl.Id) {
+                    Drag = (tl.Position - TouchOrigins[tl.Id]) * 2f;
                 }
-                
-                TouchTimes[tl.Id] += gameTime.ElapsedGameTime.TotalSeconds;
-            }
-            
-            //Modified decompiled code. Hhnnng.
-            //TODO reimplement / rename
-            Vector3 vector3 = Vector3.Transform(CameraManager.OriginalDirection, Matrix.CreateFromAxisAngle(Vector3.Up, 1.570796f));
-            Vector3 to1 = Vector3.Transform(CameraManager.OriginalDirection, Matrix.CreateFromAxisAngle(vector3, -1.570796f));
-            Vector2 vector2 = new Vector2(turnOffset, 0f) / (GameState.MenuCubeIsZoomed ? 1.75f : 6.875f);
-            float step = 0.1f;
-            if (!turnReleased) {
-              vector2 = Vector2.Clamp(new Vector2(turnOffset, 0f) / (300f * SettingsManager.GetViewScale(GraphicsDevice)), -Vector2.One, Vector2.One) / (55.0f / 16.0f);
-              step = 0.2f;
-              turnLastFactors = vector2;
-            } else {
-              if ((double) turnLastFactors.X > 0.174999997019768) {
-                RotateViewRight();
-              } else if ((double) turnLastFactors.X < -0.174999997019768) {
-                RotateViewLeft();
-              }
-            }
-            vector2 *= new Vector2(3.425f, 1.725f);
-            vector2.Y += 0.25f;
-            vector2.X += 0.5f;
-            Vector3 to2 = FezMath.Slerp(FezMath.Slerp(CameraManager.OriginalDirection, vector3, vector2.X), to1, vector2.Y);
-            if (!CameraManager.ActionRunning) {
-              CameraManager.AlterTransition(FezMath.Slerp(CameraManager.Direction, to2, step));
-            } else {
-              CameraManager.Direction = FezMath.Slerp(CameraManager.Direction, to2, step);
             }
             
         }
         
-        private void HandleButtonAt(Vector2 pos) {
+        public bool HandleButtonAt(TouchLocation tl) {
             if (Intro.Instance != null && Intro.Instance.Enabled && Intro.Instance.Visible) {
                 //TODO find a better way to check if in menu
                 bool inMenu = false;
@@ -141,12 +127,14 @@ namespace FezGame.Droid {
                 }
                 if (!inMenu) {
                     CodeInputAll.Jump.Press();
-                    return;
                 }
+                return true;
             }
+            
+            return false;
         }
         
-        private void RotateViewLeft() {
+        public void RotateViewLeft() {
             //TODO reimplement / rename
             bool flag = PlayerManager.Action == ActionType.GrabTombstone;
             if (CameraManager.Viewpoint == Viewpoint.Perspective || GameState.InMap) {
@@ -164,7 +152,7 @@ namespace FezGame.Droid {
             playerManager.Velocity = vector3;
         }
             
-        private void RotateViewRight() {
+        public void RotateViewRight() {
             //TODO reimplement / rename
             bool flag = PlayerManager.Action == ActionType.GrabTombstone;
             if (CameraManager.Viewpoint == Viewpoint.Perspective || GameState.InMap) {
@@ -182,7 +170,7 @@ namespace FezGame.Droid {
             playerManager.Velocity = vector3;
         }
         
-        private void EmitLeft() {
+        public void EmitLeft() {
             if ((double) CollisionManager.GravityFactor == 1.0) {
                 swooshLeft.Emit();
             } else {
@@ -190,7 +178,7 @@ namespace FezGame.Droid {
             }
         }
     
-        private void EmitRight() {
+        public void EmitRight() {
             if ((double) CollisionManager.GravityFactor == 1.0) {
                 swooshRight.Emit();
             } else {
@@ -198,7 +186,7 @@ namespace FezGame.Droid {
             }
         }
     
-        private void RotateTo(Viewpoint view) {
+        public void RotateTo(Viewpoint view) {
             if (Math.Abs(CameraManager.Viewpoint.GetDistance(view)) > 1) {
                 EmitRight();
             }
