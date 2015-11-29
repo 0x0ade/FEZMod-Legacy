@@ -79,6 +79,8 @@ namespace FezGame.Droid {
             new Vector2(0.5f, 1f)
         };
         private Texture2D[] buttonTexture = new Texture2D[6];
+        private float buttonWidth = 16f;
+        private float buttonHeight = 16f;
         
         public FezDroidComponent(Game game) 
             : base(game) {
@@ -132,6 +134,7 @@ namespace FezGame.Droid {
                         dragTouchId = tl.Id;
                         Dragging = true;
                     }
+                    return;
                 }
                 if (tl.State == TouchLocationState.Released) {
                     if (dragTouchId == tl.Id) {
@@ -144,6 +147,8 @@ namespace FezGame.Droid {
                 
                 if (dragTouchId == tl.Id) {
                     Drag = (tl.Position - TouchOrigins[tl.Id]) * 2f;
+                } else {
+                    HandleButtonAt(tl);
                 }
             }
             
@@ -156,6 +161,14 @@ namespace FezGame.Droid {
                 }
                 return;
             }
+            
+            if (Intro.Instance != null && Intro.Instance.Enabled && Intro.Instance.Visible) {
+                return;
+            }
+            
+            if (GameState.TimePaused) {
+                return;
+            }
 
             Viewport viewport = GraphicsDevice.Viewport;
             float viewScale = GraphicsDevice.GetViewScale();
@@ -164,8 +177,6 @@ namespace FezGame.Droid {
             SpriteBatch.BeginPoint();
             
             float buttonScale = 4f * viewScale;
-            float buttonWidth = 16f;
-            float buttonHeight = 16f;
             
             for (int i = 0; i < buttonMapping.Length; i++) {
                 Texture2D tex = buttonTexture[i];
@@ -202,6 +213,30 @@ namespace FezGame.Droid {
                     CodeInputAll.Jump.Press();
                 }
                 return true;
+            }
+            
+            if (GameState.TimePaused) {
+                return true;
+            }
+            
+            Viewport viewport = GraphicsDevice.Viewport;
+            float viewScale = GraphicsDevice.GetViewScale();
+            float buttonScale = 4f * viewScale;
+            
+            for (int i = 0; i < buttonMapping.Length; i++) {
+                Vector2 pos = buttonPosition[i];
+                Vector2 pre = buttonPre[i];
+                float x1 = pre.X * viewport.Width + (pos.X - 1) * buttonWidth * buttonScale;
+                float y1 = pre.Y * viewport.Height + (pos.Y - 1) * buttonHeight * buttonScale;
+                float x2 = x1 + buttonWidth * buttonScale;
+                float y2 = y1 + buttonHeight * buttonScale;
+                if (
+                    x1 <= tl.Position.X * viewport.Width && tl.Position.X * viewport.Width <= x2 &&
+                    y1 <= tl.Position.Y * viewport.Height && tl.Position.Y * viewport.Height <= y2
+                ) {
+                    buttonMapping[i].Hold();
+                    return true;
+                }
             }
             
             return false;
