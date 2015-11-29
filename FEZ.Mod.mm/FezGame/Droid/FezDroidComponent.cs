@@ -104,13 +104,6 @@ namespace FezGame.Droid {
         protected override void LoadContent() {
             base.LoadContent();
             
-            buttonTexture[0] = CMProvider.Global.Load<Texture2D>("Other Textures/Glyphs/BBUTTON");
-            buttonTexture[1] = CMProvider.Global.Load<Texture2D>("Other Textures/Glyphs/ABUTTON");
-            buttonTexture[2] = CMProvider.Global.Load<Texture2D>("Other Textures/Glyphs/XBUTTON");
-            buttonTexture[3] = CMProvider.Global.Load<Texture2D>("Other Textures/Glyphs/YBUTTON");
-            buttonTexture[4] = CMProvider.Global.Load<Texture2D>("Other Textures/Glyphs/STARTBUTTON");
-            buttonTexture[5] = CMProvider.Global.Load<Texture2D>("Other Textures/Glyphs/BACKBUTTON");
-            
             swooshLeft = CMProvider.Global.Load<SoundEffect>("Sounds/Ui/RotateLeft");
             swooshRight = CMProvider.Global.Load<SoundEffect>("Sounds/Ui/RotateRight");
             slowSwooshLeft = CMProvider.Global.Load<SoundEffect>("Sounds/Ui/RotateLeftHalfSpeed");
@@ -158,6 +151,12 @@ namespace FezGame.Droid {
             if (!FEZMod.Preloaded || GraphicsDevice == null || SpriteBatch == null) {
                 if (GraphicsDevice != null) {
                     SpriteBatch = new SpriteBatch(GraphicsDevice);
+                    buttonTexture[0] = CMProvider.Global.Load<Texture2D>("Other Textures/Glyphs/BBUTTON");
+                    buttonTexture[1] = CMProvider.Global.Load<Texture2D>("Other Textures/Glyphs/ABUTTON");
+                    buttonTexture[2] = CMProvider.Global.Load<Texture2D>("Other Textures/Glyphs/XBUTTON");
+                    buttonTexture[3] = CMProvider.Global.Load<Texture2D>("Other Textures/Glyphs/YBUTTON");
+                    buttonTexture[4] = CMProvider.Global.Load<Texture2D>("Other Textures/Glyphs/STARTBUTTON");
+                    buttonTexture[5] = CMProvider.Global.Load<Texture2D>("Other Textures/Glyphs/BACKBUTTON");
                 }
                 return;
             }
@@ -166,7 +165,7 @@ namespace FezGame.Droid {
                 return;
             }
             
-            if (GameState.TimePaused) {
+            if (GameState.TimePaused && !GameState.InMenuCube && !GameState.InMap) {
                 return;
             }
 
@@ -215,7 +214,7 @@ namespace FezGame.Droid {
                 return true;
             }
             
-            if (GameState.TimePaused) {
+            if (GameState.TimePaused && !GameState.InMenuCube && !GameState.InMap) {
                 return true;
             }
             
