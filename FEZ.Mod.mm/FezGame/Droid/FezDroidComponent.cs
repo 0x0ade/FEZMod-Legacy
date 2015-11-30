@@ -36,25 +36,25 @@ namespace FezGame.Droid {
         [ServiceDependency]
         public IInputManager InputManager { get; set; }
         [ServiceDependency]
-        public IContentManagerProvider CMProvider { private get; set; }
+        public IContentManagerProvider CMProvider { get; set; }
         [ServiceDependency]
-        public ICollisionManager CollisionManager { private get; set; }
+        public ICollisionManager CollisionManager { get; set; }
         
         public SpriteBatch SpriteBatch;
         
-        private SoundEffect swooshLeft;
-        private SoundEffect swooshRight;
-        private SoundEffect slowSwooshLeft;
-        private SoundEffect slowSwooshRight;
+        protected SoundEffect swooshLeft;
+        protected SoundEffect swooshRight;
+        protected SoundEffect slowSwooshLeft;
+        protected SoundEffect slowSwooshRight;
         
         public Dictionary<int, Vector2> TouchOrigins = new Dictionary<int, Vector2>();
         public Dictionary<int, double> TouchTimes = new Dictionary<int, double>();
         
         public Vector2 Drag = Vector2.Zero;
         public bool Dragging = true;
-        private int dragTouchId = -1;
+        protected int dragTouchId = -1;
         
-        private CodeInputAll[] buttonMapping = {
+        protected CodeInputAll[] buttonMapping = {
             CodeInputAll.CancelTalk,
             CodeInputAll.Jump,
             CodeInputAll.GrabThrow,
@@ -62,15 +62,15 @@ namespace FezGame.Droid {
             CodeInputAll.Start,
             CodeInputAll.Back
         };
-        private Vector2[] buttonPosition = {
-            new Vector2(-1f, -2f),
-            new Vector2(-2f, -1f),
-            new Vector2(-4f, -2f),
-            new Vector2(-2f, 2f),
-            new Vector2(1f, -1f),
-            new Vector2(-1f, -1f)
+        protected Vector2[] buttonPosition = {
+            new Vector2(0f, -1f),
+            new Vector2(-1f, 0f),
+            new Vector2(-3f, -1f),
+            new Vector2(-1f, 1f),
+            new Vector2(1f, 0f),
+            new Vector2(-1f, 0f)
         };
-        private Vector2[] buttonPre = {
+        protected Vector2[] buttonPre = {
             new Vector2(1f, 1f),
             new Vector2(1f, 1f),
             new Vector2(1f, 1f),
@@ -78,9 +78,27 @@ namespace FezGame.Droid {
             new Vector2(0.5f, 1f),
             new Vector2(0.5f, 1f)
         };
-        private Texture2D[] buttonTexture = new Texture2D[6];
-        private float buttonWidth = 16f;
-        private float buttonHeight = 16f;
+        protected float[] buttonAlpha = {
+            0f,
+            0f,
+            0f,
+            0f,
+            0f,
+            0f
+        };
+        protected bool[] buttonEnabled = {
+            false,
+            true,
+            false,
+            true,
+            true,
+            false
+        };
+        protected Texture2D[] buttonTexture = new Texture2D[6];
+        protected bool buttonsEnabled = false;
+        protected float buttonWidth = 16f;
+        protected float buttonHeight = 16f;
+        protected float buttonScaleMain = 6f;
         
         public FezDroidComponent(Game game) 
             : base(game) {
@@ -145,6 +163,12 @@ namespace FezGame.Droid {
                 }
             }
             
+            buttonsEnabled = !GameState.TimePaused || GameState.InMenuCube || GameState.InMap;
+            
+            for (int i = 0; i < buttonMapping.Length; i++) {
+                buttonAlpha[i] = buttonAlpha[i] * 0.95f + (buttonsEnabled && buttonEnabled[i] ? 1f : 0f) * 0.05f;
+            }
+            
         }
         
         public override void Draw(GameTime gameTime) {
@@ -165,17 +189,13 @@ namespace FezGame.Droid {
                 return;
             }
             
-            if (GameState.TimePaused && !GameState.InMenuCube && !GameState.InMap) {
-                return;
-            }
-
             Viewport viewport = GraphicsDevice.Viewport;
             float viewScale = GraphicsDevice.GetViewScale();
 
             GraphicsDevice.SetBlendingMode(BlendingMode.Alphablending);
             SpriteBatch.BeginPoint();
             
-            float buttonScale = 4f * viewScale;
+            float buttonScale = buttonScaleMain * viewScale;
             
             for (int i = 0; i < buttonMapping.Length; i++) {
                 Texture2D tex = buttonTexture[i];
@@ -186,7 +206,7 @@ namespace FezGame.Droid {
                         pre.X * viewport.Width + (pos.X - 1) * buttonWidth * buttonScale,
                         pre.Y * viewport.Height + (pos.Y - 1) * buttonHeight * buttonScale
                     ), null,
-                    Color.White,
+                    new Color(1f, 1f, 1f, buttonAlpha[i]),
                     0.0f,
                     Vector2.Zero,
                     buttonScale,
@@ -214,15 +234,18 @@ namespace FezGame.Droid {
                 return true;
             }
             
-            if (GameState.TimePaused && !GameState.InMenuCube && !GameState.InMap) {
+            if (!buttonsEnabled) {
                 return true;
             }
             
             Viewport viewport = GraphicsDevice.Viewport;
             float viewScale = GraphicsDevice.GetViewScale();
-            float buttonScale = 4f * viewScale;
+            float buttonScale = buttonScaleMain * viewScale;
             
             for (int i = 0; i < buttonMapping.Length; i++) {
+                if (!buttonEnabled[i]) {
+                    continue;
+                }
                 Vector2 pos = buttonPosition[i];
                 Vector2 pre = buttonPre[i];
                 float x1 = pre.X * viewport.Width + (pos.X - 1) * buttonWidth * buttonScale;
@@ -242,62 +265,16 @@ namespace FezGame.Droid {
         }
         
         public void RotateViewLeft() {
-            //TODO reimplement / rename
-            bool flag = PlayerManager.Action == ActionType.GrabTombstone;
-            if (CameraManager.Viewpoint == Viewpoint.Perspective || GameState.InMap) {
-                CameraManager.OriginalDirection = Vector3.Transform(CameraManager.OriginalDirection, Quaternion.CreateFromAxisAngle(Vector3.Up, -1.570796f));
-                if (!GameState.InMenuCube && !GameState.InMap)
-                EmitLeft();
-            } else if (CameraManager.ChangeViewpoint(CameraManager.Viewpoint.GetRotatedView(-1), (flag ? 2f : 1f) * Math.Abs(1f / CollisionManager.GravityFactor)) && !flag) {
-                EmitLeft();
-            }
-            if (LevelManager.NodeType != LevelNodeType.Lesser || !(PlayerManager.AirTime != TimeSpan.Zero)) {
-                return;
-            }
-            IPlayerManager playerManager = PlayerManager;
-            Vector3 vector3 = playerManager.Velocity * CameraManager.Viewpoint.ScreenSpaceMask();
-            playerManager.Velocity = vector3;
+            CodeInputAll.RotateLeft.Press();
         }
             
         public void RotateViewRight() {
-            //TODO reimplement / rename
-            bool flag = PlayerManager.Action == ActionType.GrabTombstone;
-            if (CameraManager.Viewpoint == Viewpoint.Perspective || GameState.InMap) {
-                CameraManager.OriginalDirection = Vector3.Transform(CameraManager.OriginalDirection, Quaternion.CreateFromAxisAngle(Vector3.Up, 1.570796f));
-                if (!GameState.InMenuCube && !GameState.InMap)
-                EmitRight();
-            } else if (CameraManager.ChangeViewpoint(CameraManager.Viewpoint.GetRotatedView(1), (flag ? 2f : 1f) * Math.Abs(1f / CollisionManager.GravityFactor)) && !flag) {
-                EmitRight();
-            }
-            if (LevelManager.NodeType != LevelNodeType.Lesser || !(PlayerManager.AirTime != TimeSpan.Zero)) {
-                return;
-            }
-            IPlayerManager playerManager = PlayerManager;
-            Vector3 vector3 = playerManager.Velocity * CameraManager.Viewpoint.ScreenSpaceMask();
-            playerManager.Velocity = vector3;
+            CodeInputAll.RotateRight.Press();
         }
         
-        public void EmitLeft() {
-            if ((double) CollisionManager.GravityFactor == 1.0) {
-                swooshLeft.Emit();
-            } else {
-                slowSwooshLeft.Emit();
-            }
-        }
-    
-        public void EmitRight() {
-            if ((double) CollisionManager.GravityFactor == 1.0) {
-                swooshRight.Emit();
-            } else {
-                slowSwooshRight.Emit();
-            }
-        }
-    
         public void RotateTo(Viewpoint view) {
-            if (Math.Abs(CameraManager.Viewpoint.GetDistance(view)) > 1) {
-                EmitRight();
-            }
-            CameraManager.ChangeViewpoint(view);
+            CameraManager.ChangeViewpoint(view, 0f);
+            CameraManager.SnapInterpolation();
         }
 
     }
