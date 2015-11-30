@@ -175,11 +175,19 @@ namespace FezGame.Droid {
             }
             
             buttonsEnabled = !GameState.TimePaused || GameState.InMenuCube || GameState.InMap;
-            buttonEnabled[5] = GameState.SaveData.CanOpenMap && LevelManager.Name != "PYRAMID" && LevelManager.Name.StartsWith("GOMEZ_HOUSE_END");
+            buttonEnabled[5] = GameState.SaveData != null && LevelManager.Name != null && GameState.SaveData.CanOpenMap && LevelManager.Name != "PYRAMID" && !LevelManager.Name.StartsWith("GOMEZ_HOUSE_END");
             
             for (int i = 0; i < buttonMapping.Length; i++) {
                 buttonAlpha[i] = buttonAlpha[i] * 0.95f + (buttonsEnabled && buttonEnabled[i] ? 1f : 0f) * 0.05f;
             }
+            
+            if (DragMode == DragMode.Move && Drag.Y <= -0.2f && Math.Abs(Drag.X) < 0.1f) {
+                CodeInputAll.Up.Press();
+            }
+            if (DragMode == DragMode.Move && Drag.Y >= 0.2f && Math.Abs(Drag.X) < 0.1f) {
+                CodeInputAll.Down.Press();
+            }
+            //TODO are left & right required?
             
         }
         
