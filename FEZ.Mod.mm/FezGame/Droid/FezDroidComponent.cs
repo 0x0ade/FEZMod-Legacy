@@ -181,13 +181,17 @@ namespace FezGame.Droid {
                 buttonAlpha[i] = buttonAlpha[i] * 0.95f + (buttonsEnabled && buttonEnabled[i] ? 1f : 0f) * 0.05f;
             }
             
-            if (DragMode == DragMode.Move && Drag.Y <= -0.2f && Math.Abs(Drag.X) < 0.1f) {
-                CodeInputAll.Up.Press();
+            if (DragMode == DragMode.Move) {
+                if (Math.Abs(Drag.X) < 0.1f) {
+                    if (Drag.Y <= -0.2f) {
+                        CodeInputAll.Up.Press();
+                    } else if (Drag.Y >= 0.2f) {
+                        CodeInputAll.Down.Press();
+                    }
+                }
+                
+                //TODO are left & right required?
             }
-            if (DragMode == DragMode.Move && Drag.Y >= 0.2f && Math.Abs(Drag.X) < 0.1f) {
-                CodeInputAll.Down.Press();
-            }
-            //TODO are left & right required?
             
         }
         
