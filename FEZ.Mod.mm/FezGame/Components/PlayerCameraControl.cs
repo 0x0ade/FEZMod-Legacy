@@ -64,9 +64,14 @@ namespace FezGame.Components {
                 } else {
                     vector2 = new Vector2(FezDroidComponent.Instance.Drag.X, 0f);
                 }
-                float step = 0.1f;
                 if (FezDroidComponent.Instance.DragMode == DragMode.Rotate) {
-                    step = 0.2f;
+                    float step = 0.2f;
+                    Vector3 to2 = FezMath.Slerp(FezMath.Slerp(origin, vector3, vector2.X), to1, vector2.Y);
+                    if (!CameraManager.ActionRunning) {
+                        CameraManager.AlterTransition(FezMath.Slerp(CameraManager.Direction, to2, step));
+                    } else {
+                        CameraManager.Direction = FezMath.Slerp(CameraManager.Direction, to2, step);
+                    }
                 } else {
                     if (FezDroidComponent.Instance.Drag.X > 0.26f) {
                         FezDroidComponent.Instance.RotateViewRight();
@@ -74,18 +79,8 @@ namespace FezGame.Components {
                         FezDroidComponent.Instance.RotateViewLeft();
                     } else {
                         FezDroidComponent.Instance.RotateTo(CameraManager.Viewpoint);
-                        CameraManager.Direction = -CameraManager.Viewpoint.ForwardVector();
                     }
                     FezDroidComponent.Instance.Drag = Vector2.Zero;
-                }
-                /*vector2 *= new Vector2(3.425f, 1.725f);
-                vector2.Y += 0.25f;
-                vector2.X += 0.5f;*/
-                Vector3 to2 = FezMath.Slerp(FezMath.Slerp(origin, vector3, vector2.X), to1, vector2.Y);
-                if (!CameraManager.ActionRunning) {
-                    CameraManager.AlterTransition(FezMath.Slerp(CameraManager.Direction, to2, step));
-                } else {
-                    CameraManager.Direction = FezMath.Slerp(CameraManager.Direction, to2, step);
                 }
                 
                 return;

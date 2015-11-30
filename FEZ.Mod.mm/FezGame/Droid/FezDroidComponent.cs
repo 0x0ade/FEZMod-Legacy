@@ -92,7 +92,7 @@ namespace FezGame.Droid {
         protected bool[] buttonEnabled = {
             false,
             true,
-            false,
+            true,
             true,
             true,
             false
@@ -123,7 +123,7 @@ namespace FezGame.Droid {
             
             Vector2 tmpMovement = new Vector2(0f, 0f);
             FakeInputHelper.get_Movement = delegate() {
-                return FakeInputHelper.Updating || DragMode != DragMode.Move ? tmpMovement : Drag * 2f;
+                return FakeInputHelper.Updating || DragMode != DragMode.Move ? tmpMovement : Drag * 4f;
             };
             FakeInputHelper.set_Movement = delegate(Vector2 value) {
                 tmpMovement = value;
@@ -138,8 +138,8 @@ namespace FezGame.Droid {
             //Handle touch input in Android mode
             TouchCollection touches = TouchPanel.GetState();
             
-            //TODO implement gestures when they work
             //TODO use screen-space touch coordinates (not 0f - 1f) when they work
+            //TODO fix multi-touch when FNA finally supports releasing multitouched touch points
             
             for (int i = 0; i < touches.Count; i++) {
                 TouchLocation tl = touches[i];
@@ -175,6 +175,7 @@ namespace FezGame.Droid {
             }
             
             buttonsEnabled = !GameState.TimePaused || GameState.InMenuCube || GameState.InMap;
+            buttonEnabled[5] = GameState.SaveData.CanOpenMap && LevelManager.Name != "PYRAMID" && LevelManager.Name.StartsWith("GOMEZ_HOUSE_END");
             
             for (int i = 0; i < buttonMapping.Length; i++) {
                 buttonAlpha[i] = buttonAlpha[i] * 0.95f + (buttonsEnabled && buttonEnabled[i] ? 1f : 0f) * 0.05f;
