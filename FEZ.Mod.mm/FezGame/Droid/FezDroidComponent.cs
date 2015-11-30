@@ -17,6 +17,13 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace FezGame.Droid {
+    
+    public enum DragMode {
+        None,
+        Rotate,
+        Move
+    }
+    
     public class FezDroidComponent : DrawableGameComponent {
         
         public static FezDroidComponent Instance;
@@ -42,16 +49,12 @@ namespace FezGame.Droid {
         
         public SpriteBatch SpriteBatch;
         
-        protected SoundEffect swooshLeft;
-        protected SoundEffect swooshRight;
-        protected SoundEffect slowSwooshLeft;
-        protected SoundEffect slowSwooshRight;
-        
         public Dictionary<int, Vector2> TouchOrigins = new Dictionary<int, Vector2>();
         public Dictionary<int, double> TouchTimes = new Dictionary<int, double>();
         
         public Vector2 Drag = Vector2.Zero;
-        public bool Dragging = true;
+        public DragMode DragMode = DragMode.None;
+        public DragMode DragModeLast = DragMode.None;
         protected int dragTouchId = -1;
         
         protected CodeInputAll[] buttonMapping = {
@@ -117,15 +120,18 @@ namespace FezGame.Droid {
             FakeInputHelper.set_FreeLook = delegate(Vector2 value) {
                 tmpFreeLook = value;
             };
+            
+            Vector2 tmpMovement = new Vector2(0f, 0f);
+            FakeInputHelper.get_Movement = delegate() {
+                return FakeInputHelper.Updating || DragMode != DragMode.Move ? tmpMovement : Drag * 2f;
+            };
+            FakeInputHelper.set_Movement = delegate(Vector2 value) {
+                tmpMovement = value;
+            };
         }
         
         protected override void LoadContent() {
             base.LoadContent();
-            
-            swooshLeft = CMProvider.Global.Load<SoundEffect>("Sounds/Ui/RotateLeft");
-            swooshRight = CMProvider.Global.Load<SoundEffect>("Sounds/Ui/RotateRight");
-            slowSwooshLeft = CMProvider.Global.Load<SoundEffect>("Sounds/Ui/RotateLeftHalfSpeed");
-            slowSwooshRight = CMProvider.Global.Load<SoundEffect>("Sounds/Ui/RotateRightHalfSpeed");
         }
 
         public override void Update(GameTime gameTime) {
@@ -143,7 +149,11 @@ namespace FezGame.Droid {
                     bool button = HandleButtonAt(tl);
                     if (dragTouchId == -1 && !button) {
                         dragTouchId = tl.Id;
-                        Dragging = true;
+                        DragModeLast = DragMode;
+                        DragMode = tl.Position.X <= 0.4f && tl.Position.Y >= 0.5f ? DragMode.Move : DragMode.Rotate;
+                    } else if (dragTouchId != -1) {
+                        //FIXME FNA multitouch support is... T.T
+                        dragTouchId = -1;
                     }
                     return;
                 }
@@ -151,7 +161,8 @@ namespace FezGame.Droid {
                     if (dragTouchId == tl.Id) {
                         dragTouchId = -1;
                         //PlayerCameraControl resets Drag
-                        Dragging = false;
+                        DragModeLast = DragMode;
+                        DragMode = DragMode.None;
                     }
                     continue;
                 }
@@ -228,7 +239,7 @@ namespace FezGame.Droid {
                         break;
                     }
                 }
-                if (!inMenu) {
+                if (!inMenu && tl.State == TouchLocationState.Pressed) {
                     CodeInputAll.Jump.Press();
                 }
                 return true;
@@ -273,8 +284,7 @@ namespace FezGame.Droid {
         }
         
         public void RotateTo(Viewpoint view) {
-            CameraManager.ChangeViewpoint(view, 0f);
-            CameraManager.SnapInterpolation();
+            CameraManager.ChangeViewpoint(view, 0.2f);
         }
 
     }

@@ -52,7 +52,7 @@ namespace FezGame.Components {
                 return;
             }
             
-            if (FezDroidComponent.Instance != null && FezDroidComponent.Instance.Drag != Vector2.Zero) {
+            if (FezDroidComponent.Instance != null && FezDroidComponent.Instance.Drag != Vector2.Zero && (FezDroidComponent.Instance.DragMode == DragMode.Rotate || FezDroidComponent.Instance.DragModeLast == DragMode.Rotate)) {
                 //Modified decompiled code. Hhnnng.
                 //TODO reimplement / rename
                 Vector3 origin = -CameraManager.Viewpoint.ForwardVector();
@@ -65,7 +65,7 @@ namespace FezGame.Components {
                     vector2 = new Vector2(FezDroidComponent.Instance.Drag.X, 0f);
                 }
                 float step = 0.1f;
-                if (FezDroidComponent.Instance.Dragging) {
+                if (FezDroidComponent.Instance.DragMode == DragMode.Rotate) {
                     step = 0.2f;
                 } else {
                     if (FezDroidComponent.Instance.Drag.X > 0.26f) {
