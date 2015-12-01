@@ -90,7 +90,7 @@ namespace FezGame.Droid {
             0f
         };
         protected bool[] buttonEnabled = {
-            false,
+            true,
             true,
             true,
             true,
