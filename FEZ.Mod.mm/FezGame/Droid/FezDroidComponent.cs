@@ -169,6 +169,7 @@ namespace FezGame.Droid {
                 
                 if (dragTouchId == tl.Id) {
                     Drag = (tl.Position - TouchOrigins[tl.Id]) * 2f;
+                    Drag.Y = -Drag.Y;//Y=0 is top, not bottom
                 } else {
                     HandleButtonAt(tl);
                 }
@@ -183,9 +184,9 @@ namespace FezGame.Droid {
             
             if (DragMode == DragMode.Move) {
                 if (Math.Abs(Drag.X) < 0.1f) {
-                    if (Drag.Y <= -0.2f) {
+                    if (Drag.Y >= -0.2f) {
                         CodeInputAll.Up.Press();
-                    } else if (Drag.Y >= 0.2f) {
+                    } else if (Drag.Y <= 0.2f) {
                         CodeInputAll.Down.Press();
                     }
                 }
