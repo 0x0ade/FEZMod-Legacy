@@ -8,6 +8,9 @@ namespace FezGame.Mod {
         public long LimitOffset;
         public long LimitLength;
         
+        public bool LimitStreamShared = false;
+        private long pos = 0;
+        
         protected byte[] cachedBuffer;
         protected long cachedOffset;
         protected long cachedLength;
@@ -50,10 +53,11 @@ namespace FezGame.Mod {
 
         public override long Position {
             get {
-                return LimitStream.Position - LimitOffset;
+                return LimitStreamShared ? pos : LimitStream.Position - LimitOffset;
             }
             set {
-                LimitStream.Position = Position + LimitOffset;
+                LimitStream.Position = value + LimitOffset;
+                pos = value;
             }
         }
         
@@ -64,7 +68,7 @@ namespace FezGame.Mod {
             LimitLength = length;
             LimitStream.Seek(offset, SeekOrigin.Begin);
         }
-
+        
         public override void Flush() {
             LimitStream.Flush();
         }
@@ -73,7 +77,20 @@ namespace FezGame.Mod {
             if (LimitOffset + LimitLength <= Position + count) {
                 throw new Exception("out of something");
             }
-            return LimitStream.Read(buffer, offset, count);
+            int read = LimitStream.Read(buffer, offset, count);
+            pos += read;
+            return read;
+        }
+        
+        public override int ReadByte() {
+            if (LimitOffset + LimitLength <= Position + 1) {
+                throw new Exception("out of something");
+            }
+            int b = LimitStream.ReadByte();
+            if (b != -1) {
+                pos++;
+            }
+            return b;
         }
 
         public override long Seek(long offset, SeekOrigin origin) {
@@ -82,16 +99,19 @@ namespace FezGame.Mod {
                     if (LimitOffset + LimitLength <= offset) {
                         throw new Exception("out of something");
                     }
+                    pos = offset;
                     return LimitStream.Seek(LimitOffset + offset, SeekOrigin.Begin);
                 case SeekOrigin.Current:
                     if (LimitOffset + LimitLength <= Position + offset) {
                         throw new Exception("out of something");
                     }
+                    pos += offset;
                     return LimitStream.Seek(offset, SeekOrigin.Current);
                 case SeekOrigin.End:
                     if (LimitLength - offset < 0) {
                         throw new Exception("out of something");
                     }
+                    pos = LimitLength - offset;
                     return LimitStream.Seek(LimitOffset + LimitLength - offset, SeekOrigin.Begin);
                 default:
                     return 0;
@@ -99,6 +119,10 @@ namespace FezGame.Mod {
         }
 
         public override void SetLength(long value) {
+            if (LimitStreamShared) {
+                LimitLength = value;
+                return;
+            }
             LimitStream.SetLength(LimitOffset + value + LimitLength);
         }
 
@@ -107,6 +131,7 @@ namespace FezGame.Mod {
                 throw new Exception("out of something");
             }
             LimitStream.Write(buffer, offset, count);
+            pos += count;
         }
         
         public override byte[] GetBuffer() {
@@ -114,24 +139,45 @@ namespace FezGame.Mod {
                 return cachedBuffer;
             }
             
+            if (!cacheBuffer_) {
+                return ToArray();
+            }
+            
+            cachedOffset = LimitOffset;
+            cachedLength = LimitLength;
+            return cachedBuffer = ToArray();
+        }
+        
+        public override byte[] ToArray() {
             byte[] buffer = new byte[LimitLength];
             int read;
             int readCompletely = 0;
             long origPosition = LimitStream.Position;
+            LimitStream.Seek(LimitOffset, SeekOrigin.Begin);
             while (readCompletely < buffer.Length) {
                 read = LimitStream.Read(buffer, readCompletely, buffer.Length - readCompletely);
                 readCompletely += read;
             }
             LimitStream.Seek(origPosition, SeekOrigin.Begin);
             
-            if (!cacheBuffer_) {
-                return buffer;
-            }
-            
-            cachedBuffer = buffer;
-            cachedOffset = LimitOffset;
-            cachedLength = LimitLength;
             return buffer;
         }
+        
+        public override void Close() {
+            base.Close();
+            if (!LimitStreamShared) {
+                LimitStream.Close();
+            }
+        }
+        
+        protected override void Dispose(bool disposing) {
+            if (!LimitStreamShared) {
+                //LimitStream.Dispose(disposing);
+                //Dispose and close are not the same, but whatever
+                LimitStream.Close();
+            }
+            base.Dispose(disposing);
+        }
+        
     }
 }

@@ -6,9 +6,18 @@ using System.IO;
 using FezEngine.Structure;
 using FezEngine.Services;
 using FezEngine.Mod;
+using Microsoft.Xna.Framework.Content;
+using MonoMod;
 
 namespace FezEngine.Tools {
-    public class MemoryContentManager {
+    public class MemoryContentManager : ContentManager {
+        
+        public MemoryContentManager(IServiceProvider serviceProvider, string rootDirectory)
+            : base(serviceProvider, rootDirectory) {
+            //no-op
+        }
+        
+        private static Dictionary<string, Tuple<string, long, int>> assetMetadata = new Dictionary<string, Tuple<string, long, int>>();
 
         private static IEnumerable<string> assetNames;
         public static IEnumerable<string> get_AssetNames() {
@@ -17,17 +26,23 @@ namespace FezEngine.Tools {
             } else {
                 if (assetNames == null) {
                     List<string> files = TraverseThrough("Resources");
-                    List<string> assets = new List<string>(files.Count);
+                    List<string> assets = new List<string>(files.Count + assetMetadata.Keys.Count);
                     for (int i = 0; i < files.Count; i++) {
                         string file = files[i];
-                        assets.Add(file.Substring(10, file.Length-14).Replace("/", "\\"));
+                        assets.Add(file.Substring(10, file.Length-14).Replace('/', '\\'));
+                    }
+                    foreach (string file in assetMetadata.Keys) {
+                        if (assets.Contains(file)) {
+                            continue;
+                        }
+                        assets.Add(file);
                     }
                     assetNames = assets;
                 }
                 return assetNames;
             }
         }
-
+        
         private static List<string> TraverseThrough(string dir, List<string> list = null) {
             if (!Directory.Exists(dir)) {
                 return list;
@@ -82,9 +97,8 @@ namespace FezEngine.Tools {
                 }
                 #endif
                 string filePath = assetName.Externalize() + extension;
-                FileInfo file = new FileInfo(filePath);
-                if (!file.Exists) {
-                    file.Directory.Create();
+                if (!File.Exists(filePath)) {
+                    Directory.GetParent(filePath).Create();
                     ModLogger.Log("FEZMod.Engine", (i+1)+" / "+count+": "+assetName+" -> "+filePath);
                     FileStream fos = new FileStream(filePath, FileMode.CreateNew);
                     fos.Write(bytes, 0, bytes.Length);
@@ -97,7 +111,7 @@ namespace FezEngine.Tools {
         }
 
         protected extern Stream orig_OpenStream(string assetName);
-        protected Stream OpenStream(string assetName) {
+        protected override Stream OpenStream(string assetName) {
             if (FezEngineMod.DumpAllResources) {
                 DumpAll();
             }
@@ -110,20 +124,33 @@ namespace FezEngine.Tools {
             }
             #endif
             string filePath = assetName.Externalize() + extension;
-            FileInfo file = new FileInfo(filePath);
-            if (file.Exists) {
+            if (File.Exists(filePath)) {
                 FileStream fis = new FileStream(filePath, FileMode.Open);
                 return fis;
-            } else if (FezEngineMod.DumpResources) {
-                file.Directory.Create();
-                ModLogger.Log("FEZMod.Engine", assetName+" -> "+filePath);
-                Stream ois = orig_OpenStream(assetName);
+            }
+            if (FezEngineMod.DumpResources) {
+                Directory.GetParent(filePath).Create();
+                ModLogger.Log("FEZMod.Engine", assetName + " -> " + filePath);
+                Stream ois = OpenStream_(assetName);
                 FileStream fos = new FileStream(filePath, FileMode.CreateNew);
                 ois.CopyTo(fos);
                 ois.Close();
                 fos.Close();
             }
-            return orig_OpenStream(assetName);
+            return OpenStream_(assetName);
+        }
+        
+        protected Stream OpenStream_(string assetName_) {
+            if (FezEngineMod.CacheDisabled) {
+                string assetName = assetName_.ToLowerInvariant().Replace('/', '\\');
+                Tuple<string, long, int> data;
+                if (assetMetadata.TryGetValue(assetName, out data)) {
+                    FileStream packStream = File.OpenRead(Path.Combine(base.RootDirectory, data.Item1));
+                    return new LimitedStream(packStream, data.Item2, data.Item3);
+                }
+            }
+            
+            return orig_OpenStream(assetName_);
         }
 
         public static extern bool orig_AssetExists(string assetName);
@@ -148,7 +175,9 @@ namespace FezEngine.Tools {
                 orig_LoadEssentials();
             } else {
                 cachedAssets = new Dictionary<string, byte[]>(0);
+                ScanPackMetadata("Essentials.pak");
             }
+            
             FEZMod.LoadEssentials();
         }
 
@@ -156,8 +185,28 @@ namespace FezEngine.Tools {
         public void Preload() {
             if (!FezEngineMod.CacheDisabled) {
                 orig_Preload();
+            } else {
+                ScanPackMetadata("Updates.pak");
+			    ScanPackMetadata("Other.pak");
             }
+            
             FEZMod.Preload();
+        }
+        
+        public void ScanPackMetadata(string name) {
+            using (FileStream packStream = File.OpenRead(Path.Combine(base.RootDirectory, name))) {
+                using (BinaryReader packReader = new BinaryReader(packStream)) {
+                    int count = packReader.ReadInt32();
+                    for (int i = 0; i < count; i++) {
+                        string file = packReader.ReadString();
+                        int length = packReader.ReadInt32();
+                        if (!assetMetadata.ContainsKey(file)) {
+                            assetMetadata[file] = Tuple.Create(name, packStream.Position, length);
+                        }
+                        packStream.Seek(length, SeekOrigin.Current);
+                    }
+                }
+            }
         }
 
     }

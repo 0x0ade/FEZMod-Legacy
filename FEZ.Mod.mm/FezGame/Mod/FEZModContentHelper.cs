@@ -92,7 +92,7 @@ namespace FezGame.Mod {
             return bitmap;
         }
 
-        private static CacheKey_RGB_A mixAlpha_key;
+        private static CacheKey_RGB_A mixAlpha_key = new CacheKey_RGB_A();
         public static Texture2D MixAlpha(this Texture2D textureRGB, Texture2D textureA) {
             mixAlpha_key.RGB = textureRGB;
             mixAlpha_key.A = textureA;
@@ -100,8 +100,8 @@ namespace FezGame.Mod {
             Texture2D textureRGBA;
 
             if (CacheMixAlpha.TryGetValue(mixAlpha_key, out textureRGBA)) {
-                //return textureRGBA;
-                textureRGBA.Dispose();
+                return textureRGBA;
+                //textureRGBA.Dispose();
             }
 
             textureRGBA = new Texture2D(ServiceHelper.Game.GraphicsDevice, textureRGB.Width, textureRGB.Height);
@@ -117,7 +117,7 @@ namespace FezGame.Mod {
             }
             textureRGBA.SetData(dataRGBA);
 
-            CacheMixAlpha[mixAlpha_key] = textureRGBA;
+            CacheMixAlpha[new CacheKey_RGB_A() { RGB = textureRGB, A = textureA }] = textureRGBA;
 
             return textureRGBA;
         }
