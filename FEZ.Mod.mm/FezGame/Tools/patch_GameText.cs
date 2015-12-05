@@ -4,7 +4,11 @@
         
         public static extern string orig_GetString(string tag);
         public static string GetString(string tag) {
-            string str = orig_GetString(tag);
+            string str = TextPatchHelper.Game.Get(tag);
+            if (str != null) {
+                return str;
+            }
+            str = orig_GetString(tag);
             if (str != MISSING_TEXT) {
                 return str;
             }
@@ -13,7 +17,11 @@
         
         public static extern string orig_GetStringRaw(string tag);
         public static string GetStringRaw(string tag) {
-            string str = orig_GetStringRaw(tag);
+            string str = TextPatchHelper.Game.Fallback[tag];
+            if (str != null) {
+                return str;
+            }
+            str = orig_GetStringRaw(tag);
             if (str != MISSING_TEXT) {
                 return str;
             }

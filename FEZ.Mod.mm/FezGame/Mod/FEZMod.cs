@@ -15,6 +15,7 @@ using System.Globalization;
 using System.Threading;
 using MonoMod.JIT;
 using FezEngine.Mod;
+using FezGame.Tools;
 #if FNA
 using SDL2;
 #endif
@@ -153,6 +154,11 @@ namespace FezGame.Mod {
                     Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
                 }
             }
+            
+            //FEZMod custom texts
+            TextPatchHelper.Static.Fallback["FEZModMenu"] = "FEZMOD MENU";
+            TextPatchHelper.Static.Fallback["StreamAssetsDisk"] = "Stream data from: {0}";
+            TextPatchHelper.Static.Fallback["StreamMusicType"] = "Stream music from: {0}";
 
             PreInitializeModules();
         }
