@@ -20,7 +20,7 @@ namespace FezEngine.Services {
 
         public extern void orig_InitializeLibrary();
         public void InitializeLibrary() {
-            if (!FezEngineMod.MusicExtractDisabled && !FezEngineMod.MusicExtractCustom && FezEngineMod.MusicCache == MusicCacheMode.Default) {
+            if (FezEngineMod.MusicCache == MusicCacheMode.Default) {
                 orig_InitializeLibrary();
                 return;
             }
@@ -58,80 +58,6 @@ namespace FezEngine.Services {
             } else if (FezEngineMod.MusicCache == MusicCacheMode.Disabled) {
                 //Skip caching / extracting completely.
                 return;
-            }
-            
-            #if FNA
-            throw new Exception("Can't initialize FEZ 1.12+ music library by extracting it (either custom or disabled)!\nUse MusicCacheMode instead!");
-            #endif
-
-            string root;
-            if (Environment.OSVersion.Platform == PlatformID.MacOSX || Directory.Exists("/Users/")) {
-                string environmentVariable = Environment.GetEnvironmentVariable("HOME");
-                if (string.IsNullOrEmpty(environmentVariable)) {
-                    root = "./FEZ";
-                } else {
-                    root = environmentVariable + "/Library/Application Support/FEZ";
-                }
-            } else {
-                if (Environment.OSVersion.Platform == PlatformID.Unix) {
-                    string environmentVariable2 = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
-                    if (string.IsNullOrEmpty(environmentVariable2)) {
-                        environmentVariable2 = Environment.GetEnvironmentVariable("HOME");
-                        if (string.IsNullOrEmpty(environmentVariable2)) {
-                            root = "./FEZ";
-                        } else {
-                            root = environmentVariable2 + "/.local/share/FEZ";
-                        }
-                    } else {
-                        root = environmentVariable2 + "/FEZ";
-                    }
-                } else {
-                    root = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "FEZ");
-                }
-            }
-            if (!FezEngineMod.MusicExtractDisabled) {
-                if (!Directory.Exists(root)) {
-                    Directory.CreateDirectory(root);
-                }
-                while (!Directory.Exists(root)) {
-                    Thread.Sleep(0);
-                }
-                MusicTempDir = Path.Combine(root, "3rcqng1i.djk");
-                if (Directory.Exists(MusicTempDir)) {
-                    Directory.Delete(MusicTempDir, true);
-                }
-                while (Directory.Exists(MusicTempDir)) {
-                    Thread.Sleep(0);
-                }
-                Directory.CreateDirectory(MusicTempDir);
-                while (!Directory.Exists(MusicTempDir)) {
-                    Thread.Sleep(0);
-                }
-            } else {
-                MusicTempDir = Path.Combine(root, "3rcqng1i.djk");
-            }
-            using (FileStream packStream = File.OpenRead(Path.Combine("Content", "Music.pak"))) {
-                using (BinaryReader packReader = new BinaryReader(packStream)) {
-                    int count = packReader.ReadInt32();
-                    MusicAliases = new Dictionary<string, string>(count);
-                    for (int i = 0; i < count; i++) {
-                        string name = packReader.ReadString();
-                        int length = packReader.ReadInt32();
-                        string file = Path.Combine(MusicTempDir, name);
-                        if (!FezEngineMod.MusicExtractDisabled) {
-                            using (FileStream fileStream = File.Create(file)) {
-                                fileStream.Write(packReader.ReadBytes(length), 0, length);
-                            }
-                        } else {
-                            packStream.Seek(length, SeekOrigin.Current);
-                        }
-                        if (MusicAliases.ContainsKey(name)) {
-                            ModLogger.Log("SoundManager", "Skipped " + name + " track because it was already loaded");
-                        } else {
-                            MusicAliases.Add(name, file);
-                        }
-                    }
-                }
             }
         }
 

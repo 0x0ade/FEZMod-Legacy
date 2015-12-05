@@ -17,32 +17,34 @@ namespace FezEngine.Tools {
             //no-op
         }
         
-        private static Dictionary<string, Tuple<string, long, int>> assetMetadata = new Dictionary<string, Tuple<string, long, int>>();
-
         private static IEnumerable<string> assetNames;
         private static int assetNamesFromMetadata;
+        private static int assetNamesFromCache;
         public static IEnumerable<string> get_AssetNames() {
-            if (!FezEngineMod.CacheDisabled) {
-                return MemoryContentManager.cachedAssets.Keys;
-            } else {
-                if (assetNames == null || assetNamesFromMetadata != assetMetadata.Count) {
-                    List<string> files = TraverseThrough("Resources");
-                    List<string> assets = new List<string>(files.Count + assetMetadata.Keys.Count);
-                    for (int i = 0; i < files.Count; i++) {
-                        string file = files[i];
-                        assets.Add(file.Substring(10, file.Length-14).Replace('/', '\\'));
-                    }
-                    assetNamesFromMetadata = assetMetadata.Count;
-                    foreach (string file in assetMetadata.Keys) {
-                        if (assets.Contains(file)) {
-                            continue;
-                        }
-                        assets.Add(file);
-                    }
-                    assetNames = assets;
+            if (assetNames == null || assetNamesFromMetadata != FezEngineMod.AssetMetadata.Count) {
+                List<string> files = TraverseThrough("Resources");
+                List<string> assets = new List<string>(files.Count + FezEngineMod.AssetMetadata.Keys.Count);
+                for (int i = 0; i < files.Count; i++) {
+                    string file = files[i];
+                    assets.Add(file.Substring(10, file.Length-14).Replace('/', '\\'));
                 }
-                return assetNames;
+                assetNamesFromMetadata = FezEngineMod.AssetMetadata.Count;
+                foreach (string file in FezEngineMod.AssetMetadata.Keys) {
+                    if (assets.Contains(file)) {
+                        continue;
+                    }
+                    assets.Add(file);
+                }
+                assetNamesFromCache = cachedAssets.Count;
+                foreach (string file in cachedAssets.Keys) {
+                    if (assets.Contains(file)) {
+                        continue;
+                    }
+                    assets.Add(file);
+                }
+                assetNames = assets;
             }
+            return assetNames;
         }
         
         private static List<string> TraverseThrough(string dir, List<string> list = null) {
@@ -143,14 +145,14 @@ namespace FezEngine.Tools {
         }
         
         protected Stream OpenStream_(string assetName_) {
-            if (FezEngineMod.CacheDisabled) {
-                string assetName = assetName_.ToLowerInvariant().Replace('/', '\\');
-                Tuple<string, long, int> data;
-                if (assetMetadata.TryGetValue(assetName, out data)) {
-                    FileStream packStream = File.OpenRead(Path.Combine(base.RootDirectory, data.Item1));
-                    return new LimitedStream(packStream, data.Item2, data.Item3);
+            string assetName = assetName_.ToLowerInvariant().Replace('/', '\\');
+            Tuple<string, long, int> data;
+            if (FezEngineMod.AssetMetadata.TryGetValue(assetName, out data)) {
+                FileStream packStream = File.OpenRead(data.Item1);
+                if (data.Item3 == 0) {
+                    return packStream;
                 }
-                ModLogger.Log("FEZMod.Engine", "File not found: " + assetName + " (" + assetName_ + " in code)");
+                return new LimitedStream(packStream, data.Item2, data.Item3);
             }
             
             return orig_OpenStream(assetName_);
@@ -169,7 +171,7 @@ namespace FezEngine.Tools {
                 return true;
             }
             
-            if (FezEngineMod.CacheDisabled && assetMetadata.ContainsKey(assetName.ToLowerInvariant().Replace('/', '\\'))) {
+            if (FezEngineMod.AssetMetadata.ContainsKey(assetName.ToLowerInvariant().Replace('/', '\\'))) {
                 return true;
             }
 
@@ -211,9 +213,8 @@ namespace FezEngine.Tools {
                     for (int i = 0; i < count; i++) {
                         string file = packReader.ReadString();
                         int length = packReader.ReadInt32();
-                        if (!assetMetadata.ContainsKey(file)) {
-                            assetMetadata[file] = Tuple.Create(name, packStream.Position, length);
-                            ModLogger.Log("FEZMod.Engine", "Scanning " + name + ": " + file + " @ " + packStream.Position + ", +" + length);
+                        if (!FezEngineMod.AssetMetadata.ContainsKey(file)) {
+                            FezEngineMod.AssetMetadata[file] = Tuple.Create(filePath, packStream.Position, length);
                         }
                         packStream.Seek(length, SeekOrigin.Current);
                     }
