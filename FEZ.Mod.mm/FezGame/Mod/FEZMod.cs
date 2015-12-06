@@ -16,11 +16,12 @@ using System.Threading;
 using MonoMod.JIT;
 using FezEngine.Mod;
 using FezGame.Tools;
+using FezEngine.Components;
 #if FNA
 using SDL2;
 #endif
-
-namespace FezGame.Mod {
+namesp
+ace FezGame.Mod {
     public static class FEZMod {
         //FEZMod metadata
         public static string Version = "0.3a8";
@@ -73,6 +74,7 @@ namespace FezGame.Mod {
         //Other configuration
         public static bool LoadedEssentials { get; private set; }
         public static bool Preloaded { get; private set; }
+        public static MenuLevel Menu { get; private set; }
 
         public static List<Assembly> LoadedAssemblies = new List<Assembly>();
 
@@ -118,6 +120,7 @@ namespace FezGame.Mod {
 
             //Console.WriteLine("JIT test return: " + TestMonoModJIT("Hello, World!"));
 
+            //Disable steamworks
             DisableCloudSaves = typeof(PCSaveDevice).GetField("DisableCloudSaves");
 
             Fez.NoSteamworks = true;
@@ -159,7 +162,78 @@ namespace FezGame.Mod {
             TextPatchHelper.Static.Fallback["FEZModMenu"] = "FEZMOD MENU";
             TextPatchHelper.Static.Fallback["StreamAssetsDisk"] = "Stream data from: {0}";
             TextPatchHelper.Static.Fallback["StreamMusicType"] = "Stream music from: {0}";
-
+            
+            //FEZMod custom menus
+            CustomMenu.Initialize += delegate(MenuBase mb) {
+                MenuItem item;
+                
+                Menu = new MenuLevel() {
+                    Title = "FEZModMenu",
+                    AButtonString = "MenuApplyWithGlyph",
+                    BButtonString = "MenuSaveWithGlyph",
+                    IsDynamic = true,
+                    Oversized = true,
+                    Parent = mb.HelpOptionsMenu,
+                    OnReset = delegate() {
+                    },
+                    OnPostDraw = delegate(SpriteBatch batch, SpriteFont font, GlyphTextRenderer tr, float alpha) {
+                        float scale = mb.Fonts.SmallFactor * batch.GraphicsDevice.GetViewScale();
+                        float y = (float) batch.GraphicsDevice.Viewport.Height / 2f - (float) batch.GraphicsDevice.Viewport.Height / 3.825f;
+                        if ((
+                            Menu.SelectedIndex == 0 ||
+                            Menu.SelectedIndex == 1
+                        ) && mb.selectorPhase == SelectorPhase.Select) {
+                            mb.sinceRestartNoteShown = Math.Min(mb.sinceRestartNoteShown + 0.05f, 1f);
+                            tr.DrawCenteredString(batch, mb.Fonts.Small, StaticText.GetString("RequiresRestart"), new Color(1f, 1f, 1f, alpha * mb.sinceRestartNoteShown), new Vector2(0f, y), scale);
+                        } else {
+                            mb.sinceRestartNoteShown = Math.Max(mb.sinceRestartNoteShown - 0.1f, 0f);
+                        }
+                    }
+                };
+                
+                item = Menu.AddItem<string>("StreamAssetsDisk", delegate() {
+                        //onSelect
+                    }, false,
+                    () => (FezEngineMod.CacheDisabled) ? "CARTRIDGE" : "RAM",
+                    delegate(string lastValue, int change) {
+                        FezEngineMod.CacheDisabled = !FezEngineMod.CacheDisabled;
+                    }
+                );
+                item.UpperCase = true;
+                
+                item = Menu.AddItem<string>("StreamMusicType", delegate() {
+                        //onSelect
+                    }, false,
+                    delegate() {
+                        switch (FezEngineMod.MusicCache) {
+                            case MusicCacheMode.Default:
+                                return "DEFAULT MEDIUM";
+                            case MusicCacheMode.Disabled:
+                                return "RAM";
+                            case MusicCacheMode.Enabled:
+                                return "CARTRIDGE";
+                        }
+                        return "UNKNOWN";
+                    },
+                    delegate(string lastValue, int change) {
+                        int val = (int) FezEngineMod.MusicCache;
+                        if (val < (int) MusicCacheMode.Default) {
+                            val = (int) MusicCacheMode.Default;
+                        }
+                        if (val > (int) MusicCacheMode.Enabled) {
+                            val = (int) MusicCacheMode.Enabled;
+                        }
+                        FezEngineMod.MusicCache = (MusicCacheMode) val;
+                    }
+                );
+                item.UpperCase = true;
+                
+                mb.HelpOptionsMenu.AddItem("FEZModMenu", delegate() {
+                    mb.ChangeMenuLevel(Menu);
+                });
+                mb.MenuLevels.Add(Menu);
+            };
+            
             PreInitializeModules();
         }
 
