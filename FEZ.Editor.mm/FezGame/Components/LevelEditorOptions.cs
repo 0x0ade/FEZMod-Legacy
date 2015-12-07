@@ -2,6 +2,7 @@
 using System.IO;
 using System.Xml;
 using FezGame.Mod;
+using FezEngine.Mod;
 
 namespace FezGame.Components {
     public class LevelEditorOptions {

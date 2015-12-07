@@ -8,9 +8,6 @@ namespace FezEngine.Tools {
     //FIXME FEZENGINE MIGRATION Due to patch_, GetComponent cannot be found
     public static class patch_ServiceHelper {
         
-        public static bool GetComponentsAsServices = false;
-        public static bool HandleComponents = false;
-
         public static Game Game { [MonoModIgnore] get; [MonoModIgnore] set; }
 
         private static List<object> services = new List<object>();
@@ -34,7 +31,7 @@ namespace FezEngine.Tools {
         public static extern T orig_Get<T>() where T : class;
         public static T Get<T>() where T : class {
             T obj = orig_Get<T>();
-            if (obj != null || !GetComponentsAsServices) {
+            if (obj != null || !FEZModEngine.GetComponentsAsServices) {
                 return obj;
             }
             if (typeof(IGameComponent).IsAssignableFrom(typeof(T))) {
@@ -46,7 +43,7 @@ namespace FezEngine.Tools {
         public static extern object orig_Get(Type type);
         public static object Get(Type type) {
             object obj = orig_Get(type);
-            if (obj != null || !GetComponentsAsServices) {
+            if (obj != null || !FEZModEngine.GetComponentsAsServices) {
                 return obj;
             }
             if (typeof(IGameComponent).IsAssignableFrom(type)) {
@@ -59,7 +56,7 @@ namespace FezEngine.Tools {
         public static void AddComponent(IGameComponent component, bool addServices) {
             orig_AddComponent(component, addServices);
 
-            if (!addServices && HandleComponents) {
+            if (!addServices && FEZModEngine.HandleComponents) {
                 components.Add(component);
                 componentMap[component.GetType()] = component;
             }
@@ -67,7 +64,7 @@ namespace FezEngine.Tools {
 
         public static extern void orig_RemoveComponent<T>(T component) where T : IGameComponent;
         public static void RemoveComponent<T>(T component) where T : IGameComponent {
-            if (!HandleComponents) {
+            if (!FEZModEngine.HandleComponents) {
                 orig_RemoveComponent(component);
                 return;
             }
@@ -90,7 +87,7 @@ namespace FezEngine.Tools {
         }
 
         public static object GetComponent(Type type) {
-            if (!HandleComponents) {
+            if (!FEZModEngine.HandleComponents) {
                 return null;
             }
 

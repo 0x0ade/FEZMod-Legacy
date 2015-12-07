@@ -72,6 +72,9 @@ namespace FezEngine.Mod {
         public static GameTime DrawGameTime;
         public static bool OverrideCultureManuallyBecauseMonoIsA_____ = false;
         
+        public static bool GetComponentsAsServices = false;
+        public static bool HandleComponents = false;
+        
         public static MusicCacheMode MusicCache = MusicCacheMode.Default;
         public static bool EnablePPHD = false;
         public static bool DumpResources = false;

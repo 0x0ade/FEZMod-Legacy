@@ -1,4 +1,5 @@
 ﻿using FezGame.Mod;
+using FezEngine.Mod;
 using FezGame.Components;
 using FezEngine.Tools;
 using Microsoft.Xna.Framework;
@@ -27,8 +28,8 @@ namespace FezGame.Editor {
                     //Fez.SkipLogos = true;
                     Fez.SkipIntro = true;
                     FEZMod.EnableDebugControls = true;
-                    FEZMod.GetComponentsAsServices = true;
-                    FEZMod.HandleComponents = true;
+                    FEZModEngine.GetComponentsAsServices = true;
+                    FEZModEngine.HandleComponents = true;
                     InEditor = true;
                 }
             }
