@@ -23,7 +23,7 @@ using SDL2;
 
 namespace FezGame.Mod {
     
-    public abstract class FezModule : FezEngineModule {
+    public abstract class FezModule : FezModuleCore {
 
         public FezModule() {
         }
@@ -47,7 +47,7 @@ namespace FezGame.Mod {
         public static FieldInfo DisableCloudSaves;
 
         //Modules and configuration
-        public static List<FezModule> Modules = new List<FezModule>();
+        public static List<FezModuleCore> Modules = new List<FezModuleCore>();
         private static Type[] ModuleTypes;
         private static Dictionary<string, MethodInfo>[] ModuleMethods;
 
@@ -184,7 +184,7 @@ namespace FezGame.Mod {
             ModuleTypes = new Type[Modules.Count];
             ModuleMethods = new Dictionary<string, MethodInfo>[ModuleTypes.Length];
             for (int i = 0; i < ModuleTypes.Length; i++) {
-                FezModule module = Modules[i];
+                FezModuleCore module = Modules[i];
                 ModuleTypes[i] = module.GetType();
                 ModuleMethods[i] = new Dictionary<string, MethodInfo>();
             }
@@ -213,14 +213,14 @@ namespace FezGame.Mod {
             }
             ModLogger.Log("FEZMod", "Found referenced assembly "+assembly.GetName().Name);
             foreach (Type type in assembly.GetTypes()) {
-                if (typeof(FezModule).IsAssignableFrom(type) && !type.IsAbstract) {
+                if (typeof(FezModuleCore).IsAssignableFrom(type) && !type.IsAbstract) {
                     PreInitializeModule(type);
                 }
             }
         }
 
         public static void PreInitializeModule(Type type) {
-            FezModule module = (FezModule) type.GetConstructor(Garbage.a_Type_0).Invoke(Garbage.a_object_0);
+            FezModuleCore module = (FezModuleCore) type.GetConstructor(Garbage.a_Type_0).Invoke(Garbage.a_object_0);
             ModLogger.Log("FEZMod", "Pre-Initializing "+module.Name);
             module.PreInitialize();
             Modules.Add(module);
@@ -529,6 +529,9 @@ namespace FezGame.Mod {
                 Dictionary<string, MethodInfo> moduleMethods = ModuleMethods[i];
                 MethodInfo method;
                 if (moduleMethods.TryGetValue(methodName, out method)) {
+                    if (method == null) {
+                        continue;
+                    }
                     Common.ReflectionHelper.InvokeMethod(method, Modules[i], args);
                     continue;
                 }
@@ -538,6 +541,9 @@ namespace FezGame.Mod {
                 }
                 method = ModuleTypes[i].GetMethod(methodName, argsTypes);
                 moduleMethods[methodName] = method;
+                if (method == null) {
+                    continue;
+                }
                 Common.ReflectionHelper.InvokeMethod(method, Modules[i], args);
             }
         }
@@ -546,9 +552,13 @@ namespace FezGame.Mod {
             Type[] argsTypes = { typeof(T) };
             object[] args = { arg };
             for (int i = 0; i < Modules.Count; i++) {
-                FezModule module = Modules[i];
+                FezModuleCore module = Modules[i];
                 //TODO use module method cache
-                arg = (T) Common.ReflectionHelper.InvokeMethod(module.GetType().GetMethod(methodName, argsTypes), module, args);
+                MethodInfo method = module.GetType().GetMethod(methodName, argsTypes);
+                if (method == null) {
+                    continue;
+                }
+                arg = (T) Common.ReflectionHelper.InvokeMethod(method, module, args);
             }
             return arg;
         }

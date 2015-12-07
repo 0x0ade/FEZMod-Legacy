@@ -7,13 +7,13 @@ using FezEngine.Tools;
 
 namespace FezEngine.Mod {
     
-    public abstract class FezEngineModule {
+    public abstract class FezModuleCore {
 
         public abstract string Name { get; }
         public abstract string Author { get; }
         public abstract string Version { get; }
 
-        public FezEngineModule() {
+        public FezModuleCore() {
         }
 
         public virtual void PreInitialize() {}
@@ -34,7 +34,7 @@ namespace FezEngine.Mod {
 
     }
     
-    public class FEZModEngine : FezEngineModule {
+    public class FEZModEngine : FezModuleCore {
         
         public static string MODVersionString {
             get {

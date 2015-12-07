@@ -116,6 +116,10 @@
       <Project>{1A401409-A56A-4930-9F0C-6215AC4408B8}</Project>
       <Name>FEZ.Mod.mm</Name>
     </ProjectReference>
+    <ProjectReference Include="..\FezEngine.Mod.mm\FezEngine.Mod.mm.csproj">
+      <Project>{D8A08E34-1DF2-4843-BE12-2D384C50897D}</Project>
+      <Name>FezEngine.Mod.mm</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="FezGame\" />
