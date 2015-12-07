@@ -8,12 +8,13 @@ namespace FezEngine.Tools {
 
         private static float viewScale;
 
+        #if FNA
         public static extern void orig_SetupViewport(this GraphicsDevice device);
-        public static void SetupViewport(this GraphicsDevice device, bool forceLetterbox) {
+        public static void SetupViewport(this GraphicsDevice device) {
             //FEZ 1.12 disables letterboxing (at least during the beta)
-            #if FNA
             orig_SetupViewport(device);
-            #else
+        #else
+        public static void SetupViewport(this GraphicsDevice device, bool forceLetterbox = false) {
             int backBufferWidth = device.PresentationParameters.BackBufferWidth;
             int backBufferHeight = device.PresentationParameters.BackBufferHeight;
             /*if (!forceLetterbox) {
@@ -31,7 +32,7 @@ namespace FezEngine.Tools {
                 MinDepth = 0,
                 MaxDepth = 1
             };
-            #endif
+        #endif
             
             if (FEZMod.EnablePPHD) {
                 SettingsManager.viewScale = 1f;
@@ -40,11 +41,5 @@ namespace FezEngine.Tools {
             }
         }
         
-        #if FNA
-        public static void SetupViewport(this GraphicsDevice device) {
-            SetupViewport(device, true);
-        }
-        #endif
-
     }
 }

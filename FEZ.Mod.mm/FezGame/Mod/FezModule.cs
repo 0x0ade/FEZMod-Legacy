@@ -2,6 +2,7 @@
 using FezGame.Structure;
 using FezEngine.Tools;
 using FezEngine.Structure;
+using FezGame.Components;
 
 namespace FezGame.Mod {
     public abstract class FezModule {
@@ -16,6 +17,7 @@ namespace FezGame.Mod {
         public virtual void PreInitialize() {}
         public virtual void ParseArgs(string[] args) {}
         public virtual void Initialize() {}
+        public virtual void InitializeMenu(MenuBase mb) {}
         public virtual void LoadComponents(Fez game) {}
         public virtual void Exit() {}
         public virtual void HandleCrash(Exception e) {}

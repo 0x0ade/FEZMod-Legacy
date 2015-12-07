@@ -23,10 +23,6 @@ using FezGame.Mod;
 
 namespace FezGame.Components {
     
-    public static class CustomMenu {
-        public static Action<MenuBase> Initialize = delegate(MenuBase mb) {};
-    }
-    
     //internal in FEZ
 	public class MenuBase : DrawableGameComponent {
         
@@ -113,7 +109,17 @@ namespace FezGame.Components {
 		public override void Initialize() {
 			orig_Initialize();
             
-            CustomMenu.Initialize(this);
+            ModLogger.Log("FEZMod", "debug a");
+            try {
+                ModLogger.Log("FEZMod", "debug b");
+                //FEZMod.CustomMenus(this);
+                //Action<MenuBase> d = delegate(MenuBase mb) {FEZMod.CustomMenus(mb);};d(this);
+                Action<MenuBase> d = delegate(MenuBase mb) {FEZMod.InitializeMenu(mb);};d(this);
+                ModLogger.Log("FEZMod", "debug c");
+            } catch (Exception e) {
+                ModLogger.Log("FEZMod", e.ToString());
+            }
+            ModLogger.Log("FEZMod", "debug d");
         
             foreach (MenuLevel current in MenuLevels) {
 				if (current != MenuRoot && current.Parent == null) {

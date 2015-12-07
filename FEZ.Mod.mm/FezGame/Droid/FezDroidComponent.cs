@@ -24,6 +24,7 @@ namespace FezGame.Droid {
         Move
     }
     
+    //This, especially the Update method, crashes monodis...
     public class FezDroidComponent : DrawableGameComponent {
         
         public static FezDroidComponent Instance;
