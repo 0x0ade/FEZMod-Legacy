@@ -111,12 +111,7 @@
     <Compile Include="FezEngine\Services\LevelManager.cs" />
     <Compile Include="FezGame\Components\WorldMap.cs" />
     <Compile Include="FezGame\Components\DotHost.cs" />
-    <Compile Include="FezGame\Mod\Garbage.cs" />
-    <Compile Include="FezGame\Mod\Cache.cs" />
-    <Compile Include="FezEngine\Mod\FezEngineMod.cs" />
-    <Compile Include="FezEngine\Mod\MusicCacheMode.cs" />
     <Compile Include="FezGame\Mod\FEZMod.cs" />
-    <Compile Include="FezGame\Mod\FezModule.cs" />
     <Compile Include="FezGame\Mod\FEZModComponent.cs" />
     <Compile Include="FezGame\Services\GameCameraManager.cs" />
     <Compile Include="FezGame\Components\PlayerCameraControl.cs" />
@@ -134,9 +129,6 @@
     <Compile Include="FezGame\Components\GomezHost.cs" />
     <Compile Include="FezGame\Structure\NetworkGomezData.cs" />
     <Compile Include="FezGame\Components\NetworkUpdateDelegates.cs" />
-    <Compile Include="FezGame\Mod\XmlHelper.cs" />
-    <Compile Include="FezGame\Mod\FakeInputHelper.cs" />
-    <Compile Include="FezGame\Mod\CodeInputAll.cs" />
     <Compile Include="FezGame\Mod\Gui\IGuiHandler.cs" />
     <Compile Include="FezGame\Mod\Gui\ButtonWidget.cs" />
     <Compile Include="FezGame\Mod\Gui\CheckboxWidget.cs" />
@@ -146,11 +138,8 @@
     <Compile Include="FezGame\Mod\Gui\TextFieldWidget.cs" />
     <Compile Include="FezGame\Mod\Gui\TopBarWidget.cs" />
     <Compile Include="FezGame\Mod\Gui\WindowHeaderWidget.cs" />
-    <Compile Include="FezGame\Mod\FEZModContentHelper.cs" />
-    <Compile Include="FezGame\ModLogger.cs" />
     <Compile Include="FezGame\Mod\Gui\AGuiHandler.cs" />
     <Compile Include="FezGame\Mod\FEZModReflectionHelper.cs" />
-    <Compile Include="FezGame\Mod\LimitedStream.cs" />
     <Compile Include="FezGame\Tools\patch_StaticText.cs" />
     <Compile Include="FezGame\Tools\patch_GameText.cs" />
     <Compile Include="FezGame\Tools\TextPatchHelper.cs" />
@@ -171,5 +160,11 @@
     <Folder Include="FezGame\Tools\" />
     <Folder Include="FezGame\Components\Actions\" />
     <Folder Include="FezGame\Mod\Gui\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FezEngine.Mod.mm\FezEngine.Mod.mm.csproj">
+      <Project>{D8A08E34-1DF2-4843-BE12-2D384C50897D}</Project>
+      <Name>FezEngine.Mod.mm</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

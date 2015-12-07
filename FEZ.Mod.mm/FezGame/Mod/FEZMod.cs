@@ -22,6 +22,21 @@ using SDL2;
 #endif
 
 namespace FezGame.Mod {
+    
+    public abstract class FezModule : FezEngineModule {
+
+        public FezModule() {
+        }
+
+        public virtual void InitializeMenu(FezGame.Components.MenuBase mb) {}
+        public virtual void LoadComponents(FezGame.Fez game) {}
+        public virtual void SaveClear(FezGame.Structure.SaveData saveData) {}
+        public virtual void SaveClone(FezGame.Structure.SaveData source, FezGame.Structure.SaveData dest) {}
+        public virtual void SaveRead(FezGame.Structure.SaveData saveData, CrcReader reader) {}
+        public virtual void SaveWrite(FezGame.Structure.SaveData saveData, CrcWriter writer) {}
+        
+    }
+    
     public static class FEZMod {
         //FEZMod metadata
         public static string Version = "0.3a8";
@@ -43,12 +58,9 @@ namespace FezGame.Mod {
         public static bool EnableFEZometric = true;
         public static bool EnableBugfixes = true;
         public static bool EnableHD = true;
-        public static bool EnablePPHD = false;
         public static List<int[]> CustomResolutions = new List<int[]>();
         public static bool EnableMultiplayer = false;
         public static bool EnableMultiplayerLocalhost = false;
-        public static bool GetComponentsAsServices = false;
-        public static bool HandleComponents = false;
         public static bool CreatingThumbnail = false;
         private static string loadingLevel = null;
         public static string LoadingLevel {
@@ -72,9 +84,6 @@ namespace FezGame.Mod {
         public static bool LoadedEssentials { get; private set; }
         public static bool Preloaded { get; private set; }
         public static MenuLevel Menu { get; private set; }
-        public static GameTime UpdateGameTime;
-        public static GameTime DrawGameTime;
-        public static bool OverrideCultureManuallyBecauseMonoIsA_____ = false;
 
         public static List<Assembly> LoadedAssemblies = new List<Assembly>();
 
@@ -153,7 +162,7 @@ namespace FezGame.Mod {
                     ModLogger.Log("FEZMod", "This message will always appear to remind the authors of FEZMod to find another workaround.");
                     ModLogger.Log("FEZMod", "Also, Mono sucks at .NET accuracy.");
 
-                    OverrideCultureManuallyBecauseMonoIsA_____ = true;
+                    FEZModEngine.OverrideCultureManuallyBecauseMonoIsA_____ = true;
                     Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
                 }
             }
@@ -259,7 +268,7 @@ namespace FezGame.Mod {
                 }
                 if (args[i] == "-pphd" || args[i] == "--pixel-perfect-high-definition") {
                     ModLogger.Log("FEZMod", "Found -pphd / --pixel-perfect-high-definition");
-                    EnablePPHD = true;
+                    FEZModEngine.EnablePPHD = true;
                 }
                 if (args[i] == "-4k" || args[i] == "--ultra-high-definition") {
                     ModLogger.Log("FEZMod", "Found -4k / --ultra-high-definition");
@@ -399,9 +408,9 @@ namespace FezGame.Mod {
             item = Menu.AddItem<string>("StreamAssetsDisk", delegate() {
                     //onSelect
                 }, false,
-                () => (FezEngineMod.CacheDisabled) ? "CARTRIDGE" : "RAM",
+                () => (FEZModEngine.CacheDisabled) ? "CARTRIDGE" : "RAM",
                 delegate(string lastValue, int change) {
-                    FezEngineMod.CacheDisabled = !FezEngineMod.CacheDisabled;
+                    FEZModEngine.CacheDisabled = !FEZModEngine.CacheDisabled;
                 }
             );
             item.UpperCase = true;
@@ -410,7 +419,7 @@ namespace FezGame.Mod {
                     //onSelect
                 }, false,
                 delegate() {
-                    switch (FezEngineMod.MusicCache) {
+                    switch (FEZModEngine.MusicCache) {
                         case MusicCacheMode.Default:
                             return "DEFAULT MEDIUM";
                         case MusicCacheMode.Disabled:
@@ -421,14 +430,14 @@ namespace FezGame.Mod {
                     return "UNKNOWN";
                 },
                 delegate(string lastValue, int change) {
-                    int val = (int) FezEngineMod.MusicCache + change;
+                    int val = (int) FEZModEngine.MusicCache + change;
                     if (val < (int) MusicCacheMode.Default) {
                         val = (int) MusicCacheMode.Default;
                     }
                     if (val > (int) MusicCacheMode.Enabled) {
                         val = (int) MusicCacheMode.Enabled;
                     }
-                    FezEngineMod.MusicCache = (MusicCacheMode) val;
+                    FEZModEngine.MusicCache = (MusicCacheMode) val;
                 }
             );
             item.UpperCase = true;

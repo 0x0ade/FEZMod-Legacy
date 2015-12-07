@@ -1,11 +1,16 @@
 ﻿#pragma warning disable 436
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using FezGame.Mod;
+using FezEngine.Mod;
+using MonoMod;
 
 namespace FezEngine.Tools {
-    public static class SettingsManager {
+    public static class patch_SettingsManager {
 
+        #if FNA
+        //FIXME FEZ 1.12
+        [MonoModLinkTo("FezEngine.Tools.SettingsManager", "FEZ112viewScaleOrSomethingRIPME")]
+        #endif
         private static float viewScale;
 
         #if FNA
@@ -34,10 +39,10 @@ namespace FezEngine.Tools {
             };
         #endif
             
-            if (FEZMod.EnablePPHD) {
-                SettingsManager.viewScale = 1f;
+            if (FEZModEngine.EnablePPHD) {
+                viewScale = 1f;
             } else {
-                SettingsManager.viewScale = ((float) device.Viewport.Width / 1280f + (float) device.Viewport.Height / 720f) / 2f;
+                viewScale = ((float) device.Viewport.Width / 1280f + (float) device.Viewport.Height / 720f) / 2f;
             }
         }
         

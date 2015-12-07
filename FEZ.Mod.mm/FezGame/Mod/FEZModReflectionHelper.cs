@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using FezEngine.Mod;
 
 namespace FezGame.Mod {
     public static class FEZModReflectionHelper {

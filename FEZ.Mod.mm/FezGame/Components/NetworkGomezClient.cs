@@ -4,6 +4,7 @@ using System.Threading;
 using System.Net;
 using System.IO;
 using FezGame.Mod;
+using FezEngine.Mod;
 
 namespace FezGame.Components {
     public class NetworkGomezClient {

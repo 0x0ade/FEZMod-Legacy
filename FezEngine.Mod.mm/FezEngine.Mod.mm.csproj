@@ -14,7 +14,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
+    <DefineConstants>DEBUG;ENGINE;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -23,6 +23,7 @@
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
+    <DefineConstants>ENGINE;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -32,7 +33,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\DebugFNA</OutputPath>
-    <DefineConstants>DEBUG;FNA;</DefineConstants>
+    <DefineConstants>DEBUG;FNA;ENGINE;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -42,7 +43,7 @@
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\ReleaseFNA</OutputPath>
-    <DefineConstants>FNA;</DefineConstants>
+    <DefineConstants>FNA;ENGINE;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -70,6 +71,9 @@
     <Reference Include="ContentSerialization">
       <HintPath>..\libs\ContentSerialization.dll</HintPath>
     </Reference>
+    <Reference Include="Common">
+      <HintPath>..\libs\Common.dll</HintPath>
+    </Reference>
     <Reference Include="mscorlib">
       <HintPath>..\libs\mscorlib.dll</HintPath>
     </Reference>
@@ -94,10 +98,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="FezEngine\Tools\MemoryContentManager.cs" />
-    <Compile Include="FezEngine\Structure\Level.cs" />
-    <Compile Include="FezEngine\Tools\ServiceHelper.cs" />
-    <Compile Include="FezEngine\Tools\SettingsManager.cs" />
+    <Compile Include="FezEngine\Mod\ModLogger.cs" />
+    <Compile Include="FezEngine\Mod\Garbage.cs" />
+    <Compile Include="FezEngine\Mod\Cache.cs" />
+    <Compile Include="FezEngine\Mod\FEZModEngine.cs" />
+    <Compile Include="FezEngine\Mod\MusicCacheMode.cs" />
+    <Compile Include="FezEngine\Mod\FakeInputHelper.cs" />
+    <Compile Include="FezEngine\Mod\CodeInputAll.cs" />
+    <Compile Include="FezEngine\Mod\FEZModContentHelper.cs" />
+    <Compile Include="FezEngine\Mod\LimitedStream.cs" />
+    <Compile Include="FezEngine\Mod\XmlHelper.cs" />
+    <Compile Include="FezEngine\Tools\patch_MemoryContentManager.cs" />
+    <Compile Include="FezEngine\Tools\patch_ServiceHelper.cs" />
+    <Compile Include="FezEngine\Tools\patch_SettingsManager.cs" />
     <Compile Include="FezEngine\Services\SoundManager.cs" />
     <Compile Include="FezEngine\Tools\SharedContentManager.cs" />
     <Compile Include="FezEngine\Structure\Geometry\ShaderInstancedIndexedPrimitives.cs" />
@@ -113,9 +126,9 @@
     <Folder Include="FezEngine\Structure\Geometry\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FEZ.Mod.mm\FEZ.Mod.mm.csproj">
+    <!--ProjectReference Include="..\FEZ.Mod.mm\FEZ.Mod.mm.csproj">
       <Project>{1A401409-A56A-4930-9F0C-6215AC4408B8}</Project>
       <Name>FEZ.Mod.mm</Name>
-    </ProjectReference>
+    </ProjectReference-->
   </ItemGroup>
 </Project>

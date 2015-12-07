@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using FezGame.Mod;
+using FezEngine.Mod;
 using Microsoft.Xna.Framework;
 using MonoMod;
 
 namespace FezEngine.Tools {
-    public static class ServiceHelper {
+    //FIXME FEZENGINE MIGRATION Due to patch_, GetComponent cannot be found
+    public static class patch_ServiceHelper {
+        
+        public static bool GetComponentsAsServices = false;
+        public static bool HandleComponents = false;
 
         public static Game Game { [MonoModIgnore] get; [MonoModIgnore] set; }
 
@@ -21,7 +25,7 @@ namespace FezEngine.Tools {
         public static void InitializeServices() {
             int oldCount = services.Count;
             orig_InitializeServices();
-            FEZMod.Initialize();
+            FEZModEngine.PassInitialize();
             for (int i = oldCount; i < services.Count; i++) {
                 InjectServices(services[i]);
             }
@@ -30,7 +34,7 @@ namespace FezEngine.Tools {
         public static extern T orig_Get<T>() where T : class;
         public static T Get<T>() where T : class {
             T obj = orig_Get<T>();
-            if (obj != null || !FEZMod.GetComponentsAsServices) {
+            if (obj != null || !GetComponentsAsServices) {
                 return obj;
             }
             if (typeof(IGameComponent).IsAssignableFrom(typeof(T))) {
@@ -42,7 +46,7 @@ namespace FezEngine.Tools {
         public static extern object orig_Get(Type type);
         public static object Get(Type type) {
             object obj = orig_Get(type);
-            if (obj != null || !FEZMod.GetComponentsAsServices) {
+            if (obj != null || !GetComponentsAsServices) {
                 return obj;
             }
             if (typeof(IGameComponent).IsAssignableFrom(type)) {
@@ -55,7 +59,7 @@ namespace FezEngine.Tools {
         public static void AddComponent(IGameComponent component, bool addServices) {
             orig_AddComponent(component, addServices);
 
-            if (!addServices && FEZMod.HandleComponents) {
+            if (!addServices && HandleComponents) {
                 components.Add(component);
                 componentMap[component.GetType()] = component;
             }
@@ -63,7 +67,7 @@ namespace FezEngine.Tools {
 
         public static extern void orig_RemoveComponent<T>(T component) where T : IGameComponent;
         public static void RemoveComponent<T>(T component) where T : IGameComponent {
-            if (!FEZMod.HandleComponents) {
+            if (!HandleComponents) {
                 orig_RemoveComponent(component);
                 return;
             }
@@ -86,7 +90,7 @@ namespace FezEngine.Tools {
         }
 
         public static object GetComponent(Type type) {
-            if (!FEZMod.HandleComponents) {
+            if (!HandleComponents) {
                 return null;
             }
 

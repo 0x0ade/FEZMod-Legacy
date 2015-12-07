@@ -18,7 +18,7 @@ using System.Globalization;
 using System.Threading;
 using Common;
 
-namespace FezGame.Mod {
+namespace FezEngine.Mod {
     public struct CacheKey_Type_NodeName {
         public Type Type;
         public string NodeName;
@@ -61,7 +61,7 @@ namespace FezGame.Mod {
         private static CacheKey_Type_NodeName deserialize_key;
         private static CacheKey_NodeName_AttribName deserialize_key_attrib;
         public static object Deserialize(this XmlNode node, Type parent = null, ContentManager cm = null, bool descend = true) {
-            if (FEZMod.OverrideCultureManuallyBecauseMonoIsA_____) {
+            if (FEZModEngine.OverrideCultureManuallyBecauseMonoIsA_____) {
                 Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             }
 
@@ -407,7 +407,7 @@ namespace FezGame.Mod {
         }
 
         public static void HandleSpecialDataDeserialize(this object obj, XmlElement elem, ContentManager cm) {
-            if (FEZMod.OverrideCultureManuallyBecauseMonoIsA_____) {
+            if (FEZModEngine.OverrideCultureManuallyBecauseMonoIsA_____) {
                 Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             }
 
@@ -499,7 +499,9 @@ namespace FezGame.Mod {
                 ao.Size = (Vector3) elem.ChildNodes[0].FirstChild.Deserialize();
                 foreach (XmlNode childNode in elem.ChildNodes) {
                     if (childNode.Name == "ShaderInstancedIndexedPrimitives") {
-                        ao.Geometry = (ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>) childNode.Deserialize(typeof(ArtObject));
+                        //FIXME FEZENGINE MIGRATION
+                        //FezEngine/Mod/XmlHelper.cs(502,129): error CS0029: Cannot implicitly convert type `FezEngine.Structure.Geometry.ShaderInstancedIndexedPrimitives<FezEngine.Structure.Geometry.VertexPositionNormalTextureInstance,Microsoft.Xna.Framework.Matrix> [FezEngine.Mod.mm, Version=1.0.5819.39244, Culture=neutral, PublicKeyToken=null]' to `FezEngine.Structure.Geometry.ShaderInstancedIndexedPrimitives<FezEngine.Structure.Geometry.VertexPositionNormalTextureInstance,Microsoft.Xna.Framework.Matrix> [FezEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]'
+                        //ao.Geometry = (ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>) childNode.Deserialize(typeof(ArtObject));
                         break;
                     }
                 }
@@ -641,7 +643,7 @@ namespace FezGame.Mod {
 
         private static CacheKey_Type_NodeName new_key;
         public static object New(this Type type, XmlElement elem = null) {
-            if (FEZMod.OverrideCultureManuallyBecauseMonoIsA_____) {
+            if (FEZModEngine.OverrideCultureManuallyBecauseMonoIsA_____) {
                 Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             }
 
@@ -780,7 +782,7 @@ namespace FezGame.Mod {
         }
 
         public static object Parse(this Type type, string str) {
-            if (FEZMod.OverrideCultureManuallyBecauseMonoIsA_____) {
+            if (FEZModEngine.OverrideCultureManuallyBecauseMonoIsA_____) {
                 Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             }
 
@@ -817,7 +819,7 @@ namespace FezGame.Mod {
         }
 
         public static XmlNode Serialize(this object obj, XmlDocument document, string name = null) {
-            if (FEZMod.OverrideCultureManuallyBecauseMonoIsA_____) {
+            if (FEZModEngine.OverrideCultureManuallyBecauseMonoIsA_____) {
                 Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             }
 
@@ -1017,7 +1019,7 @@ namespace FezGame.Mod {
         }
 
         public static XmlElement HandleSpecialDataPreSerialize(this XmlElement elem, object obj) {
-            if (FEZMod.OverrideCultureManuallyBecauseMonoIsA_____) {
+            if (FEZModEngine.OverrideCultureManuallyBecauseMonoIsA_____) {
                 Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             }
 
@@ -1033,7 +1035,7 @@ namespace FezGame.Mod {
         }
 
         public static XmlElement HandleSpecialDataPostSerialize(this XmlElement elem, object obj) {
-            if (FEZMod.OverrideCultureManuallyBecauseMonoIsA_____) {
+            if (FEZModEngine.OverrideCultureManuallyBecauseMonoIsA_____) {
                 Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             }
 

@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 #endif
 using Microsoft.Xna.Framework.Graphics;
 using MonoMod;
-using FezGame.Mod;
+using FezEngine.Mod;
 
 namespace FezEngine.Structure.Geometry {
     public class ShaderInstancedIndexedPrimitives<TemplateType, InstanceType> : IndexedPrimitiveCollectionBase<TemplateType, int>, IFakeDisposable where TemplateType : struct, IShaderInstantiatableVertex where InstanceType : struct {
@@ -96,14 +96,14 @@ namespace FezEngine.Structure.Geometry {
             }
             
             #if !FNA
-            if (FEZMod.FEZVersion == V_1_11) {
+            if (FEZModEngine.FEZVersion == V_1_11) {
                 Draw_1_11(effect);
                 return;
             }
             #else
             //FNA is used by 1.12+ anyways, so avoid errors when calling / patching this method.
             //Also, FEZ 1.12+ fixes the Intel bug. Custom SIIP code shouldn't be required anymore.
-            if (FEZMod.FEZVersion == V_1_12) {
+            if (FEZModEngine.FEZVersion == V_1_12) {
                 Draw_1_12(effect);
                 return;
             }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using FezGame.Mod;
+using FezEngine.Mod;
 using Microsoft.Xna.Framework;
 using Common;
 using MonoMod;
@@ -64,7 +65,7 @@ namespace FezGame {
             #endif
             gameTime = mul(gameTime, FEZMod.GameSpeed);
             
-            FEZMod.UpdateGameTime = gameTime;
+            FEZModEngine.UpdateGameTime = gameTime;
             
             #if FNA
             if (FEZMod.Smooth) {
@@ -87,7 +88,7 @@ namespace FezGame {
             #endif
             gameTime = mul(gameTime, FEZMod.GameSpeed);
             
-            FEZMod.DrawGameTime = gameTime;
+            FEZModEngine.DrawGameTime = gameTime;
             
             //TODO should FEZMod.Smooth affect Draw, too?
             

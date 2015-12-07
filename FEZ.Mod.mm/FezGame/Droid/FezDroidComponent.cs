@@ -13,6 +13,7 @@ using FezEngine.Structure;
 using Microsoft.Xna.Framework.Audio;
 using FezGame.Components;
 using FezGame.Mod;
+using FezEngine.Mod;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -24,7 +25,6 @@ namespace FezGame.Droid {
         Move
     }
     
-    //This, especially the Update method, crashes monodis...
     public class FezDroidComponent : DrawableGameComponent {
         
         public static FezDroidComponent Instance;

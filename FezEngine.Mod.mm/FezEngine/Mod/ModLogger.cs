@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace FezGame.Mod {
+namespace FezEngine.Mod {
     public class ModLogger {
         private static readonly string LogFilePath = "JAFM Log.txt";//Creates the .txt wherever the game is running (next to FEZ.exe)
         private const string TimeFormat = "HH:mm:ss.fff";

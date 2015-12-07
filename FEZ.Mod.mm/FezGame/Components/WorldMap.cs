@@ -1,5 +1,6 @@
 ﻿#pragma warning disable 436
 using FezGame.Mod;
+using FezEngine.Mod;
 using FezGame.Services;
 using FezEngine.Components;
 using FezEngine.Structure;

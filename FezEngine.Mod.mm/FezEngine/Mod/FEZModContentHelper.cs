@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using FezEngine.Tools;
 using Microsoft.Xna.Framework;
 
-namespace FezGame.Mod {
+namespace FezEngine.Mod {
     public struct CacheKey_RGB_A {
         public Texture2D RGB;
         public Texture2D A;

@@ -1,4 +1,3 @@
-
 using System;
 
 //Straight outta trashbin (shadow-engine)
@@ -9,7 +8,7 @@ using System;
 //some Android devices and thus lowering the GC invocation count
 //and frequency for FEZMod's garbage should help.
 //TL;DR: This class keeps the GC quiet and is horrible.
-namespace FezGame.Mod {
+namespace FezEngine.Mod {
     
     public static class Garbage {
         

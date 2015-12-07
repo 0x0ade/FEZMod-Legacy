@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace FezGame.Mod {
+namespace FezEngine.Mod {
     public class LimitedStream : MemoryStream {
         
         public Stream LimitStream;

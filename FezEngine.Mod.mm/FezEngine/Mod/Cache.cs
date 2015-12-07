@@ -1,8 +1,7 @@
-
 using System;
 
 //Straight outta trashbin (shadow-engine)
-namespace FezGame.Mod {
+namespace FezEngine.Mod {
     
     public class Cache<T> {
     

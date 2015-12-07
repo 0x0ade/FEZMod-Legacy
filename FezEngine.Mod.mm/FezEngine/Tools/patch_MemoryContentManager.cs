@@ -1,6 +1,5 @@
 ﻿#pragma warning disable 436
 using System;
-using FezGame.Mod;
 using System.Collections.Generic;
 using System.IO;
 using FezEngine.Structure;
@@ -10,9 +9,9 @@ using Microsoft.Xna.Framework.Content;
 using MonoMod;
 
 namespace FezEngine.Tools {
-    public class MemoryContentManager : ContentManager {
+    public class patch_MemoryContentManager : ContentManager {
         
-        public MemoryContentManager(IServiceProvider serviceProvider, string rootDirectory)
+        public patch_MemoryContentManager(IServiceProvider serviceProvider, string rootDirectory)
             : base(serviceProvider, rootDirectory) {
             //no-op
         }
@@ -21,15 +20,15 @@ namespace FezEngine.Tools {
         private static int assetNamesFromMetadata;
         private static int assetNamesFromCache;
         public static IEnumerable<string> get_AssetNames() {
-            if (assetNames == null || assetNamesFromMetadata != FezEngineMod.AssetMetadata.Count) {
+            if (assetNames == null || assetNamesFromMetadata != FEZModEngine.AssetMetadata.Count) {
                 List<string> files = TraverseThrough("Resources");
-                List<string> assets = new List<string>(files.Count + FezEngineMod.AssetMetadata.Keys.Count);
+                List<string> assets = new List<string>(files.Count + FEZModEngine.AssetMetadata.Keys.Count);
                 for (int i = 0; i < files.Count; i++) {
                     string file = files[i];
                     assets.Add(file.Substring(10, file.Length-14).Replace('/', '\\'));
                 }
-                assetNamesFromMetadata = FezEngineMod.AssetMetadata.Count;
-                foreach (string file in FezEngineMod.AssetMetadata.Keys) {
+                assetNamesFromMetadata = FEZModEngine.AssetMetadata.Count;
+                foreach (string file in FEZModEngine.AssetMetadata.Keys) {
                     if (assets.Contains(file)) {
                         continue;
                     }
@@ -116,7 +115,7 @@ namespace FezEngine.Tools {
 
         protected extern Stream orig_OpenStream(string assetName);
         protected override Stream OpenStream(string assetName) {
-            if (FezEngineMod.DumpAllResources) {
+            if (FEZModEngine.DumpAllResources) {
                 DumpAll();
             }
 
@@ -132,7 +131,7 @@ namespace FezEngine.Tools {
                 FileStream fis = new FileStream(filePath, FileMode.Open);
                 return fis;
             }
-            if (FezEngineMod.DumpResources) {
+            if (FEZModEngine.DumpResources) {
                 Directory.GetParent(filePath).Create();
                 ModLogger.Log("FEZMod.Engine", assetName + " -> " + filePath);
                 Stream ois = OpenStream_(assetName);
@@ -147,7 +146,7 @@ namespace FezEngine.Tools {
         protected Stream OpenStream_(string assetName_) {
             string assetName = assetName_.ToLowerInvariant().Replace('/', '\\');
             Tuple<string, long, int> data;
-            if (FezEngineMod.AssetMetadata.TryGetValue(assetName, out data)) {
+            if (FEZModEngine.AssetMetadata.TryGetValue(assetName, out data)) {
                 FileStream packStream = File.OpenRead(data.Item1);
                 if (data.Item3 == 0) {
                     return packStream;
@@ -171,7 +170,7 @@ namespace FezEngine.Tools {
                 return true;
             }
             
-            if (FezEngineMod.AssetMetadata.ContainsKey(assetName.ToLowerInvariant().Replace('/', '\\'))) {
+            if (FEZModEngine.AssetMetadata.ContainsKey(assetName.ToLowerInvariant().Replace('/', '\\'))) {
                 return true;
             }
 
@@ -180,26 +179,26 @@ namespace FezEngine.Tools {
 
         public extern void orig_LoadEssentials();
         public void LoadEssentials() {
-            if (!FezEngineMod.CacheDisabled) {
+            if (!FEZModEngine.CacheDisabled) {
                 orig_LoadEssentials();
             } else {
                 cachedAssets = new Dictionary<string, byte[]>(0);
                 ScanPackMetadata("Essentials.pak");
             }
             
-            FEZMod.LoadEssentials();
+            FEZModEngine.PassLoadEssentials();
         }
 
         public extern void orig_Preload();
         public void Preload() {
-            if (!FezEngineMod.CacheDisabled) {
+            if (!FEZModEngine.CacheDisabled) {
                 orig_Preload();
             } else {
                 ScanPackMetadata("Updates.pak");
 			    ScanPackMetadata("Other.pak");
             }
             
-            FEZMod.Preload();
+            FEZModEngine.PassPreload();
         }
         
         public void ScanPackMetadata(string name) {
@@ -213,8 +212,8 @@ namespace FezEngine.Tools {
                     for (int i = 0; i < count; i++) {
                         string file = packReader.ReadString();
                         int length = packReader.ReadInt32();
-                        if (!FezEngineMod.AssetMetadata.ContainsKey(file)) {
-                            FezEngineMod.AssetMetadata[file] = Tuple.Create(filePath, packStream.Position, length);
+                        if (!FEZModEngine.AssetMetadata.ContainsKey(file)) {
+                            FEZModEngine.AssetMetadata[file] = Tuple.Create(filePath, packStream.Position, length);
                         }
                         packStream.Seek(length, SeekOrigin.Current);
                     }

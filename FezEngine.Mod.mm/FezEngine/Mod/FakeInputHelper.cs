@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using FezEngine.Structure.Input;
 using System.Collections.Generic;
 
-namespace FezGame.Mod {
+namespace FezEngine.Mod {
     
     public struct Sequential_Key_Duration {
         public CodeInputAll Key;
@@ -186,7 +186,7 @@ namespace FezGame.Mod {
             }
             
             if (apply) {
-                time = keyTimes[key] = time + FEZMod.UpdateGameTime.ElapsedGameTime.TotalSeconds;
+                time = keyTimes[key] = time + FEZModEngine.UpdateGameTime.ElapsedGameTime.TotalSeconds;
                 keyTimesApplied.Add(key);
             }
             

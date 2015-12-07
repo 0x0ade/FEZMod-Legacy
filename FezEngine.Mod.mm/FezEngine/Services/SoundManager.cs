@@ -1,5 +1,4 @@
 ﻿using System;
-using FezGame.Mod;
 using System.IO;
 using System.Collections.Generic;
 using System.Threading;
@@ -11,7 +10,7 @@ using FezEngine.Structure;
 
 namespace FezEngine.Services {
     public class SoundManager {
-
+        
         private bool initialized;
         private string MusicTempDir;
         private Dictionary<string, string> MusicAliases;
@@ -20,12 +19,12 @@ namespace FezEngine.Services {
 
         public extern void orig_InitializeLibrary();
         public void InitializeLibrary() {
-            if (FezEngineMod.MusicCache == MusicCacheMode.Default) {
+            if (FEZModEngine.MusicCache == MusicCacheMode.Default) {
                 orig_InitializeLibrary();
                 return;
             }
             
-            if (FezEngineMod.MusicCache == MusicCacheMode.Enabled) {
+            if (FEZModEngine.MusicCache == MusicCacheMode.Enabled) {
                 #if FNA
                 //1.12's default behaviour is to cache.
                 orig_InitializeLibrary();
@@ -55,7 +54,7 @@ namespace FezEngine.Services {
                 }
                 
                 return;
-            } else if (FezEngineMod.MusicCache == MusicCacheMode.Disabled) {
+            } else if (FEZModEngine.MusicCache == MusicCacheMode.Disabled) {
                 //Skip caching / extracting completely.
                 return;
             }
@@ -92,10 +91,10 @@ namespace FezEngine.Services {
             }
             
             //Backport the MusicCache
-            if (FezEngineMod.MusicCache != MusicCacheMode.Default) {
+            if (FEZModEngine.MusicCache != MusicCacheMode.Default) {
                 OggStream oggStream = null;
                 try {
-                    if (FezEngineMod.MusicCache == MusicCacheMode.Enabled) {
+                    if (FEZModEngine.MusicCache == MusicCacheMode.Enabled) {
                         byte[] data = MusicCache[name.Replace(" ^ ", "\\").ToLowerInvariant()];
                         oggStream = new OggStream(new MemoryStream(data, 0, data.Length, false, true));
                     } else {

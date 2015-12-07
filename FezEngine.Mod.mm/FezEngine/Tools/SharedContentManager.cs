@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System.IO;
 using System.Xml;
-using FezGame.Mod;
+using FezEngine.Mod;
 
 namespace FezEngine.Tools {
     public class SharedContentManager {
