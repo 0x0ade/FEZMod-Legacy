@@ -109,17 +109,7 @@ namespace FezGame.Components {
 		public override void Initialize() {
 			orig_Initialize();
             
-            ModLogger.Log("FEZMod", "debug a");
-            try {
-                ModLogger.Log("FEZMod", "debug b");
-                //FEZMod.CustomMenus(this);
-                //Action<MenuBase> d = delegate(MenuBase mb) {FEZMod.CustomMenus(mb);};d(this);
-                Action<MenuBase> d = delegate(MenuBase mb) {FEZMod.InitializeMenu(mb);};d(this);
-                ModLogger.Log("FEZMod", "debug c");
-            } catch (Exception e) {
-                ModLogger.Log("FEZMod", e.ToString());
-            }
-            ModLogger.Log("FEZMod", "debug d");
+            FEZMod.InitializeMenu(this);
         
             foreach (MenuLevel current in MenuLevels) {
 				if (current != MenuRoot && current.Parent == null) {
