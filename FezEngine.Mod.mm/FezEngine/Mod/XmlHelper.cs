@@ -499,9 +499,7 @@ namespace FezEngine.Mod {
                 ao.Size = (Vector3) elem.ChildNodes[0].FirstChild.Deserialize();
                 foreach (XmlNode childNode in elem.ChildNodes) {
                     if (childNode.Name == "ShaderInstancedIndexedPrimitives") {
-                        //FIXME FEZENGINE MIGRATION
-                        //FezEngine/Mod/XmlHelper.cs(502,129): error CS0029: Cannot implicitly convert type `FezEngine.Structure.Geometry.ShaderInstancedIndexedPrimitives<FezEngine.Structure.Geometry.VertexPositionNormalTextureInstance,Microsoft.Xna.Framework.Matrix> [FezEngine.Mod.mm, Version=1.0.5819.39244, Culture=neutral, PublicKeyToken=null]' to `FezEngine.Structure.Geometry.ShaderInstancedIndexedPrimitives<FezEngine.Structure.Geometry.VertexPositionNormalTextureInstance,Microsoft.Xna.Framework.Matrix> [FezEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]'
-                        //ao.Geometry = (ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>) childNode.Deserialize(typeof(ArtObject));
+                        ao.Geometry = (ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Matrix>) childNode.Deserialize(typeof(ArtObject));
                         break;
                     }
                 }

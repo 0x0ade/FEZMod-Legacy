@@ -114,6 +114,17 @@ namespace FezGame.Mod {
             ModLogger.Clear();
             ModLogger.Log("FEZMod", "JustAnotherFEZMod (FEZMod) "+FEZMod.Version);
             
+            //Pre-initialize FEZModEngine link to FEZMod
+            FEZModEngine.GetVersion = () => Version;
+            FEZModEngine.SetVersion = (v) => Version = v;
+            FEZModEngine.GetMODVersion = () => MODVersion;
+            FEZModEngine.SetMODVersion = (v) => MODVersion = v;
+            FEZModEngine.GetFEZVersion = () => FEZVersion;
+            FEZModEngine.SetFEZVersion = (v) => FEZVersion = v;
+            FEZModEngine.PassLoadEssentials = LoadEssentials;
+            FEZModEngine.PassPreload = Preload;
+            FEZModEngine.PassInitialize = Initialize;
+            
             try {
                 FEZVersion = new Version(Fez.Version.IndexOf('a') == -1 ? Fez.Version : Fez.Version.Substring(0, Fez.Version.IndexOf('a')));
             } catch (Exception e) {

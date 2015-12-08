@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 using MonoMod;
 
 namespace FezEngine.Tools {
-    //FIXME FEZENGINE MIGRATION Due to patch_, GetComponent cannot be found
+    //TODO Due to patch_, GetComponent cannot be found
     public static class patch_ServiceHelper {
         
         public static Game Game { [MonoModIgnore] get; [MonoModIgnore] set; }

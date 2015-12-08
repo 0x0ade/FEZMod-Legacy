@@ -4,6 +4,8 @@ using FezEngine.Structure;
 using Microsoft.Xna.Framework;
 using FezEngine.Services;
 using FezEngine.Tools;
+using System.Reflection;
+using Common;
 
 namespace FezEngine.Mod {
     
@@ -36,31 +38,38 @@ namespace FezEngine.Mod {
     
     public class FEZModEngine : FezModuleCore {
         
+        public static Func<string> GetVersion;
+        public static Action<string> SetVersion;
+        public static Func<Version> GetMODVersion;
+        public static Action<Version> SetMODVersion;
+        public static Func<Version> GetFEZVersion;
+        public static Action<Version> SetFEZVersion;
+        public static Action PassLoadEssentials;
+        public static Action PassPreload;
+        public static Action PassInitialize;
+        
         public static string MODVersionString {
             get {
-                //FIXME FEZENGINE MIGRATION
-                return null;
+                return GetVersion();
             }
             set {
-                //FIXME FEZENGINE MIGRATION
+                SetVersion(value);
             }
         }
         public static Version MODVersion {
             get {
-                //FIXME FEZENGINE MIGRATION
-                return null;
+                return GetMODVersion();
             }
             set {
-                //FIXME FEZENGINE MIGRATION
+                SetMODVersion(value);
             }
         }
         public static Version FEZVersion {
             get {
-                //FIXME FEZENGINE MIGRATION
-                return null;
+                return GetFEZVersion();
             }
             set {
-                //FIXME FEZENGINE MIGRATION
+                SetFEZVersion(value);
             }
         }
 
@@ -81,7 +90,6 @@ namespace FezEngine.Mod {
         public static bool DumpAllResources = false;
         public static bool CacheDisabled = false;
         public static Dictionary<string, Tuple<string, long, int>> AssetMetadata = new Dictionary<string, Tuple<string, long, int>>();
-        
 
         public FEZModEngine() {
         }
@@ -115,18 +123,6 @@ namespace FezEngine.Mod {
             }
         }
         
-        public static void PassLoadEssentials() {
-            //FIXME FEZENGINE MIGRATION
-        }
-        
-        public static void PassPreload() {
-            //FIXME FEZENGINE MIGRATION
-        }
-        
-        public static void PassInitialize() {
-            //FIXME FEZENGINE MIGRATION
-        }
-
     }
 }
 
