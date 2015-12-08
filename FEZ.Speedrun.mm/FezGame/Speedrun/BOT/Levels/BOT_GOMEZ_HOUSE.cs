@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using FezGame.Components;
 using FezEngine.Structure.Input;
 using FezGame.Mod;
+using FezEngine.Mod;
 using FezEngine.Structure;
 
 namespace FezGame.Speedrun.BOT.Levels {

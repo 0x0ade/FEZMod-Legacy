@@ -1,5 +1,6 @@
 using FezEngine.Structure.Input;
 using FezGame.Mod;
+using FezEngine.Mod;
 
 namespace FezGame.Speedrun.BOT {
     public static class ControllerCodeHelper {

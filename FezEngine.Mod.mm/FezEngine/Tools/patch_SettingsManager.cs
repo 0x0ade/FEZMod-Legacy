@@ -7,19 +7,16 @@ using MonoMod;
 namespace FezEngine.Tools {
     public static class patch_SettingsManager {
 
-        #if FNA
-        //FIXME FEZ 1.12
-        [MonoModLinkTo("FezEngine.Tools.SettingsManager", "FEZ112viewScaleOrSomethingRIPME")]
-        #endif
         private static float viewScale;
-
+        
+        //originally public but must be private as it's an extension method
         #if FNA
-        public static extern void orig_SetupViewport(this GraphicsDevice device);
-        public static void SetupViewport(this GraphicsDevice device) {
+        private static extern void orig_SetupViewport(this GraphicsDevice device);
+        private static void SetupViewport(this GraphicsDevice device) {
             //FEZ 1.12 disables letterboxing (at least during the beta)
             orig_SetupViewport(device);
         #else
-        public static void SetupViewport(this GraphicsDevice device, bool forceLetterbox = false) {
+        private static void SetupViewport(this GraphicsDevice device, bool forceLetterbox = false) {
             int backBufferWidth = device.PresentationParameters.BackBufferWidth;
             int backBufferHeight = device.PresentationParameters.BackBufferHeight;
             /*if (!forceLetterbox) {

@@ -8,7 +8,7 @@ using MonoMod;
 using FezEngine.Mod;
 
 namespace FezEngine.Structure.Geometry {
-    public class ShaderInstancedIndexedPrimitives<TemplateType, InstanceType> : IndexedPrimitiveCollectionBase<TemplateType, int>, IFakeDisposable where TemplateType : struct, IShaderInstantiatableVertex where InstanceType : struct {
+    public class patch_ShaderInstancedIndexedPrimitives<TemplateType, InstanceType> : IndexedPrimitiveCollectionBase<TemplateType, int>, IFakeDisposable where TemplateType : struct, IShaderInstantiatableVertex where InstanceType : struct {
 
         //Reusable version instances, just because
         private readonly static Version V_1_11 = new Version(1, 11);
@@ -50,7 +50,7 @@ namespace FezEngine.Structure.Geometry {
 
         #if !FNA
         [MonoModIgnore]
-        public ShaderInstancedIndexedPrimitives(PrimitiveType type, int instancesPerBatch)
+        public patch_ShaderInstancedIndexedPrimitives(PrimitiveType type, int instancesPerBatch)
             : base(type) {
             InstancesPerBatch = instancesPerBatch;
         }
@@ -59,7 +59,7 @@ namespace FezEngine.Structure.Geometry {
         private VertexBufferBinding[] tmpVertexBufferBindingArray;
         
         [MonoModIgnore]
-        public ShaderInstancedIndexedPrimitives(PrimitiveType type, int instancesPerBatch, bool appendIndex = false)
+        public patch_ShaderInstancedIndexedPrimitives(PrimitiveType type, int instancesPerBatch, bool appendIndex = false)
             : base(type) {
             InstancesPerBatch = instancesPerBatch;
             appendIndex = appendIndex;

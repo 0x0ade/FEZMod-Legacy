@@ -113,7 +113,7 @@
     <Compile Include="FezEngine\Tools\patch_SettingsManager.cs" />
     <Compile Include="FezEngine\Services\SoundManager.cs" />
     <Compile Include="FezEngine\Tools\SharedContentManager.cs" />
-    <Compile Include="FezEngine\Structure\Geometry\ShaderInstancedIndexedPrimitives.cs" />
+    <Compile Include="FezEngine\Structure\Geometry\patch_ShaderInstancedIndexedPrimitives.cs" />
     <Compile Include="FezEngine\Structure\Geometry\IndexedVector4.cs" />
     <Compile Include="FezEngine\Components\InputManager.cs" />
   </ItemGroup>

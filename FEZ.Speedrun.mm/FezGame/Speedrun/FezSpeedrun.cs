@@ -1,5 +1,6 @@
 ﻿using System;
 using FezGame.Mod;
+using FezEngine.Mod;
 using FezEngine.Tools;
 using FezGame.Components;
 using System.Collections.Generic;
@@ -54,8 +55,8 @@ namespace FezGame.Speedrun {
                     FEZMod.EnableFEZometric = true;
                     FEZMod.EnableQuickWarp = true;
                     //Currently reqired unless someone hooks MovingGroupsHost and others to give a public instance
-                    FEZMod.GetComponentsAsServices = true;
-                    FEZMod.HandleComponents = true;
+                    FEZModEngine.GetComponentsAsServices = true;
+                    FEZModEngine.HandleComponents = true;
                 }
                 if (Clock != null && (args[i] == "-bot" || args[i] == "--bot")) {
                     ModLogger.Log("FEZMod", "Found -bot / --bot");
