@@ -458,7 +458,7 @@ namespace FezGame.Mod {
             });
             mb.MenuLevels.Add(Menu);
             
-            CallInEachModule("Initialize", Garbage.GetObjectArray(mb));
+            CallInEachModule("InitializeMenu", Garbage.GetObjectArray(mb));
         }
         
         //Hooked FEZ methods or calls in each module
