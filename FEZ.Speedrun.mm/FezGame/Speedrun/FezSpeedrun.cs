@@ -100,6 +100,9 @@ namespace FezGame.Speedrun {
         public override void InitializeMenu(MenuBase mb) {
             MenuItem item;
             
+            MenuItem displayMode = null;
+            MenuItem toolAssist = null;
+            
             ModLogger.Log("FEZMod.Speedrun", "Initializing FEZSpeedrunMenu");
             
             Menu = new MenuLevel() {
@@ -119,11 +122,13 @@ namespace FezGame.Speedrun {
                 () => (SpeedrunMode) ? "SPEEDRUN" : "LET'S PLAY",
                 delegate(string lastValue, int change) {
                     SpeedrunMode = !SpeedrunMode;
+                    displayMode.Selectable = toolAssist.Selectable = SpeedrunMode;
+                    displayMode.Disabled = toolAssist.Disabled = !SpeedrunMode;
                 }
             );
             item.UpperCase = true;
             
-            item = Menu.AddItem<string>("DisplayMode", delegate() {
+            displayMode = Menu.AddItem<string>("DisplayMode", delegate() {
                     //onSelect
                 }, false,
                 () => 
@@ -170,9 +175,9 @@ namespace FezGame.Speedrun {
                     
                 }
             );
-            item.UpperCase = true;
+            displayMode.UpperCase = true;
             
-            item = Menu.AddItem<string>("ToolAssist", delegate() {
+            toolAssist = Menu.AddItem<string>("ToolAssist", delegate() {
                     //onSelect
                 }, false,
                 () => (ToolAssistedSpeedrun) ? StaticText.GetString("On") : StaticText.GetString("Off"),
@@ -180,7 +185,10 @@ namespace FezGame.Speedrun {
                     ToolAssistedSpeedrun = !ToolAssistedSpeedrun;
                 }
             );
-            item.UpperCase = true;
+            toolAssist.UpperCase = true;
+            
+            displayMode.Selectable = toolAssist.Selectable = SpeedrunMode;
+            displayMode.Disabled = toolAssist.Disabled = !SpeedrunMode;
             
             FEZMod.Menu.AddItem("FEZSpeedrunMenu", delegate() {
                 mb.ChangeMenuLevel(Menu);
