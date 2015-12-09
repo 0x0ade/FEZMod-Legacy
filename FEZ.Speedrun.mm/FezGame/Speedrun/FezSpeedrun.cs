@@ -3,11 +3,14 @@ using FezGame.Mod;
 using FezEngine.Mod;
 using FezEngine.Tools;
 using FezGame.Components;
+using FezEngine.Components;
 using System.Collections.Generic;
 using FezGame.Speedrun.Clocks;
 using FezGame.Structure;
 using FezGame.Tools;
 using FezGame.Speedrun.BOT;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace FezGame.Speedrun {
     public class FezSpeedrun : FezModule {
@@ -100,10 +103,11 @@ namespace FezGame.Speedrun {
         public override void InitializeMenu(MenuBase mb) {
             MenuItem item;
             
+            float livesplitShownSince = 0f;
+            const string livesplitText = "Visit https://livesplit.github.io/ for LiveSplit and the server component.";
+            
             MenuItem displayMode = null;
             MenuItem toolAssist = null;
-            
-            ModLogger.Log("FEZMod.Speedrun", "Initializing FEZSpeedrunMenu");
             
             Menu = new MenuLevel() {
                 Title = "FEZSpeedrunMenu",
@@ -113,6 +117,16 @@ namespace FezGame.Speedrun {
                 Oversized = true,
                 Parent = FEZMod.Menu,
                 OnReset = delegate() {
+                },
+                OnPostDraw = delegate(SpriteBatch batch, SpriteFont font, GlyphTextRenderer tr, float alpha) {
+                    float scale = mb.Fonts.SmallFactor * batch.GraphicsDevice.GetViewScale();
+                    float y = (float) batch.GraphicsDevice.Viewport.Height / 2f + (float) batch.GraphicsDevice.Viewport.Height / 3.825f;
+                    if (LiveSplitSync && mb.selectorPhase == SelectorPhase.Select) {
+                        livesplitShownSince = Math.Min(livesplitShownSince + 0.05f, 1f);
+                        tr.DrawCenteredString(batch, mb.Fonts.Small, livesplitText, new Color(1f, 1f, 1f, alpha * livesplitShownSince), new Vector2(0f, y), scale);
+                    } else {
+                        livesplitShownSince = Math.Max(livesplitShownSince - 0.1f, 0f);
+                    }
                 }
             };
             
