@@ -5,6 +5,9 @@ using FezEngine.Tools;
 using FezGame.Components;
 using System.Collections.Generic;
 using FezGame.Speedrun.Clocks;
+using FezGame.Structure;
+using FezGame.Tools;
+using FezGame.Speedrun.BOT;
 
 namespace FezGame.Speedrun {
     public class FezSpeedrun : FezModule {
@@ -14,6 +17,8 @@ namespace FezGame.Speedrun {
         public override string Version { get { return FEZMod.Version; } }
 
         public static bool SpeedrunMode = false;
+        public static bool LiveSplitSync = false;
+        public static int LiveSplitPort = 16834;
         public static bool PerRoomTime = false;
 
         public static bool ToolAssistedSpeedrun = false;
@@ -22,6 +27,8 @@ namespace FezGame.Speedrun {
         public static ISpeedrunClock Clock = new SpeedrunClock();
 
         public static List<SplitCase> DefaultSplitCases = new List<SplitCase>();
+        
+        public static MenuLevel Menu;
 
         public FezSpeedrun() {
         }
@@ -63,6 +70,11 @@ namespace FezGame.Speedrun {
                     BOTEnabled = true;
                 }
             }
+            
+            TextPatchHelper.Static.Fallback["FEZSpeedrunMenu"] = "SPEEDRUN MENU";
+            TextPatchHelper.Static.Fallback["SpeedrunMode"] = "Mode: {0}";
+            TextPatchHelper.Static.Fallback["DisplayMode"] = "Display time: {0}";
+            TextPatchHelper.Static.Fallback["ToolAssist"] = "Tool assist (quicksaves, ...): {0}";
         }
 
         public override void LoadComponents(Fez game) {
@@ -83,6 +95,119 @@ namespace FezGame.Speedrun {
 
         public override void HandleCrash(Exception e) {
             Exit();
+        }
+        
+        public override void InitializeMenu(MenuBase mb) {
+            MenuItem item;
+            
+            ModLogger.Log("FEZMod.Speedrun", "Initializing FEZSpeedrunMenu");
+            
+            Menu = new MenuLevel() {
+                Title = "FEZSpeedrunMenu",
+                AButtonString = "MenuApplyWithGlyph",
+                BButtonString = "MenuSaveWithGlyph",
+                IsDynamic = true,
+                Oversized = true,
+                Parent = FEZMod.Menu,
+                OnReset = delegate() {
+                }
+            };
+            
+            item = Menu.AddItem<string>("SpeedrunMode", delegate() {
+                    //onSelect
+                }, false,
+                () => (SpeedrunMode) ? "SPEEDRUN" : "LET'S PLAY",
+                delegate(string lastValue, int change) {
+                    SpeedrunMode = !SpeedrunMode;
+                }
+            );
+            item.UpperCase = true;
+            
+            item = Menu.AddItem<string>("DisplayMode", delegate() {
+                    //onSelect
+                }, false,
+                () => 
+                !PerRoomTime && !LiveSplitSync ? "CURRENT ONLY" : 
+                 PerRoomTime && !LiveSplitSync ? "CURRENT + PER ROOM" :
+                !PerRoomTime && LiveSplitSync ? "LIVESPLIT (" + LiveSplitPort + ")" :
+                "UNKNOWN",
+                delegate(string lastValue, int change) {
+                    if (
+                        //well... keep as-is?
+                        change == 0 ||
+                        (change < 0 && !PerRoomTime && !LiveSplitSync) ||
+                        (0 < change && !PerRoomTime && LiveSplitSync)
+                    ) {
+                        return;
+                    }
+                    
+                    if (
+                        //CURRENT + PER ROOM -> CURRENT ONLY
+                        (change < 0 && PerRoomTime && !LiveSplitSync)
+                    ) {
+                        PerRoomTime = false;
+                        LiveSplitSync = false;
+                    } else if (
+                        //CURRENT ONLY -> CURRENT + PER ROOM
+                        (change < 0 && !PerRoomTime && LiveSplitSync) ||
+                        //LIVESPLIT -> CURRENT + PER ROOM
+                        (0 < change && !PerRoomTime && !LiveSplitSync)
+                    ) {
+                        PerRoomTime = true;
+                        LiveSplitSync = false;
+                        return;
+                    } else if (
+                        //CURRENT + PER ROOM -> LIVESPLIT
+                        (0 < change && PerRoomTime && !LiveSplitSync)
+                    ) {
+                        PerRoomTime = false;
+                        LiveSplitSync = true;
+                    } else {
+                        //RESET DUE TO ERROR
+                        PerRoomTime = false;
+                        LiveSplitSync = false;
+                    }
+                    
+                }
+            );
+            item.UpperCase = true;
+            
+            item = Menu.AddItem<string>("ToolAssist", delegate() {
+                    //onSelect
+                }, false,
+                () => (ToolAssistedSpeedrun) ? StaticText.GetString("On") : StaticText.GetString("Off"),
+                delegate(string lastValue, int change) {
+                    ToolAssistedSpeedrun = !ToolAssistedSpeedrun;
+                }
+            );
+            item.UpperCase = true;
+            
+            FEZMod.Menu.AddItem("FEZSpeedrunMenu", delegate() {
+                mb.ChangeMenuLevel(Menu);
+            });
+            mb.MenuLevels.Add(Menu);
+        }
+        
+        public static void TriggerClock() {
+            if (!SpeedrunMode) {
+                return;
+            }
+            
+            //TODO initialize the clock here
+            
+            if (Clock.Running) {
+                Clock.Running = false; //Forces the clock to reset.
+            }
+            Clock.Running = true;
+            //Initialize BOT if needed
+            if (BOTEnabled) {
+                if (TASComponent.Instance.BOT == null) {
+                    TASComponent.Instance.BOT = new FezGame.Speedrun.BOT.BOT(TASComponent.Instance);
+                } else {
+                    TASComponent.Instance.BOT.Dispose();
+                }
+                TASComponent.Instance.BOT.Initialize();
+            }
         }
 
     }

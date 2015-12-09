@@ -1,10 +1,15 @@
 ﻿using FezGame.Speedrun;
 
 namespace FezGame.Components {
-    public class MainMenu {
+    public class patch_MenuBase {
+
+        public extern void orig_StartNewGame();
+        public void StartNewGame() {
+            orig_StartNewGame();
+            FezSpeedrun.TriggerClock();
+        }
 
         public extern void orig_ContinueGame();
-        //MainMenu overrides the MenuBase ContinueGame without calling it anymore
         public void ContinueGame() {
             orig_ContinueGame();
             FezSpeedrun.TriggerClock();

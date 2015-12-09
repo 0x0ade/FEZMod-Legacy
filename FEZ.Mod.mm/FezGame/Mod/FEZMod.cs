@@ -28,12 +28,12 @@ namespace FezGame.Mod {
         public FezModule() {
         }
 
-        public virtual void InitializeMenu(FezGame.Components.MenuBase mb) {}
-        public virtual void LoadComponents(FezGame.Fez game) {}
-        public virtual void SaveClear(FezGame.Structure.SaveData saveData) {}
-        public virtual void SaveClone(FezGame.Structure.SaveData source, FezGame.Structure.SaveData dest) {}
-        public virtual void SaveRead(FezGame.Structure.SaveData saveData, CrcReader reader) {}
-        public virtual void SaveWrite(FezGame.Structure.SaveData saveData, CrcWriter writer) {}
+        public virtual void InitializeMenu(MenuBase mb) {}
+        public virtual void LoadComponents(Fez game) {}
+        public virtual void SaveClear(SaveData saveData) {}
+        public virtual void SaveClone(SaveData source, SaveData dest) {}
+        public virtual void SaveRead(SaveData saveData, CrcReader reader) {}
+        public virtual void SaveWrite(SaveData saveData, CrcWriter writer) {}
         
     }
     
@@ -84,6 +84,7 @@ namespace FezGame.Mod {
         public static bool LoadedEssentials { get; private set; }
         public static bool Preloaded { get; private set; }
         public static MenuLevel Menu { get; private set; }
+        private static float Menu_SinceRestartNoteShown = 0f;
 
         public static List<Assembly> LoadedAssemblies = new List<Assembly>();
 
@@ -392,6 +393,8 @@ namespace FezGame.Mod {
         public static void InitializeMenu(MenuBase mb) {
             MenuItem item;
             
+            Menu_SinceRestartNoteShown = 0f;
+            
             Menu = new MenuLevel() {
                 Title = "FEZModMenu",
                 AButtonString = "MenuApplyWithGlyph",
@@ -408,10 +411,10 @@ namespace FezGame.Mod {
                         Menu.SelectedIndex == 0 ||
                         Menu.SelectedIndex == 1
                     ) && mb.selectorPhase == SelectorPhase.Select) {
-                        mb.sinceRestartNoteShown = Math.Min(mb.sinceRestartNoteShown + 0.05f, 1f);
-                        tr.DrawCenteredString(batch, mb.Fonts.Small, StaticText.GetString("RequiresRestart"), new Color(1f, 1f, 1f, alpha * mb.sinceRestartNoteShown), new Vector2(0f, y), scale);
+                        Menu_SinceRestartNoteShown = Math.Min(Menu_SinceRestartNoteShown + 0.05f, 1f);
+                        tr.DrawCenteredString(batch, mb.Fonts.Small, StaticText.GetString("RequiresRestart"), new Color(1f, 1f, 1f, alpha * Menu_SinceRestartNoteShown), new Vector2(0f, y), scale);
                     } else {
-                        mb.sinceRestartNoteShown = Math.Max(mb.sinceRestartNoteShown - 0.1f, 0f);
+                        Menu_SinceRestartNoteShown = Math.Max(Menu_SinceRestartNoteShown - 0.1f, 0f);
                     }
                 }
             };

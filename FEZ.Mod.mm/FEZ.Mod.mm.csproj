@@ -145,9 +145,7 @@
     <Compile Include="FezGame\Tools\TextPatchHelper.cs" />
     <Compile Include="FezGame\Droid\FezDroid.cs" />
     <Compile Include="FezGame\Droid\FezDroidComponent.cs" />
-    <Compile Include="FezGame\Components\MenuBase.cs" />
-    <Compile Include="FezGame\Components\MenuLevel.cs" />
-    <Compile Include="FezGame\Components\MenuItem.cs" />
+    <Compile Include="FezGame\Components\patch_MenuBase.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
