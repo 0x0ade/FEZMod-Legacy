@@ -42,8 +42,10 @@ namespace FezGame.Mod.Gui {
             }
 
             ProgressWidget.Background = GuiHandler.DefaultForeground;
+            
+            string time = FezSpeedrun.Clock != null ? FezSpeedrun.Clock.Time.ToString() : "----";
 
-            TimeWidget.Label = "T: " + SpeedrunInfo.FormatTime(FezSpeedrun.Clock.Time.ToString());
+            TimeWidget.Label = "T: " + SpeedrunInfo.FormatTime(time);
             TimeWidget.Size.X = 192f * GraphicsDevice.GetViewScale();
             TimeWidget.Size.Y = 24f * GraphicsDevice.GetViewScale();
             TimeWidget.Position.X = 0f;
