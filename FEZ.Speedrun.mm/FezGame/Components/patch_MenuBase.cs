@@ -6,13 +6,13 @@ namespace FezGame.Components {
         public extern void orig_StartNewGame();
         public void StartNewGame() {
             orig_StartNewGame();
-            FezSpeedrun.TriggerClock();
+            FezSpeedrun.StartClock();
         }
 
         public extern void orig_ContinueGame();
         public void ContinueGame() {
             orig_ContinueGame();
-            FezSpeedrun.TriggerClock();
+            FezSpeedrun.StartClock();
         }
 
     }

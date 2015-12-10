@@ -73,11 +73,11 @@ namespace FezGame.Components {
             //Register special key hooks
             Vector2 tmpFreeLook = new Vector2(0f, 0f);
             FakeInputHelper.get_FreeLook = delegate() {
-                return FakeInputHelper.Updating ? tmpFreeLook : new Vector2(0f, 0f);
+                return !FezSpeedrun.ToolAssistedSpeedrun || FakeInputHelper.Updating ? tmpFreeLook : new Vector2(0f, 0f);
             };
             FakeInputHelper.set_FreeLook = delegate(Vector2 value) {
                 //Set game speed
-                if (FakeInputHelper.Updating) {
+                if (FezSpeedrun.ToolAssistedSpeedrun && FakeInputHelper.Updating) {
                     FEZMod.GameSpeed = 1d + 0.5d * ((double) value.X) + 0.5d * ((double) value.Y);
                 }
                 tmpFreeLook = value;
@@ -103,16 +103,14 @@ namespace FezGame.Components {
             });
             */
 
-            if (!FezSpeedrun.BOTEnabled) {
-                RewindListening.Add(new MovingGroupsRewindInfo());
-    
-                FillRewindListening<IPlayerManager>();
-                FillRewindListening<PlayerManager>(delegate(RewindInfo info) {
-                    info.InstanceGetter = () => ServiceHelper.Get<IPlayerManager>();
-                });
-                FillRewindListening<ITimeManager>();
-                FillRewindListening<IDefaultCameraManager>();
-            }
+            RewindListening.Add(new MovingGroupsRewindInfo());
+
+            FillRewindListening<IPlayerManager>();
+            FillRewindListening<PlayerManager>(delegate(RewindInfo info) {
+                info.InstanceGetter = () => ServiceHelper.Get<IPlayerManager>();
+            });
+            FillRewindListening<ITimeManager>();
+            FillRewindListening<IDefaultCameraManager>();
 
             //DEBUG
             ModLogger.Log("FEZMod.TAS", "Listening to the following ");
@@ -127,6 +125,10 @@ namespace FezGame.Components {
         }
 
         public override void Update(GameTime gameTime) {
+            if (!FezSpeedrun.ToolAssistedSpeedrun) {
+                return;
+            }
+            
             //Basic clock setup
             if (FezSpeedrun.Clock != null) {
                 FezSpeedrun.Clock.InGame = false;
@@ -142,50 +144,50 @@ namespace FezGame.Components {
             //Schedule a BOT call
             if (BOT != null) {
                 BOT.Update(gameTime);
-            }
-
-            //Freeze and rewind
-            if (InputManager.OpenInventory == FezButtonState.Pressed) {
-                Frozen = !Frozen;
-                GameState.InMenuCube = Frozen;
-            }
-            if (Frozen) {
-                FezSpeedrun.Clock.Strict = InputManager.CancelTalk == FezButtonState.Down;
             } else {
-                FezSpeedrun.Clock.Strict = false;
-            }
-            if (Frozen && InputManager.CancelTalk == FezButtonState.Down && RewindData.Count > 0) {
-                RewindFrame();
-
-                DefaultCameraManager.NoInterpolation = true;
-                FezSpeedrun.Clock.Direction = -1D;
-            } else if (!GameState.InMenuCube && !FezSpeedrun.BOTEnabled) {
-                RecordFrame();
-
-                DefaultCameraManager.NoInterpolation = false;
-                FezSpeedrun.Clock.Direction = 1D;
-                if (FezSpeedrun.Clock.Time > MaxTime) {
-                    MaxTime = FezSpeedrun.Clock.Time;
+                //Freeze and rewind
+                if (InputManager.OpenInventory == FezButtonState.Pressed) {
+                    Frozen = !Frozen;
+                    GameState.InMenuCube = Frozen;
                 }
-            }
-
-            //Quicksave
-            if (KeyboardState.GetKeyState(Keys.F6) == FezButtonState.Pressed) {
-                //Save
-                QuickSave();
-            }
-
-            if (KeyboardState.GetKeyState(Keys.F9) == FezButtonState.Pressed && QuickSaves.Count > 0) {
-                //Load
-                QuickLoad();
-            }
-
-            //Add quicksaves to the GUI
-            if (QuickSavesWidget.Widgets.Count != QuickSaves.Count || (ThumbnailScheduled == null && ThumbnailRT != null)) {
-                ThumbnailRT = null;
-                QuickSavesWidget.Widgets.Clear();
-                for (int i = 0; i < QuickSaves.Count; i++) {
-                    QuickSavesWidget.Widgets.Insert(0, new QuickSaveWidget(Game, QuickSaves[i], QuickSavesWidget.Size.X));
+                if (Frozen) {
+                    FezSpeedrun.Clock.Strict = InputManager.CancelTalk == FezButtonState.Down;
+                } else {
+                    FezSpeedrun.Clock.Strict = false;
+                }
+                if (Frozen && InputManager.CancelTalk == FezButtonState.Down && RewindData.Count > 0) {
+                    RewindFrame();
+    
+                    DefaultCameraManager.NoInterpolation = true;
+                    FezSpeedrun.Clock.Direction = -1D;
+                } else if (!GameState.InMenuCube && !FezSpeedrun.BOTEnabled) {
+                    RecordFrame();
+    
+                    DefaultCameraManager.NoInterpolation = false;
+                    FezSpeedrun.Clock.Direction = 1D;
+                    if (FezSpeedrun.Clock.Time > MaxTime) {
+                        MaxTime = FezSpeedrun.Clock.Time;
+                    }
+                }
+    
+                //Quicksave
+                if (KeyboardState.GetKeyState(Keys.F6) == FezButtonState.Pressed) {
+                    //Save
+                    QuickSave();
+                }
+    
+                if (KeyboardState.GetKeyState(Keys.F9) == FezButtonState.Pressed && QuickSaves.Count > 0) {
+                    //Load
+                    QuickLoad();
+                }
+    
+                //Add quicksaves to the GUI
+                if (QuickSavesWidget.Widgets.Count != QuickSaves.Count || (ThumbnailScheduled == null && ThumbnailRT != null)) {
+                    ThumbnailRT = null;
+                    QuickSavesWidget.Widgets.Clear();
+                    for (int i = 0; i < QuickSaves.Count; i++) {
+                        QuickSavesWidget.Widgets.Insert(0, new QuickSaveWidget(Game, QuickSaves[i], QuickSavesWidget.Size.X));
+                    }
                 }
             }
 
@@ -198,6 +200,10 @@ namespace FezGame.Components {
         }
 
         public override void Draw(GameTime gameTime) {
+            if (!FezSpeedrun.ToolAssistedSpeedrun) {
+                return;
+            }
+            
             if (ThumbnailScheduled != null) {
                 if (ThumbnailRT == null) {
                     base.Draw(gameTime);
@@ -306,11 +312,11 @@ namespace FezGame.Components {
         public void FillRewindListening(Type type, Action<RewindInfo> onCreate = null) {
             FieldInfo[] fields = type.GetFields();
             for (int i = 0; i < fields.Length; i++) {
-              AddRewindListening(fields[i], onCreate);
+                AddRewindListening(fields[i], onCreate);
             }
             PropertyInfo[] properties = type.GetProperties();
             for (int i = 0; i < properties.Length; i++) {
-              AddRewindListening(properties[i], onCreate);
+                AddRewindListening(properties[i], onCreate);
             }
         }
         

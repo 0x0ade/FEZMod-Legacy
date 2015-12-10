@@ -50,13 +50,9 @@ namespace FezGame {
             return gameTime;
         }
         
-        public void orig_Update(GameTime gameTime) {
-        }
-        
+        public extern void orig_Update(GameTime gameTime);
         [MonoModLinkTo(typeof(Game), "Update")]
-        public void game_Update(GameTime gameTime) {
-        }
-        
+        public extern void game_Update(GameTime gameTime);
         protected override void Update(GameTime gameTime) {
             #if FNA
             if (FEZMod.ForceTimestep != null) {
@@ -76,10 +72,7 @@ namespace FezGame {
             orig_Update(gameTime);
         }
         
-        public void orig_Draw(GameTime gameTime) {
-        }
-        
-        
+        public extern void orig_Draw(GameTime gameTime);
         protected override void Draw(GameTime gameTime) {
             #if FNA
             if (FEZMod.ForceTimestep != null) {
@@ -95,9 +88,7 @@ namespace FezGame {
             orig_Draw(gameTime);
         }
         
-        public static void orig_LoadComponents(Fez game) {
-        }
-
+        public static extern void orig_LoadComponents(Fez game);
         public static void LoadComponents(Fez game) {
             orig_LoadComponents(game);
             FEZMod.LoadComponents(game);

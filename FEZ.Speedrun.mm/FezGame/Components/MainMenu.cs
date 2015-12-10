@@ -7,7 +7,7 @@ namespace FezGame.Components {
         //MainMenu overrides the MenuBase ContinueGame without calling it anymore
         public void ContinueGame() {
             orig_ContinueGame();
-            FezSpeedrun.TriggerClock();
+            FezSpeedrun.StartClock();
         }
 
     }

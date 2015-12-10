@@ -50,9 +50,6 @@ namespace FezGame.Components {
         public override void Initialize() {
             base.Initialize();
 
-            SpriteBatch = new SpriteBatch(GraphicsDevice);
-            GTR = new GlyphTextRenderer(Game);
-
             FontSmall = FontManager.Small;
             FontSmallFactor = 1f;
             FontBig = FontManager.Big;
@@ -72,6 +69,11 @@ namespace FezGame.Components {
                 }
                 return null;
             });
+        }
+        
+        protected override void LoadContent() {
+            SpriteBatch = new SpriteBatch(GraphicsDevice);
+            GTR = new GlyphTextRenderer(Game);
         }
 
         public override void Update(GameTime gameTime) {
@@ -97,7 +99,7 @@ namespace FezGame.Components {
             float lineBigHeight = FontBig.MeasureString("Time: 01:23:45.6789").Y * viewScale * FontBigFactor;
             GTR.DrawShadowedText(SpriteBatch, FontBig, "Time: "+FormatTime(FezSpeedrun.Clock.Time.ToString()), new Vector2(0, 0), Color.White, viewScale * FontBigFactor);
 
-            if (FezSpeedrun.PerRoomTime) {
+            if (FezSpeedrun.Display == SpeedrunDisplayMode.CurrentPerRoom) {
                 List<Split> levelTimes = FezSpeedrun.Clock.Splits;
             
                 float lineHeight = FontSmall.MeasureString("Time: 01:23:45.6789").Y * viewScale * FontSmallFactor;

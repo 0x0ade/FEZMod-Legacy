@@ -20,14 +20,13 @@ namespace FezGame.Speedrun {
         public override string Version { get { return FEZMod.Version; } }
 
         public static bool SpeedrunMode = false;
-        public static bool LiveSplitSync = false;
+        public static SpeedrunDisplayMode Display = SpeedrunDisplayMode.Current;
         public static int LiveSplitPort = 16834;
-        public static bool PerRoomTime = false;
 
         public static bool ToolAssistedSpeedrun = false;
         public static bool BOTEnabled = false;//Broken Optimizing Thing
 
-        public static ISpeedrunClock Clock = new SpeedrunClock();
+        public static ISpeedrunClock Clock;
 
         public static List<SplitCase> DefaultSplitCases = new List<SplitCase>();
         
@@ -35,43 +34,21 @@ namespace FezGame.Speedrun {
 
         public FezSpeedrun() {
         }
-
-        public override void ParseArgs(string[] args) {
-            for (int i = 0; i < args.Length; i++) {
-                if (args[i] == "-sr" || args[i] == "--speedrun") {
-                    ModLogger.Log("FEZMod", "Found -sr / --speedrun");
-                    if (i + 1 < args.Length && !args[i+1].StartsWith("-")) {
-                        ModLogger.Log("FEZMod", "Connecting to LiveSplit on port " + args[i + 1] + "...");
-                        LiveSplitClock lsClock = new LiveSplitClock("localhost", int.Parse(args[i + 1]));
-                        lsClock.Clock = Clock;
-                        Clock = lsClock;
-                    }
-                    SpeedrunMode = true;
-                    FEZMod.EnableFEZometric = false;
-                    FEZMod.EnableQuickWarp = false;
-                    FEZMod.EnableBugfixes = false;
-                }
-                if (Clock is LiveSplitClock && (args[i] == "-lss" || args[i] == "--livesplit-sync")) {
-                    ModLogger.Log("FEZMod", "Found -lss / --livesplit-sync");
-                    ((LiveSplitClock) Clock).Sync = true;
-                }
-                if (Clock != null && (args[i] == "-prt" || args[i] == "--per-room-time")) {
-                    ModLogger.Log("FEZMod", "Found -prt / --per-room-time");
-                    PerRoomTime = true;
-                }
-                if (Clock != null && (args[i] == "-tas" || args[i] == "--tool-assisted-speedrun")) {
-                    ModLogger.Log("FEZMod", "Found -tas / --tool-assisted-speedrun");
-                    ToolAssistedSpeedrun = true;
-                    FEZMod.EnableFEZometric = true;
-                    FEZMod.EnableQuickWarp = true;
-                    //Currently reqired unless someone hooks MovingGroupsHost and others to give a public instance
-                    FEZModEngine.GetComponentsAsServices = true;
-                    FEZModEngine.HandleComponents = true;
-                }
-                if (Clock != null && (args[i] == "-bot" || args[i] == "--bot")) {
-                    ModLogger.Log("FEZMod", "Found -bot / --bot");
-                    BOTEnabled = true;
-                }
+        
+        public override void Initialize() {
+            //TODO load config
+            if (SpeedrunMode) {
+                FEZMod.EnableFEZometric = false;
+                FEZMod.EnableQuickWarp = false;
+                FEZMod.EnableBugfixes = false;
+            }
+            
+            if (ToolAssistedSpeedrun) {
+                FEZMod.EnableFEZometric = true;
+                FEZMod.EnableQuickWarp = true;
+                //Currently reqired unless someone hooks MovingGroupsHost and others to give a public instance
+                FEZModEngine.GetComponentsAsServices = true;
+                FEZModEngine.HandleComponents = true;
             }
             
             TextPatchHelper.Static.Fallback["FEZSpeedrunMenu"] = "SPEEDRUN MENU";
@@ -80,13 +57,24 @@ namespace FezGame.Speedrun {
             TextPatchHelper.Static.Fallback["ToolAssist"] = "Tool assist (quicksaves, ...): {0}";
         }
 
+        public override void ParseArgs(string[] args) {
+            for (int i = 0; i < args.Length; i++) {
+                if (Clock != null && (args[i] == "-tas" || args[i] == "--tool-assisted-speedrun")) {
+                    ModLogger.Log("FEZMod", "Found -tas / --tool-assisted-speedrun");
+                    /*
+                    */
+                    ModLogger.Log("FEZMod", "C'MON! RAHRHH");
+                }
+                if (Clock != null && (args[i] == "-bot" || args[i] == "--bot")) {
+                    ModLogger.Log("FEZMod", "Found -bot / --bot");
+                    BOTEnabled = true;
+                }
+            }
+        }
+        
         public override void LoadComponents(Fez game) {
-            if (SpeedrunMode) {
-                ServiceHelper.AddComponent(new SpeedrunInfo(ServiceHelper.Game));
-            }
-            if (ToolAssistedSpeedrun) {
-                ServiceHelper.AddComponent(new TASComponent(ServiceHelper.Game));
-            }
+            ServiceHelper.AddComponent(new SpeedrunInfo(ServiceHelper.Game));
+            ServiceHelper.AddComponent(new TASComponent(ServiceHelper.Game));
         }
 
         public override void Exit() {
@@ -121,7 +109,7 @@ namespace FezGame.Speedrun {
                 OnPostDraw = delegate(SpriteBatch batch, SpriteFont font, GlyphTextRenderer tr, float alpha) {
                     float scale = mb.Fonts.SmallFactor * batch.GraphicsDevice.GetViewScale();
                     float y = (float) batch.GraphicsDevice.Viewport.Height / 2f + (float) batch.GraphicsDevice.Viewport.Height / 3.825f;
-                    if (LiveSplitSync && mb.selectorPhase == SelectorPhase.Select) {
+                    if (SpeedrunMode && Display == SpeedrunDisplayMode.LiveSplit && mb.selectorPhase == SelectorPhase.Select) {
                         livesplitShownSince = Math.Min(livesplitShownSince + 0.05f, 1f);
                         tr.DrawCenteredString(batch, mb.Fonts.Small, livesplitText, new Color(1f, 1f, 1f, alpha * livesplitShownSince), new Vector2(0f, y), scale);
                     } else {
@@ -135,9 +123,19 @@ namespace FezGame.Speedrun {
                 }, false,
                 () => (SpeedrunMode) ? "SPEEDRUN" : "LET'S PLAY",
                 delegate(string lastValue, int change) {
-                    SpeedrunMode = !SpeedrunMode;
+                    if (change != 0) {
+                        SpeedrunMode = !SpeedrunMode;
+                    }
+                    
                     displayMode.Selectable = toolAssist.Selectable = SpeedrunMode;
                     displayMode.Disabled = toolAssist.Disabled = !SpeedrunMode;
+                    
+                    FEZMod.EnableFEZometric = !SpeedrunMode;
+                    FEZMod.EnableQuickWarp = !SpeedrunMode;
+                    FEZMod.EnableBugfixes = !SpeedrunMode;
+                    
+                    ((MenuItem<string>) displayMode).SliderValueSetter(null, 0);
+                    ((MenuItem<string>) toolAssist).SliderValueSetter(null, 0);
                 }
             );
             item.UpperCase = true;
@@ -145,47 +143,26 @@ namespace FezGame.Speedrun {
             displayMode = Menu.AddItem<string>("DisplayMode", delegate() {
                     //onSelect
                 }, false,
-                () => 
-                !PerRoomTime && !LiveSplitSync ? "CURRENT ONLY" : 
-                 PerRoomTime && !LiveSplitSync ? "CURRENT + PER ROOM" :
-                !PerRoomTime && LiveSplitSync ? "LIVESPLIT (" + LiveSplitPort + ")" :
-                "UNKNOWN",
+                delegate() {
+                    switch (Display) {
+                        case SpeedrunDisplayMode.Current:
+                            return "CURRENT ONLY";
+                        case SpeedrunDisplayMode.CurrentPerRoom:
+                            return "CURRENT + PER ROOM";
+                        case SpeedrunDisplayMode.LiveSplit:
+                            return "LIVESPLIT (" + LiveSplitPort + ")";
+                    }
+                    return "UNKNOWN";
+                },
                 delegate(string lastValue, int change) {
-                    if (
-                        //well... keep as-is?
-                        change == 0 ||
-                        (change < 0 && !PerRoomTime && !LiveSplitSync) ||
-                        (0 < change && !PerRoomTime && LiveSplitSync)
-                    ) {
-                        return;
+                    int val = (int) Display + change;
+                    if (val < (int) SpeedrunDisplayMode.Current) {
+                        val = (int) SpeedrunDisplayMode.Current;
                     }
-                    
-                    if (
-                        //CURRENT + PER ROOM -> CURRENT ONLY
-                        (change < 0 && PerRoomTime && !LiveSplitSync)
-                    ) {
-                        PerRoomTime = false;
-                        LiveSplitSync = false;
-                    } else if (
-                        //CURRENT ONLY -> CURRENT + PER ROOM
-                        (change < 0 && !PerRoomTime && LiveSplitSync) ||
-                        //LIVESPLIT -> CURRENT + PER ROOM
-                        (0 < change && !PerRoomTime && !LiveSplitSync)
-                    ) {
-                        PerRoomTime = true;
-                        LiveSplitSync = false;
-                        return;
-                    } else if (
-                        //CURRENT + PER ROOM -> LIVESPLIT
-                        (0 < change && PerRoomTime && !LiveSplitSync)
-                    ) {
-                        PerRoomTime = false;
-                        LiveSplitSync = true;
-                    } else {
-                        //RESET DUE TO ERROR
-                        PerRoomTime = false;
-                        LiveSplitSync = false;
+                    if (val > (int) SpeedrunDisplayMode.LiveSplit) {
+                        val = (int) SpeedrunDisplayMode.LiveSplit;
                     }
+                    Display = (SpeedrunDisplayMode) val;
                     
                 }
             );
@@ -194,9 +171,35 @@ namespace FezGame.Speedrun {
             toolAssist = Menu.AddItem<string>("ToolAssist", delegate() {
                     //onSelect
                 }, false,
-                () => (ToolAssistedSpeedrun) ? StaticText.GetString("On") : StaticText.GetString("Off"),
+                () => (ToolAssistedSpeedrun) ? (BOTEnabled ? "BOT" : "ON") : "OFF",
                 delegate(string lastValue, int change) {
-                    ToolAssistedSpeedrun = !ToolAssistedSpeedrun;
+                    if (change != 0) {
+                        if ((!ToolAssistedSpeedrun && !BOTEnabled && change < 0) || (ToolAssistedSpeedrun && BOTEnabled && 0 < change)) {
+                            //no-op
+                        } else if (!ToolAssistedSpeedrun && !BOTEnabled && 0 < change) {
+                            //OFF > ON
+                            ToolAssistedSpeedrun = true;
+                            BOTEnabled = false;
+                        } else if (ToolAssistedSpeedrun && !BOTEnabled && 0 < change) {
+                            //ON > BOT
+                            ToolAssistedSpeedrun = true;
+                            BOTEnabled = true;
+                        } else if (ToolAssistedSpeedrun && BOTEnabled && change < 0) {
+                            //BOT > ON
+                            ToolAssistedSpeedrun = true;
+                            BOTEnabled = false;
+                        } else if (ToolAssistedSpeedrun && !BOTEnabled && change < 0) {
+                            //ON > OFF
+                            ToolAssistedSpeedrun = false;
+                            BOTEnabled = false;
+                        }
+                    }
+                    
+                    FEZMod.EnableFEZometric = ToolAssistedSpeedrun;
+                    FEZMod.EnableQuickWarp = ToolAssistedSpeedrun;
+                    //Currently reqired unless someone hooks MovingGroupsHost and others to give a public instance
+                    FEZModEngine.GetComponentsAsServices = ToolAssistedSpeedrun;
+                    FEZModEngine.HandleComponents = ToolAssistedSpeedrun;
                 }
             );
             toolAssist.UpperCase = true;
@@ -210,16 +213,29 @@ namespace FezGame.Speedrun {
             mb.MenuLevels.Add(Menu);
         }
         
-        public static void TriggerClock() {
+        public static void StartClock() {
             if (!SpeedrunMode) {
                 return;
             }
             
-            //TODO initialize the clock here
-            
-            if (Clock.Running) {
-                Clock.Running = false; //Forces the clock to reset.
+            //dispose old clock
+            if (Clock != null && Clock.Running) {
+                Clock.Running = false;
+                Clock.Dispose();
             }
+            
+            switch (Display) {
+                case SpeedrunDisplayMode.Current:
+                case SpeedrunDisplayMode.CurrentPerRoom:
+                    Clock = new SpeedrunClock();
+                    break;
+                case SpeedrunDisplayMode.LiveSplit:
+                    LiveSplitClock lsClock = new LiveSplitClock("localhost", LiveSplitPort);
+                    lsClock.Clock = new SpeedrunClock();
+                    Clock = lsClock;
+                    break;
+            }
+            
             Clock.Running = true;
             //Initialize BOT if needed
             if (BOTEnabled) {
@@ -229,6 +245,9 @@ namespace FezGame.Speedrun {
                     TASComponent.Instance.BOT.Dispose();
                 }
                 TASComponent.Instance.BOT.Initialize();
+            } else {
+                TASComponent.Instance.BOT.Dispose();
+                TASComponent.Instance.BOT = null;
             }
         }
 
