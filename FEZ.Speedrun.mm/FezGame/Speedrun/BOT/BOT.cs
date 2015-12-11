@@ -33,7 +33,7 @@ namespace FezGame.Speedrun.BOT {
                 Assembly[] asms = AppDomain.CurrentDomain.GetAssemblies();
                 for (int ai = 0; ai < asms.Length; ai++) {
                     Assembly asm = asms[ai];
-                    if (!asm.GetName().Name.EndsWith(".mm")) {
+                    if (asm.GetName().Name.EndsWith(".mm")) {
                         continue;
                     }
                     Type[] types = asm.GetTypes();
