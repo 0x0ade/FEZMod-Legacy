@@ -245,7 +245,7 @@ namespace FezGame.Speedrun {
                     TASComponent.Instance.BOT.Dispose();
                 }
                 TASComponent.Instance.BOT.Initialize();
-            } else {
+            } else if (TASComponent.Instance.BOT != null) {
                 TASComponent.Instance.BOT.Dispose();
                 TASComponent.Instance.BOT = null;
             }

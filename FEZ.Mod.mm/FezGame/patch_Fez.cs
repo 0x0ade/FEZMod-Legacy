@@ -51,39 +51,19 @@ namespace FezGame {
         }
         
         public extern void orig_Update(GameTime gameTime);
-        [MonoModLinkTo(typeof(Game), "Update")]
-        public extern void game_Update(GameTime gameTime);
         protected override void Update(GameTime gameTime) {
-            #if FNA
-            if (FEZMod.ForceTimestep != null) {
-                gameTime = setElapsed(gameTime, FEZMod.ForceTimestep.Value);
-            }
-            #endif
             gameTime = mul(gameTime, FEZMod.GameSpeed);
             
             FEZModEngine.UpdateGameTime = gameTime;
             
-            #if FNA
-            if (FEZMod.Smooth) {
-                game_Update(gameTime);
-                return;
-            }
-            #endif
             orig_Update(gameTime);
         }
         
         public extern void orig_Draw(GameTime gameTime);
         protected override void Draw(GameTime gameTime) {
-            #if FNA
-            if (FEZMod.ForceTimestep != null) {
-                gameTime = setElapsed(gameTime, FEZMod.ForceTimestep.Value);
-            }
-            #endif
             gameTime = mul(gameTime, FEZMod.GameSpeed);
             
             FEZModEngine.DrawGameTime = gameTime;
-            
-            //TODO should FEZMod.Smooth affect Draw, too?
             
             orig_Draw(gameTime);
         }
