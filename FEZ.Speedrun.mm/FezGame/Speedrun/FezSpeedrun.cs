@@ -221,14 +221,15 @@ namespace FezGame.Speedrun {
         }
         
         public static void StartClock() {
-            if (!SpeedrunMode) {
-                return;
-            }
-            
             //dispose old clock
             if (Clock != null && Clock.Running) {
                 Clock.Running = false;
                 Clock.Dispose();
+                Clock = null;
+            }
+            
+            if (!SpeedrunMode) {
+                return;
             }
             
             switch (Display) {
