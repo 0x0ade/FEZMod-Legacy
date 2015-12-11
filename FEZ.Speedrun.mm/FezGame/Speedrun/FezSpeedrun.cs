@@ -61,8 +61,6 @@ namespace FezGame.Speedrun {
             for (int i = 0; i < args.Length; i++) {
                 if (Clock != null && (args[i] == "-tas" || args[i] == "--tool-assisted-speedrun")) {
                     ModLogger.Log("FEZMod", "Found -tas / --tool-assisted-speedrun");
-                    /*
-                    */
                     ModLogger.Log("FEZMod", "C'MON! RAHRHH");
                 }
                 if (Clock != null && (args[i] == "-bot" || args[i] == "--bot")) {
@@ -73,8 +71,17 @@ namespace FezGame.Speedrun {
         }
         
         public override void LoadComponents(Fez game) {
-            ServiceHelper.AddComponent(new SpeedrunInfo(ServiceHelper.Game));
-            ServiceHelper.AddComponent(new TASComponent(ServiceHelper.Game));
+            Action load = delegate() {
+                ServiceHelper.AddComponent(new SpeedrunInfo(ServiceHelper.Game));
+                ServiceHelper.AddComponent(new TASComponent(ServiceHelper.Game));
+            };
+            #if FNA
+            //Proper way would be to only initialize what's required via FezEngine.Tools.DrawActionScheduler.Schedule, but.. yeah.
+            //SI and TASC aren't required pre draw, so they can get added later.
+            DrawActionScheduler.Schedule(load);
+            #else
+            load();
+            #endif
         }
 
         public override void Exit() {
