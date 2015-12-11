@@ -99,7 +99,7 @@ namespace FezGame.Components {
             float lineBigHeight = FontBig.MeasureString("Time: 01:23:45.6789").Y * viewScale * FontBigFactor;
             GTR.DrawShadowedText(SpriteBatch, FontBig, "Time: "+FormatTime(FezSpeedrun.Clock.Time.ToString()), new Vector2(0, 0), Color.White, viewScale * FontBigFactor);
 
-            if (FezSpeedrun.Display == SpeedrunDisplayMode.CurrentPerRoom) {
+            if (FezSpeedrun.Settings.Display == SpeedrunDisplayMode.CurrentPerRoom) {
                 List<Split> levelTimes = FezSpeedrun.Clock.Splits;
             
                 float lineHeight = FontSmall.MeasureString("Time: 01:23:45.6789").Y * viewScale * FontSmallFactor;

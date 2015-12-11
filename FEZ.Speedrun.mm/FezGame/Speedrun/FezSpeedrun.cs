@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using ContentSerialization;
 using FezGame.Mod;
 using FezEngine.Mod;
 using FezEngine.Tools;
@@ -13,18 +15,31 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace FezGame.Speedrun {
+    
+    public class FezSpeedrunSettings : FezModuleSettings {
+        public bool SpeedrunMode = false;
+        public SpeedrunDisplayMode Display = SpeedrunDisplayMode.Current;
+        public int LiveSplitPort = 16834;
+
+        public bool ToolAssistedSpeedrun = false;
+        public bool BOTEnabled = false;//Broken Optimizing Thing
+        
+        public FezSpeedrunSettings()
+            : this(null) {
+        }
+        
+        public FezSpeedrunSettings(string fileDefault)
+            : base(fileDefault) {
+        }
+    }
+    
     public class FezSpeedrun : FezModule {
 
         public override string Name { get { return "FEZMod.Speedrun"; } }
         public override string Author { get { return "AngelDE98 & FEZMod contributors"; } }
         public override string Version { get { return FEZMod.Version; } }
-
-        public static bool SpeedrunMode = false;
-        public static SpeedrunDisplayMode Display = SpeedrunDisplayMode.Current;
-        public static int LiveSplitPort = 16834;
-
-        public static bool ToolAssistedSpeedrun = false;
-        public static bool BOTEnabled = false;//Broken Optimizing Thing
+        
+        public static FezSpeedrunSettings Settings;
 
         public static ISpeedrunClock Clock;
 
@@ -36,14 +51,15 @@ namespace FezGame.Speedrun {
         }
         
         public override void Initialize() {
-            //TODO load config
-            if (SpeedrunMode) {
+            Settings = FezModuleSettings.Load<FezSpeedrunSettings>("FEZMod.Speedrun.Settings.sdl") ?? new FezSpeedrunSettings("FEZMod.Speedrun.Settings.sdl");
+            
+            if (Settings.SpeedrunMode) {
                 FEZMod.EnableFEZometric = false;
                 FEZMod.EnableQuickWarp = false;
                 FEZMod.EnableBugfixes = false;
             }
             
-            if (ToolAssistedSpeedrun) {
+            if (Settings.ToolAssistedSpeedrun) {
                 FEZMod.EnableFEZometric = true;
                 FEZMod.EnableQuickWarp = true;
                 //Currently reqired unless someone hooks MovingGroupsHost and others to give a public instance
@@ -55,19 +71,6 @@ namespace FezGame.Speedrun {
             TextPatchHelper.Static.Fallback["SpeedrunMode"] = "Mode: {0}";
             TextPatchHelper.Static.Fallback["DisplayMode"] = "Display time: {0}";
             TextPatchHelper.Static.Fallback["ToolAssist"] = "Tool assist (quicksaves, ...): {0}";
-        }
-
-        public override void ParseArgs(string[] args) {
-            for (int i = 0; i < args.Length; i++) {
-                if (Clock != null && (args[i] == "-tas" || args[i] == "--tool-assisted-speedrun")) {
-                    ModLogger.Log("FEZMod", "Found -tas / --tool-assisted-speedrun");
-                    ModLogger.Log("FEZMod", "C'MON! RAHRHH");
-                }
-                if (Clock != null && (args[i] == "-bot" || args[i] == "--bot")) {
-                    ModLogger.Log("FEZMod", "Found -bot / --bot");
-                    BOTEnabled = true;
-                }
-            }
         }
         
         public override void LoadComponents(Fez game) {
@@ -96,6 +99,23 @@ namespace FezGame.Speedrun {
         }
         
         public override void InitializeMenu(MenuBase mb) {
+            FezSpeedrunSettings tmpSettings = null;
+            Action save = delegate() {
+                if (tmpSettings != null) {
+                    Settings = tmpSettings;
+                    Settings.Save();
+                }
+                tmpSettings = new FezSpeedrunSettings(Settings.FileDefault) {
+                    SpeedrunMode = Settings.SpeedrunMode,
+                    Display = Settings.Display,
+                    LiveSplitPort = Settings.LiveSplitPort,
+                    
+                    ToolAssistedSpeedrun = Settings.ToolAssistedSpeedrun,
+                    BOTEnabled = Settings.BOTEnabled
+                };
+            };
+            save();
+            
             MenuItem item;
             
             float livesplitShownSince = 0f;
@@ -116,7 +136,7 @@ namespace FezGame.Speedrun {
                 OnPostDraw = delegate(SpriteBatch batch, SpriteFont font, GlyphTextRenderer tr, float alpha) {
                     float scale = mb.Fonts.SmallFactor * batch.GraphicsDevice.GetViewScale();
                     float y = (float) batch.GraphicsDevice.Viewport.Height / 2f + (float) batch.GraphicsDevice.Viewport.Height / 3.825f;
-                    if (SpeedrunMode && Display == SpeedrunDisplayMode.LiveSplit && mb.selectorPhase == SelectorPhase.Select) {
+                    if (tmpSettings.SpeedrunMode && tmpSettings.Display == SpeedrunDisplayMode.LiveSplit && mb.selectorPhase == SelectorPhase.Select) {
                         livesplitShownSince = Math.Min(livesplitShownSince + 0.05f, 1f);
                         tr.DrawCenteredString(batch, mb.Fonts.Small, livesplitText, new Color(1f, 1f, 1f, alpha * livesplitShownSince), new Vector2(0f, y), scale);
                     } else {
@@ -125,21 +145,19 @@ namespace FezGame.Speedrun {
                 }
             };
             
-            item = Menu.AddItem<string>("SpeedrunMode", delegate() {
-                    //onSelect
-                }, false,
-                () => (SpeedrunMode) ? "SPEEDRUN" : "LET'S PLAY",
+            item = Menu.AddItem<string>("SpeedrunMode", save, false,
+                () => (tmpSettings.SpeedrunMode) ? "SPEEDRUN" : "LET'S PLAY",
                 delegate(string lastValue, int change) {
                     if (change != 0) {
-                        SpeedrunMode = !SpeedrunMode;
+                        tmpSettings.SpeedrunMode = !tmpSettings.SpeedrunMode;
                     }
                     
-                    displayMode.Selectable = toolAssist.Selectable = SpeedrunMode;
-                    displayMode.Disabled = toolAssist.Disabled = !SpeedrunMode;
+                    displayMode.Selectable = toolAssist.Selectable = tmpSettings.SpeedrunMode;
+                    displayMode.Disabled = toolAssist.Disabled = !tmpSettings.SpeedrunMode;
                     
-                    FEZMod.EnableFEZometric = !SpeedrunMode;
-                    FEZMod.EnableQuickWarp = !SpeedrunMode;
-                    FEZMod.EnableBugfixes = !SpeedrunMode;
+                    FEZMod.EnableFEZometric = !tmpSettings.SpeedrunMode;
+                    FEZMod.EnableQuickWarp = !tmpSettings.SpeedrunMode;
+                    FEZMod.EnableBugfixes = !tmpSettings.SpeedrunMode;
                     
                     ((MenuItem<string>) displayMode).SliderValueSetter(null, 0);
                     ((MenuItem<string>) toolAssist).SliderValueSetter(null, 0);
@@ -147,72 +165,68 @@ namespace FezGame.Speedrun {
             );
             item.UpperCase = true;
             
-            displayMode = Menu.AddItem<string>("DisplayMode", delegate() {
-                    //onSelect
-                }, false,
+            displayMode = Menu.AddItem<string>("DisplayMode", save, false,
                 delegate() {
-                    switch (Display) {
+                    switch (tmpSettings.Display) {
                         case SpeedrunDisplayMode.Current:
                             return "CURRENT ONLY";
                         case SpeedrunDisplayMode.CurrentPerRoom:
                             return "CURRENT + PER ROOM";
                         case SpeedrunDisplayMode.LiveSplit:
-                            return "LIVESPLIT (" + LiveSplitPort + ")";
+                            return "LIVESPLIT (" + tmpSettings.LiveSplitPort + ")";
                     }
                     return "UNKNOWN";
                 },
                 delegate(string lastValue, int change) {
-                    int val = (int) Display + change;
+                    int val = (int) tmpSettings.Display + change;
                     if (val < (int) SpeedrunDisplayMode.Current) {
                         val = (int) SpeedrunDisplayMode.Current;
                     }
                     if (val > (int) SpeedrunDisplayMode.LiveSplit) {
                         val = (int) SpeedrunDisplayMode.LiveSplit;
                     }
-                    Display = (SpeedrunDisplayMode) val;
+                    tmpSettings.Display = (SpeedrunDisplayMode) val;
                     
                 }
             );
             displayMode.UpperCase = true;
             
-            toolAssist = Menu.AddItem<string>("ToolAssist", delegate() {
-                    //onSelect
-                }, false,
-                () => (ToolAssistedSpeedrun) ? (BOTEnabled ? "BOT" : "ON") : "OFF",
+            toolAssist = Menu.AddItem<string>("ToolAssist", save, false,
+                () => (tmpSettings.ToolAssistedSpeedrun) ? (tmpSettings.BOTEnabled ? "BOT" : "ON") : "OFF",
                 delegate(string lastValue, int change) {
                     if (change != 0) {
-                        if ((!ToolAssistedSpeedrun && !BOTEnabled && change < 0) || (ToolAssistedSpeedrun && BOTEnabled && 0 < change)) {
+                        if ((!tmpSettings.ToolAssistedSpeedrun && !tmpSettings.BOTEnabled && change < 0) || (tmpSettings.ToolAssistedSpeedrun && tmpSettings.BOTEnabled && 0 < change)) {
                             //no-op
-                        } else if (!ToolAssistedSpeedrun && !BOTEnabled && 0 < change) {
+                        } else if (!tmpSettings.ToolAssistedSpeedrun && !tmpSettings.BOTEnabled && 0 < change) {
                             //OFF > ON
-                            ToolAssistedSpeedrun = true;
-                            BOTEnabled = false;
-                        } else if (ToolAssistedSpeedrun && !BOTEnabled && 0 < change) {
+                            tmpSettings.ToolAssistedSpeedrun = true;
+                            tmpSettings.BOTEnabled = false;
+                        } else if (tmpSettings.ToolAssistedSpeedrun && !tmpSettings.BOTEnabled && 0 < change) {
                             //ON > BOT
-                            ToolAssistedSpeedrun = true;
-                            BOTEnabled = true;
-                        } else if (ToolAssistedSpeedrun && BOTEnabled && change < 0) {
+                            tmpSettings.ToolAssistedSpeedrun = true;
+                            tmpSettings.BOTEnabled = true;
+                        } else if (tmpSettings.ToolAssistedSpeedrun && tmpSettings.BOTEnabled && change < 0) {
                             //BOT > ON
-                            ToolAssistedSpeedrun = true;
-                            BOTEnabled = false;
-                        } else if (ToolAssistedSpeedrun && !BOTEnabled && change < 0) {
+                            tmpSettings.ToolAssistedSpeedrun = true;
+                            tmpSettings.BOTEnabled = false;
+                        } else if (tmpSettings.ToolAssistedSpeedrun && !tmpSettings.BOTEnabled && change < 0) {
                             //ON > OFF
-                            ToolAssistedSpeedrun = false;
-                            BOTEnabled = false;
+                            tmpSettings.ToolAssistedSpeedrun = false;
+                            tmpSettings.BOTEnabled = false;
                         }
                     }
                     
-                    FEZMod.EnableFEZometric = ToolAssistedSpeedrun;
-                    FEZMod.EnableQuickWarp = ToolAssistedSpeedrun;
+                    FEZMod.EnableFEZometric = tmpSettings.ToolAssistedSpeedrun;
+                    FEZMod.EnableQuickWarp = tmpSettings.ToolAssistedSpeedrun;
                     //Currently reqired unless someone hooks MovingGroupsHost and others to give a public instance
-                    FEZModEngine.GetComponentsAsServices = ToolAssistedSpeedrun;
-                    FEZModEngine.HandleComponents = ToolAssistedSpeedrun;
+                    FEZModEngine.GetComponentsAsServices = tmpSettings.ToolAssistedSpeedrun;
+                    FEZModEngine.HandleComponents = tmpSettings.ToolAssistedSpeedrun;
                 }
             );
             toolAssist.UpperCase = true;
             
-            displayMode.Selectable = toolAssist.Selectable = SpeedrunMode;
-            displayMode.Disabled = toolAssist.Disabled = !SpeedrunMode;
+            displayMode.Selectable = toolAssist.Selectable = tmpSettings.SpeedrunMode;
+            displayMode.Disabled = toolAssist.Disabled = !tmpSettings.SpeedrunMode;
             
             FEZMod.Menu.AddItem("FEZSpeedrunMenu", delegate() {
                 mb.ChangeMenuLevel(Menu);
@@ -228,25 +242,29 @@ namespace FezGame.Speedrun {
                 Clock = null;
             }
             
-            if (!SpeedrunMode) {
+            //reset TAS progress if any
+            TASComponent.Instance.RewindData.Clear();
+            TASComponent.Instance.RewindPosition = 0;
+            
+            if (!Settings.SpeedrunMode) {
                 return;
             }
             
-            switch (Display) {
+            switch (Settings.Display) {
                 case SpeedrunDisplayMode.Current:
                 case SpeedrunDisplayMode.CurrentPerRoom:
                     Clock = new SpeedrunClock();
                     break;
                 case SpeedrunDisplayMode.LiveSplit:
-                    LiveSplitClock lsClock = new LiveSplitClock("localhost", LiveSplitPort);
+                    LiveSplitClock lsClock = new LiveSplitClock("localhost", Settings.LiveSplitPort);
                     lsClock.Clock = new SpeedrunClock();
                     Clock = lsClock;
                     break;
             }
             
             Clock.Running = true;
-            //Initialize BOT if needed
-            if (BOTEnabled) {
+            //initialize BOT if needed
+            if (Settings.BOTEnabled) {
                 if (TASComponent.Instance.BOT == null) {
                     TASComponent.Instance.BOT = new FezGame.Speedrun.BOT.BOT(TASComponent.Instance);
                 } else {
@@ -258,7 +276,8 @@ namespace FezGame.Speedrun {
                 TASComponent.Instance.BOT = null;
             }
         }
-
+        
     }
+    
 }
 

@@ -9,6 +9,8 @@ using FezGame.Structure;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.IO;
+using ContentSerialization;
+using ContentSerialization.Attributes;
 using FezEngine.Structure;
 using EasyStorage;
 using System.Globalization;
@@ -22,6 +24,41 @@ using SDL2;
 #endif
 
 namespace FezGame.Mod {
+    
+    public abstract class FezModuleSettings {
+        [Serialization(Ignore = true)]
+        public string FileDefault;
+        
+        public FezModuleSettings()
+            : this(null) {
+        }
+        
+        public FezModuleSettings(string fileDefault) {
+            FileDefault = fileDefault;
+        }
+        
+        public static T Load<T>(string file) where T : FezModuleSettings {
+            if (!File.Exists(file)) {
+                return null;
+            }
+            
+            try {
+                T settings = SdlSerializer.Deserialize<T>(file);
+                settings.FileDefault = file;
+                return settings;
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
+    
+    public static class FezModuleSettingsExtensions {
+        public static void Save<T>(this T settings, string file = null) where T : FezModuleSettings {
+            file = file ?? settings.FileDefault;
+
+            SdlSerializer.Serialize<T>(file, settings);
+        }
+    }
     
     public abstract class FezModule : FezModuleCore {
 

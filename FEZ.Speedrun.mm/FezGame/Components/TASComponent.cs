@@ -73,11 +73,11 @@ namespace FezGame.Components {
             //Register special key hooks
             Vector2 tmpFreeLook = new Vector2(0f, 0f);
             FakeInputHelper.get_FreeLook = delegate() {
-                return !FezSpeedrun.ToolAssistedSpeedrun || FakeInputHelper.Updating ? tmpFreeLook : new Vector2(0f, 0f);
+                return !FezSpeedrun.Settings.ToolAssistedSpeedrun || FakeInputHelper.Updating ? tmpFreeLook : new Vector2(0f, 0f);
             };
             FakeInputHelper.set_FreeLook = delegate(Vector2 value) {
                 //Set game speed
-                if (FezSpeedrun.ToolAssistedSpeedrun && FakeInputHelper.Updating) {
+                if (FezSpeedrun.Settings.ToolAssistedSpeedrun && FakeInputHelper.Updating) {
                     FEZMod.GameSpeed = 1d + 0.5d * ((double) value.X) + 0.5d * ((double) value.Y);
                 }
                 tmpFreeLook = value;
@@ -93,7 +93,7 @@ namespace FezGame.Components {
                 Size = new Vector2(256f, 300f),
                 UpdateBounds = true
             };
-            if (!FezSpeedrun.BOTEnabled) {
+            if (!FezSpeedrun.Settings.BOTEnabled) {
                 Widgets.Add(QuickSavesWidget);
             }
 
@@ -125,7 +125,7 @@ namespace FezGame.Components {
         }
 
         public override void Update(GameTime gameTime) {
-            if (!FezSpeedrun.ToolAssistedSpeedrun) {
+            if (!FezSpeedrun.Settings.ToolAssistedSpeedrun) {
                 return;
             }
             
@@ -160,7 +160,7 @@ namespace FezGame.Components {
     
                     DefaultCameraManager.NoInterpolation = true;
                     FezSpeedrun.Clock.Direction = -1D;
-                } else if (!GameState.InMenuCube && !FezSpeedrun.BOTEnabled) {
+                } else if (!GameState.InMenuCube && !FezSpeedrun.Settings.BOTEnabled) {
                     RecordFrame();
     
                     DefaultCameraManager.NoInterpolation = false;
@@ -200,7 +200,7 @@ namespace FezGame.Components {
         }
 
         public override void Draw(GameTime gameTime) {
-            if (!FezSpeedrun.ToolAssistedSpeedrun) {
+            if (!FezSpeedrun.Settings.ToolAssistedSpeedrun) {
                 return;
             }
             
@@ -257,7 +257,7 @@ namespace FezGame.Components {
         }
 
         public void RewindFrame() {
-            if (RewindPosition <= 0 || RewindPosition > RewindData.Count | FezSpeedrun.BOTEnabled) {
+            if (RewindPosition <= 0 || RewindPosition > RewindData.Count | FezSpeedrun.Settings.BOTEnabled) {
                 return;
             }
 
@@ -273,7 +273,7 @@ namespace FezGame.Components {
         }
 
         public void RecordFrame() {
-            if (RewindPosition < 0 || RewindPosition > RewindData.Count || FezSpeedrun.BOTEnabled) {
+            if (RewindPosition < 0 || RewindPosition > RewindData.Count || FezSpeedrun.Settings.BOTEnabled) {
                 return;
             }
 

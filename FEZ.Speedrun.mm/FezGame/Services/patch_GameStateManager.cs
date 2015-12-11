@@ -7,7 +7,7 @@ namespace FezGame.Services {
         }
 
         public void ToggleInventory() {
-            if (FezSpeedrun.ToolAssistedSpeedrun) {
+            if (FezSpeedrun.Settings.ToolAssistedSpeedrun) {
                 return;
             }
 
