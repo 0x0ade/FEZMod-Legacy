@@ -28,12 +28,15 @@ namespace FezGame.Components {
         
         private extern void orig_Talk();
         private void Talk() {
+            string oldSpeaker = ((patch_ISpeechBubbleManager) SpeechManager).Speaker;
+            ((patch_ISpeechBubbleManager) SpeechManager).Speaker = Npc.Name.ToUpperInvariant();
+            
+            //FIXME still doesn't make the text show up on first talk...
             orig_Talk();
             
-            //TODO make it change the speaker before changing the text
-			/*if (CurrentAction == NpcAction.Talk) {
-                ((patch_ISpeechBubbleManager) SpeechManager).Speaker = Npc.Name;
-            }*/
+			if (!Npc.Talking) {
+                ((patch_ISpeechBubbleManager) SpeechManager).Speaker = oldSpeaker;
+            }
         }
         
     }

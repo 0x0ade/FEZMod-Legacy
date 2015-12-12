@@ -9,6 +9,6 @@ namespace FezGame.Components {
 	public interface patch_ISpeechBubbleManager : ISpeechBubbleManager {
         Color ColorFG { get; set; }
         Color ColorBG { get; set; }
-        string Speaker { set; }
+        string Speaker { get; set; }
     }
 }

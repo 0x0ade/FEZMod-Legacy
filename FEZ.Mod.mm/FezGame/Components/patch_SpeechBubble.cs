@@ -82,19 +82,12 @@ namespace FezGame.Components {
 		private Group scalableBottom;
 
 		public IGameCameraManager CameraManager { [MonoModIgnore] get; [MonoModIgnore] set; }
-
 		public IContentManagerProvider CMProvider { [MonoModIgnore] get; [MonoModIgnore] set; }
-
 		public SpeechFont Font { [MonoModIgnore] get; [MonoModIgnore] set; }
-
 		public IFontManager FontManager { [MonoModIgnore] get; [MonoModIgnore] set; }
-
 		public IGameStateManager GameState { [MonoModIgnore] get; [MonoModIgnore] set; }
-
 		public bool Hidden { [MonoModIgnore] get; }
-
 		public ILevelManager LevelManager { [MonoModIgnore] get; [MonoModIgnore] set; }
-
 		public Vector3 Origin { [MonoModIgnore] get; [MonoModIgnore] set; }
         
         private Color textColor;
@@ -121,6 +114,7 @@ namespace FezGame.Components {
                 }
             }
         }
+        private Color lastColorBG;
         public Color ColorBG { get; set; }
         
         private string textSpeaker;
@@ -136,6 +130,8 @@ namespace FezGame.Components {
             }
         }
         
+        private Texture2D tailGroupTexture, neGroupTexture, nwGroupTexture, seGroupTexture, swGroupTexture, scalableGroupTexture;
+        
         public patch_SpeechBubble(Game game)
             : base(game) {
             //no-op
@@ -146,8 +142,36 @@ namespace FezGame.Components {
             orig_Initialize();
             
             textColor = Color.White;
-            textSecondaryColor = new Color(0.8f, 0.9f, 1f);
-            ColorBG = Color.Blue;
+            textSecondaryColor = new Color(1f, 1f, 1f, 0.7f);
+            ColorBG = Color.Black;
+        }
+        
+        protected extern void orig_LoadContent();
+        protected override void LoadContent() {
+            orig_LoadContent();
+            
+            //Currently requires custom assets, thus default color is black.
+            
+            tailGroupTexture = (Texture2D) tailGroup.Texture;
+            neGroupTexture = (Texture2D) neGroup.Texture;
+            nwGroupTexture = (Texture2D) nwGroup.Texture;
+            seGroupTexture = (Texture2D) seGroup.Texture;
+            swGroupTexture = (Texture2D) swGroup.Texture;
+            scalableGroupTexture = CMProvider.Global.Load<Texture2D>("Other Textures/FullWhite");
+        }
+        
+        protected extern void orig_UnloadContent();
+        protected override void UnloadContent() {
+            orig_UnloadContent();
+            if (!(scalableMiddle.Texture is RenderTarget2D)) {
+                return;
+            }
+            TextureExtensions.Unhook(tailGroup.Texture); tailGroup.Texture.Dispose();
+            TextureExtensions.Unhook(neGroup.Texture); neGroup.Texture.Dispose();
+            TextureExtensions.Unhook(nwGroup.Texture); nwGroup.Texture.Dispose();
+            TextureExtensions.Unhook(seGroup.Texture); seGroup.Texture.Dispose();
+            TextureExtensions.Unhook(swGroup.Texture); swGroup.Texture.Dispose();
+            TextureExtensions.Unhook(scalableMiddle.Texture); scalableMiddle.Texture.Dispose();
         }
         
         private extern void orig_OnTextChanged(bool update);
@@ -156,12 +180,6 @@ namespace FezGame.Components {
             float num = 2;
             string a = textString;
             textString = originalString;
-            
-            if (textSpeaker != null) {
-                for (float i = 0; i < textSpeaker.Length; i += 1f) {
-                    textString = " " + textString;
-                }
-            }
             
             SpriteFont spriteFont = (Font != SpeechFont.Pixel) ? zuishFont : FontManager.Big;
             SpriteFont spriteFontSpeaker = (Font != SpeechFont.Pixel) ? zuishFont : FontManager.Small;
@@ -268,7 +286,7 @@ namespace FezGame.Components {
                 spriteBatch.DrawString(spriteFont, textString, vector / 2 - value / 2, textColor, 0, Vector2.Zero, scalableMiddleSize / vector, SpriteEffects.None, 0);
             }
             if (textSpeaker != null) {
-                GTR.DrawString(spriteBatch, FontManager.Small, textSpeaker, new Vector2(0f, 0f), textSecondaryColor, fontScale);
+                GTR.DrawString(spriteBatch, FontManager.Small, textSpeaker, new Vector2(0.1f, 0f), textSecondaryColor, fontScale / 2f);
             }
             spriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
@@ -289,10 +307,59 @@ namespace FezGame.Components {
             if (!Culture.IsCJK && flag3) {
                 spriteFont.LineSpacing -= 8;
             }
+            
+            recolorBG();
+        }
+        
+        private void recolorBG(Group group, Texture2D tex) {
+            RenderTarget2D rt;
+            if (group.Texture is RenderTarget2D) {
+                rt = (RenderTarget2D) group.Texture;
+            } else {
+                group.Texture = rt = new RenderTarget2D(GraphicsDevice, tex.Width, tex.Height, false, GraphicsDevice.PresentationParameters.BackBufferFormat, GraphicsDevice.PresentationParameters.DepthStencilFormat, 0, RenderTargetUsage.PreserveContents);
+            }
+            
+            RenderTargetBinding[] prevRT = GraphicsDevice.GetRenderTargets();
+            
+            GraphicsDevice.SetRenderTarget(rt);
+            GraphicsDevice.PrepareDraw();
+            GraphicsDevice.Clear(ClearOptions.Target, ColorEx.TransparentWhite, 1, 0);
+            
+            spriteBatch.BeginPoint();
+            spriteBatch.Draw(tex, new Rectangle(0, 0, tex.Width, tex.Height), ColorBG);
+            
+            spriteBatch.End();
+            if (prevRT.Length > 0) {
+                if (prevRT[0].RenderTarget is RenderTarget2D) {
+                    GraphicsDevice.SetRenderTarget((RenderTarget2D) prevRT[0].RenderTarget);
+                } else {
+                    GraphicsDevice.SetRenderTarget((RenderTargetCube) prevRT[0].RenderTarget, prevRT[0].CubeMapFace);
+                }
+            } else {
+                GraphicsDevice.SetRenderTarget(null);
+            }
+        }
+        
+        private void recolorBG() {
+            //FIXME flicker
+            if (lastColorBG != ColorBG) {
+                lastColorBG = ColorBG;
+                
+                //Instead of simply drawing the texture tinted.. nope, recolor the texture!
+                recolorBG(tailGroup, tailGroupTexture);
+                recolorBG(neGroup, neGroupTexture);
+                recolorBG(nwGroup, nwGroupTexture);
+                recolorBG(seGroup, seGroupTexture);
+                recolorBG(swGroup, swGroupTexture);
+                recolorBG(scalableMiddle, scalableGroupTexture);
+                scalableBottom.Texture = scalableTop.Texture = scalableMiddle.Texture;
+            }
         }
         
         public extern void orig_Draw(GameTime gameTime);
         public override void Draw(GameTime gameTime) {
+            recolorBG();
+            
             orig_Draw(gameTime);
             
             if (FezMath.AlmostEqual(sinceShown, 0f) && !show && !changingText) {
