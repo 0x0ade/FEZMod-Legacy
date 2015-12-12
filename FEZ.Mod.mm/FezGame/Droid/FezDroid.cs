@@ -59,7 +59,7 @@ namespace FezGame.Droid {
                 FEZMod.DisableCloudSaves.SetValue(null, false);
             }
             
-            FEZModEngine.Settings.CacheDisabled = true;
+            FEZModEngine.Settings.DataCache = DataCacheMode.Disabled;
             FEZModEngine.Settings.MusicCache = MusicCacheMode.Disabled;
         }
 

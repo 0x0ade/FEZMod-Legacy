@@ -145,13 +145,42 @@ namespace FezEngine.Tools {
         
         protected Stream OpenStream_(string assetName_) {
             string assetName = assetName_.ToLowerInvariant().Replace('/', '\\');
-            Tuple<string, long, int> data;
-            if (FEZModEngine.AssetMetadata.TryGetValue(assetName, out data)) {
-                FileStream packStream = File.OpenRead(data.Item1);
-                if (data.Item3 == 0) {
+            
+            byte[] data;
+            if (AssetDataCache.Persistent.TryGetValue(assetName, out data)) {
+                return new MemoryStream(data);
+            }
+            
+            CachedAssetData cached;
+            if (AssetDataCache.Temporary.TryGetValue(assetName, out cached)) {
+                cached.References++;
+                cached.Age = 0;
+                return new MemoryStream(data);
+            }
+            
+            if (AssetDataCache.Preloaded.TryGetValue(assetName, out data)) {
+                AssetDataCache.Temporary[assetName] = new CachedAssetData() {
+                    Data = data,
+                    References = 1
+                };
+                return new MemoryStream(data);
+            }
+            
+            Tuple<string, long, int> metadata;
+            if (FEZModEngine.AssetMetadata.TryGetValue(assetName, out metadata)) {
+                FileStream packStream = File.OpenRead(metadata.Item1);
+                if (metadata.Item3 == 0) {
                     return packStream;
                 }
-                return new LimitedStream(packStream, data.Item2, data.Item3);
+                LimitedStream ls = new LimitedStream(packStream, metadata.Item2, metadata.Item3);
+                if (FEZModEngine.Settings.DataCache == DataCacheMode.Smart) {
+                    AssetDataCache.Temporary[assetName] = new CachedAssetData() {
+                        Data = ls.ToArray(),
+                        References = 1
+                    };
+                    return ls;
+                }
+                return ls;
             }
             
             return orig_OpenStream(assetName_);
@@ -179,11 +208,16 @@ namespace FezEngine.Tools {
 
         public extern void orig_LoadEssentials();
         public void LoadEssentials() {
-            if (!FEZModEngine.Settings.CacheDisabled) {
+            if (FEZModEngine.Settings.DataCache == DataCacheMode.Default) {
                 orig_LoadEssentials();
             } else {
                 cachedAssets = new Dictionary<string, byte[]>(0);
-                ScanPackMetadata("Essentials.pak");
+                if (FEZModEngine.Settings.DataCache == DataCacheMode.Smart) {
+                    AssetDataCache.CachePersistent("Essentials.pak");
+                    AssetDataCache.UpdatePersistent("Updates.pak");
+                } else {
+                    ScanPackMetadata("Essentials.pak");
+                }
             }
             
             FEZModEngine.PassLoadEssentials();
@@ -191,7 +225,7 @@ namespace FezEngine.Tools {
 
         public extern void orig_Preload();
         public void Preload() {
-            if (!FEZModEngine.Settings.CacheDisabled) {
+            if (FEZModEngine.Settings.DataCache == DataCacheMode.Default) {
                 orig_Preload();
             } else {
                 ScanPackMetadata("Updates.pak");
@@ -202,7 +236,7 @@ namespace FezEngine.Tools {
         }
         
         public void ScanPackMetadata(string name) {
-            string filePath = Path.Combine(base.RootDirectory, name);
+            string filePath = Path.Combine(RootDirectory, name);
             if (!File.Exists(filePath)) {
                 return;
             }
@@ -222,5 +256,63 @@ namespace FezEngine.Tools {
         }
 
     }
+    
+    public static class AssetDataCache {
+        
+        public static Dictionary<string, byte[]> Persistent = new Dictionary<string, byte[]>();
+        
+        public static Dictionary<string, CachedAssetData> Temporary = new Dictionary<string, CachedAssetData>();
+        
+        public static Dictionary<string, byte[]> Preloaded = new Dictionary<string, byte[]>();
+        
+        public static void CachePersistent(string name) {
+            string filePath = Path.Combine(ServiceHelper.Game.Content.RootDirectory, name);
+            if (!File.Exists(filePath)) {
+                return;
+            }
+            using (FileStream packStream = File.OpenRead(filePath)) {
+                using (BinaryReader packReader = new BinaryReader(packStream)) {
+                    int count = packReader.ReadInt32();
+                    for (int i = 0; i < count; i++) {
+                        string file = packReader.ReadString();
+                        int length = packReader.ReadInt32();
+                        if (!Persistent.ContainsKey(file)) {
+                            Persistent[file] = packReader.ReadBytes(length);
+                        } else {
+                            packStream.Seek(length, SeekOrigin.Current);
+                        }
+                    }
+                }
+            }
+        }
+        
+        public static void UpdatePersistent(string name) {
+            string filePath = Path.Combine(ServiceHelper.Game.Content.RootDirectory, name);
+            if (!File.Exists(filePath)) {
+                return;
+            }
+            using (FileStream packStream = File.OpenRead(filePath)) {
+                using (BinaryReader packReader = new BinaryReader(packStream)) {
+                    int count = packReader.ReadInt32();
+                    for (int i = 0; i < count; i++) {
+                        string file = packReader.ReadString();
+                        int length = packReader.ReadInt32();
+                        if (Persistent.ContainsKey(file)) {
+                            Persistent[file] = packReader.ReadBytes(length);
+                        } else {
+                            packStream.Seek(length, SeekOrigin.Current);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    public class CachedAssetData {
+        public byte[] Data;
+        public int References;
+        public int Age;
+    }
+    
 }
 

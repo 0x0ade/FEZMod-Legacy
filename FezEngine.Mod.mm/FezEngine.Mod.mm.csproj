@@ -102,7 +102,7 @@
     <Compile Include="FezEngine\Mod\Garbage.cs" />
     <Compile Include="FezEngine\Mod\Cache.cs" />
     <Compile Include="FezEngine\Mod\FEZModEngine.cs" />
-    <Compile Include="FezEngine\Mod\MusicCacheMode.cs" />
+    <Compile Include="FezEngine\Mod\CacheModes.cs" />
     <Compile Include="FezEngine\Mod\FakeInputHelper.cs" />
     <Compile Include="FezEngine\Mod\CodeInputAll.cs" />
     <Compile Include="FezEngine\Mod\FEZModContentHelper.cs" />
@@ -116,6 +116,7 @@
     <Compile Include="FezEngine\Structure\Geometry\patch_ShaderInstancedIndexedPrimitives.cs" />
     <Compile Include="FezEngine\Structure\Geometry\IndexedVector4.cs" />
     <Compile Include="FezEngine\Components\InputManager.cs" />
+    <Compile Include="FezEngine\Services\patch_ContentManagerProvider.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

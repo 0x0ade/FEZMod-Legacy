@@ -79,7 +79,7 @@ namespace FezEngine.Mod {
         public string LastFEZVersion = FEZModEngine.FEZVersion.ToString();
         
         public MusicCacheMode MusicCache = MusicCacheMode.Default;
-        public bool CacheDisabled = false;
+        public DataCacheMode DataCache = DataCacheMode.Default;
         
         public FEZModSettings()
             : this(null) {

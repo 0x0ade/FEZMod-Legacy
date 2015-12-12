@@ -394,7 +394,7 @@ namespace FezGame.Mod {
                 }
                 tmpSettings = new FEZModSettings(FEZModEngine.Settings.FileDefault) {
                     MusicCache = FEZModEngine.Settings.MusicCache,
-                    CacheDisabled = FEZModEngine.Settings.CacheDisabled
+                    DataCache = FEZModEngine.Settings.DataCache
                 };
             };
             save();
@@ -428,9 +428,26 @@ namespace FezGame.Mod {
             };
             
             item = Menu.AddItem<string>("StreamAssetsDisk", save, false,
-                () => (tmpSettings.CacheDisabled) ? "CARTRIDGE" : "RAM",
+                delegate() {
+                    switch (tmpSettings.DataCache) {
+                        case DataCacheMode.Default:
+                            return "RAM";
+                        case DataCacheMode.Disabled:
+                            return "CARTRIDGE";
+                        case DataCacheMode.Smart:
+                            return "MAGIC";
+                    }
+                    return "UNKNOWN";
+                },
                 delegate(string lastValue, int change) {
-                    tmpSettings.CacheDisabled = !tmpSettings.CacheDisabled;
+                    int val = (int) tmpSettings.DataCache + change;
+                    if (val < (int) DataCacheMode.Default) {
+                        val = (int) DataCacheMode.Default;
+                    }
+                    if (val > (int) DataCacheMode.Smart) {
+                        val = (int) DataCacheMode.Smart;
+                    }
+                    tmpSettings.DataCache = (DataCacheMode) val;
                 }
             );
             item.UpperCase = true;
@@ -441,9 +458,9 @@ namespace FezGame.Mod {
                         case MusicCacheMode.Default:
                             return "DEFAULT MEDIUM";
                         case MusicCacheMode.Disabled:
-                            return "RAM";
-                        case MusicCacheMode.Enabled:
                             return "CARTRIDGE";
+                        case MusicCacheMode.Enabled:
+                            return "RAM";
                     }
                     return "UNKNOWN";
                 },

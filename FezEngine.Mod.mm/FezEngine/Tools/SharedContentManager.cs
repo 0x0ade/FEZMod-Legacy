@@ -1,12 +1,17 @@
 ﻿#pragma warning disable 436
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Content;
 using System.IO;
 using System.Xml;
 using FezEngine.Mod;
+using MonoMod;
 
 namespace FezEngine.Tools {
     public class SharedContentManager {
-
+        
+        [MonoModLinkTo(typeof(ContentManager), "Dispose")]
+        public extern void Dispose();
+        
         private class CommonContentManager {
 
             private extern T orig_ReadAsset<T>(string assetName) ;
