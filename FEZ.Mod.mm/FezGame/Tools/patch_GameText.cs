@@ -17,8 +17,8 @@
         
         public static extern string orig_GetStringRaw(string tag);
         public static string GetStringRaw(string tag) {
-            string str = TextPatchHelper.Game.Fallback[tag];
-            if (str != null) {
+            string str;
+            if (TextPatchHelper.Game.Fallback.TryGetValue(tag, out str)) {
                 return str;
             }
             str = orig_GetStringRaw(tag);

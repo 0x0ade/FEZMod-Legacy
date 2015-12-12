@@ -64,6 +64,12 @@
     <Reference Include="ContentSerialization">
       <HintPath>..\libs\ContentSerialization.dll</HintPath>
     </Reference>
+    <Reference Include="XnaWordWrapCore" Condition=" '$(XnaType)' == 'MonoGame' ">
+      <HintPath>..\libs\XnaWordWrapCore.dll</HintPath>
+    </Reference>
+    <Reference Include="XnaWordWrapCore" Condition=" '$(XnaType)' == 'FNA' ">
+      <HintPath>..\libs\XnaWordWrapCore.fna.dll</HintPath>
+    </Reference>
     <Reference Include="FEZ" Condition=" '$(XnaType)' == 'MonoGame' ">
       <HintPath>..\libs\FEZ.exe</HintPath>
     </Reference>
@@ -146,6 +152,9 @@
     <Compile Include="FezGame\Droid\FezDroid.cs" />
     <Compile Include="FezGame\Droid\FezDroidComponent.cs" />
     <Compile Include="FezGame\Components\patch_MenuBase.cs" />
+    <Compile Include="FezGame\Components\patch_ISpeechBubbleManager.cs" />
+    <Compile Include="FezGame\Components\patch_SpeechBubble.cs" />
+    <Compile Include="FezGame\Components\patch_GameNpcState.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
