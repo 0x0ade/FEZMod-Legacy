@@ -1,14 +1,52 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using FezEngine.Structure;
 using Microsoft.Xna.Framework;
 using FezEngine.Services;
 using FezEngine.Tools;
 using System.Reflection;
 using Common;
+using ContentSerialization;
+using ContentSerialization.Attributes;
 
 namespace FezEngine.Mod {
     
+    public abstract class FezModuleSettings {
+        [Serialization(Ignore = true)]
+        public string FileDefault;
+        
+        public FezModuleSettings()
+            : this(null) {
+        }
+        
+        public FezModuleSettings(string fileDefault) {
+            FileDefault = fileDefault;
+        }
+        
+        public static T Load<T>(string file, T alt) where T : FezModuleSettings {
+            if (!File.Exists(file)) {
+                alt.FileDefault = file;
+                return alt;
+            }
+            
+            T settings;
+            try {
+                settings = SdlSerializer.Deserialize<T>(file) ?? alt;
+            } catch {
+                settings = alt;
+            }
+            settings.FileDefault = file;
+            return settings;
+        }
+    }
+    public static class FezModuleSettingsExtensions {
+        public static void Save<T>(this T settings, string file = null) where T : FezModuleSettings {
+            file = file ?? settings.FileDefault;
+
+            SdlSerializer.Serialize<T>(file, settings);
+        }
+    }
     public abstract class FezModuleCore {
 
         public abstract string Name { get; }
@@ -36,6 +74,21 @@ namespace FezEngine.Mod {
 
     }
     
+    public class FEZModSettings : FezModuleSettings {
+        public string LastVersion = FEZModEngine.MODVersion.ToString();
+        public string LastFEZVersion = FEZModEngine.FEZVersion.ToString();
+        
+        public MusicCacheMode MusicCache = MusicCacheMode.Default;
+        public bool CacheDisabled = false;
+        
+        public FEZModSettings()
+            : this(null) {
+        }
+        
+        public FEZModSettings(string fileDefault)
+            : base(fileDefault) {
+        }
+    }
     public class FEZModEngine : FezModuleCore {
         
         public static Func<string> GetVersion;
@@ -84,11 +137,13 @@ namespace FezEngine.Mod {
         public static bool GetComponentsAsServices = false;
         public static bool HandleComponents = false;
         
-        public static MusicCacheMode MusicCache = MusicCacheMode.Default;
+        public static FEZModSettings Settings;
+        
         public static bool EnablePPHD = false;
         public static bool DumpResources = false;
         public static bool DumpAllResources = false;
-        public static bool CacheDisabled = false;
+        
+        
         public static Dictionary<string, Tuple<string, long, int>> AssetMetadata = new Dictionary<string, Tuple<string, long, int>>();
 
         public FEZModEngine() {
@@ -106,19 +161,7 @@ namespace FezEngine.Mod {
                 }
                 if (args[i] == "-nf" || args[i] == "--no-flat") {
                     ModLogger.Log("FEZMod.Engine", "Found -nf / --no-flat");
-                    ModLogger.Log("FEZMod.Engine", "OBSOLETE!");
-                }
-                if (args[i] == "-nc" || args[i] == "--no-cache") {
-                    ModLogger.Log("FEZMod.Engine", "Found -nc / --no-cache");
-                    CacheDisabled = true;
-                }
-                if (args[i] == "-mc" || args[i] == "--music-cache") {
-                    ModLogger.Log("FEZMod.Engine", "Found -mc / --music-cache");
-                    MusicCache = MusicCacheMode.Enabled;
-                }
-                if (args[i] == "-mnc" || args[i] == "--music-no-cache") {
-                    ModLogger.Log("FEZMod.Engine", "Found -mnc / --music-no-cache");
-                    MusicCache = MusicCacheMode.Disabled;
+                    ModLogger.Log("FEZMod.Engine", "REMOVED - DEAL WITH IT!");
                 }
             }
         }

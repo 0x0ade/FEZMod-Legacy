@@ -51,7 +51,7 @@ namespace FezGame.Speedrun {
         }
         
         public override void Initialize() {
-            Settings = FezModuleSettings.Load<FezSpeedrunSettings>("FEZMod.Speedrun.Settings.sdl") ?? new FezSpeedrunSettings("FEZMod.Speedrun.Settings.sdl");
+            Settings = FezModuleSettings.Load<FezSpeedrunSettings>("FEZMod.Speedrun.Settings.sdl", new FezSpeedrunSettings());
             
             if (Settings.SpeedrunMode) {
                 FEZMod.EnableFEZometric = false;

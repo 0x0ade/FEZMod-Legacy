@@ -19,12 +19,12 @@ namespace FezEngine.Services {
 
         public extern void orig_InitializeLibrary();
         public void InitializeLibrary() {
-            if (FEZModEngine.MusicCache == MusicCacheMode.Default) {
+            if (FEZModEngine.Settings.MusicCache == MusicCacheMode.Default) {
                 orig_InitializeLibrary();
                 return;
             }
             
-            if (FEZModEngine.MusicCache == MusicCacheMode.Enabled) {
+            if (FEZModEngine.Settings.MusicCache == MusicCacheMode.Enabled) {
                 #if FNA
                 //1.12's default behaviour is to cache.
                 orig_InitializeLibrary();
@@ -54,7 +54,7 @@ namespace FezEngine.Services {
                 }
                 
                 return;
-            } else if (FEZModEngine.MusicCache == MusicCacheMode.Disabled) {
+            } else if (FEZModEngine.Settings.MusicCache == MusicCacheMode.Disabled) {
                 //Skip caching / extracting completely.
                 return;
             }
@@ -91,10 +91,10 @@ namespace FezEngine.Services {
             }
             
             //Backport the MusicCache
-            if (FEZModEngine.MusicCache != MusicCacheMode.Default) {
+            if (FEZModEngine.Settings.MusicCache != MusicCacheMode.Default) {
                 OggStream oggStream = null;
                 try {
-                    if (FEZModEngine.MusicCache == MusicCacheMode.Enabled) {
+                    if (FEZModEngine.Settings.MusicCache == MusicCacheMode.Enabled) {
                         byte[] data = MusicCache[name.Replace(" ^ ", "\\").ToLowerInvariant()];
                         oggStream = new OggStream(new MemoryStream(data, 0, data.Length, false, true));
                     } else {

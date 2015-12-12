@@ -179,7 +179,7 @@ namespace FezEngine.Tools {
 
         public extern void orig_LoadEssentials();
         public void LoadEssentials() {
-            if (!FEZModEngine.CacheDisabled) {
+            if (!FEZModEngine.Settings.CacheDisabled) {
                 orig_LoadEssentials();
             } else {
                 cachedAssets = new Dictionary<string, byte[]>(0);
@@ -191,7 +191,7 @@ namespace FezEngine.Tools {
 
         public extern void orig_Preload();
         public void Preload() {
-            if (!FEZModEngine.CacheDisabled) {
+            if (!FEZModEngine.Settings.CacheDisabled) {
                 orig_Preload();
             } else {
                 ScanPackMetadata("Updates.pak");

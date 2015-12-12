@@ -9,8 +9,6 @@ using FezGame.Structure;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.IO;
-using ContentSerialization;
-using ContentSerialization.Attributes;
 using FezEngine.Structure;
 using EasyStorage;
 using System.Globalization;
@@ -24,41 +22,6 @@ using SDL2;
 #endif
 
 namespace FezGame.Mod {
-    
-    public abstract class FezModuleSettings {
-        [Serialization(Ignore = true)]
-        public string FileDefault;
-        
-        public FezModuleSettings()
-            : this(null) {
-        }
-        
-        public FezModuleSettings(string fileDefault) {
-            FileDefault = fileDefault;
-        }
-        
-        public static T Load<T>(string file) where T : FezModuleSettings {
-            if (!File.Exists(file)) {
-                return null;
-            }
-            
-            try {
-                T settings = SdlSerializer.Deserialize<T>(file);
-                settings.FileDefault = file;
-                return settings;
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
-    
-    public static class FezModuleSettingsExtensions {
-        public static void Save<T>(this T settings, string file = null) where T : FezModuleSettings {
-            file = file ?? settings.FileDefault;
-
-            SdlSerializer.Serialize<T>(file, settings);
-        }
-    }
     
     public abstract class FezModule : FezModuleCore {
 
@@ -87,7 +50,7 @@ namespace FezGame.Mod {
         public static List<FezModuleCore> Modules = new List<FezModuleCore>();
         private static Type[] ModuleTypes;
         private static Dictionary<string, MethodInfo>[] ModuleMethods;
-
+        
         public static bool IsAlwaysTurnable = false;
         public static float OverridePixelsPerTrixel = 0f;
         public static bool EnableDebugControls = false;
@@ -216,6 +179,22 @@ namespace FezGame.Mod {
             TextPatchHelper.Static.Fallback["FEZModMenu"] = "FEZMOD MENU";
             TextPatchHelper.Static.Fallback["StreamAssetsDisk"] = "Stream data from: {0}";
             TextPatchHelper.Static.Fallback["StreamMusicType"] = "Stream music from: {0}";
+            
+            //Load settings and handle updates early enough for FEZMod itself
+            FEZModEngine.Settings = FezModuleSettings.Load<FEZModSettings>("FEZMod.Settings.sdl", new FEZModSettings());
+            
+            if (new Version(FEZModEngine.Settings.LastVersion) < MODVersion) {
+                ModLogger.Log("FEZMod", "Handling FEZMod update from " + FEZModEngine.Settings.LastVersion);
+            }
+            
+            if (new Version(FEZModEngine.Settings.LastFEZVersion) < FEZVersion) {
+                ModLogger.Log("FEZMod", "Handling FEZ update from " + FEZModEngine.Settings.LastFEZVersion);
+            }
+            
+            FEZModEngine.Settings.LastVersion = MODVersion.ToString();
+            FEZModEngine.Settings.LastFEZVersion = FEZVersion.ToString();
+            
+            FEZModEngine.Settings.Save();
             
             PreInitializeModules();
         }
@@ -407,6 +386,19 @@ namespace FezGame.Mod {
         }
         
         public static void InitializeMenu(MenuBase mb) {
+            FEZModSettings tmpSettings = null;
+            Action save = delegate() {
+                if (tmpSettings != null) {
+                    FEZModEngine.Settings = tmpSettings;
+                    FEZModEngine.Settings.Save();
+                }
+                tmpSettings = new FEZModSettings(FEZModEngine.Settings.FileDefault) {
+                    MusicCache = FEZModEngine.Settings.MusicCache,
+                    CacheDisabled = FEZModEngine.Settings.CacheDisabled
+                };
+            };
+            save();
+            
             MenuItem item;
             
             Menu_SinceRestartNoteShown = 0f;
@@ -435,21 +427,17 @@ namespace FezGame.Mod {
                 }
             };
             
-            item = Menu.AddItem<string>("StreamAssetsDisk", delegate() {
-                    //onSelect
-                }, false,
-                () => (FEZModEngine.CacheDisabled) ? "CARTRIDGE" : "RAM",
+            item = Menu.AddItem<string>("StreamAssetsDisk", save, false,
+                () => (tmpSettings.CacheDisabled) ? "CARTRIDGE" : "RAM",
                 delegate(string lastValue, int change) {
-                    FEZModEngine.CacheDisabled = !FEZModEngine.CacheDisabled;
+                    tmpSettings.CacheDisabled = !tmpSettings.CacheDisabled;
                 }
             );
             item.UpperCase = true;
             
-            item = Menu.AddItem<string>("StreamMusicType", delegate() {
-                    //onSelect
-                }, false,
+            item = Menu.AddItem<string>("StreamMusicType", save, false,
                 delegate() {
-                    switch (FEZModEngine.MusicCache) {
+                    switch (tmpSettings.MusicCache) {
                         case MusicCacheMode.Default:
                             return "DEFAULT MEDIUM";
                         case MusicCacheMode.Disabled:
@@ -460,14 +448,14 @@ namespace FezGame.Mod {
                     return "UNKNOWN";
                 },
                 delegate(string lastValue, int change) {
-                    int val = (int) FEZModEngine.MusicCache + change;
+                    int val = (int) tmpSettings.MusicCache + change;
                     if (val < (int) MusicCacheMode.Default) {
                         val = (int) MusicCacheMode.Default;
                     }
                     if (val > (int) MusicCacheMode.Enabled) {
                         val = (int) MusicCacheMode.Enabled;
                     }
-                    FEZModEngine.MusicCache = (MusicCacheMode) val;
+                    tmpSettings.MusicCache = (MusicCacheMode) val;
                 }
             );
             item.UpperCase = true;
