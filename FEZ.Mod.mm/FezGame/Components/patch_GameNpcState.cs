@@ -20,6 +20,7 @@ namespace FezGame.Components {
 	public class patch_GameNpcState : GameNpcState {
         
         public ISpeechBubbleManager SpeechManager { [MonoModIgnore] get; [MonoModIgnore] set; }
+        public IPlayerManager PlayerManager { [MonoModIgnore] get; [MonoModIgnore] set; }
         
         public patch_GameNpcState(Game game, NpcInstance npc)
             : base(game, npc) {
@@ -28,14 +29,14 @@ namespace FezGame.Components {
         
         private extern void orig_Talk();
         private void Talk() {
-            string oldSpeaker = ((patch_ISpeechBubbleManager) SpeechManager).Speaker;
-            ((patch_ISpeechBubbleManager) SpeechManager).Speaker = Npc.Name.ToUpperInvariant();
-            
-            //FIXME still doesn't make the text show up on first talk...
             orig_Talk();
             
-			if (!Npc.Talking) {
-                ((patch_ISpeechBubbleManager) SpeechManager).Speaker = oldSpeaker;
+            Action action = () => ((patch_ISpeechBubbleManager) SpeechManager).Speaker = Npc.Name.ToLowerInvariant();
+            
+            if (PlayerManager.Action == ActionType.WalkingTo) {
+                Waiters.Wait(() => PlayerManager.Action != ActionType.WalkingTo, action).AutoPause = true;
+            } else {
+                action();
             }
         }
         

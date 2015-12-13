@@ -39,7 +39,15 @@ namespace FezEngine.Tools {
             if (FEZModEngine.EnablePPHD) {
                 viewScale = 1f;
             } else {
-                viewScale = ((float) device.Viewport.Width / 1280f + (float) device.Viewport.Height / 720f) / 2f;
+                float scale = (float) backBufferWidth / (float) backBufferHeight;
+                if (scale > (16f/9f)) {
+                    viewScale = (float) device.Viewport.Height / (1280f * scale);
+                } else {
+                    viewScale = (float) device.Viewport.Width / (720f * scale);
+                }
+                if (viewScale < 1f) {
+                    viewScale = 1f;
+                }
             }
         }
         

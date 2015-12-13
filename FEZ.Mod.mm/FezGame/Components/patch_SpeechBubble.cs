@@ -142,7 +142,7 @@ namespace FezGame.Components {
             orig_Initialize();
             
             textColor = Color.White;
-            textSecondaryColor = new Color(1f, 1f, 1f, 0.7f);
+            textSecondaryColor = new Color(1f, 1f, 1f, 0.8f);
             ColorBG = Color.Black;
         }
         
@@ -177,7 +177,6 @@ namespace FezGame.Components {
         private extern void orig_OnTextChanged(bool update);
         private void OnTextChanged(bool update) {
             //Holy decompiler code.
-            float num = 2;
             string a = textString;
             textString = originalString;
             
@@ -185,18 +184,19 @@ namespace FezGame.Components {
             SpriteFont spriteFontSpeaker = (Font != SpeechFont.Pixel) ? zuishFont : FontManager.Small;
             if (Font == SpeechFont.Zuish) {
                 textString = textString.Replace(" ", "  ");
+                textSpeaker = textSpeaker.ToUpperInvariant();
             }
-            float fontScale = (!Culture.IsCJK || Font != SpeechFont.Pixel) ? 1 : FontManager.SmallFactor;
+            float fontScale = (!Culture.IsCJK || Font != SpeechFont.Pixel) ? 1f : FontManager.SmallFactor;
             float num3 = 0;
             if (Font != SpeechFont.Zuish) {
                 float num4 = (!update) ? 0.85f : 0.9f;
-                float num5 = (float) GraphicsDevice.Viewport.Width / (1280 * GraphicsDevice.GetViewScale());
+                float num5 = (float) GraphicsDevice.Viewport.Width / (1280f * GraphicsDevice.GetViewScale());
                 num3 = (Origin - CameraManager.InterpolatedCenter).Dot(CameraManager.Viewpoint.RightVector());
-                float num6 = (GraphicsDevice.DisplayMode.Width >= 1280) ? (Math.Max(-num3 * 16 * CameraManager.PixelsPerTrixel + 1280 * num5 / 2 * num4, 50) / (CameraManager.PixelsPerTrixel / 2)) : (Math.Max(-num3 * 16 * CameraManager.PixelsPerTrixel + 640 * num4, 50) * 0.6666667f);
+                float num6 = (GraphicsDevice.DisplayMode.Width >= 1280f) ? (Math.Max(-num3 * 16f * CameraManager.PixelsPerTrixel + 1280f * num5 / 2f * num4, 50f) / (CameraManager.PixelsPerTrixel / 2f)) : (Math.Max(-num3 * 16f * CameraManager.PixelsPerTrixel + 640f * num4, 50f) * 0.6666667f);
                 if (GameState.InMap) {
-                    num6 = 500;
+                    num6 = 500f;
                 }
-                num6 = Math.Max(num6, 70);
+                num6 = Math.Max(num6, 70f);
                 List<GlyphTextRenderer.FilledInGlyph> list;
                 string text = GTR.FillInGlyphs(textString, out list);
                 if (Culture.IsCJK) {
@@ -250,26 +250,50 @@ namespace FezGame.Components {
                 value = GTR.MeasureWithGlyphs(spriteFont, textString, fontScale, out flag3);
                 flag3 = flag4;
             }
-            float scaleFactor = 1;
+            float scaleFactor = 1f;
             if (Culture.IsCJK && Font == SpeechFont.Pixel) {
                 scaleFactor = 2f;
             }
-            scalableMiddleSize = value + Vector2.One * 4 * 2 * scaleFactor + Vector2.UnitX * 4 * 2 * scaleFactor;
+            scalableMiddleSize = value + Vector2.One * 4f * 2f * scaleFactor + Vector2.UnitX * 4f * 2f * scaleFactor;
             if (Font == SpeechFont.Zuish) {
-                scalableMiddleSize += Vector2.UnitY * 2;
+                scalableMiddleSize += Vector2.UnitY * 2f;
             }
+            
+            Vector2 textMainSize = new Vector2(scalableMiddleSize.X, scalableMiddleSize.Y);
+            
+            float fontScaleSpeaker = fontScale * 0.5f;
+            int speakerHeight = 0;
+            int speakerOffset = 0;
+            int speakerHeightAdded = 0;
+            if (textSpeaker != null) {
+                speakerHeight = (int) spriteFontSpeaker.MeasureString(textSpeaker).Y;
+                speakerHeightAdded += 4;
+                if (Font != SpeechFont.Pixel) {
+                    speakerOffset += 2;
+                }
+                scalableMiddleSize.Y += speakerHeightAdded;
+            }
+            
             int width = (int) scalableMiddleSize.X;
             int height = (int) scalableMiddleSize.Y;
+            
             if (Culture.IsCJK && Font == SpeechFont.Pixel) {
                 fontScale *= 2f;
+                fontScaleSpeaker *= 2f;
                 width *= 2;
                 height *= 2;
             }
-            Vector2 vector = scalableMiddleSize;
+            if (textSpeaker != null && Font == SpeechFont.Pixel) {
+                fontScale *= 2f;
+                fontScaleSpeaker *= 2f;
+                width *= 2;
+                height *= 2;
+            }
             if (text != null) {
                 text.Unhook();
                 text.Dispose();
             }
+            
             text = new RenderTarget2D(GraphicsDevice, width, height, false, GraphicsDevice.PresentationParameters.BackBufferFormat, GraphicsDevice.PresentationParameters.DepthStencilFormat, 0, RenderTargetUsage.PreserveContents);
             GraphicsDevice.SetRenderTarget(text);
             GraphicsDevice.PrepareDraw();
@@ -281,13 +305,15 @@ namespace FezGame.Components {
                 spriteBatch.BeginPoint();
             }
             if (Font == SpeechFont.Pixel) {
-                GTR.DrawString(spriteBatch, spriteFont, textString, (vector / 2 - value / 2 + value2).Round(), textColor, fontScale);
+                GTR.DrawString(spriteBatch, spriteFont, textString, (textMainSize / 2 - value / 2 + value2).Round(), textColor, fontScale);
             } else {
-                spriteBatch.DrawString(spriteFont, textString, vector / 2 - value / 2, textColor, 0, Vector2.Zero, scalableMiddleSize / vector, SpriteEffects.None, 0);
+                spriteBatch.DrawString(spriteFont, textString, textMainSize / 2 - value / 2, textColor, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
             }
+            
             if (textSpeaker != null) {
-                GTR.DrawString(spriteBatch, FontManager.Small, textSpeaker, new Vector2(0.1f, 0f), textSecondaryColor, fontScale / 2f);
+                GTR.DrawString(spriteBatch, spriteFontSpeaker, textSpeaker, new Vector2((textMainSize / 2 - value / 2 + value2).Round().X, height - speakerHeight * fontScaleSpeaker - speakerOffset), textSecondaryColor, fontScaleSpeaker);
             }
+            
             spriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
             if (Font == SpeechFont.Zuish) {
@@ -296,7 +322,7 @@ namespace FezGame.Components {
                 scalableMiddleSize.Y = x;
             }
             if (Culture.IsCJK && Font == SpeechFont.Pixel) {
-                scalableMiddleSize /= num;
+                scalableMiddleSize /= 2f;
             }
             scalableMiddleSize /= 16f;
             scalableMiddleSize -= Vector2.One;
@@ -308,40 +334,6 @@ namespace FezGame.Components {
                 spriteFont.LineSpacing -= 8;
             }
             
-            recolorBG();
-        }
-        
-        private void recolorBG(Group group, Texture2D tex) {
-            RenderTarget2D rt;
-            if (group.Texture is RenderTarget2D) {
-                rt = (RenderTarget2D) group.Texture;
-            } else {
-                group.Texture = rt = new RenderTarget2D(GraphicsDevice, tex.Width, tex.Height, false, GraphicsDevice.PresentationParameters.BackBufferFormat, GraphicsDevice.PresentationParameters.DepthStencilFormat, 0, RenderTargetUsage.PreserveContents);
-            }
-            
-            RenderTargetBinding[] prevRT = GraphicsDevice.GetRenderTargets();
-            
-            GraphicsDevice.SetRenderTarget(rt);
-            GraphicsDevice.PrepareDraw();
-            GraphicsDevice.Clear(ClearOptions.Target, ColorEx.TransparentWhite, 1, 0);
-            
-            spriteBatch.BeginPoint();
-            spriteBatch.Draw(tex, new Rectangle(0, 0, tex.Width, tex.Height), ColorBG);
-            
-            spriteBatch.End();
-            if (prevRT.Length > 0) {
-                if (prevRT[0].RenderTarget is RenderTarget2D) {
-                    GraphicsDevice.SetRenderTarget((RenderTarget2D) prevRT[0].RenderTarget);
-                } else {
-                    GraphicsDevice.SetRenderTarget((RenderTargetCube) prevRT[0].RenderTarget, prevRT[0].CubeMapFace);
-                }
-            } else {
-                GraphicsDevice.SetRenderTarget(null);
-            }
-        }
-        
-        private void recolorBG() {
-            //FIXME flicker
             if (lastColorBG != ColorBG) {
                 lastColorBG = ColorBG;
                 
@@ -356,14 +348,35 @@ namespace FezGame.Components {
             }
         }
         
+        private void recolorBG(Group group, Texture2D tex) {
+            RenderTarget2D rt;
+            if (group.Texture is RenderTarget2D) {
+                rt = (RenderTarget2D) group.Texture;
+            } else {
+                group.Texture = rt = new RenderTarget2D(GraphicsDevice, tex.Width, tex.Height, false, GraphicsDevice.PresentationParameters.BackBufferFormat, GraphicsDevice.PresentationParameters.DepthStencilFormat, 0, RenderTargetUsage.PreserveContents);
+            }
+            
+            GraphicsDevice.SetRenderTarget(rt);
+            GraphicsDevice.PrepareDraw();
+            GraphicsDevice.Clear(ClearOptions.Target, ColorEx.TransparentWhite, 1, 0);
+            
+            spriteBatch.BeginPoint();
+            spriteBatch.Draw(tex, new Rectangle(0, 0, tex.Width, tex.Height), ColorBG);
+            
+            spriteBatch.End();
+            GraphicsDevice.SetRenderTarget(null);
+        }
+        
         public extern void orig_Draw(GameTime gameTime);
         public override void Draw(GameTime gameTime) {
-            recolorBG();
-            
             orig_Draw(gameTime);
             
-            if (FezMath.AlmostEqual(sinceShown, 0f) && !show && !changingText) {
-                Speaker = null;
+            bool flag = show;
+			if (show && changingText) {
+				flag = false;
+			}
+			if (sinceShown == 0 && !flag && !changingText) {
+                textSpeaker = null;
             }
         }
         
