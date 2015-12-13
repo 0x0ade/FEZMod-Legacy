@@ -105,18 +105,18 @@ namespace FezGame.Components {
 
         public Color DefaultForeground {
             get {
-                return LevelEditorOptions.Instance.DefaultForeground;
+                return FezEditor.Settings.DefaultForeground;
             }
             set {
-                LevelEditorOptions.Instance.DefaultForeground = value;
+                FezEditor.Settings.DefaultForeground = value;
             }
         }
         public Color DefaultBackground {
             get {
-                return LevelEditorOptions.Instance.DefaultBackground;
+                return FezEditor.Settings.DefaultBackground;
             }
             set {
-                LevelEditorOptions.Instance.DefaultBackground = value;
+                FezEditor.Settings.DefaultBackground = value;
             }
         }
 
@@ -141,8 +141,6 @@ namespace FezGame.Components {
 
         public override void Initialize() {
             base.Initialize();
-
-            LevelEditorOptions.Initialize();
 
             Scheduled = new List<Action>();
 
@@ -1905,13 +1903,13 @@ namespace FezGame.Components {
             TopBarWidget.Widgets.Add(button = new ButtonWidget(Game, "Settings"));
             button.Background.A = 0;
             button.Widgets.Add(new ButtonWidget(Game, "Invert theme", delegate() {
-                LevelEditorOptions.Instance.DefaultBackground.R = (byte) (255 - LevelEditorOptions.Instance.DefaultBackground.R);
-                LevelEditorOptions.Instance.DefaultBackground.G = (byte) (255 - LevelEditorOptions.Instance.DefaultBackground.G);
-                LevelEditorOptions.Instance.DefaultBackground.B = (byte) (255 - LevelEditorOptions.Instance.DefaultBackground.B);
+                FezEditor.Settings.DefaultBackground.R = (byte) (255 - FezEditor.Settings.DefaultBackground.R);
+                FezEditor.Settings.DefaultBackground.G = (byte) (255 - FezEditor.Settings.DefaultBackground.G);
+                FezEditor.Settings.DefaultBackground.B = (byte) (255 - FezEditor.Settings.DefaultBackground.B);
 
-                LevelEditorOptions.Instance.DefaultForeground.R = (byte) (255 - LevelEditorOptions.Instance.DefaultForeground.R);
-                LevelEditorOptions.Instance.DefaultForeground.G = (byte) (255 - LevelEditorOptions.Instance.DefaultForeground.G);
-                LevelEditorOptions.Instance.DefaultForeground.B = (byte) (255 - LevelEditorOptions.Instance.DefaultForeground.B);
+                FezEditor.Settings.DefaultForeground.R = (byte) (255 - FezEditor.Settings.DefaultForeground.R);
+                FezEditor.Settings.DefaultForeground.G = (byte) (255 - FezEditor.Settings.DefaultForeground.G);
+                FezEditor.Settings.DefaultForeground.B = (byte) (255 - FezEditor.Settings.DefaultForeground.B);
 
                 foreach (GuiWidget widget in Widgets) {
                     widget.UpdateTheme();
@@ -1919,7 +1917,7 @@ namespace FezGame.Components {
             }));
             CheckboxWidget checkboxShowAOTooltips;
             button.Widgets.Add(checkboxShowAOTooltips = new CheckboxWidget(Game, "ArtObject tooltips") {
-                RefreshValue = () => LevelEditorOptions.Instance.TooltipArtObjectInfo
+                RefreshValue = () => FezEditor.Settings.TooltipArtObjectInfo
             });
             TextFieldWidget fieldBackupHistory;
             button.Widgets.Add(new ContainerWidget(Game, new GuiWidget[] {
@@ -1929,7 +1927,7 @@ namespace FezGame.Components {
                     Position = new Vector2(0f, 0f)
                 },
                 fieldBackupHistory = new TextFieldWidget(Game) {
-                    RefreshValue = () => LevelEditorOptions.Instance.BackupHistory.ToString(),
+                    RefreshValue = () => FezEditor.Settings.BackupHistory.ToString(),
                     Size = new Vector2(48f, 24f),
                     Position = new Vector2(144f, 0f)
                 }
@@ -1937,9 +1935,9 @@ namespace FezGame.Components {
                 Size = new Vector2(192f, 24f)
             });
             button.Widgets.Add(new ButtonWidget(Game, "Save", delegate() {
-                LevelEditorOptions.Instance.TooltipArtObjectInfo = checkboxShowAOTooltips.Checked;
-                LevelEditorOptions.Instance.BackupHistory = int.Parse(fieldBackupHistory.Text);
-                LevelEditorOptions.Instance.Save();
+                FezEditor.Settings.TooltipArtObjectInfo = checkboxShowAOTooltips.Checked;
+                FezEditor.Settings.BackupHistory = int.Parse(fieldBackupHistory.Text);
+                FezEditor.Settings.Save();
             }));
 
             //INFO
@@ -2020,7 +2018,7 @@ namespace FezGame.Components {
             }
 
             HoveredAO = null;
-            if (LevelEditorOptions.Instance.TooltipArtObjectInfo) {
+            if (FezEditor.Settings.TooltipArtObjectInfo) {
                 int aosCount = LevelManager.ArtObjects.Count;
                 LevelManager.ArtObjects.CopyTo(tmpAOs.Length < aosCount ? (tmpAOs = new KeyValuePair<int, ArtObjectInstance>[aosCount]) : tmpAOs, 0);
                 for (int i = 0; i < aosCount; i++) {
@@ -2119,12 +2117,14 @@ namespace FezGame.Components {
                     return;
                 }
 
+                string filePath = ("other textures/map_screens/" + LevelManager.Name).Externalize() + ".png";
+                Directory.GetParent(filePath).Create();
                 TRM.Resolve(ThumbnailRT.Target, false);
                 using (System.Drawing.Bitmap bitmap = ThumbnailRT.Target.ToBitmap()) {
                     //float x = ThumbnailRT.Target.Width / 2 - ThumbnailSize / 2f;
                     //float y = ThumbnailRT.Target.Height / 2 - ThumbnailSize / 2f;
                     using (System.Drawing.Bitmap thumbnail = bitmap.Clone(new System.Drawing.Rectangle(ThumbnailX, ThumbnailY, ThumbnailSize, ThumbnailSize), bitmap.PixelFormat)) {
-                        using (FileStream fs = new FileStream(("other textures/map_screens/" + LevelManager.Name).Externalize() + ".png", FileMode.Create)) {
+                        using (FileStream fs = new FileStream(filePath, FileMode.Create)) {
                             thumbnail.Save(fs, ImageFormat.Png);
                         }
                     }
@@ -2325,22 +2325,23 @@ namespace FezGame.Components {
             string fileExtension = (binary ? "fmb" : "xml");
             string filePath = filePath_ + fileExtension;
             FileInfo file = new FileInfo(filePath);
+            file.Directory.Create();
 
             Action save = delegate() {
                 if (file.Exists) {
-                    FileInfo fileBackupOldest = new FileInfo(filePath_ + LevelEditorOptions.Instance.BackupHistory + "." + fileExtension);
+                    FileInfo fileBackupOldest = new FileInfo(filePath_ + FezEditor.Settings.BackupHistory + "." + fileExtension);
                     if (fileBackupOldest.Exists) {
                         fileBackupOldest.Delete();
                     }
 
-                    for (int i = LevelEditorOptions.Instance.BackupHistory - 1; i > 0; i--) {
+                    for (int i = FezEditor.Settings.BackupHistory - 1; i > 0; i--) {
                         FileInfo fileBackup = new FileInfo(filePath_ + i + "." + fileExtension);
                         if (fileBackup.Exists) {
                             fileBackup.MoveTo(filePath_ + (i+1) + "." + fileExtension);
                         }
                     }
 
-                    if (LevelEditorOptions.Instance.BackupHistory <= 0) {
+                    if (FezEditor.Settings.BackupHistory <= 0) {
                         file.Delete();
                     } else {
                         file.MoveTo(filePath_ + "1." + fileExtension);

@@ -233,8 +233,12 @@ namespace FezGame.Mod.Gui {
                 return;
             }
 
-            PrevDefaultForeground = foreground_ = GuiHandler.DefaultForeground;
-            PrevDefaultBackground = Background = GuiHandler.DefaultBackground;
+            PrevDefaultForeground.R = foreground_.R = GuiHandler.DefaultForeground.R;
+            PrevDefaultForeground.G = foreground_.G = GuiHandler.DefaultForeground.G;
+            PrevDefaultForeground.B = foreground_.B = GuiHandler.DefaultForeground.B;
+            PrevDefaultBackground.R = Background.R = GuiHandler.DefaultBackground.R;
+            PrevDefaultBackground.G = Background.G = GuiHandler.DefaultBackground.G;
+            PrevDefaultBackground.B = Background.B = GuiHandler.DefaultBackground.B;
         }
 
         public virtual void Refresh() {

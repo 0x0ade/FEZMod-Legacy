@@ -392,10 +392,7 @@ namespace FezGame.Mod {
                     FEZModEngine.Settings = tmpSettings;
                     FEZModEngine.Settings.Save();
                 }
-                tmpSettings = new FEZModSettings(FEZModEngine.Settings.FileDefault) {
-                    MusicCache = FEZModEngine.Settings.MusicCache,
-                    DataCache = FEZModEngine.Settings.DataCache
-                };
+                tmpSettings = FEZModEngine.Settings.ShallowClone();
             };
             save();
             

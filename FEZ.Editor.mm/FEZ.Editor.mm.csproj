@@ -103,7 +103,6 @@
     <Compile Include="FezGame\Editor\FezEditor.cs" />
     <Compile Include="FezGame\Components\LevelEditor.cs" />
     <Compile Include="FezGame\Components\ILevelEditor.cs" />
-    <Compile Include="FezGame\Components\LevelEditorOptions.cs" />
     <Compile Include="FezGame\Mod\Gui\TrileButtonWidget.cs" />
     <Compile Include="FezGame\Mod\Gui\TrilePickerWidget.cs" />
     <Compile Include="FezGame\Editor\EditorUtils.cs" />

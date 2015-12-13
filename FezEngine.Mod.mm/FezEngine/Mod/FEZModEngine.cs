@@ -16,14 +16,6 @@ namespace FezEngine.Mod {
         [Serialization(Ignore = true)]
         public string FileDefault;
         
-        public FezModuleSettings()
-            : this(null) {
-        }
-        
-        public FezModuleSettings(string fileDefault) {
-            FileDefault = fileDefault;
-        }
-        
         public static T Load<T>(string file, T alt) where T : FezModuleSettings {
             if (!File.Exists(file)) {
                 alt.FileDefault = file;
@@ -39,12 +31,20 @@ namespace FezEngine.Mod {
             settings.FileDefault = file;
             return settings;
         }
+        
+        public FezModuleSettings ShallowCloneThis() {
+            return (FezModuleSettings) MemberwiseClone();
+        }
     }
     public static class FezModuleSettingsExtensions {
         public static void Save<T>(this T settings, string file = null) where T : FezModuleSettings {
             file = file ?? settings.FileDefault;
 
             SdlSerializer.Serialize<T>(file, settings);
+        }
+        
+        public static T ShallowClone<T>(this T settings) where T : FezModuleSettings {
+            return (T) settings.ShallowCloneThis();
         }
     }
     public abstract class FezModuleCore {
@@ -80,14 +80,6 @@ namespace FezEngine.Mod {
         
         public MusicCacheMode MusicCache = MusicCacheMode.Default;
         public DataCacheMode DataCache = DataCacheMode.Default;
-        
-        public FEZModSettings()
-            : this(null) {
-        }
-        
-        public FEZModSettings(string fileDefault)
-            : base(fileDefault) {
-        }
     }
     public class FEZModEngine : FezModuleCore {
         

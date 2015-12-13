@@ -5,13 +5,25 @@ using FezEngine.Tools;
 using Microsoft.Xna.Framework;
 
 namespace FezGame.Editor {
+    
+    public class FezEditorSettings : FezModuleSettings {
+        public Color DefaultForeground = Color.White;
+        public Color DefaultBackground = new Color(0f, 0f, 0f, 0.75f);
+
+        public bool TooltipArtObjectInfo = false;
+        
+        public int BackupHistory = 5;
+    }
+    
     public class FezEditor : FezModule {
 
         public override string Name { get { return "FEZMod.FezEditor"; } }
         public override string Author { get { return "AngelDE98 & JAFM contributors"; } }
         public override string Version { get { return FEZMod.Version; } }
+        
+        public static FezEditorSettings Settings;
 
-        public bool InEditor = false;
+        public static bool InEditor = false;
 
         public FezEditor() {
         }
@@ -34,6 +46,10 @@ namespace FezGame.Editor {
                 }
             }
         }
+        
+        public override void Initialize() {
+            Settings = FezModuleSettings.Load<FezEditorSettings>("FEZMod.Editor.Settings.sdl", new FezEditorSettings());
+        }
 
         public override void LoadComponents(Fez game) {
             if (InEditor) {
@@ -48,5 +64,6 @@ namespace FezGame.Editor {
         }
 
     }
+    
 }
 

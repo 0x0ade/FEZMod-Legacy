@@ -23,14 +23,6 @@ namespace FezGame.Speedrun {
 
         public bool ToolAssistedSpeedrun = false;
         public bool BOTEnabled = false;//Broken Optimizing Thing
-        
-        public FezSpeedrunSettings()
-            : this(null) {
-        }
-        
-        public FezSpeedrunSettings(string fileDefault)
-            : base(fileDefault) {
-        }
     }
     
     public class FezSpeedrun : FezModule {
@@ -105,14 +97,7 @@ namespace FezGame.Speedrun {
                     Settings = tmpSettings;
                     Settings.Save();
                 }
-                tmpSettings = new FezSpeedrunSettings(Settings.FileDefault) {
-                    SpeedrunMode = Settings.SpeedrunMode,
-                    Display = Settings.Display,
-                    LiveSplitPort = Settings.LiveSplitPort,
-                    
-                    ToolAssistedSpeedrun = Settings.ToolAssistedSpeedrun,
-                    BOTEnabled = Settings.BOTEnabled
-                };
+                tmpSettings = Settings.ShallowClone();
             };
             save();
             
