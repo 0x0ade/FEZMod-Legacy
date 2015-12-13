@@ -13,6 +13,8 @@ namespace FezEngine.Tools {
         #if FNA
         private static extern void orig_SetupViewport(this GraphicsDevice device);
         private static void SetupViewport(this GraphicsDevice device) {
+            int backBufferWidth = device.PresentationParameters.BackBufferWidth;
+            int backBufferHeight = device.PresentationParameters.BackBufferHeight;
             //FEZ 1.12 disables letterboxing (at least during the beta)
             orig_SetupViewport(device);
         #else

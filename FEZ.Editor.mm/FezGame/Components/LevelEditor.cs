@@ -56,6 +56,12 @@ namespace FezGame.Components {
         public ITargetRenderingManager TRM { get; set; }
 
         public static LevelEditor Instance;
+        
+        #if !FNA
+        public static readonly float WheelTurnsFactor = 1f;
+        #else
+        public static readonly float WheelTurnsFactor = 1f / 64f;
+        #endif
 
         public SpriteBatch SpriteBatch { get; set; }
         public GlyphTextRenderer GTR { get; set; }
@@ -2088,7 +2094,7 @@ namespace FezGame.Components {
                 TrileId = HoveredTrile.TrileId;
             }
 
-            CameraManager.PixelsPerTrixel = Math.Max(0.25f, CameraManager.PixelsPerTrixel + 0.25f * MouseState.WheelTurns);
+            CameraManager.PixelsPerTrixel = Math.Max(0.25f, CameraManager.PixelsPerTrixel + 0.25f * MouseState.WheelTurns * WheelTurnsFactor);
 
             if (string.IsNullOrEmpty(TooltipWidget.Label)) {
                 if (TooltipWidgetAdded) {
@@ -2201,7 +2207,7 @@ namespace FezGame.Components {
                         DraggingWidget = widget;
                         DraggingWidget.Dragging(gameTime, MouseButtonStates.DragStarted);
                     }
-                    widget.Scroll(gameTime, MouseState.WheelTurns);
+                    widget.Scroll(gameTime, (int) (MouseState.WheelTurns * WheelTurnsFactor));
                 }
                 cursorOnWidget = cursorOnWidget || cursorOnChild;
             }
