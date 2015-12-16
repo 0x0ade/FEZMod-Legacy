@@ -441,8 +441,8 @@ namespace FezGame.Mod {
                     if (val < (int) DataCacheMode.Default) {
                         val = (int) DataCacheMode.Default;
                     }
-                    if (val > (int) DataCacheMode.Smart) {
-                        val = (int) DataCacheMode.Smart;
+                    if (val > (int) DataCacheMode.Disabled) {
+                        val = (int) DataCacheMode.Disabled;
                     }
                     tmpSettings.DataCache = (DataCacheMode) val;
                 }

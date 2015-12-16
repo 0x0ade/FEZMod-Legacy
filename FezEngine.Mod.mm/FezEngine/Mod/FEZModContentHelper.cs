@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using FezEngine.Tools;
 using Microsoft.Xna.Framework;
+using System;
 
 namespace FezEngine.Mod {
     public struct CacheKey_RGB_A {

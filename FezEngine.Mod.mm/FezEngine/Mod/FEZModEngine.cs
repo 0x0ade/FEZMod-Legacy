@@ -9,6 +9,7 @@ using System.Reflection;
 using Common;
 using ContentSerialization;
 using ContentSerialization.Attributes;
+using System.Runtime.CompilerServices;
 
 namespace FezEngine.Mod {
     
@@ -156,6 +157,15 @@ namespace FezEngine.Mod {
                     ModLogger.Log("FEZMod.Engine", "REMOVED - DEAL WITH IT!");
                 }
             }
+        }
+        
+        [MethodImpl((MethodImplOptions) 0x0100 /*AggressiveInlining*/)]
+        public static void InvokeGL(Action a) {
+            #if !FNA
+            a();
+            #else
+            DrawActionScheduler.Schedule(a);
+            #endif
         }
         
     }

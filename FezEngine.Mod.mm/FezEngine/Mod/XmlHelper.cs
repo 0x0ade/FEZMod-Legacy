@@ -478,7 +478,9 @@ namespace FezEngine.Mod {
                 int height = int.Parse(elem.GetAttribute("height"));
                 ani.FrameWidth = int.Parse(elem.GetAttribute("actualWidth"));
                 ani.FrameHeight = int.Parse(elem.GetAttribute("actualHeight"));
-                ani.Texture = cm.Load<Texture2D>(elem.OwnerDocument.DocumentElement.GetAttribute("assetName") + ".ani");
+                FEZModEngine.InvokeGL(delegate() {
+                    ani.Texture = cm.Load<Texture2D>(elem.OwnerDocument.DocumentElement.GetAttribute("assetName") + ".ani");
+                });
                 ani.Offsets = new Rectangle[elem.FirstChild.ChildNodes.Count];
                 float[] durations = new float[elem.FirstChild.ChildNodes.Count];
                 for (int i = 0; i < elem.FirstChild.ChildNodes.Count; i++) {
@@ -495,7 +497,9 @@ namespace FezEngine.Mod {
                 //DateTime timeStart = DateTime.UtcNow;
                 ArtObject ao = (ArtObject) obj;
                 ao.Name = elem.GetAttribute("name");
-                ao.Cubemap = cm.Load<Texture2D>(elem.OwnerDocument.DocumentElement.GetAttribute("assetName") + "-fm-Texture2D").MixAlpha(cm.Load<Texture2D>(elem.OwnerDocument.DocumentElement.GetAttribute("assetName") + "_alpha"));
+                FEZModEngine.InvokeGL(delegate() {
+                    ao.Cubemap = cm.Load<Texture2D>(elem.OwnerDocument.DocumentElement.GetAttribute("assetName") + "-fm-Texture2D").MixAlpha(cm.Load<Texture2D>(elem.OwnerDocument.DocumentElement.GetAttribute("assetName") + "_alpha"));
+                });
                 ao.Size = (Vector3) elem.ChildNodes[0].FirstChild.Deserialize();
                 foreach (XmlNode childNode in elem.ChildNodes) {
                     if (childNode.Name == "ShaderInstancedIndexedPrimitives") {
@@ -510,7 +514,9 @@ namespace FezEngine.Mod {
             }
 
             if (obj is TrileSet) {
-                ((TrileSet) obj).TextureAtlas = cm.Load<Texture2D>(elem.OwnerDocument.DocumentElement.GetAttribute("assetName") + "-fm-Texture2D").MixAlpha(cm.Load<Texture2D>(elem.OwnerDocument.DocumentElement.GetAttribute("assetName") + "_alpha"));
+                FEZModEngine.InvokeGL(delegate() {
+                    ((TrileSet) obj).TextureAtlas = cm.Load<Texture2D>(elem.OwnerDocument.DocumentElement.GetAttribute("assetName") + "-fm-Texture2D").MixAlpha(cm.Load<Texture2D>(elem.OwnerDocument.DocumentElement.GetAttribute("assetName") + "_alpha"));
+                });
             }
 
             MethodInfo onDeserialization = obj.GetType().GetMethod("OnDeserialization");
