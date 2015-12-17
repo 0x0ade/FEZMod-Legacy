@@ -125,11 +125,16 @@
     <Folder Include="FezEngine\Structure\" />
     <Folder Include="FezEngine\Services\" />
     <Folder Include="FezEngine\Structure\Geometry\" />
+    <Folder Include="Content\" />
   </ItemGroup>
   <ItemGroup>
     <!--ProjectReference Include="..\FEZ.Mod.mm\FEZ.Mod.mm.csproj">
       <Project>{1A401409-A56A-4930-9F0C-6215AC4408B8}</Project>
       <Name>FEZ.Mod.mm</Name>
     </ProjectReference-->
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Content\andknuckles.png" />
+    <EmbeddedResource Include="Content\andknuckles.xcf" />
   </ItemGroup>
 </Project>

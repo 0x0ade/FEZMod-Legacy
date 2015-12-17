@@ -7,6 +7,7 @@ using FezEngine.Services;
 using FezEngine.Mod;
 using Microsoft.Xna.Framework.Content;
 using MonoMod;
+using System.Reflection;
 
 namespace FezEngine.Tools {
     public class patch_MemoryContentManager : ContentManager {

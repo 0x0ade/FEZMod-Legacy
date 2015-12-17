@@ -236,6 +236,7 @@ namespace FezGame.Mod {
                 return;
             }
             ModLogger.Log("FEZMod", "Found referenced assembly "+assembly.GetName().Name);
+            assembly.ScanAssemblyMetadataForContent();
             foreach (Type type in assembly.GetTypes()) {
                 if (typeof(FezModuleCore).IsAssignableFrom(type) && !type.IsAbstract) {
                     PreInitializeModule(type);

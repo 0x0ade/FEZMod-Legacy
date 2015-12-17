@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using FezEngine.Tools;
 using Microsoft.Xna.Framework;
 using System;
+using System.Reflection;
 
 namespace FezEngine.Mod {
     public struct CacheKey_RGB_A {
@@ -121,6 +122,17 @@ namespace FezEngine.Mod {
             CacheMixAlpha[new CacheKey_RGB_A() { RGB = textureRGB, A = textureA }] = textureRGBA;
 
             return textureRGBA;
+        }
+        
+        public static void ScanAssemblyMetadata(this Assembly assembly) {
+            string[] resourceNames = assembly.GetManifestResourceNames();
+            for (int i = 0; i < resourceNames.Length; i++) {
+                if (!resourceNames[i].Contains("Content")) {
+                    break;
+                }
+                
+                //TODO actually map the files
+            }
         }
 
     }
