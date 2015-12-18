@@ -108,6 +108,8 @@
     <Compile Include="FezEngine\Mod\FEZModContentHelper.cs" />
     <Compile Include="FezEngine\Mod\LimitedStream.cs" />
     <Compile Include="FezEngine\Mod\XmlHelper.cs" />
+    <Compile Include="FezEngine\Mod\AssetMetadata.cs" />
+    <Compile Include="FezEngine\Mod\AssetDataCache.cs" />
     <Compile Include="FezEngine\Tools\patch_MemoryContentManager.cs" />
     <Compile Include="FezEngine\Tools\patch_ServiceHelper.cs" />
     <Compile Include="FezEngine\Tools\patch_SettingsManager.cs" />
@@ -132,9 +134,5 @@
       <Project>{1A401409-A56A-4930-9F0C-6215AC4408B8}</Project>
       <Name>FEZ.Mod.mm</Name>
     </ProjectReference-->
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Content\andknuckles.png" />
-    <EmbeddedResource Include="Content\andknuckles.xcf" />
   </ItemGroup>
 </Project>

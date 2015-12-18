@@ -81,6 +81,8 @@ namespace FezEngine.Mod {
         
         public MusicCacheMode MusicCache = MusicCacheMode.Default;
         public DataCacheMode DataCache = DataCacheMode.Default;
+        
+        public bool ShowADELogo = false;
     }
     public class FEZModEngine : FezModuleCore {
         
@@ -136,9 +138,6 @@ namespace FezEngine.Mod {
         public static bool DumpResources = false;
         public static bool DumpAllResources = false;
         
-        
-        public static Dictionary<string, Tuple<string, long, int>> AssetMetadata = new Dictionary<string, Tuple<string, long, int>>();
-
         public FEZModEngine() {
         }
 

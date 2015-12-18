@@ -21,15 +21,15 @@ namespace FezEngine.Tools {
         private static int assetNamesFromMetadata;
         private static int assetNamesFromCache;
         public static IEnumerable<string> get_AssetNames() {
-            if (assetNames == null || assetNamesFromMetadata != FEZModEngine.AssetMetadata.Count) {
+            if (assetNames == null || assetNamesFromMetadata != AssetMetadata.Map.Count) {
                 List<string> files = TraverseThrough("Resources");
-                List<string> assets = new List<string>(files.Count + FEZModEngine.AssetMetadata.Keys.Count);
+                List<string> assets = new List<string>(files.Count + AssetMetadata.Map.Keys.Count);
                 for (int i = 0; i < files.Count; i++) {
                     string file = files[i];
                     assets.Add(file.Substring(10, file.Length-14).Replace('/', '\\'));
                 }
-                assetNamesFromMetadata = FEZModEngine.AssetMetadata.Count;
-                foreach (string file in FEZModEngine.AssetMetadata.Keys) {
+                assetNamesFromMetadata = AssetMetadata.Map.Count;
+                foreach (string file in AssetMetadata.Map.Keys) {
                     if (assets.Contains(file)) {
                         continue;
                     }
@@ -167,13 +167,18 @@ namespace FezEngine.Tools {
                 return new MemoryStream(data);
             }
             
-            Tuple<string, long, int> metadata;
-            if (FEZModEngine.AssetMetadata.TryGetValue(assetName, out metadata)) {
-                FileStream packStream = File.OpenRead(metadata.Item1);
-                if (metadata.Item3 == 0) {
-                    return packStream;
+            AssetMetadata metadata;
+            if (AssetMetadata.Map.TryGetValue(assetName, out metadata)) {
+                Stream assetStream;
+                if (metadata.Assembly == null) {
+                    assetStream = File.OpenRead(metadata.File);
+                } else {
+                    assetStream = metadata.Assembly.GetManifestResourceStream(metadata.File);
                 }
-                LimitedStream ls = new LimitedStream(packStream, metadata.Item2, metadata.Item3);
+                if (metadata.Length == 0) {
+                    return assetStream;
+                }
+                LimitedStream ls = new LimitedStream(assetStream, metadata.Offset, metadata.Length);
                 if (FEZModEngine.Settings.DataCache == DataCacheMode.Smart) {
                     AssetDataCache.Temporary[assetName] = new CachedAssetData() {
                         Data = ls.ToArray(),
@@ -200,7 +205,7 @@ namespace FezEngine.Tools {
                 return true;
             }
             
-            if (FEZModEngine.AssetMetadata.ContainsKey(assetName.ToLowerInvariant().Replace('/', '\\'))) {
+            if (AssetMetadata.Map.ContainsKey(assetName.ToLowerInvariant().Replace('/', '\\'))) {
                 return true;
             }
 
@@ -247,8 +252,8 @@ namespace FezEngine.Tools {
                     for (int i = 0; i < count; i++) {
                         string file = packReader.ReadString();
                         int length = packReader.ReadInt32();
-                        if (!FEZModEngine.AssetMetadata.ContainsKey(file)) {
-                            FEZModEngine.AssetMetadata[file] = Tuple.Create(filePath, packStream.Position, length);
+                        if (!AssetMetadata.Map.ContainsKey(file)) {
+                            AssetMetadata.Map[file] = new AssetMetadata(filePath, packStream.Position, length);
                         }
                         packStream.Seek(length, SeekOrigin.Current);
                     }
@@ -257,63 +262,5 @@ namespace FezEngine.Tools {
         }
 
     }
-    
-    public static class AssetDataCache {
-        
-        public static Dictionary<string, byte[]> Persistent = new Dictionary<string, byte[]>();
-        
-        public static Dictionary<string, CachedAssetData> Temporary = new Dictionary<string, CachedAssetData>();
-        
-        public static Dictionary<string, byte[]> Preloaded = new Dictionary<string, byte[]>();
-        
-        public static void CachePersistent(string name) {
-            string filePath = Path.Combine(ServiceHelper.Game.Content.RootDirectory, name);
-            if (!File.Exists(filePath)) {
-                return;
-            }
-            using (FileStream packStream = File.OpenRead(filePath)) {
-                using (BinaryReader packReader = new BinaryReader(packStream)) {
-                    int count = packReader.ReadInt32();
-                    for (int i = 0; i < count; i++) {
-                        string file = packReader.ReadString();
-                        int length = packReader.ReadInt32();
-                        if (!Persistent.ContainsKey(file)) {
-                            Persistent[file] = packReader.ReadBytes(length);
-                        } else {
-                            packStream.Seek(length, SeekOrigin.Current);
-                        }
-                    }
-                }
-            }
-        }
-        
-        public static void UpdatePersistent(string name) {
-            string filePath = Path.Combine(ServiceHelper.Game.Content.RootDirectory, name);
-            if (!File.Exists(filePath)) {
-                return;
-            }
-            using (FileStream packStream = File.OpenRead(filePath)) {
-                using (BinaryReader packReader = new BinaryReader(packStream)) {
-                    int count = packReader.ReadInt32();
-                    for (int i = 0; i < count; i++) {
-                        string file = packReader.ReadString();
-                        int length = packReader.ReadInt32();
-                        if (Persistent.ContainsKey(file)) {
-                            Persistent[file] = packReader.ReadBytes(length);
-                        } else {
-                            packStream.Seek(length, SeekOrigin.Current);
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    public class CachedAssetData {
-        public byte[] Data;
-        public int References;
-        public int Age;
-    }
-    
 }
 

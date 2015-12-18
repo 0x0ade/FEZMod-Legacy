@@ -124,14 +124,43 @@ namespace FezEngine.Mod {
             return textureRGBA;
         }
         
-        public static void ScanAssemblyMetadata(this Assembly assembly) {
+        public static void ScanAssemblyMetadataForContent(this Assembly assembly) {
             string[] resourceNames = assembly.GetManifestResourceNames();
             for (int i = 0; i < resourceNames.Length; i++) {
-                if (!resourceNames[i].Contains("Content")) {
-                    break;
+                string name = resourceNames[i].ToLowerInvariant();
+                
+                int indexOfContent = name.IndexOf("content");
+                if (indexOfContent < 0) {
+                    continue;
+                }
+                name = name.Substring(indexOfContent + 8);
+                
+                if (name.EndsWith(".xnb") ||
+                    name.EndsWith(".fxb") ||
+                    name.EndsWith(".ogg") ||
+                    name.EndsWith(".png") ||
+                    name.EndsWith(".jpg") ||
+                    name.EndsWith(".gif")) {
+                    name = name.Substring(0, name.Length - 4);
+                } else if (name.EndsWith(".jpeg")) {
+                    name = name.Substring(0, name.Length - 5);
                 }
                 
-                //TODO actually map the files
+                name = name.Replace('/', '\\').Replace('.', '\\');
+                
+                //Good news: Embedded resources get their spaces replaced with underscores.
+                //As we don't know what was a space and what was an underscore, add all combos!
+                AssetMetadata metadata = new AssetMetadata(assembly, resourceNames[i], 0, 0);
+                string[] split = name.Split('_');
+                int combos = (int) Math.Pow(2, split.Length - 1);
+                for (int ci = 0; ci < combos; ci++) {
+                    string rebuiltname = split[0];
+                    for (int si = 1; si < split.Length; si++) {
+                        rebuiltname += ci % (si + 1) == 0 ? "_" : " ";
+                        rebuiltname += split[si];
+                    }
+                    AssetMetadata.Map[rebuiltname] = metadata;
+                }
             }
         }
 

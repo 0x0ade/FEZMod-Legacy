@@ -155,6 +155,7 @@
     <Compile Include="FezGame\Components\patch_ISpeechBubbleManager.cs" />
     <Compile Include="FezGame\Components\patch_SpeechBubble.cs" />
     <Compile Include="FezGame\Components\patch_GameNpcState.cs" />
+    <Compile Include="FezGame\Components\Intro.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -173,5 +174,11 @@
       <Project>{D8A08E34-1DF2-4843-BE12-2D384C50897D}</Project>
       <Name>FezEngine.Mod.mm</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Content\andknuckles.png" />
+    <EmbeddedResource Include="Content\other textures\splash\ade.png" />
+    <EmbeddedResource Include="Content\other textures\splash\ade_tl.png" />
+    <EmbeddedResource Include="Content\other textures\splash\ade_dr.png" />
   </ItemGroup>
 </Project>
