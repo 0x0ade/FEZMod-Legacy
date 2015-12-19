@@ -32,6 +32,9 @@ namespace FezGame.Components {
         private void Talk() {
             orig_Talk();
             
+            ((patch_ISpeechBubbleManager) SpeechManager).ColorBG = Color.Black;
+            ((patch_ISpeechBubbleManager) SpeechManager).ColorFG = Color.White;
+            
             if (FEZModEngine.Settings.ModdedSpeechBubbles) {
                 Action action = () => ((patch_ISpeechBubbleManager) SpeechManager).Speaker = Npc.Name.ToLowerInvariant();
             

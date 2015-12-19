@@ -5,15 +5,25 @@ using FezGame.Mod;
 using FezGame.Structure;
 using FezGame.Services;
 using FezEngine.Tools;
+using Microsoft.Xna.Framework;
+using MonoMod;
 
 namespace FezGame.Components.Actions {
     public class Bounce : PlayerAction {
-        public void orig_TestConditions() {
-
+        
+        private IGameStateManager gameStateManager;
+        
+        public Bounce(Game game)
+            : base(game) {
+            //no-op
         }
-
+        
+        [MonoModIgnore] public extern void orig_TestConditions();
         public void TestConditions() {
-            if (FEZMod.EnableBugfixes && (ServiceHelper.Get<IGameStateManager>().InCutscene || !PlayerManager.CanControl)) {
+            if (gameStateManager == null) {
+                gameStateManager = ServiceHelper.Get<IGameStateManager>();
+            }
+            if (FEZMod.EnableBugfixes && (gameStateManager.InCutscene || !PlayerManager.CanControl)) {
                 if (PlayerManager.Action == ActionType.Bouncing) {
                     PlayerManager.Action = ActionType.Landing;
                 }
@@ -22,6 +32,7 @@ namespace FezGame.Components.Actions {
             }
         }
 
+        [MonoModIgnore] protected override extern bool IsActionAllowed(ActionType type);
     }
 }
 #endif
