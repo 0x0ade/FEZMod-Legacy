@@ -14,6 +14,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Linq;
+using FezEngine.Mod;
 using MonoMod;
 
 namespace FezGame.Components {
@@ -31,12 +32,14 @@ namespace FezGame.Components {
         private void Talk() {
             orig_Talk();
             
-            Action action = () => ((patch_ISpeechBubbleManager) SpeechManager).Speaker = Npc.Name.ToLowerInvariant();
+            if (FEZModEngine.Settings.ModdedSpeechBubbles) {
+                Action action = () => ((patch_ISpeechBubbleManager) SpeechManager).Speaker = Npc.Name.ToLowerInvariant();
             
-            if (PlayerManager.Action == ActionType.WalkingTo) {
-                Waiters.Wait(() => PlayerManager.Action != ActionType.WalkingTo, action).AutoPause = true;
-            } else {
-                action();
+                if (PlayerManager.Action == ActionType.WalkingTo) {
+                    Waiters.Wait(() => PlayerManager.Action != ActionType.WalkingTo, action).AutoPause = true;
+                } else {
+                    action();
+                }
             }
         }
         

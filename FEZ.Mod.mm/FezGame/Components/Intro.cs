@@ -24,7 +24,7 @@ using FezEngine.Mod;
 
 namespace FezGame.Components {
     //TODO allow mods to patch intro without killing each other
-    //FIXME nested types in patch_ types
+    //FIXME MonoMod nested types in patch_ types
     public class Intro : DrawableGameComponent {
         
         private readonly Mesh TrixelPlanes = null;

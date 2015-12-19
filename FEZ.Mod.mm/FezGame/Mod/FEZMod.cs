@@ -182,6 +182,7 @@ namespace FezGame.Mod {
             TextPatchHelper.Static.Fallback["FEZModMenu"] = "FEZMOD MENU";
             TextPatchHelper.Static.Fallback["StreamAssetsDisk"] = "Stream data from: {0}";
             TextPatchHelper.Static.Fallback["StreamMusicType"] = "Stream music from: {0}";
+            TextPatchHelper.Static.Fallback["ModdedSpeechBubbles"] = "Speech Bubbles: {0}";
             
             //Load settings and handle updates early enough for FEZMod itself
             FEZModEngine.Settings = FezModuleSettings.Load<FEZModSettings>("FEZMod.Settings.sdl", new FEZModSettings());
@@ -474,6 +475,14 @@ namespace FezGame.Mod {
                         val = (int) MusicCacheMode.Enabled;
                     }
                     tmpSettings.MusicCache = (MusicCacheMode) val;
+                }
+            );
+            item.UpperCase = true;
+            
+            item = Menu.AddItem<string>("ModdedSpeechBubbles", save, false,
+                () => tmpSettings.ModdedSpeechBubbles ? "MODDED" : "DEFAULT",
+                delegate(string lastValue, int change) {
+                    tmpSettings.ModdedSpeechBubbles = !tmpSettings.ModdedSpeechBubbles;
                 }
             );
             item.UpperCase = true;
