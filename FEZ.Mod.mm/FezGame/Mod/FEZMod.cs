@@ -138,12 +138,15 @@ namespace FezGame.Mod {
             //Console.WriteLine("JIT test return: " + TestMonoModJIT("Hello, World!"));
 
             //Disable steamworks
+            //Handled by FEZ in 1.12+
             DisableCloudSaves = typeof(PCSaveDevice).GetField("DisableCloudSaves");
 
+            #if !FNA
             Fez.NoSteamworks = true;
             if (DisableCloudSaves != null) {
                 DisableCloudSaves.SetValue(null, true);
             }
+            #endif
 
             Type typeCultureInfo = typeof(CultureInfo);
             PropertyInfo propDefaultThreadCurrentCulture = typeCultureInfo.GetProperty("DefaultThreadCurrentCulture", BindingFlags.Public | BindingFlags.Static);
