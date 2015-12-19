@@ -32,6 +32,8 @@ namespace FezGame.Components {
         private void Talk() {
             orig_Talk();
             
+            //FIXME MonoMod: System.MissingMethodException: Method '<Talk>c__AnonStorey0..ctor' not found.
+            //patch_ISpeechBubbleManager speechBubbleEXT = (patch_ISpeechBubbleManager) SpeechManager;
             ((patch_ISpeechBubbleManager) SpeechManager).ColorBG = Color.Black;
             ((patch_ISpeechBubbleManager) SpeechManager).ColorFG = Color.White;
             

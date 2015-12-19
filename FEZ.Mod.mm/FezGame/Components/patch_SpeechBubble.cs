@@ -97,6 +97,7 @@ namespace FezGame.Components {
             }
             set {
                 textColor = value;
+                textSecondaryColor = value;
                 if (!FezMath.AlmostEqual(lastUsedOrigin, origin, 0.0625f) && sinceShown >= 1 && !changingText) {
                     OnTextChanged(false);
                 }
@@ -184,7 +185,9 @@ namespace FezGame.Components {
             SpriteFont spriteFontSpeaker = (Font != SpeechFont.Pixel) ? zuishFont : FontManager.Small;
             if (Font == SpeechFont.Zuish) {
                 textString = textString.Replace(" ", "  ");
-                textSpeaker = textSpeaker.ToUpperInvariant();
+                if (textSpeaker != null) {
+                    textSpeaker = textSpeaker.ToUpperInvariant();
+                }
             }
             float fontScale = (!Culture.IsCJK || Font != SpeechFont.Pixel) ? 1f : FontManager.SmallFactor;
             float num3 = 0;

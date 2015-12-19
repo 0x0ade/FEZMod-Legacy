@@ -26,6 +26,8 @@ namespace FezGame.Components.Actions {
                 return;
             }
             
+            patch_ISpeechBubbleManager speechBubbleEXT = (patch_ISpeechBubbleManager) SpeechBubble;
+            
             switch (this.PlayerManager.Action) {
                 case ActionType.Teetering:
                 case ActionType.IdlePlay:
@@ -41,7 +43,6 @@ namespace FezGame.Components.Actions {
                 case ActionType.Running:
                 case ActionType.Sliding:
                 case ActionType.Landing:
-                    patch_ISpeechBubbleManager speechBubbleEXT = (patch_ISpeechBubbleManager) SpeechBubble;
                     //speechBubbleEXT.Speaker = "sign";
                     speechBubbleEXT.ColorBG = FEZModEngine.Settings.ModdedSpeechBubbles ? ColorBG : Color.Black;
                     speechBubbleEXT.ColorFG = FEZModEngine.Settings.ModdedSpeechBubbles ? ColorFG : Color.White;
