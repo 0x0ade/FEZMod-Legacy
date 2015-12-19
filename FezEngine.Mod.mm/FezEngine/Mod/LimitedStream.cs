@@ -62,7 +62,7 @@ namespace FezEngine.Mod {
         }
         
         public LimitedStream(Stream stream, long offset, long length)
-            : base(0) {
+            : base() {
             LimitStream = stream;
             LimitOffset = offset;
             LimitLength = length;
@@ -148,18 +148,40 @@ namespace FezEngine.Mod {
             return cachedBuffer = ToArray();
         }
         
+        private readonly byte[] toArrayReadBuffer = new byte[2048];
         public override byte[] ToArray() {
-            byte[] buffer = new byte[LimitLength];
+            byte[] buffer;
             int read;
-            int readCompletely = 0;
+            
             long origPosition = LimitStream.Position;
             LimitStream.Seek(LimitOffset, SeekOrigin.Begin);
-            while (readCompletely < buffer.Length) {
+            
+            long length = LimitLength == 0 ? LimitStream.Length : LimitLength;
+            
+            if (length == 0) {
+                //most performant way would be to use the base MemoryStream, but
+                //System.NotSupportedException: Stream does not support writing.
+                MemoryStream ms = new MemoryStream();
+                
+                LimitStream.Seek(LimitOffset, SeekOrigin.Begin);
+                while (0 < (read = LimitStream.Read(toArrayReadBuffer, 0, toArrayReadBuffer.Length))) {
+                    base.Write(toArrayReadBuffer, 0, read);
+                }
+                
+                LimitStream.Seek(origPosition, SeekOrigin.Begin);
+                buffer = base.ToArray();
+                ms.Close();
+                return buffer;
+            }
+            
+            buffer = new byte[length];
+            int readCompletely = 0;
+            while (readCompletely < length) {
                 read = LimitStream.Read(buffer, readCompletely, buffer.Length - readCompletely);
                 readCompletely += read;
             }
-            LimitStream.Seek(origPosition, SeekOrigin.Begin);
             
+            LimitStream.Seek(origPosition, SeekOrigin.Begin);
             return buffer;
         }
         

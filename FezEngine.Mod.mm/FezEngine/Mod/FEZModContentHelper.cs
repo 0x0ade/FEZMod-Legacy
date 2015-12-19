@@ -125,6 +125,8 @@ namespace FezEngine.Mod {
         }
         
         public static void ScanAssemblyMetadataForContent(this Assembly assembly) {
+            Dictionary<string, byte[]> cachedAssets = patch_MemoryContentManager.GetCachedAssets();
+            
             string[] resourceNames = assembly.GetManifestResourceNames();
             for (int i = 0; i < resourceNames.Length; i++) {
                 string name = resourceNames[i].ToLowerInvariant();
@@ -151,6 +153,12 @@ namespace FezEngine.Mod {
                 //Good news: Embedded resources get their spaces replaced with underscores.
                 //As we don't know what was a space and what was an underscore, add all combos!
                 AssetMetadata metadata = new AssetMetadata(assembly, resourceNames[i], 0, 0);
+                byte[] data = null;
+                if (FEZModEngine.Settings.DataCache == DataCacheMode.Default) {
+                    LimitedStream ls = new LimitedStream(metadata.Assembly.GetManifestResourceStream(resourceNames[i]), 0, 0);
+                    data = ls.ToArray();
+                    ls.Close();
+                }
                 string[] split = name.Split('_');
                 int combos = (int) Math.Pow(2, split.Length - 1);
                 for (int ci = 0; ci < combos; ci++) {
@@ -160,6 +168,9 @@ namespace FezEngine.Mod {
                         rebuiltname += split[si];
                     }
                     AssetMetadata.Map[rebuiltname] = metadata;
+                    if (data != null) {
+                        cachedAssets[rebuiltname] = data;
+                    }
                 }
             }
         }

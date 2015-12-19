@@ -180,5 +180,11 @@
     <EmbeddedResource Include="Content\other textures\splash\ade.png" />
     <EmbeddedResource Include="Content\other textures\splash\ade_tl.png" />
     <EmbeddedResource Include="Content\other textures\splash\ade_dr.png" />
+    <EmbeddedResource Include="Content\other textures\speech_bubble\b_prompt.png" />
+    <EmbeddedResource Include="Content\other textures\speech_bubble\speechbubblene.png" />
+    <EmbeddedResource Include="Content\other textures\speech_bubble\speechbubblenw.png" />
+    <EmbeddedResource Include="Content\other textures\speech_bubble\speechbubblese.png" />
+    <EmbeddedResource Include="Content\other textures\speech_bubble\speechbubblesw.png" />
+    <EmbeddedResource Include="Content\other textures\speech_bubble\speechbubbletail.png" />
   </ItemGroup>
 </Project>

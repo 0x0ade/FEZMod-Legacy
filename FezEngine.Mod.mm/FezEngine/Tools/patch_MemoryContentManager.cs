@@ -69,7 +69,13 @@ namespace FezEngine.Tools {
             return list;
         }
 
-        private static Dictionary<String, byte[]> cachedAssets;
+        [MonoModIgnore] private static Dictionary<string, byte[]> cachedAssets;
+        public static Dictionary<string, byte[]> GetCachedAssets() {
+            if (cachedAssets == null) {
+                cachedAssets = new Dictionary<string, byte[]>();
+            }
+            return cachedAssets;
+        }
 
         private static int DumpAllResourcesCount = 0;
 
@@ -87,7 +93,7 @@ namespace FezEngine.Tools {
             }
             DumpAllResourcesCount = count;
             ModLogger.Log("FEZMod.Engine", "Dumping "+count+" assets...");
-            String[] assetNames_ = new String[count];
+            string[] assetNames_ = new string[count];
             cachedAssets.Keys.CopyTo(assetNames_, 0);
 
             for (int i = 0; i < count; i++) {
@@ -215,7 +221,12 @@ namespace FezEngine.Tools {
         public extern void orig_LoadEssentials();
         public void LoadEssentials() {
             if (FEZModEngine.Settings.DataCache == DataCacheMode.Default) {
+                Dictionary<string, byte[]> preCachedAssets = cachedAssets;
+                cachedAssets = null;
                 orig_LoadEssentials();
+                foreach (KeyValuePair<string, byte[]> pair in preCachedAssets) {
+                    cachedAssets[pair.Key] = pair.Value;
+                }
             } else {
                 cachedAssets = new Dictionary<string, byte[]>(0);
                 if (FEZModEngine.Settings.DataCache == DataCacheMode.Smart) {
