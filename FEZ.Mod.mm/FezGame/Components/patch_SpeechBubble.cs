@@ -380,6 +380,8 @@ namespace FezGame.Components {
 			}
 			if (sinceShown == 0 && !flag && !changingText) {
                 textSpeaker = null;
+                textColor = Color.Black;
+                textSecondaryColor = Color.White;
             }
         }
         
