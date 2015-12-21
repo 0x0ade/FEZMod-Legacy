@@ -42,11 +42,10 @@ namespace FezGame.Services.Scripting {
                 name = "hexahedron";
                 speechBubbleEXT.ColorBG = HexahedronColorBG;
                 speechBubbleEXT.ColorFG = HexahedronColorFG;
+                speechBubbleEXT.ColorSecondaryFG = HexahedronColorFG;
             }
             
             speechBubbleEXT.Speaker = name.Replace("_", " ");
-            
-            ModLogger.Log("WTF debug", "ao post: " + name);
             
             LongRunningAction action = orig_Say(id, text, zuish);
             return action;

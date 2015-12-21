@@ -21,6 +21,8 @@ using FezGame.Mod;
 namespace FezGame.Components {
     public class patch_SpeechBubble : SpeechBubble, patch_ISpeechBubbleManager {
         
+        private static readonly Color DefaultTextSecondaryColor = new Color(1f, 1f, 1f, 0.8f);
+        
         [MonoModIgnore]
 		private const int TextBorder = 4;
 
@@ -97,7 +99,6 @@ namespace FezGame.Components {
             }
             set {
                 textColor = value;
-                textSecondaryColor = value;
                 if (!FezMath.AlmostEqual(lastUsedOrigin, origin, 0.0625f) && sinceShown >= 1 && !changingText) {
                     OnTextChanged(false);
                 }
@@ -143,7 +144,7 @@ namespace FezGame.Components {
             orig_Initialize();
             
             textColor = Color.White;
-            textSecondaryColor = new Color(1f, 1f, 1f, 0.8f);
+            textSecondaryColor = DefaultTextSecondaryColor;
             ColorBG = Color.Black;
         }
         
@@ -380,8 +381,9 @@ namespace FezGame.Components {
 			}
 			if (sinceShown == 0 && !flag && !changingText) {
                 textSpeaker = null;
-                textColor = Color.Black;
-                textSecondaryColor = Color.White;
+                textColor = Color.White;
+                textSecondaryColor = DefaultTextSecondaryColor;
+                ColorBG = Color.Black;
             }
         }
         
