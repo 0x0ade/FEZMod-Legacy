@@ -1,0 +1,3 @@
+[submodule "libs-projs/FmbLib"]
+	path = libs-projs/FmbLib
+	url = git@github.com:AngelDE98/FmbLib.git

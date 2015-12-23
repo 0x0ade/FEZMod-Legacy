@@ -14,7 +14,8 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;ENGINE;</DefineConstants>
+    <!-- XNA and FEZENGINE are two flags required for FmbLib to compile in XNAFEZ mode. -->
+    <DefineConstants>DEBUG;XNA;FEZENGINE;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -23,7 +24,7 @@
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
-    <DefineConstants>ENGINE;</DefineConstants>
+    <DefineConstants>XNA;FEZENGINE;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -33,7 +34,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\DebugFNA</OutputPath>
-    <DefineConstants>DEBUG;FNA;ENGINE;</DefineConstants>
+    <DefineConstants>DEBUG;FNA;XNA;FEZENGINE;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -43,7 +44,7 @@
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\ReleaseFNA</OutputPath>
-    <DefineConstants>FNA;ENGINE;</DefineConstants>
+    <DefineConstants>FNA;XNA;FEZENGINE;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -119,6 +120,45 @@
     <Compile Include="FezEngine\Structure\Geometry\IndexedVector4.cs" />
     <Compile Include="FezEngine\Components\InputManager.cs" />
     <Compile Include="FezEngine\Services\patch_ContentManagerProvider.cs" />
+    
+    <!-- FmbLib -->
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\BooleanReader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\BoundingBoxReader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\ByteReader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\CharReader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\ColorReader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\DateTimeReader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\DecimalReader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\DictionaryReader`2.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\DoubleReader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\EnumReader`1.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\Int16Reader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\Int32Reader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\Int64Reader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\ListReader`1.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\MatrixReader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\NullableReader`1.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\PlaneReader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\PointReader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\QuaternionReader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\RectangleReader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\SByteReader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\SingleReader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\StringReader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\Texture2DReader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\TimeSpanReader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\UInt16Reader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\UInt32Reader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\UInt64Reader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\Vector2Reader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\Vector3Reader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\Vector4Reader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\ArrayReader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\FmbUtil.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\FmbHelper.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Fez\ShaderInstancedIndexedPrimitivesReader`2.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Fez\VertexPositionNormalTextureInstanceReader.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -130,9 +170,50 @@
     <Folder Include="Content\" />
   </ItemGroup>
   <ItemGroup>
-    <!--ProjectReference Include="..\FEZ.Mod.mm\FEZ.Mod.mm.csproj">
-      <Project>{1A401409-A56A-4930-9F0C-6215AC4408B8}</Project>
-      <Name>FEZ.Mod.mm</Name>
-    </ProjectReference-->
+    <!-- FmbLib -->
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\AmbienceTrackReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\AnimatedTextureReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\ArtObjectActorSettingsReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\ArtObjectInstanceReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\ArtObjectReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\BackgroundPlaneReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\CameraNodeDataReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\DotDialogueLineReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\EntityReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\ExtensibleReader`1.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\FezVertexPositionNormalTextureReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\FrameReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\GarbagelessTexture2DReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\IndexedUserPrimitivesReader`1.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\InstanceActorSettingsReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\LevelReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\LoopReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\MapNodeConnectionReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\MapNodeReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\MapTreeReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\MovementPathReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\NpcActionContentReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\NpcInstanceReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\NpcMetadataReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\PathSegmentReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\RectangularTrixelSurfacePartReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\ScriptActionReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\ScriptConditionReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\ScriptReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\ScriptTriggerReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\SkyLayerReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\SkyReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\SpeechLineReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\TrackedSongReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\TrileEmplacementReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\TrileFaceReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\TrileGroupReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\TrileInstanceReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\TrileReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\TrileSetReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\TrixelIdentifierReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\VolumeActorSettingsReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\VolumeReader.txt" />
+    <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\WinConditionsReader.txt" />
   </ItemGroup>
 </Project>
