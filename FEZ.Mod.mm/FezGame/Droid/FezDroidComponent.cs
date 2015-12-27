@@ -131,10 +131,6 @@ namespace FezGame.Droid {
             };
         }
         
-        protected override void LoadContent() {
-            base.LoadContent();
-        }
-
         public override void Update(GameTime gameTime) {
             //Handle touch input in Android mode
             TouchCollection touches = TouchPanel.GetState();
@@ -194,7 +190,6 @@ namespace FezGame.Droid {
                 
                 //TODO are left & right required?
             }
-            
         }
         
         public override void Draw(GameTime gameTime) {

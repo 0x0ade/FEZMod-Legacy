@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework.Content;
 using System.IO;
 using System.Xml;
 using MonoMod;
+using FmbLib;
 
 namespace FezGame.Services {
 	public class GameLevelManager : LevelManager {
@@ -22,16 +23,6 @@ namespace FezGame.Services {
 
         public extern void orig_Load(string levelName);
         public void Load(string levelName) {
-            if (levelName.StartsWith("JAFM_WORKAROUND_SAVE:")) {
-                string[] split = levelName.Split(new char[] {':'});
-                Save(split[1], (split.Length > 2) ? bool.Parse(split[2]) : false);
-                return;
-            }
-            if (levelName == "JAFM_WORKAROUND_CHANGELEVEL") {
-                ChangeLevel(GameLevelManagerHelper.ChangeLevel_);
-                return;
-            }
-
             if (tmpLevel != null) {
                 ClearArtSatellites();
 
@@ -44,24 +35,37 @@ namespace FezGame.Services {
             }
 
             levelName = FEZMod.ProcessLevelName(levelName);
-
+            ContentManager cm = CMProvider.GetForLevel(levelName);
+            
             string filePath_ = ("Resources\\levels\\"+(levelName.ToLower())).Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString())+".";
 
             string filePathFMB = filePath_ + "fmb";
-            FileInfo fileFMB = new FileInfo(filePathFMB);
-            if (fileFMB.Exists) {
+            if (File.Exists(filePathFMB)) {
                 ModLogger.Log("FEZMod", "Loading level from FMB: "+levelName);
-
-                using (FileStream fs = new FileStream(fileFMB.FullName, FileMode.Open)) {
-                    throw new FormatException("FEZMod can't load FMB files yet.");
+                
+                ClearArtSatellites();
+                oldLevel = levelData;
+                
+                levelData = (Level) FmbUtil.ReadObject(filePathFMB);
+                
+                if (levelData.SkyName != null) {
+                    levelData.Sky = cm.Load<Sky>("Skies/" + levelData.SkyName);
                 }
-
+                if (levelData.TrileSetName != null) {
+                    levelData.TrileSet = cm.Load<TrileSet>("Trile Sets/" + levelData.TrileSetName);
+                }
+                if (levelData.SongName != null) {
+                    levelData.Song = cm.Load<TrackedSong>("Music/" + levelData.SongName);
+                    levelData.Song.Initialize();
+                }
+                
+                FEZMod.ProcessLevelData(levelData);
+                GameLevelManagerHelper.Level = levelData;
                 return;
             }
 
-            string filePathXML = filePath_+"xml";
-            FileInfo fileXML = new FileInfo(filePathXML);
-            if (!fileXML.Exists) {
+            string filePathXML = filePath_ + "xml";
+            if (!File.Exists(filePathXML)) {
                 if (MemoryContentManager.AssetExists("LEVELS/"+levelName)) {
                     orig_Load(levelName);
                 } else {
@@ -76,18 +80,13 @@ namespace FezGame.Services {
 
             ModLogger.Log("FEZMod", "Loading level from XML: "+levelName);
 
-            ClearArtSatellites();
-
-            oldLevel = levelData;
-
-            FileStream fis = new FileStream(fileXML.FullName, FileMode.Open);
+            FileStream fis = new FileStream(filePathXML, FileMode.Open);
             XmlReader xmlReader = XmlReader.Create(fis);
             XmlDocument xmlDocument = new XmlDocument();
             xmlDocument.Load(xmlReader);
             xmlReader.Close();
             fis.Close();
 
-            ContentManager cm = CMProvider.GetForLevel(levelName);
             levelData = (Level) xmlDocument.Deserialize(null, cm, true);
             levelData.Name = levelName;
 
@@ -109,13 +108,10 @@ namespace FezGame.Services {
 
             if (binary) {
                 ModLogger.Log("FEZMod", "Saving level to binary file: " + levelName);
-
-                //TODO use custom writer instead of quickly and dirtily serializing the level
-                //FYI: Levels are not serializable.
-                using (FileStream fs = new FileStream(filePath, FileMode.CreateNew)) {
-                    throw new FormatException("FEZMod can't save FMB files yet.");
-                }
-
+                
+                FmbUtil.WriteObject(filePath, levelData);
+                
+                GC.Collect(3);
                 return;
             }
 
@@ -137,8 +133,7 @@ namespace FezGame.Services {
             GC.Collect(3);
         }
 
-        [MonoModIgnore]
-        public extern void ChangeLevel(string levelName);
+        [MonoModIgnore] public extern void ChangeLevel(string levelName);
         public void ChangeLevel(Level level) {
             ContentManager cm = CMProvider.GetForLevel(level.Name);
             if (level.SkyName != null) {

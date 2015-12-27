@@ -168,9 +168,15 @@
     <Folder Include="FezEngine\Services\" />
     <Folder Include="FezEngine\Structure\Geometry\" />
     <Folder Include="Content\" />
+    <Folder Include="..\libs-projs\FmbLib\TypeHandlerBases\" />
   </ItemGroup>
   <ItemGroup>
     <!-- FmbLib -->
+    <!--
+        TypeHandlerBases - we're using the pre-parsed XNAFEZ handlers, which are still WIP.
+        Reason behind this is that somehow mono fails compiling the THBs JIT.
+    -->
+    <!--
     <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\AmbienceTrackReader.txt" />
     <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\AnimatedTextureReader.txt" />
     <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\ArtObjectActorSettingsReader.txt" />
@@ -215,5 +221,48 @@
     <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\VolumeActorSettingsReader.txt" />
     <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\VolumeReader.txt" />
     <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\WinConditionsReader.txt" />
+    -->
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\AmbienceTrackHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\AnimatedTextureHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\ArtObjectActorSettingsHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\ArtObjectInstanceHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\ArtObjectHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\BackgroundPlaneHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\CameraNodeDataHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\DotDialogueLineHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\EntityHandler.cs" />
+    <!--Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\FezVertexPositionNormalTextureHandler.cs" /-->
+    <!--Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\FrameHandler.cs" /-->
+    <!--Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\GarbagelessTexture2DHandler.cs" /-->
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\InstanceActorSettingsHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\LevelHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\LoopHandler.cs" />
+    <!--Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\MapNodeConnectionHandler.cs" /-->
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\MapNodeHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\MapTreeHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\MovementPathHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\NpcActionContentHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\NpcInstanceHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\NpcMetadataHandler.cs" />
+    <!--Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\PathSegmentHandler.cs" /-->
+    <!--Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\RectangularTrixelSurfacePartHandler.cs" /-->
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\ScriptActionHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\ScriptConditionHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\ScriptHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\ScriptTriggerHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\SkyLayerHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\SkyHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\SpeechLineHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\TrackedSongHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\TrileEmplacementHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\TrileFaceHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\TrileGroupHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\TrileInstanceHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\TrileHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\TrileSetHandler.cs" />
+    <!--Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\TrixelIdentifierHandler.cs" /-->
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\VolumeActorSettingsHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\VolumeHandler.cs" />
+    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\WinConditionsHandler.cs" />
   </ItemGroup>
 </Project>

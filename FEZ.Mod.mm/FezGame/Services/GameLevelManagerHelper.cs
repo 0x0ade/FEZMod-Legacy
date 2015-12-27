@@ -8,33 +8,22 @@ namespace FezGame.Services {
     /// Workaround until MonoMod patches types into the destination assembly.
     /// </summary>
     public static class GameLevelManagerHelper {
-
+        
+        private static ILevelManager levelManager;
         public static ILevelManager LevelManager {
             get {
-                return ServiceHelper.Get<ILevelManager>();
+                return levelManager ?? (levelManager = ServiceHelper.Get<ILevelManager>());
             }
         }
 
         public static Level Level;
 
-        private static Level ChangeLevel__;
-
-        public static Level ChangeLevel_ {
-            get {
-                return ChangeLevel__;
-            }
-            private set {
-                ChangeLevel__ = value;
-            }
-        }
-
         public static void Save(string levelName, bool binary = false) {
-            LevelManager.Load("JAFM_WORKAROUND_SAVE:"+levelName+":"+binary);
+            ((GameLevelManager) LevelManager).Save(levelName, binary);
         }
 
         public static void ChangeLevel(Level level) {
-            ChangeLevel_ = level;
-            LevelManager.Load("JAFM_WORKAROUND_CHANGELEVEL");
+            ((GameLevelManager) LevelManager).ChangeLevel(level);
         }
 
     }
