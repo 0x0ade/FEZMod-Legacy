@@ -159,6 +159,7 @@
     <Compile Include="..\libs-projs\FmbLib\FmbLib\FmbHelper.cs" />
     <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Fez\ShaderInstancedIndexedPrimitivesReader`2.cs" />
     <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Fez\VertexPositionNormalTextureInstanceReader.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\ILzxDecompressor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -223,7 +224,7 @@
     <EmbeddedResource Include="..\libs-projs\FmbLib\TypeHandlerBases\Fez\WinConditionsReader.txt" />
     -->
     <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\AmbienceTrackHandler.cs" />
-    <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\AnimatedTextureHandler.cs" />
+    <!--Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\AnimatedTextureHandler.cs" /-->
     <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\ArtObjectActorSettingsHandler.cs" />
     <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\ArtObjectInstanceHandler.cs" />
     <Compile Include="..\libs-projs\FmbLib\PreParsedBases\XNAFEZ\ArtObjectHandler.cs" />
