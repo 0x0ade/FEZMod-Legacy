@@ -49,12 +49,8 @@
     <XnaType>FNA</XnaType>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System">
-      <HintPath>..\libs\System.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml">
-      <HintPath>..\libs\System.Xml.dll</HintPath>
-    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
     <Reference Include="MonoGame.Framework" Condition=" '$(XnaType)' == 'MonoGame' ">
       <HintPath>..\libs\MonoGame.Framework.dll</HintPath>
     </Reference>
@@ -82,30 +78,18 @@
     <Reference Include="FezEngine" Condition=" '$(XnaType)' == 'FNA' ">
       <HintPath>..\libs\FezEngine.fna.dll</HintPath>
     </Reference>
-    <Reference Include="mscorlib">
-      <HintPath>..\libs\mscorlib.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Configuration">
-      <HintPath>..\libs\System.Configuration.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Data">
-      <HintPath>..\libs\System.Data.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Drawing">
-      <HintPath>..\libs\System.Drawing.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Security">
-      <HintPath>..\libs\System.Security.dll</HintPath>
-    </Reference>
+    <Reference Include="mscorlib" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Security" />
     <Reference Include="EasyStorage">
       <HintPath>..\libs\EasyStorage.dll</HintPath>
     </Reference>
     <Reference Include="Common">
       <HintPath>..\libs\Common.dll</HintPath>
     </Reference>
-    <Reference Include="System.Core">
-      <HintPath>..\libs\System.Core.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Core" />
     <Reference Include="MonoMod">
       <HintPath>..\libs\MonoMod.exe</HintPath>
     </Reference>
@@ -157,6 +141,7 @@
     <Compile Include="FezGame\Components\patch_SpeechBubble.cs" />
     <Compile Include="FezGame\Components\patch_GameNpcState.cs" />
     <Compile Include="FezGame\Components\Intro.cs" />
+    <Compile Include="FezGame\Mod\FEZCrossExt.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

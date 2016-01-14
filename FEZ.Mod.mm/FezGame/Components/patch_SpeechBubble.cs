@@ -84,13 +84,13 @@ namespace FezGame.Components {
 		private Group scalableBottom;
 
 		public IGameCameraManager CameraManager { [MonoModIgnore] get; [MonoModIgnore] set; }
-		public IContentManagerProvider CMProvider { [MonoModIgnore] get; [MonoModIgnore] set; }
-		public SpeechFont Font { [MonoModIgnore] get; [MonoModIgnore] set; }
-		public IFontManager FontManager { [MonoModIgnore] get; [MonoModIgnore] set; }
-		public IGameStateManager GameState { [MonoModIgnore] get; [MonoModIgnore] set; }
-		public bool Hidden { [MonoModIgnore] get; }
-		public ILevelManager LevelManager { [MonoModIgnore] get; [MonoModIgnore] set; }
-		public Vector3 Origin { [MonoModIgnore] get; [MonoModIgnore] set; }
+        public IContentManagerProvider CMProvider { [MonoModIgnore] get; [MonoModIgnore] set; }
+        public SpeechFont Font { [MonoModIgnore] get; [MonoModIgnore] set; }
+        public IFontManager FontManager { [MonoModIgnore] get; [MonoModIgnore] set; }
+        public IGameStateManager GameState { [MonoModIgnore] get; [MonoModIgnore] set; }
+        public bool Hidden { [MonoModIgnore] get; [MonoModIgnore] private set; }
+        public ILevelManager LevelManager { [MonoModIgnore] get; [MonoModIgnore] set; }
+        public Vector3 Origin { [MonoModIgnore] get; [MonoModIgnore] set; }
         
         private Color textColor;
         public Color ColorFG {
@@ -293,7 +293,7 @@ namespace FezGame.Components {
                 width *= 2;
                 height *= 2;
             }
-            if (text != null) {
+            if (this.text != null) {
                 text.Unhook();
                 text.Dispose();
             }
