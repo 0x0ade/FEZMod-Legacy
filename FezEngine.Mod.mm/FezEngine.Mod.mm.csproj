@@ -140,9 +140,9 @@
     <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\ArrayReader.cs" />
     <Compile Include="..\libs-projs\FmbLib\FmbLib\FmbUtil.cs" />
     <Compile Include="..\libs-projs\FmbLib\FmbLib\FmbHelper.cs" />
-    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Fez\ShaderInstancedIndexedPrimitivesReader`2.cs" />
     <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Fez\VertexPositionNormalTextureInstanceReader.cs" />
     <Compile Include="..\libs-projs\FmbLib\FmbLib\ILzxDecompressor.cs" />
+    <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Fez\ShaderInstancedIndexedPrimitivesReader`2.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

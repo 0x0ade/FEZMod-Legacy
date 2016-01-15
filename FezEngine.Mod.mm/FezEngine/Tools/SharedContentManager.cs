@@ -8,9 +8,16 @@ using MonoMod;
 
 namespace FezEngine.Tools {
     public class SharedContentManager {
-        
+
+        //non-existent in FEZ 1.11 for Windows; didn't test on Linux, but Mono didn't complain.
+        #if FNA
         [MonoModLinkTo(typeof(ContentManager), "Dispose")]
         public extern void Dispose();
+        #else
+        public void Dispose() {
+            //uuuhhh... didn't SharedContentManger have Close()?
+        }
+        #endif
         
         private class CommonContentManager {
 
