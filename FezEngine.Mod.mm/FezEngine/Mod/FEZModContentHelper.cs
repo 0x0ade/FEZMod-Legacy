@@ -110,7 +110,7 @@ namespace FezEngine.Mod {
             string[] resourceNames = assembly.GetManifestResourceNames();
             for (int i = 0; i < resourceNames.Length; i++) {
                 string name = resourceNames[i].ToLowerInvariant();
-                
+
                 int indexOfContent = name.IndexOf("content");
                 if (indexOfContent < 0) {
                     continue;
@@ -118,8 +118,12 @@ namespace FezEngine.Mod {
                 name = name.Substring(indexOfContent + 8);
                 
                 if (name.EndsWith(".xnb") ||
-                    name.EndsWith(".fxb") ||
-                    name.EndsWith(".ogg") ||
+                    name.EndsWith(".fxb")) {
+                    name = name.Substring(0, name.Length - 4);
+                }
+                //FNA supports loading these via ContentManager.
+                #if FNA
+                else if (name.EndsWith(".ogg") ||
                     name.EndsWith(".png") ||
                     name.EndsWith(".jpg") ||
                     name.EndsWith(".gif")) {
@@ -127,9 +131,10 @@ namespace FezEngine.Mod {
                 } else if (name.EndsWith(".jpeg")) {
                     name = name.Substring(0, name.Length - 5);
                 }
+                #endif
                 
                 name = name.Replace('/', '\\').Replace('.', '\\');
-                
+
                 //Good news: Embedded resources get their spaces replaced with underscores.
                 //As we don't know what was a space and what was an underscore, add all combos!
                 AssetMetadata metadata = new AssetMetadata(assembly, resourceNames[i], 0, 0);

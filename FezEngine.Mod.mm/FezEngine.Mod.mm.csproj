@@ -151,7 +151,6 @@
     <Folder Include="FezEngine\Structure\" />
     <Folder Include="FezEngine\Services\" />
     <Folder Include="FezEngine\Structure\Geometry\" />
-    <Folder Include="Content\" />
     <Folder Include="..\libs-projs\FmbLib\TypeHandlerBases\" />
   </ItemGroup>
   <ItemGroup>
