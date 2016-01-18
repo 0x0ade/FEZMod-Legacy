@@ -48,12 +48,12 @@ namespace FezEngine.Tools {
         }
         
         private static List<string> TraverseThrough(string dir, List<string> list = null) {
-            if (!Directory.Exists(dir)) {
-                return list;
-            }
-            
             if (list == null) {
                 list = new List<string>();
+            }
+
+            if (!Directory.Exists(dir)) {
+                return list;
             }
 
             string[] dirs = Directory.GetDirectories(dir);

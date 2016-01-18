@@ -8,6 +8,7 @@ using MonoMod;
 using FezGame.Structure;
 using FezGame.Mod;
 using FezEngine.Services;
+using FezEngine.Mod;
 
 namespace FezGame.Components {
     public class GomezHost {

@@ -142,6 +142,7 @@
     <Compile Include="FezGame\Components\patch_GameNpcState.cs" />
     <Compile Include="FezGame\Components\Intro.cs" />
     <Compile Include="FezGame\Mod\FEZCrossExt.cs" />
+    <Compile Include="FezGame\Components\GameLightingPostProcess.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

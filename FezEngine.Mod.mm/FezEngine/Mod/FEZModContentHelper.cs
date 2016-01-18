@@ -116,24 +116,31 @@ namespace FezEngine.Mod {
                     continue;
                 }
                 name = name.Substring(indexOfContent + 8);
+                string extension = null;
                 
                 if (name.EndsWith(".xnb") ||
                     name.EndsWith(".fxb")) {
                     name = name.Substring(0, name.Length - 4);
                 }
                 //FNA supports loading these via ContentManager.
-                #if FNA
                 else if (name.EndsWith(".ogg") ||
                     name.EndsWith(".png") ||
                     name.EndsWith(".jpg") ||
                     name.EndsWith(".gif")) {
+                    //We need to keep the ending for non-FNA
+                    extension = name.Substring(name.Length - 4);
                     name = name.Substring(0, name.Length - 4);
                 } else if (name.EndsWith(".jpeg")) {
+                    extension = name.Substring(name.Length - 5);
                     name = name.Substring(0, name.Length - 5);
                 }
-                #endif
                 
                 name = name.Replace('/', '\\').Replace('.', '\\');
+
+                //Thanks, MonoGame, for being not as cool as FNA!
+                #if !FNA
+                name += extension;
+                #endif
 
                 //Good news: Embedded resources get their spaces replaced with underscores.
                 //As we don't know what was a space and what was an underscore, add all combos!
