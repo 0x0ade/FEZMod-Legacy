@@ -24,7 +24,7 @@ namespace FezEngine.Tools {
                 }
 
                 AssetMetadata metadata = null;
-                #if !FNA
+                //#if !FNA
                 //Hey, we're in MonoGame! MonoGame suuuuuuuucks!
                 //... does this syntax work?
                 bool monogameSUUUUUUUUUUUUUUUUUUUUUCKS =
@@ -34,7 +34,7 @@ namespace FezEngine.Tools {
                     AssetMetadata.Map.TryGetValue(assetName + ".jpeg", out metadata) ||
                     AssetMetadata.Map.TryGetValue(assetName + ".gif", out metadata) ||
                     AssetMetadata.Map.TryGetValue(assetName + ".xml", out metadata);
-                #endif
+                //#endif
 
                 if (typeof(T) == typeof(Texture2D)) {
                     if (metadata == null) {
@@ -80,11 +80,15 @@ namespace FezEngine.Tools {
                 //Works in Mono, but .NET hates us.
                 //.NET doesn't call the modified MemoryContentManager ReadAsset and directly
                 //dies if something unexpected (for FEZ) happens.
-                return orig_ReadAsset<T>(assetName);
+                try {
+                    return orig_ReadAsset<T>(assetName);
+                } catch (Exception e) {
+                    ModLogger.Log("FEZMod.Engine", "orig_ReadAsset failed on " + assetName + ": \n" + e);
+                    return default(T);
+                }
             }
 
         }
 
     }
 }
-

@@ -15,38 +15,22 @@ namespace FezEngine.Structure.Geometry {
         private readonly static Version V_1_12 = new Version(1, 12);
         
         //Field list taken from 1.12; Compiles for non-FNA, which won't use the new fields anyways.
-        [MonoModIgnore]
-        public int PredictiveBatchSize;
-        [MonoModIgnore]
-        private int[] tempIndices;
-        [MonoModIgnore]
-        private InstanceType[] tempInstances;
-        [MonoModIgnore]
-        private TemplateType[] tempVertices;
-        [MonoModIgnore]
-        private VertexDeclaration vertexDeclaration;
-        [MonoModIgnore]
-        private bool appendIndex;
-        [MonoModIgnore]
-        private IndexedVector4[] indexedInstances;
-        [MonoModIgnore]
-        private bool useHwInstancing;
-        [MonoModIgnore]
-        private int oldInstanceCount;
-        [MonoModIgnore]
-        private readonly int InstancesPerBatch;
-        [MonoModIgnore]
-        private VertexBuffer vertexBuffer;
-        [MonoModIgnore]
-        private IndexBuffer indexBuffer;
-        [MonoModIgnore]
-        private DynamicVertexBuffer instanceBuffer;
-        [MonoModIgnore]
-        public InstanceType[] Instances;
-        [MonoModIgnore]
-        public int InstanceCount;
-        [MonoModIgnore]
-        public bool InstancesDirty;
+        [MonoModIgnore] public int PredictiveBatchSize;
+        [MonoModIgnore] private int[] tempIndices;
+        [MonoModIgnore] private InstanceType[] tempInstances;
+        [MonoModIgnore] private TemplateType[] tempVertices;
+        [MonoModIgnore] private VertexDeclaration vertexDeclaration;
+        [MonoModIgnore] private bool appendIndex;
+        [MonoModIgnore] private IndexedVector4[] indexedInstances;
+        [MonoModIgnore] private bool useHwInstancing;
+        [MonoModIgnore] private int oldInstanceCount;
+        [MonoModIgnore] private readonly int InstancesPerBatch;
+        [MonoModIgnore] private VertexBuffer vertexBuffer;
+        [MonoModIgnore] private IndexBuffer indexBuffer;
+        [MonoModIgnore] private DynamicVertexBuffer instanceBuffer;
+        [MonoModIgnore] public InstanceType[] Instances;
+        [MonoModIgnore] public int InstanceCount;
+        [MonoModIgnore] public bool InstancesDirty;
 
         #if !FNA
         [MonoModIgnore]
@@ -67,36 +51,23 @@ namespace FezEngine.Structure.Geometry {
         }
         #endif
 
-        [MonoModIgnore]
-        public void RefreshInstancingMode(bool force = false) {
-        }
-
-        [MonoModIgnore]
-        public void Dispose() {
-        }
-        
-        [MonoModIgnore]
-        public void UpdateBuffers() {
+        [MonoModIgnore] public extern void RefreshInstancingMode(bool force = false);
+        [MonoModIgnore] public extern void Dispose();
+        [MonoModIgnore] public void UpdateBuffers() {
             UpdateBuffers(false);
 		}
-
-        [MonoModIgnore]
-        private void UpdateBuffers(bool rebuild) {
-		}
-
-        [MonoModIgnore]
-        public override IIndexedPrimitiveCollection Clone() {
-            return null;
-        }
+        [MonoModIgnore] private extern void UpdateBuffers(bool rebuild);
+        [MonoModIgnore] public override extern IIndexedPrimitiveCollection Clone();
 
         public extern void orig_Draw(BaseEffect effect);
         public override void Draw(BaseEffect effect) {
             if (device == null || primitiveCount == 0 || vertices == null || vertices.Length == 0 || indexBuffer == null || vertexBuffer == null || Instances == null || InstanceCount <= 0) {
                 return;
             }
-            
+
             #if !FNA
             if (FEZModEngine.FEZVersion == V_1_11) {
+                ModLogger.Log("FEZMod.SIIP", "Draw 1.11");
                 Draw_1_11(effect);
                 return;
             }
@@ -108,7 +79,7 @@ namespace FezEngine.Structure.Geometry {
                 return;
             }
             #endif
-            
+
             orig_Draw(effect);
         }
         
@@ -143,7 +114,7 @@ namespace FezEngine.Structure.Geometry {
             } else {
                 device.SetVertexBuffer(vertexBuffer);
             }
-            
+
             device.Indices = indexBuffer;
             
             if (useHwInstancing) {
@@ -188,7 +159,7 @@ namespace FezEngine.Structure.Geometry {
             int i = InstanceCount;
             int sourceIndex = 0;
             try {
-                for (; i > 0; i -= batchInstanceCount) {
+                for (; 0 < i; i -= batchInstanceCount) {
                     batchInstanceCount = Math.Min(i, InstancesPerBatch);
                     
                     /*int */sourceIndex = InstanceCount - i;
@@ -203,7 +174,7 @@ namespace FezEngine.Structure.Geometry {
                     }
                     if (tempInstances.Length < batchInstanceCount) {
                         //instance count mismatch, intel crash
-                        i -= batchInstanceCount - tempInstances.Length; //otherwise ends up hanging in this loop
+                        i = batchInstanceCount - tempInstances.Length; //otherwise ends up hanging in this loop
                         batchInstanceCount = tempInstances.Length;
                     }
                     

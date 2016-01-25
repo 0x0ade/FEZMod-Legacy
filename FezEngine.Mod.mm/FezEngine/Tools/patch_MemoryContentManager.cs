@@ -194,7 +194,7 @@ namespace FezEngine.Tools {
                 }
                 return ls;
             }
-            
+
             return orig_OpenStream(assetName_);
         }
 
@@ -224,8 +224,10 @@ namespace FezEngine.Tools {
                 Dictionary<string, byte[]> preCachedAssets = cachedAssets;
                 cachedAssets = null;
                 orig_LoadEssentials();
-                foreach (KeyValuePair<string, byte[]> pair in preCachedAssets) {
-                    cachedAssets[pair.Key] = pair.Value;
+                if (preCachedAssets != null) {
+                    foreach (KeyValuePair<string, byte[]> pair in preCachedAssets) {
+                        cachedAssets[pair.Key] = pair.Value;
+                    }
                 }
             } else {
                 cachedAssets = new Dictionary<string, byte[]>(0);
@@ -236,7 +238,7 @@ namespace FezEngine.Tools {
                     ScanPackMetadata("Essentials.pak");
                 }
             }
-            
+
             FEZModEngine.PassLoadEssentials();
         }
 

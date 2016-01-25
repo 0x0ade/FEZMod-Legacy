@@ -76,8 +76,8 @@ namespace FezEngine.Mod {
     }
     
     public class FEZModSettings : FezModuleSettings {
-        public string LastVersion = FEZModEngine.MODVersion.ToString();
-        public string LastFEZVersion = FEZModEngine.FEZVersion.ToString();
+        public string LastVersion = FEZModEngine.GetMODVersion == null ? "0" : FEZModEngine.MODVersion.ToString();
+        public string LastFEZVersion = FEZModEngine.GetFEZVersion == null ? "0" : FEZModEngine.FEZVersion.ToString();
         
         public MusicCacheMode MusicCache = MusicCacheMode.Default;
         public DataCacheMode DataCache = DataCacheMode.Default;
@@ -135,7 +135,7 @@ namespace FezEngine.Mod {
         public static bool GetComponentsAsServices = false;
         public static bool HandleComponents = false;
         
-        public static FEZModSettings Settings;
+        public static FEZModSettings Settings = new FEZModSettings();
         
         public static bool EnablePPHD = false;
         public static bool DumpResources = false;

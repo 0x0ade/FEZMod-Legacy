@@ -51,7 +51,7 @@ namespace FezGame.Components {
                 }
                 return;
             }
-            
+
             if (FezDroidComponent.Instance != null && FezDroidComponent.Instance.Drag != Vector2.Zero && (FezDroidComponent.Instance.DragMode == DragMode.Rotate || FezDroidComponent.Instance.DragModeLast == DragMode.Rotate)) {
                 //Modified decompiled code. Hhnnng.
                 //TODO reimplement / rename

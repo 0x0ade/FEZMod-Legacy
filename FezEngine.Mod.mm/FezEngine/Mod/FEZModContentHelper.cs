@@ -105,6 +105,12 @@ namespace FezEngine.Mod {
         }
         
         public static void ScanAssemblyMetadataForContent(this Assembly assembly) {
+            //WINHACK
+            if (true) {
+                //return;
+            }
+
+
             Dictionary<string, byte[]> cachedAssets = patch_MemoryContentManager.GetCachedAssets();
             
             string[] resourceNames = assembly.GetManifestResourceNames();
