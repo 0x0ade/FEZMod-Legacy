@@ -9,7 +9,7 @@ script:
     - ./build_easystorage.sh
     - ./build_main.sh
     - ./build_engine.sh
-    - ./build_editor.sh
+#    - ./build_editor.sh #Causes issues on Win32; Fezzer 2 replaces this.
     - ./build_speedrun.sh
     - ./build_fixmonolive.sh
 after_success:

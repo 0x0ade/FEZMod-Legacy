@@ -18,7 +18,7 @@ namespace FezGame {
                 ModLogger.Log("FEZMod", "Handling FEZMod PreInitialize crash...");
                 log(e);
                 FEZMod.HandleCrash(e);
-                throw e;
+                throw;
             }
 
 			ModLogger.Log("FEZMod", "Passing to FEZ...");
@@ -34,7 +34,7 @@ namespace FezGame {
                 ModLogger.Log("FEZMod", "Handling FEZ crash...");
                 log(e);
                 FEZMod.HandleCrash(e);
-                throw e;
+                throw;
             }
         }
 
