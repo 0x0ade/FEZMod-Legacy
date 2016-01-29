@@ -2,14 +2,14 @@ sudo: false
 language: csharp
 env:
     global:
-       - "BUILD_NUMBER=$TRAVIS_BUILD_NUMBER"
-       - "BUILD_DIR=$TRAVIS_BUILD_DIR"
+        - "BUILD_NUMBER=$TRAVIS_BUILD_NUMBER"
+        - "BUILD_DIR=$TRAVIS_BUILD_DIR"
 script:
     - ./build_common.sh
     - ./build_easystorage.sh
-    - ./build_main.sh
     - ./build_engine.sh
-#    - ./build_editor.sh #Causes issues on Win32; Fezzer 2 replaces this.
+    - ./build_main.sh
+    - ./build_editor.sh
     - ./build_speedrun.sh
     - ./build_fixmonolive.sh
 after_success:

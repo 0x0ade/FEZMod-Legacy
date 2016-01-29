@@ -1,9 +1,8 @@
-﻿<Properties StartupItem="Common.Mod.mm/Common.Mod.mm.csproj">
+﻿<Properties StartupItem="Common.Mod.mm\Common.Mod.mm.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug - FNA" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="FEZ.Mod.mm/FezGame/Mod/FEZMod.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="FEZ.Mod.mm\FezGame\Mod\FEZMod.cs">
     <Files>
-      <File FileName="FEZ.Mod.mm/FezGame/Mod/FEZMod.cs" Line="1" Column="1" />
-      <File FileName="FEZ.Secret.mm/FezGame/Components/WarpGateHost.cs" Line="1" Column="1" />
+      <File FileName="FEZ.Mod.mm\FezGame\Mod\FEZMod.cs" Line="24" Column="24" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

@@ -1,6 +1,6 @@
 #!/bin/bash
 cd FEZ.Mod.mm
-if [ -z ${BUILD_BUMBER+x} ]; then
+if [ -z ${BUILD_NUMBER+x} ]; then
   echo 'build_main: Leaving version default.'
 else
   echo 'build_main: Replacing version string in FEZMod.'
