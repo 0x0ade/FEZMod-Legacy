@@ -1,8 +1,9 @@
 ﻿<Properties StartupItem="Common.Mod.mm\Common.Mod.mm.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug - FNA" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="FEZ.Mod.mm\FezGame\Mod\FEZMod.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="FezEngine.Mod.mm\FezEngine\Tools\patch_SettingsManager.cs">
     <Files>
-      <File FileName="FEZ.Mod.mm\FezGame\Mod\FEZMod.cs" Line="24" Column="24" />
+      <File FileName="FEZ.Mod.mm\FezGame\Mod\FEZMod.cs" Line="374" Column="11" />
+      <File FileName="FezEngine.Mod.mm\FezEngine\Tools\patch_SettingsManager.cs" Line="13" Column="17" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

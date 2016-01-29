@@ -40,7 +40,7 @@ namespace FezGame.Mod {
     public static class FEZMod {
         //FEZMod metadata
         public static string Version = "0.3a8";
-        public static Version MODVersion = new Version(Version.IndexOf('a') == -1 ? Version : Version.Substring(0, Version.IndexOf('a')));
+        public static Version MODVersion = new Version(Version.IndexOf("dev") > -1 ? ("1337." + Version.Substring(4)) : Version.IndexOf('a') > -1 ? Version.Substring(0, Version.IndexOf('a')) : Version);
         public static Version FEZVersion;
 
         //FEZ version-dependent reflection
