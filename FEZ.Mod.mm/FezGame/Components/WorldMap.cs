@@ -45,6 +45,9 @@ namespace FezGame.Components {
                 FEZMod.LoadingLevel = levelName;
             }
 
+            if (InputManager.OpenInventory == FezButtonState.Pressed) {
+                ModLogger.Log("FEZMod", "OpenInventory pressed.");
+            }
             if (FEZMod.EnableFEZometric && InputManager.OpenInventory == FezButtonState.Pressed) {
                 ModLogger.Log("FEZMod", "Switching to FEZometric mode");
                 GameState.InMap = false;

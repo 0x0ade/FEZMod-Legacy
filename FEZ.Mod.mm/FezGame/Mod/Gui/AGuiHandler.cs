@@ -8,6 +8,9 @@ using FezEngine.Services;
 using FezEngine.Services.Scripting;
 using FezGame.Services;
 using FezEngine.Structure.Input;
+using FezEngine.Mod;
+
+
 #if FNA
 using Microsoft.Xna.Framework.Input;
 using SDL2;
@@ -86,14 +89,16 @@ namespace FezGame.Mod.Gui {
         protected override void LoadContent() {
             base.LoadContent();
 
-            GTR = new GlyphTextRenderer(Game);
+            FEZModEngine.InvokeGL(delegate() {
+                GTR = new GlyphTextRenderer(Game);
 
-            PointerCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_POINTER");
-            CanClickCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_CLICKER_A");
-            ClickedCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_CLICKER_B");
-            GrabbedCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_GRABBER");
+                PointerCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_POINTER");
+                CanClickCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_CLICKER_A");
+                ClickedCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_CLICKER_B");
+                GrabbedCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_GRABBER");
 
-            SpriteBatch = new SpriteBatch(GraphicsDevice);
+                SpriteBatch = new SpriteBatch(GraphicsDevice);
+            });
         }
 
         public override void Update(GameTime gameTime) {

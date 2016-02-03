@@ -6,7 +6,7 @@ using FezEngine.Structure.Input;
 namespace FezGame.Mod.Gui {
     public class ThumbnailCreatorWidget : GuiWidget {
 
-        protected Vector2 PreDrag;
+        protected Vector2 PreDrag = new Vector2(-1337, -1337);
 
         protected int OldSize;
 
@@ -89,12 +89,12 @@ namespace FezGame.Mod.Gui {
         }
 
         public override void Dragging(GameTime gameTime, MouseButtonStates state) {
-            if (state == MouseButtonStates.DragEnded) {
+            if (state == MouseButtonStates.DragEnded || MouseState.LeftButton.DragState == null || MouseState.LeftButton.DragState.Movement == null) {
                 return;
             }
 
-            if (state == MouseButtonStates.DragStarted) {
-                PreDrag = Parent.Position;
+            if (state == MouseButtonStates.DragStarted || (PreDrag.X == PreDrag.Y && PreDrag.X == -1337)) {
+                PreDrag = (Parent ?? this).Position;
             }
 
             Position.X = PreDrag.X + MouseState.LeftButton.DragState.Movement.X;

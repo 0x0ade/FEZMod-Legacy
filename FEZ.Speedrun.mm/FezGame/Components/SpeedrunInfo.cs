@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using FezGame.Speedrun;
 using FezGame.Speedrun.Clocks;
+using FezEngine.Mod;
 
 namespace FezGame.Components {
     public class SpeedrunInfo : DrawableGameComponent {
@@ -42,8 +43,8 @@ namespace FezGame.Components {
 
         public SpeedrunInfo(Game game)
             : base(game) {
-            UpdateOrder = 1000;
-            DrawOrder = 3000;
+            UpdateOrder = 2000;
+            DrawOrder = 4000;
             Instance = this;
         }
 
@@ -72,8 +73,10 @@ namespace FezGame.Components {
         }
         
         protected override void LoadContent() {
-            SpriteBatch = new SpriteBatch(GraphicsDevice);
-            GTR = new GlyphTextRenderer(Game);
+            FEZModEngine.InvokeGL(delegate() {
+                SpriteBatch = new SpriteBatch(GraphicsDevice);
+                GTR = new GlyphTextRenderer(Game);
+            });
         }
 
         public override void Update(GameTime gameTime) {
@@ -95,7 +98,7 @@ namespace FezGame.Components {
             
             GraphicsDevice.SetBlendingMode(BlendingMode.Alphablending);
             SpriteBatch.BeginPoint();
-            
+
             float lineBigHeight = FontBig.MeasureString("Time: 01:23:45.6789").Y * viewScale * FontBigFactor;
             GTR.DrawShadowedText(SpriteBatch, FontBig, "Time: "+FormatTime(FezSpeedrun.Clock.Time.ToString()), new Vector2(0, 0), Color.White, viewScale * FontBigFactor);
 
@@ -122,7 +125,7 @@ namespace FezGame.Components {
                 if (dotIndex < 0) {
                     return time;
                 }
-                return time.Substring(0, time.IndexOf('.'));
+                return time.Substring(0, dotIndex);
             }
             time = time.TrimEnd(FormatTime_zero);
             if (time.EndsWith(":")) {

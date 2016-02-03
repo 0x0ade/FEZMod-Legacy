@@ -8,6 +8,8 @@ using FezEngine.Tools;
 namespace FezGame.Speedrun.Clocks {
     public class SpeedrunClock : ISpeedrunClock {
 
+        protected TimeSpan timePerFrame = TimeSpan.FromMilliseconds(17);
+
         public bool InGame { get; set; }
 
         protected IGameStateManager gameState_;
@@ -25,33 +27,10 @@ namespace FezGame.Speedrun.Clocks {
         public TimeSpan TimeLoading { get; set; }
         public List<Split> Splits { get; set; }
         public double Direction { get; set; }
-        protected DateTime timeNow = new DateTime(0);
-        protected DateTime timePrev = new DateTime(0);
-        protected readonly DateTime timeNull = new DateTime(0);
 
         public bool Strict { get; set; }
 
-        protected bool running_ = false;
-
-        public bool Running {
-            get {
-                return running_;
-            }
-            set {
-                if (value && !running_) {
-                    while (clockThread != null && Thread.CurrentThread != clockThread && clockThread.IsAlive) {
-                        Thread.Sleep(0);
-                    }
-                    defaultSplitCases = FezSpeedrun.DefaultSplitCases;
-                    Time = new TimeSpan();
-                    clockThread = new Thread(ClockThreadLoop);
-                    clockThread.IsBackground = true;
-                    clockThread.Start();
-                }
-
-                running_ = value;
-            }
-        }
+        public bool Running { get; set; }
 
         public bool Paused { get; set; }
 
@@ -87,67 +66,43 @@ namespace FezGame.Speedrun.Clocks {
         }
 
         public void Update() {
-        }
+            if (!Running || Paused || GameState == null || GameState.Loading) {
+                return;
+            }
 
-        protected void ClockThreadLoop() {
-            TimeSpan diff;
-            timePrev = DateTime.Now;
-            while (running_) {
-                timeNow = DateTime.Now;
-                if (Paused || GameState == null) {
-                    Thread.Sleep(0);
-                    timePrev = timeNow;
-                    continue;
-                }
+            while (scheduledSplits.Count > 0) {
+                Split_(scheduledSplits[0]);
+                scheduledSplits.RemoveAt(0);
+            }
 
-                diff = timeNow - timePrev;
-                diff = TimeSpan.FromTicks((long) (diff.Ticks * Direction));
+            if (GameState.TimePaused && !Strict) {
+                return;
+            }
+            TimeSpan timeThisFrame = TimeSpan.FromTicks((long) (timePerFrame.Ticks * Direction));
+            Time += timeThisFrame;
+            if (Time.Ticks < 0) {
+                timeThisFrame = Time = new TimeSpan(0);
+            }
+            if (Splits.Count > 0) {
+                Splits[Splits.Count-1].Time += timeThisFrame;
+            }
 
-                if (GameState.Loading) {
-                    if (timePrev == timeNull) {
-                        timePrev = timeNow;
-                    }
-                    TimeLoading += diff;
-                    timePrev = timeNow;
-                    continue;
-                }
-
-                while (scheduledSplits.Count > 0) {
-                    Split_(scheduledSplits[0]);
-                    scheduledSplits.RemoveAt(0);
-                }
-
-                if (GameState.TimePaused && !Strict) {
-                    timePrev = timeNow;
-                    continue;
-                }
-                if (timePrev == timeNull) {
-                    timePrev = timeNow;
-                }
-                Time += diff;
-                if (Splits.Count > 0) {
-                    Splits[Splits.Count-1].Time += diff;
-                }
-                timePrev = timeNow;
-
-                string split = null;
-                foreach (SplitCase tosplit in defaultSplitCases) {
-                    if (split != null) {
-                        break;
-                    }
-                    split = tosplit(this);
-                }
-                foreach (SplitCase tosplit in SplitCases) {
-                    if (split != null) {
-                        break;
-                    }
-                    split = tosplit(this);
-                }
-
+            string split = null;
+            foreach (SplitCase tosplit in defaultSplitCases) {
                 if (split != null) {
-                    Split_(split);
+                    break;
                 }
+                split = tosplit(this);
+            }
+            foreach (SplitCase tosplit in SplitCases) {
+                if (split != null) {
+                    break;
+                }
+                split = tosplit(this);
+            }
 
+            if (split != null) {
+                Split_(split);
             }
         }
 

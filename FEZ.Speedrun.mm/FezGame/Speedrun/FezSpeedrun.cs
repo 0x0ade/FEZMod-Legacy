@@ -66,12 +66,8 @@ namespace FezGame.Speedrun {
         }
         
         public override void LoadComponents(Fez game) {
-            //Proper way would be to only initialize what's required via FezEngine.Tools.DrawActionScheduler.Schedule, but.. yeah.
-            //SI and TASC aren't required pre draw, so they can get added later.
-            FEZModEngine.InvokeGL(delegate() {
-                ServiceHelper.AddComponent(new SpeedrunInfo(ServiceHelper.Game));
-                ServiceHelper.AddComponent(new TASComponent(ServiceHelper.Game));
-            });
+            ServiceHelper.AddComponent(new SpeedrunInfo(ServiceHelper.Game));
+            ServiceHelper.AddComponent(new TASComponent(ServiceHelper.Game));
         }
 
         public override void Exit() {
@@ -221,7 +217,7 @@ namespace FezGame.Speedrun {
                 Clock.Dispose();
                 Clock = null;
             }
-            
+
             //reset TAS progress if any
             TASComponent.Instance.RewindData.Clear();
             TASComponent.Instance.RewindPosition = 0;
@@ -229,7 +225,7 @@ namespace FezGame.Speedrun {
             if (!Settings.SpeedrunMode) {
                 return;
             }
-            
+
             switch (Settings.Display) {
                 case SpeedrunDisplayMode.Current:
                 case SpeedrunDisplayMode.CurrentPerRoom:
@@ -241,7 +237,7 @@ namespace FezGame.Speedrun {
                     Clock = lsClock;
                     break;
             }
-            
+
             Clock.Running = true;
             //initialize BOT if needed
             if (Settings.BOTEnabled) {
