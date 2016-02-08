@@ -47,7 +47,10 @@ namespace FezGame.Services {
                 oldLevel = levelData;
                 
                 levelData = (Level) FmbUtil.ReadObject(filePathFMB);
-                
+
+                foreach (ArtObjectInstance ao in levelData.ArtObjects.Values) {
+                    ao.ArtObject = cm.Load<ArtObject>("Art Objects/" + ao.ArtObjectName);
+                }
                 if (levelData.SkyName != null) {
                     levelData.Sky = cm.Load<Sky>("Skies/" + levelData.SkyName);
                 }
@@ -57,6 +60,11 @@ namespace FezGame.Services {
                 if (levelData.SongName != null) {
                     levelData.Song = cm.Load<TrackedSong>("Music/" + levelData.SongName);
                     levelData.Song.Initialize();
+                }
+
+                LevelSaveData save = GameState.SaveData.ThisLevel;
+                if (save != null) {
+                    save.FirstVisit = false;
                 }
                 
                 FEZMod.ProcessLevelData(levelData);
@@ -90,9 +98,9 @@ namespace FezGame.Services {
             levelData = (Level) xmlDocument.Deserialize(null, cm, true);
             levelData.Name = levelName;
 
-            LevelSaveData save = GameState.SaveData.ThisLevel;
-            if (save != null) {
-                save.FirstVisit = false;
+            LevelSaveData save_ = GameState.SaveData.ThisLevel;
+            if (save_ != null) {
+                save_.FirstVisit = false;
             }
 
             FEZMod.ProcessLevelData(levelData);

@@ -1,16 +1,13 @@
 ﻿<Properties StartupItem="Common.Mod.mm\Common.Mod.mm.csproj">
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug - FNA" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="FEZ.Speedrun.mm\FezGame\Speedrun\Clocks\SpeedrunClock.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug - FNA|x86" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="libs-projs\FmbLib\FmbLib\FmbUtil.cs">
     <Files>
-      <File FileName="FEZ.Mod.mm\FezGame\Mod\FEZMod.cs" Line="58" Column="44" />
-      <File FileName="FezEngine.Mod.mm\FezEngine\Tools\patch_SettingsManager.cs" Line="1" Column="1" />
-      <File FileName="FEZ.Speedrun.mm\FezGame\Speedrun\FezSpeedrun.cs" Line="1" Column="1" />
-      <File FileName="FEZ.Speedrun.mm\FezGame\Components\SpeedrunInfo.cs" Line="75" Column="48" />
-      <File FileName="FEZ.Speedrun.mm\FezGame\Components\TASComponent.cs" Line="1" Column="1" />
-      <File FileName="FEZ.Mod.mm\FezGame\Mod\Gui\AGuiHandler.cs" Line="1" Column="1" />
-      <File FileName="FEZ.Speedrun.mm\FezGame\Speedrun\Clocks\SpeedrunClock.cs" Line="69" Column="80" />
-      <File FileName="FEZ.Speedrun.mm\FezGame\Speedrun\Clocks\ISpeedrunClock.cs" Line="23" Column="21" />
-      <File FileName="FEZ.Mod.mm\FezGame\Components\WorldMap.cs" Line="46" Column="14" />
+      <File FileName="FEZ.Mod.mm\FezGame\Mod\FEZMod.cs" Line="1" Column="1" />
+      <File FileName="FEZ.Mod.mm\FezGame\Components\WorldMap.cs" Line="1" Column="1" />
+      <File FileName="FEZ.Mod.mm\FezGame\Program.cs" Line="1" Column="1" />
+      <File FileName="libs-projs\FmbLib\FmbLib\FmbUtil.cs" Line="431" Column="61" />
+      <File FileName="libs-projs\FmbLib\PreParsedBases\XNAFEZ\TrileFaceHandler.cs" Line="1" Column="1" />
+      <File FileName="libs-projs\FmbLib\FmbLib\TypeHandlers\Xna\EnumReader`1.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

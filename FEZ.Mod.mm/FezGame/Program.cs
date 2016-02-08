@@ -53,6 +53,9 @@ namespace FezGame {
                 if (e_ is TypeLoadException) {
                     ModLogger.Log("FEZMod" + (tag == null ? "" : ("[" + tag + "]")), "TypeLoadException.TypeName: " + ((TypeLoadException) e_).TypeName);
                 }
+                if (e_ is BadImageFormatException) {
+                    ModLogger.Log("FEZMod" + (tag == null ? "" : ("[" + tag + "]")), "BadImageFormatException.FileName: " + ((BadImageFormatException) e_).FileName);
+                }
             }
         }
 
