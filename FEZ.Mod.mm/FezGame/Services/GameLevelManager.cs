@@ -13,7 +13,7 @@ using MonoMod;
 using FmbLib;
 
 namespace FezGame.Services {
-	public class GameLevelManager : LevelManager {
+	public class GameLevelManager : patch_LevelManager {
 
         public Level oldLevel;
 

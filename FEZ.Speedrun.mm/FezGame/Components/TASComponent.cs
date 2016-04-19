@@ -72,8 +72,10 @@ namespace FezGame.Components {
             
             //Register special key hooks
             Vector2 tmpFreeLook = new Vector2(0f, 0f);
+            Func<Vector2> prev_get_FreeLook = FakeInputHelper.get_FreeLook;
+            Action<Vector2> prev_set_FreeLook = FakeInputHelper.set_FreeLook;
             FakeInputHelper.get_FreeLook = delegate() {
-                return !FezSpeedrun.Settings.ToolAssistedSpeedrun || FakeInputHelper.Updating ? tmpFreeLook : new Vector2(0f, 0f);
+                return !FezSpeedrun.Settings.ToolAssistedSpeedrun || FakeInputHelper.Updating ? (prev_get_FreeLook != null ? prev_get_FreeLook() : tmpFreeLook) : new Vector2(0f, 0f);
             };
             FakeInputHelper.set_FreeLook = delegate(Vector2 value) {
                 //Set game speed
@@ -81,6 +83,9 @@ namespace FezGame.Components {
                     FEZMod.GameSpeed = 1d + 0.5d * ((double) value.X) + 0.5d * ((double) value.Y);
                 }
                 tmpFreeLook = value;
+                if (prev_set_FreeLook != null) {
+                    prev_set_FreeLook(value);
+                }
             };
             
             //Add GUI

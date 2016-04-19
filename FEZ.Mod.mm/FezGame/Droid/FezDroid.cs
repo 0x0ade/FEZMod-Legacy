@@ -4,6 +4,8 @@ using FezGame.Mod;
 using FezEngine.Mod;
 using FezEngine.Tools;
 using Microsoft.Xna.Framework;
+using System.Reflection;
+using Microsoft.Xna.Framework.Input.Touch;
 
 namespace FezGame.Droid {
     public class FezDroid : FezModule {
@@ -17,6 +19,24 @@ namespace FezGame.Droid {
             get {
                 ModLogger.Log("FEZDroid", "Checking if running in Android");
                 return Directory.Exists("/system/app") && Directory.Exists("/data") && Directory.Exists("/sdcard");
+            }
+        }
+        
+        public static int TouchWidth {
+            get {
+                return 0 < TouchPanel.DisplayWidth ? TouchPanel.DisplayWidth : ServiceHelper.Game.Window.ClientBounds.Width;
+            }
+            set {
+                TouchPanel.DisplayWidth = value;
+            }
+        }
+        
+        public static int TouchHeight {
+            get {
+                return 0 < TouchPanel.DisplayHeight ? TouchPanel.DisplayHeight : ServiceHelper.Game.Window.ClientBounds.Height;
+            }
+            set {
+                TouchPanel.DisplayHeight = value;
             }
         }
 
@@ -61,6 +81,19 @@ namespace FezGame.Droid {
             
             FEZModEngine.Settings.DataCache = DataCacheMode.Disabled;
             FEZModEngine.Settings.MusicCache = MusicCacheMode.Disabled;
+            
+            #if FNA
+            #endif
+            Assembly asmBoot = Assembly.GetEntryAssembly();
+            if (asmBoot.GetName().Name != "FNADroid-Boot") {
+                ModLogger.Log("FEZDroid", "Not running in FNADroid, though.");
+                return;
+            }
+            ModLogger.Log("FEZDroid", "Enabling FNADroid-specific features...");
+            Assembly asmLib = Assembly.Load("FNADroid-Lib");
+            
+            //TODO add FNADroid-specific functionality here.
+            
         }
 
     }

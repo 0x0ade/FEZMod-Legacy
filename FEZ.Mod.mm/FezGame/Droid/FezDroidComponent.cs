@@ -49,6 +49,7 @@ namespace FezGame.Droid {
         public ICollisionManager CollisionManager { get; set; }
         
         public SpriteBatch SpriteBatch;
+        protected static Texture2D pixelTexture;
         
         public Dictionary<int, Vector2> TouchOrigins = new Dictionary<int, Vector2>();
         public Dictionary<int, double> TouchTimes = new Dictionary<int, double>();
@@ -71,8 +72,8 @@ namespace FezGame.Droid {
             new Vector2(-1f, 0f),
             new Vector2(-3f, -1f),
             new Vector2(-1f, 1f),
-            new Vector2(1f, 0f),
-            new Vector2(-1f, 0f)
+            new Vector2(1.5f, 0f),
+            new Vector2(-0.5f, 0f)
         };
         protected Vector2[] buttonPre = {
             new Vector2(1f, 1f),
@@ -104,6 +105,10 @@ namespace FezGame.Droid {
         protected float buttonHeight = 16f;
         protected float buttonScaleMain = 6f;
         
+        protected Vector2 touchFieldPosition = new Vector2(0f, 0.5f);
+        protected Vector2 touchFieldSize = new Vector2(0.4f, 0.5f);
+        protected Color touchFieldBackground = new Color(0.75f, 0.75f, 0.75f, 0.25f);
+        
         public FezDroidComponent(Game game) 
             : base(game) {
             UpdateOrder = 10;
@@ -115,28 +120,52 @@ namespace FezGame.Droid {
             base.Initialize();
             
             Vector2 tmpFreeLook = new Vector2(0f, 0f);
+            Func<Vector2> prev_get_FreeLook = FakeInputHelper.get_FreeLook;
+            Action<Vector2> prev_set_FreeLook = FakeInputHelper.set_FreeLook;
             FakeInputHelper.get_FreeLook = delegate() {
-                return FakeInputHelper.Updating ? tmpFreeLook : new Vector2(0f, 0f);
+                return FakeInputHelper.Updating ? (prev_get_FreeLook != null ? prev_get_FreeLook() : tmpFreeLook) : Vector2.Zero;
             };
             FakeInputHelper.set_FreeLook = delegate(Vector2 value) {
                 tmpFreeLook = value;
+                if (prev_set_FreeLook != null) {
+                    prev_set_FreeLook(value);
+                }
             };
             
             Vector2 tmpMovement = new Vector2(0f, 0f);
+            Func<Vector2> prev_get_Movement = FakeInputHelper.get_Movement;
+            Action<Vector2> prev_set_Movement = FakeInputHelper.set_Movement;
             FakeInputHelper.get_Movement = delegate() {
-                return FakeInputHelper.Updating || DragMode != DragMode.Move ? tmpMovement : Drag * 4f;
+                return FakeInputHelper.Updating || DragMode != DragMode.Move ? (prev_get_Movement != null ? prev_get_Movement() : tmpMovement) : Drag * 4f;
             };
             FakeInputHelper.set_Movement = delegate(Vector2 value) {
                 tmpMovement = value;
+                if (prev_set_Movement != null) {
+                    prev_set_Movement(value);
+                }
             };
+        }
+        
+        protected override void LoadContent() {
+            FEZModEngine.InvokeGL(delegate() {
+                SpriteBatch = new SpriteBatch(GraphicsDevice);
+                buttonTexture[0] = CMProvider.Global.Load<Texture2D>("Other Textures/Glyphs/BBUTTON");
+                buttonTexture[1] = CMProvider.Global.Load<Texture2D>("Other Textures/Glyphs/ABUTTON");
+                buttonTexture[2] = CMProvider.Global.Load<Texture2D>("Other Textures/Glyphs/XBUTTON");
+                buttonTexture[3] = CMProvider.Global.Load<Texture2D>("Other Textures/Glyphs/YBUTTON");
+                buttonTexture[4] = CMProvider.Global.Load<Texture2D>("Other Textures/Glyphs/STARTBUTTON");
+                buttonTexture[5] = CMProvider.Global.Load<Texture2D>("Other Textures/Glyphs/BACKBUTTON");
+            });
         }
         
         public override void Update(GameTime gameTime) {
             //Handle touch input in Android mode
             TouchCollection touches = TouchPanel.GetState();
             
-            //TODO use screen-space touch coordinates (not 0f - 1f) when they work
-            //TODO fix multi-touch when FNA finally supports releasing multitouched touch points
+            float x1 = touchFieldPosition.X * FezDroid.TouchWidth;
+            float y1 = touchFieldPosition.Y * FezDroid.TouchHeight;
+            float x2 = x1 + touchFieldSize.X * FezDroid.TouchWidth;
+            float y2 = y1 + touchFieldSize.Y * FezDroid.TouchHeight;
             
             for (int i = 0; i < touches.Count; i++) {
                 TouchLocation tl = touches[i];
@@ -147,12 +176,12 @@ namespace FezGame.Droid {
                     if (dragTouchId == -1 && !button) {
                         dragTouchId = tl.Id;
                         DragModeLast = DragMode;
-                        DragMode = tl.Position.X <= 0.4f && tl.Position.Y >= 0.5f ? DragMode.Move : DragMode.Rotate;
-                    } else if (dragTouchId != -1) {
-                        //FIXME FNA multitouch support is... T.T
-                        dragTouchId = -1;
+                        DragMode =
+                            x1 <= tl.Position.X && tl.Position.X <= x2 &&
+                            y1 <= tl.Position.Y && tl.Position.Y <= y2 ?
+                            DragMode.Move : DragMode.Rotate;
                     }
-                    return;
+                    continue;
                 }
                 if (tl.State == TouchLocationState.Released) {
                     if (dragTouchId == tl.Id) {
@@ -165,8 +194,10 @@ namespace FezGame.Droid {
                 }
                 
                 if (dragTouchId == tl.Id) {
-                    Drag = (tl.Position - TouchOrigins[tl.Id]) * 2f;
-                    Drag.Y = -Drag.Y;//Y=0 is top, not bottom
+                    Drag = (tl.Position - TouchOrigins[tl.Id]);
+                    Drag.Y = -Drag.Y; //Y == 0 is top, not bottom
+                    Drag.X *= 2f / FezDroid.TouchWidth;
+                    Drag.Y *= 2f / FezDroid.TouchHeight;
                 } else {
                     HandleButtonAt(tl);
                 }
@@ -179,30 +210,32 @@ namespace FezGame.Droid {
                 buttonAlpha[i] = buttonAlpha[i] * 0.95f + (buttonsEnabled && buttonEnabled[i] ? 1f : 0f) * 0.05f;
             }
             
+            touchFieldBackground = new Color(0, 0, 0, 0.25f);
             if (DragMode == DragMode.Move) {
-                if (Math.Abs(Drag.X) < 0.1f) {
-                    if (Drag.Y >= -0.2f) {
+                if (Math.Abs(Drag.Y) < 0.3f * FezDroid.TouchHeight) {
+                    if (Drag.X >= -0.2f * FezDroid.TouchWidth) {
+                        CodeInputAll.Left.Press();
+                        touchFieldBackground.R = 255;
+                        touchFieldBackground.G = 0;
+                    } else if (Drag.X <= 0.2f * FezDroid.TouchWidth) {
+                        CodeInputAll.Right.Press();
+                        touchFieldBackground.R = 0;
+                        touchFieldBackground.G = 255;
+                    }
+                }
+                if (Math.Abs(Drag.X) < 0.3f * FezDroid.TouchWidth) {
+                    if (Drag.Y >= -0.2f * FezDroid.TouchHeight) {
                         CodeInputAll.Up.Press();
-                    } else if (Drag.Y <= 0.2f) {
+                        touchFieldBackground.B = 255;
+                    } else if (Drag.Y <= 0.2f * FezDroid.TouchHeight) {
                         CodeInputAll.Down.Press();
                     }
                 }
-                
-                //TODO are left & right required?
             }
         }
         
         public override void Draw(GameTime gameTime) {
             if (!FEZMod.Preloaded || GraphicsDevice == null || SpriteBatch == null) {
-                if (GraphicsDevice != null) {
-                    SpriteBatch = new SpriteBatch(GraphicsDevice);
-                    buttonTexture[0] = CMProvider.Global.Load<Texture2D>("Other Textures/Glyphs/BBUTTON");
-                    buttonTexture[1] = CMProvider.Global.Load<Texture2D>("Other Textures/Glyphs/ABUTTON");
-                    buttonTexture[2] = CMProvider.Global.Load<Texture2D>("Other Textures/Glyphs/XBUTTON");
-                    buttonTexture[3] = CMProvider.Global.Load<Texture2D>("Other Textures/Glyphs/YBUTTON");
-                    buttonTexture[4] = CMProvider.Global.Load<Texture2D>("Other Textures/Glyphs/STARTBUTTON");
-                    buttonTexture[5] = CMProvider.Global.Load<Texture2D>("Other Textures/Glyphs/BACKBUTTON");
-                }
                 return;
             }
             
@@ -218,7 +251,33 @@ namespace FezGame.Droid {
             
             float buttonScale = buttonScaleMain * viewScale;
             
+            if (pixelTexture == null) {
+                pixelTexture = new Texture2D(GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
+                pixelTexture.SetData<Color>(new Color[] { Color.White });
+            }
+
+            if (buttonAlpha[0] != 0f) {
+                //We simply take the CancelTalk ([0]) state and apply it to the touch area.
+                SpriteBatch.Draw(pixelTexture,
+                    new Vector2(
+                        touchFieldPosition.X * viewport.Width,
+                        touchFieldPosition.Y * viewport.Height
+                    ), null,
+                    touchFieldBackground * buttonAlpha[0],
+                    0.0f,
+                    Vector2.Zero,
+                    new Vector2(
+                        touchFieldSize.X * viewport.Width,
+                        touchFieldSize.Y * viewport.Height
+                    ),
+                    SpriteEffects.None,
+                    0.0f);
+            }
+            
             for (int i = 0; i < buttonMapping.Length; i++) {
+                if (buttonAlpha[i] == 0f) {
+                    continue;
+                }
                 Texture2D tex = buttonTexture[i];
                 Vector2 pos = buttonPosition[i];
                 Vector2 pre = buttonPre[i];
@@ -274,8 +333,8 @@ namespace FezGame.Droid {
                 float x2 = x1 + buttonWidth * buttonScale;
                 float y2 = y1 + buttonHeight * buttonScale;
                 if (
-                    x1 <= tl.Position.X * viewport.Width && tl.Position.X * viewport.Width <= x2 &&
-                    y1 <= tl.Position.Y * viewport.Height && tl.Position.Y * viewport.Height <= y2
+                    x1 <= tl.Position.X && tl.Position.X <= x2 &&
+                    y1 <= tl.Position.Y && tl.Position.Y <= y2
                 ) {
                     buttonMapping[i].Hold();
                     return true;
