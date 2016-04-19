@@ -27,7 +27,7 @@ namespace FezGame.Components {
     //FIXME MonoMod nested types in patch_ types
     public class Intro : DrawableGameComponent {
         
-        private readonly Mesh TrixelPlanes = null;
+        [MonoModIgnore] private readonly Mesh TrixelPlanes = null;
         [MonoModIgnore] private Texture2D TrixelEngineText;
         [MonoModIgnore] private Texture2D TrapdoorLogo;
         [MonoModIgnore] private GlyphTextRenderer tr;
@@ -93,116 +93,98 @@ namespace FezGame.Components {
             //no-op
         }
         
-        private Texture2D adeLogoTL;
-        private Texture2D adeLogoDR;
-        private float adeOffset = 0f;
-        
-        private Texture2D segaLogo;
+        //Initialize gets called after LoadContent
+        //public extern void orig_Initialize();
+        /*public override void Initialize() {
+            //orig_Initialize();
+            //There is no original Initialize..?!
+            base.Initialize();
+            
+            CustomIntroHelper.Create(this);
+        }*/
         
         protected extern void orig_LoadContent();
         protected override void LoadContent() {
             orig_LoadContent();
             
-            if (FEZModEngine.Settings.ShowADELogo) {
-                ContentManager cm = CMProvider.Get(CM.Intro);
-                adeLogoTL = cm.Load<Texture2D>("other textures/splash/ade_tl");
-                adeLogoDR = cm.Load<Texture2D>("other textures/splash/ade_dr");
-            }
-            
+            CustomIntroHelper.Create(this);
         }
         
         private extern void orig_ChangeScreen();
         private void ChangeScreen() {
-            if (!FEZModEngine.Settings.ShowADELogo) {
-                orig_ChangeScreen();
-                return;
-            }
-            
             if (screen == Screen.Trapdoor) {
-                screen = Screen.ADE;
+                screen = Screen.FEZMOD;
                 return;
             }
-            if (screen == Screen.ADE) {
-                screen = Screen.Trapdoor;
-                orig_ChangeScreen();
-                return;
+            if (screen == Screen.FEZMOD) {
+                if (CustomIntroHelper.Current == null) {
+                    screen = Screen.Trapdoor;
+                } else {
+                    return;
+                }
             }
             
             orig_ChangeScreen();
         }
+        public void ForceChangeScreen() {
+            orig_ChangeScreen();
+        }
+        
+        private GameTime _gameTime;
+        public extern void orig_Update(GameTime gameTime);
+        public void Update(GameTime gameTime) {
+            //We hook Update to get the gameTime for UpdateLogo.
+            _gameTime = gameTime;
+            
+            orig_Update(gameTime);
+        }
         
         private extern void orig_UpdateLogo();
         private void UpdateLogo() {
-            if (screen != Screen.ADE || !FEZModEngine.Settings.ShowADELogo) {
+            if (screen != Screen.FEZMOD) {
                 orig_UpdateLogo();
                 return;
             }
             
-            double time = phaseTime.TotalSeconds;
-            if (phase == Phase.Wait) {
-                ChangePhase();
-                time = 0.0;
+            if (phase == Phase.FadeIn) {
+                CustomIntroHelper.Reset();
             }
-            switch (phase) {
-                case Phase.FadeIn:
-                    if (time >= 1.0) {
-                        ChangePhase();
-                        break;
-                    }
-                    opacity = Easing.EaseIn(FezMath.Saturate(time * 8.0), EasingType.Quadratic);
-                    //adeOffset = 1f + (float) Math.Cos(Math.PI * (time / 1.0)) + 1f;
-                    adeOffset = 1f + Easing.EaseIn(1f - time, EasingType.Quadratic);
-                    break;
-                case Phase.FadeOut:
-                    if (time >= 0.5) {
-                        ChangePhase();
-                        opacity = 0f;
-                        break;
-                    }
-                    opacity = 1f - Easing.EaseOut(Math.Max((time - 0.25) / 0.25, 0.0), EasingType.Quadratic);
-                    adeOffset = (float) Math.Cos(Math.PI * (time / 1.0));
-                    break;
+            if (phase == Phase.FadeIn || phase == Phase.FadeOut || CustomIntroHelper.Current == null) {
+                ChangePhase();
             }
             
+            if (CustomIntroHelper.Current != null) {
+                CustomIntroHelper.Current.Update(_gameTime);
+            }
         }
         
         public extern void orig_Draw(GameTime gameTime);
         public override void Draw(GameTime gameTime) {
-            if (Fez.SkipLogos || screen != Screen.ADE || !FEZModEngine.Settings.ShowADELogo) {
+            if (Fez.SkipLogos || screen != Screen.FEZMOD) {
                 orig_Draw(gameTime);
                 return;
             }
             
-            GraphicsDevice.Clear(Color.White);
-            
-            Vector2 screenSize = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-            Vector2 screenMid = FezMath.Round(screenSize / 2f);
-            
-            float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
-            
-            Vector2 offsTL = 0.25f * new Vector2(adeLogoTL.Width, -adeLogoTL.Height) * (1f - adeOffset);
-            Vector2 offsDR = -offsTL;
-            
-            GraphicsDeviceExtensions.BeginPoint(spriteBatch);
-            spriteBatch.Draw(
-                adeLogoTL,
-                screenMid - FezMath.Round(new Vector2(adeLogoTL.Width, adeLogoTL.Height) / 2f) + offsTL,
-                new Color(1f, 1f, 1f, opacity)
-            );
-            spriteBatch.Draw(
-                adeLogoDR,
-                screenMid - FezMath.Round(new Vector2(adeLogoTL.Width, adeLogoDR.Height) / 2f) + offsDR,
-                new Color(1f, 1f, 1f, opacity)
-            );
-            spriteBatch.End();
+            if (CustomIntroHelper.Current != null) {
+                CustomIntroHelper.Current.Draw(_gameTime);
+            }
         }
         
-        [MonoModIgnore]
-        private extern void ChangePhase();
+        private extern void orig_ChangePhase();
+        private void ChangePhase() {
+            if (screen != Screen.FEZMOD || (screen == Screen.FEZMOD && phase != Phase.Wait) || CustomIntroHelper.Current == null) {
+                orig_ChangePhase();
+                return;
+            }
+            
+            if (CustomIntroHelper.Current != null) {
+                CustomIntroHelper.Current.ChangePhase();
+            }
+        }
         
         [MonoModEnumReplace]
         private enum Screen {
-            //Original enum values, must be the same to original due to possibly inlined / hardcoded / ?? values
+            //Original enum values, must be the same to original to avoid an hardcoded / resolved value mismatch
             ESRB_PEGI,
             XBLA,
             MGS,
@@ -219,7 +201,7 @@ namespace FezGame.Components {
             MainMenu,
             Warp,
             //Custom values
-            ADE = 100
+            FEZMOD = 100
         }
         
         [MonoModIgnore]

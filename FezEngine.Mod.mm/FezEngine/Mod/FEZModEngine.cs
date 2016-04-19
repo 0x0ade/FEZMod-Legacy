@@ -83,9 +83,6 @@ namespace FezEngine.Mod {
         public DataCacheMode DataCache = DataCacheMode.Default;
         
         public bool ModdedSpeechBubbles = true;
-        
-        //DEBUG - will be removed!
-        public bool ShowADELogo = false;
     }
     public class FEZModEngine : FezModuleCore {
         

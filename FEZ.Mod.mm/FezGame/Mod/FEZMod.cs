@@ -35,6 +35,8 @@ namespace FezGame.Mod {
         public virtual void SaveRead(SaveData saveData, CrcReader reader) {}
         public virtual void SaveWrite(SaveData saveData, CrcWriter writer) {}
         
+        public virtual CustomIntro[] CreateIntros() { return null; }
+        
     }
     
     public static class FEZMod {
@@ -109,7 +111,7 @@ namespace FezGame.Mod {
 
         public static void PreInitialize() {
             ModLogger.Clear();
-            ModLogger.Log("FEZMod", "JustAnotherFEZMod (FEZMod) "+FEZMod.Version);
+            ModLogger.Log("FEZMod", "JustAnotherFEZMod (FEZMod) " + FEZMod.Version);
             
             //Pre-initialize FEZModEngine link to FEZMod
             FEZModEngine.GetVersion = () => Version;
