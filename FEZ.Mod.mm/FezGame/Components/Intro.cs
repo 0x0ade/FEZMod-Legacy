@@ -106,7 +106,6 @@ namespace FezGame.Components {
         protected extern void orig_LoadContent();
         protected override void LoadContent() {
             orig_LoadContent();
-            
             CustomIntroHelper.Create(this);
         }
         
@@ -168,6 +167,13 @@ namespace FezGame.Components {
             if (CustomIntroHelper.Current != null) {
                 CustomIntroHelper.Current.Draw(_gameTime);
             }
+        }
+        
+        protected extern void orig_Dispose(bool disposing);
+        protected override void Dispose(bool disposing) {
+            orig_Dispose(disposing);
+            
+            CustomIntroHelper.Dispose();
         }
         
         private extern void orig_ChangePhase();

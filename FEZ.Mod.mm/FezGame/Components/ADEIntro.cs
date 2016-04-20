@@ -90,5 +90,11 @@ namespace FezGame.Components
             spriteBatch.End();
         }
         
+        public override void Dispose() {
+            spriteBatch.Dispose();
+            logoTL.Dispose();
+            logoDR.Dispose();
+        }
+        
     }
 }

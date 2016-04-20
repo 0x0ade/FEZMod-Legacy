@@ -26,7 +26,7 @@ using System.Collections.Generic;
 namespace FezGame.Mod {
     public static class CustomIntroHelper {
         
-        public static List<CustomIntro> Intros = new List<CustomIntro>();
+        public static List<CustomIntro> Intros;
         
         public static int CurrentIndex;
         public static CustomIntro Current {
@@ -76,6 +76,12 @@ namespace FezGame.Mod {
             CurrentIndex = 0;
             for (int i = 0; i < Intros.Count; i++) {
                 Intros[i].Reset();
+            }
+        }
+        
+        public static void Dispose() {
+            for (int i = 0; i < Intros.Count; i++) {
+                Intros[i].Dispose();
             }
         }
         

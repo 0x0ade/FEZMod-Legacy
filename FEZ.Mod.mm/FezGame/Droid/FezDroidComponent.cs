@@ -136,7 +136,7 @@ namespace FezGame.Droid {
             Func<Vector2> prev_get_Movement = FakeInputHelper.get_Movement;
             Action<Vector2> prev_set_Movement = FakeInputHelper.set_Movement;
             FakeInputHelper.get_Movement = delegate() {
-                return FakeInputHelper.Updating || DragMode != DragMode.Move ? (prev_get_Movement != null ? prev_get_Movement() : tmpMovement) : Drag * 4f;
+                return FakeInputHelper.Updating || DragMode != DragMode.Move ? (prev_get_Movement != null ? prev_get_Movement() : tmpMovement) : Vector2.Clamp(Drag, -Vector2.One, Vector2.One);
             };
             FakeInputHelper.set_Movement = delegate(Vector2 value) {
                 tmpMovement = value;
@@ -198,6 +198,9 @@ namespace FezGame.Droid {
                     Drag.Y = -Drag.Y; //Y == 0 is top, not bottom
                     Drag.X *= 2f / FezDroid.TouchWidth;
                     Drag.Y *= 2f / FezDroid.TouchHeight;
+                    if (DragMode == DragMode.Move) {
+                        Drag *= 4f;
+                    }
                 } else {
                     HandleButtonAt(tl);
                 }
@@ -210,26 +213,16 @@ namespace FezGame.Droid {
                 buttonAlpha[i] = buttonAlpha[i] * 0.95f + (buttonsEnabled && buttonEnabled[i] ? 1f : 0f) * 0.05f;
             }
             
-            touchFieldBackground = new Color(0, 0, 0, 0.25f);
             if (DragMode == DragMode.Move) {
-                if (Math.Abs(Drag.Y) < 0.3f * FezDroid.TouchHeight) {
-                    if (Drag.X >= -0.2f * FezDroid.TouchWidth) {
-                        CodeInputAll.Left.Press();
-                        touchFieldBackground.R = 255;
-                        touchFieldBackground.G = 0;
-                    } else if (Drag.X <= 0.2f * FezDroid.TouchWidth) {
-                        CodeInputAll.Right.Press();
-                        touchFieldBackground.R = 0;
-                        touchFieldBackground.G = 255;
-                    }
+                if (Drag.X <= -1f) {
+                    CodeInputAll.Left.Press();
+                } else if (Drag.X >= 1f) {
+                    CodeInputAll.Right.Press();
                 }
-                if (Math.Abs(Drag.X) < 0.3f * FezDroid.TouchWidth) {
-                    if (Drag.Y >= -0.2f * FezDroid.TouchHeight) {
-                        CodeInputAll.Up.Press();
-                        touchFieldBackground.B = 255;
-                    } else if (Drag.Y <= 0.2f * FezDroid.TouchHeight) {
-                        CodeInputAll.Down.Press();
-                    }
+                if (Drag.Y <= -1f) {
+                    CodeInputAll.Up.Press();
+                } else if (Drag.Y >= 1f) {
+                    CodeInputAll.Down.Press();
                 }
             }
         }

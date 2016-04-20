@@ -37,6 +37,9 @@ namespace FezGame.Components
         public virtual void Draw(GameTime gameTime) {
         }
         
+        public virtual void Dispose() {
+        }
+        
         public virtual void ChangePhase() {
             switch (phase) {
                 case Phase.FadeIn: phase = Phase.Wait; break;
