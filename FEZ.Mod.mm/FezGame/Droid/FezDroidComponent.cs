@@ -195,10 +195,16 @@ namespace FezGame.Droid {
                 
                 if (dragTouchId == tl.Id) {
                     Drag = (tl.Position - TouchOrigins[tl.Id]);
-                    Drag.Y = -Drag.Y; //Y == 0 is top, not bottom
                     Drag.X *= 2f / FezDroid.TouchWidth;
                     Drag.Y *= 2f / FezDroid.TouchHeight;
                     if (DragMode == DragMode.Move) {
+                        Drag.Y = -Drag.Y; //Movement logic!
+                        
+                        //Fake "deadzone"
+                        Drag.X = Math.Sign(Drag.X) * Math.Abs(Drag.X - 0.13f);
+                        Drag.Y = Math.Sign(Drag.Y) * Math.Abs(Drag.Y - 0.13f);
+                        
+                        //The player shouldn't drag across the whole screen just to move Gomez...
                         Drag *= 4f;
                     }
                 } else {
@@ -219,10 +225,10 @@ namespace FezGame.Droid {
                 } else if (Drag.X >= 1f) {
                     CodeInputAll.Right.Press();
                 }
-                if (Drag.Y <= -1f) {
-                    CodeInputAll.Up.Press();
-                } else if (Drag.Y >= 1f) {
+                if (Drag.Y <= -0.78f) {
                     CodeInputAll.Down.Press();
+                } else if (Drag.Y >= 1f) {
+                    CodeInputAll.Up.Press();
                 }
             }
         }
