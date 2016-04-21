@@ -146,7 +146,7 @@ namespace FezGame.Components {
 
             #if FNA
             TextInputEXT.TextInput += OnTextInput;
-            SDL.SDL_StartTextInput();
+            //SDL.SDL_StartTextInput(); //FIXME: Only enable text input when a text field is selected!
             #else
             Game.Window.TextInput += OnTextInput;
             #endif
