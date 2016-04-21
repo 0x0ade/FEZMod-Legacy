@@ -67,7 +67,6 @@ namespace FezEngine.Structure.Geometry {
 
             #if !FNA
             if (FEZModEngine.FEZVersion == V_1_11) {
-                ModLogger.Log("FEZMod.SIIP", "Draw 1.11");
                 Draw_1_11(effect);
                 return;
             }
