@@ -95,7 +95,7 @@ namespace FezGame.Droid {
             true,
             true,
             true,
-            true,
+            false,
             true,
             false
         };
@@ -201,8 +201,8 @@ namespace FezGame.Droid {
                         Drag.Y = -Drag.Y; //Movement logic!
                         
                         //Fake "deadzone"
-                        Drag.X = Math.Sign(Drag.X) * Math.Abs(Drag.X - 0.13f);
-                        Drag.Y = Math.Sign(Drag.Y) * Math.Abs(Drag.Y - 0.13f);
+                        Drag.X = Math.Sign(Drag.X) * Math.Max(0f, Math.Abs(Drag.X) - 0.13f);
+                        Drag.Y = Math.Sign(Drag.Y) * Math.Max(0f, Math.Abs(Drag.Y) - 0.14f);
                         
                         //The player shouldn't drag across the whole screen just to move Gomez...
                         Drag *= 4f;
@@ -213,6 +213,9 @@ namespace FezGame.Droid {
             }
             
             buttonsEnabled = !GameState.TimePaused || GameState.InMenuCube || GameState.InMap;
+            //Y button //TODO condition separate from map?
+            buttonEnabled[3] = GameState.SaveData != null && LevelManager.Name != null && GameState.SaveData.CanOpenMap && LevelManager.Name != "PYRAMID" && !LevelManager.Name.StartsWith("GOMEZ_HOUSE_END");
+            //Back button
             buttonEnabled[5] = GameState.SaveData != null && LevelManager.Name != null && GameState.SaveData.CanOpenMap && LevelManager.Name != "PYRAMID" && !LevelManager.Name.StartsWith("GOMEZ_HOUSE_END");
             
             for (int i = 0; i < buttonMapping.Length; i++) {

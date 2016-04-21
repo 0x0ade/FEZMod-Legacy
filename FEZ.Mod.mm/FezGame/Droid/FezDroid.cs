@@ -6,6 +6,7 @@ using FezEngine.Tools;
 using Microsoft.Xna.Framework;
 using System.Reflection;
 using Microsoft.Xna.Framework.Input.Touch;
+using Common;
 
 namespace FezGame.Droid {
     public class FezDroid : FezModule {
@@ -39,7 +40,10 @@ namespace FezGame.Droid {
                 TouchPanel.DisplayHeight = value;
             }
         }
-
+        
+        //Using FNADroid dierctly would kill desktop support.
+        public static Vector3 AccelerometerData { get; protected set; }
+        
         public FezDroid() {
         }
         
@@ -92,7 +96,13 @@ namespace FezGame.Droid {
             ModLogger.Log("FEZDroid", "Enabling FNADroid-specific features...");
             Assembly asmLib = Assembly.Load("FNADroid-Lib");
             
-            //TODO add FNADroid-specific functionality here.
+            //Add FNADroid-specific functionality here.
+            
+            Environment.SetEnvironmentVariable("FNA_GAMEPAD_VIBRATION_PHONE", "1");
+            
+            Type t_Accelerometer = asmLib.GetType("FNADroid.Accelerometer");
+            t_Accelerometer.GetEvent("DataChanged").AddEventHandler(null,
+            (Action<Vector3>) ((Vector3 data) => AccelerometerData = data));
             
         }
 
