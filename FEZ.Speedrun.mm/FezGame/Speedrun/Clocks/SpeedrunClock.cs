@@ -88,6 +88,12 @@ namespace FezGame.Speedrun.Clocks {
             }
 
             string split = null;
+            foreach (SplitCase tosplit in FezSpeedrun.DefaultSplitCases) {
+                if (split != null) {
+                    break;
+                }
+                split = tosplit(this);
+            }
             foreach (SplitCase tosplit in defaultSplitCases) {
                 if (split != null) {
                     break;
