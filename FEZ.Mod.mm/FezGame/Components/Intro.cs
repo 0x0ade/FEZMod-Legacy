@@ -111,6 +111,11 @@ namespace FezGame.Components {
         
         private extern void orig_ChangeScreen();
         private void ChangeScreen() {
+            if (!FEZMod.EnableCustomIntros) {
+                orig_ChangeScreen();
+                return;
+            }
+            
             if (screen == Screen.Trapdoor) {
                 screen = Screen.FEZMOD;
                 return;
@@ -140,7 +145,7 @@ namespace FezGame.Components {
         
         private extern void orig_UpdateLogo();
         private void UpdateLogo() {
-            if (screen != Screen.FEZMOD) {
+            if (screen != Screen.FEZMOD || !FEZMod.EnableCustomIntros) {
                 orig_UpdateLogo();
                 return;
             }
@@ -159,7 +164,7 @@ namespace FezGame.Components {
         
         public extern void orig_Draw(GameTime gameTime);
         public override void Draw(GameTime gameTime) {
-            if (Fez.SkipLogos || screen != Screen.FEZMOD) {
+            if (Fez.SkipLogos || screen != Screen.FEZMOD || !FEZMod.EnableCustomIntros) {
                 orig_Draw(gameTime);
                 return;
             }
@@ -178,7 +183,7 @@ namespace FezGame.Components {
         
         private extern void orig_ChangePhase();
         private void ChangePhase() {
-            if (screen != Screen.FEZMOD || (screen == Screen.FEZMOD && phase != Phase.Wait) || CustomIntroHelper.Current == null) {
+            if (screen != Screen.FEZMOD || (screen == Screen.FEZMOD && phase != Phase.Wait) || CustomIntroHelper.Current == null || !FEZMod.EnableCustomIntros) {
                 orig_ChangePhase();
                 return;
             }
@@ -207,7 +212,7 @@ namespace FezGame.Components {
             MainMenu,
             Warp,
             //Custom values
-            FEZMOD = 100
+            FEZMOD = -100
         }
         
         [MonoModIgnore]

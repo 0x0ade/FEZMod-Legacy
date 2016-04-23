@@ -167,13 +167,13 @@ namespace FezEngine.Structure.Geometry {
                     }
                     
                     if (Instances.Length - sourceIndex < batchInstanceCount) {
-                        //instance count mismatch, non-intel crash
+                        //instance count mismatch, non-Intel crash
                         i = 0; //otherwise ends up hanging in this loop
                         batchInstanceCount = Instances.Length - sourceIndex;
                     }
                     if (tempInstances.Length < batchInstanceCount) {
-                        //instance count mismatch, intel crash
-                        i = batchInstanceCount - tempInstances.Length; //otherwise ends up hanging in this loop
+                        //instance count mismatch, Intel crash
+                        i = 0;//batchInstanceCount - tempInstances.Length; //otherwise ends up hanging in this loop
                         batchInstanceCount = tempInstances.Length;
                     }
                     

@@ -22,10 +22,12 @@ namespace FezGame.Components
         public override void LoadContent() {
             base.LoadContent();
             
-            logoTL = cm.Load<Texture2D>("other textures/splash/ade_tl");
-            logoDR = cm.Load<Texture2D>("other textures/splash/ade_dr");
-            
-            spriteBatch = new SpriteBatch(Intro.GraphicsDevice);
+            FEZModEngine.InvokeGL(delegate() {
+                logoTL = cm.Load<Texture2D>("other textures/splash/ade_tl");
+                logoDR = cm.Load<Texture2D>("other textures/splash/ade_dr");
+                
+                spriteBatch = new SpriteBatch(Intro.GraphicsDevice);
+            });
         }
         
         public override void Reset() {

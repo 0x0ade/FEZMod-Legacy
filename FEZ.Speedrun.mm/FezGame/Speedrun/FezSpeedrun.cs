@@ -49,6 +49,7 @@ namespace FezGame.Speedrun {
                 FEZMod.EnableFEZometric = false;
                 FEZMod.EnableQuickWarp = false;
                 FEZMod.EnableBugfixes = false;
+                FEZMod.EnableCustomIntros = false;
             }
             
             if (Settings.ToolAssistedSpeedrun) {
@@ -134,6 +135,7 @@ namespace FezGame.Speedrun {
                     FEZMod.EnableFEZometric = !tmpSettings.SpeedrunMode;
                     FEZMod.EnableQuickWarp = !tmpSettings.SpeedrunMode;
                     FEZMod.EnableBugfixes = !tmpSettings.SpeedrunMode;
+                    FEZMod.EnableCustomIntros = !tmpSettings.SpeedrunMode;
                     
                     ((MenuItem<string>) displayMode).SliderValueSetter(null, 0);
                     ((MenuItem<string>) toolAssist).SliderValueSetter(null, 0);

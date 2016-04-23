@@ -64,6 +64,7 @@ namespace FezGame.Mod {
         public static bool EnableMultiplayer = false;
         public static bool EnableMultiplayerLocalhost = false;
         public static bool CreatingThumbnail = false;
+        public static bool EnableCustomIntros = true;
         private static string loadingLevel = null;
         public static string LoadingLevel {
             get {
@@ -491,7 +492,7 @@ namespace FezGame.Mod {
             
             mb.HelpOptionsMenu.AddItem("FEZModMenu", delegate() {
                 mb.ChangeMenuLevel(Menu);
-            });
+            }, mb.HelpOptionsMenu.Items.Count - 1); //Above save management
             mb.MenuLevels.Add(Menu);
             
             CallInEachModule("InitializeMenu", Garbage.GetObjectArray(mb));
