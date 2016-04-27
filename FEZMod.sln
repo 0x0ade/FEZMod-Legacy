@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FezEngine.Mod.mm", "FezEngi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FEZ.Editor.mm", "FEZ.Editor.mm\FEZ.Editor.mm.csproj", "{00040ED9-020B-4427-89A5-6F7B0A5EDE95}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FEZ.Speedrun.mm", "FEZ.Speedrun.mm\FEZ.Speedrun.mm.csproj", "{678C8F90-55B3-4887-83CC-57186092D674}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FEZ.TAS.mm", "FEZ.TAS.mm\FEZ.TAS.mm.csproj", "{678C8F90-55B3-4887-83CC-57186092D674}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.FML.mm", "MonoGame.Framework.FML.mm\MonoGame.Framework.FML.mm.csproj", "{E5E4B725-1FFC-414D-BD3C-3AD35FE1A9B2}"
 EndProject

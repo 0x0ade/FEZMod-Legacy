@@ -109,7 +109,7 @@
     <Compile Include="FezGame\Components\PlayerCameraControl.cs" />
     <Compile Include="FezGame\Mod\FEZModSaveHelper.cs" />
     <Compile Include="FezGame\Structure\patch_SaveData.cs" />
-    <Compile Include="FezGame\Tools\SaveFileOperations.cs" />
+    <Compile Include="FezGame\Tools\patch_SaveFileOperations.cs" />
     <Compile Include="FezGame\Components\Actions\Bounce.cs" />
     <Compile Include="FezGame\Components\Actions\ReadSign.cs" />
     <Compile Include="FezGame\Components\SlaveGomezHost.cs" />
