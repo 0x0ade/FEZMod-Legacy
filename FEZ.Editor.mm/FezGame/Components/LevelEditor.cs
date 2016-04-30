@@ -409,7 +409,7 @@ namespace FezGame.Components {
                         Position = new Vector2(0f, 0f)
                     },
                     fieldSpawnX = new TextFieldWidget(Game) {
-                        RefreshValue = () => LevelManager.StartingPosition.Id.X.ToString(),
+                        RefreshValue = () => LevelManager.StartingPosition == null ? "0" : LevelManager.StartingPosition.Id.X.ToString(),
                         Size = new Vector2(160f, 24f),
                         Position = new Vector2(96f, 0f)
                     }
@@ -423,7 +423,7 @@ namespace FezGame.Components {
                         Position = new Vector2(0f, 0f)
                     },
                     fieldSpawnY = new TextFieldWidget(Game) {
-                        RefreshValue = () => LevelManager.StartingPosition.Id.Y.ToString(),
+                        RefreshValue = () => LevelManager.StartingPosition == null ? "0" : LevelManager.StartingPosition.Id.Y.ToString(),
                         Size = new Vector2(160f, 24f),
                         Position = new Vector2(96f, 0f)
                     }
@@ -437,7 +437,7 @@ namespace FezGame.Components {
                         Position = new Vector2(0f, 0f)
                     },
                     fieldSpawnZ = new TextFieldWidget(Game) {
-                        RefreshValue = () => LevelManager.StartingPosition.Id.Z.ToString(),
+                        RefreshValue = () => LevelManager.StartingPosition == null ? "0" : LevelManager.StartingPosition.Id.Z.ToString(),
                         Size = new Vector2(160f, 24f),
                         Position = new Vector2(96f, 0f)
                     }
@@ -451,7 +451,7 @@ namespace FezGame.Components {
                         Position = new Vector2(0f, 0f)
                     },
                     fieldSpawnFace = new TextFieldWidget(Game, "", Enum.GetNames(typeof(FaceOrientation))) {
-                        RefreshValue = () => LevelManager.StartingPosition.Face.ToString(),
+                        RefreshValue = () => LevelManager.StartingPosition == null ? "Front" : LevelManager.StartingPosition.Face.ToString(),
                         Size = new Vector2(160f, 24f),
                         Position = new Vector2(96f, 0f)
                     }
@@ -459,6 +459,9 @@ namespace FezGame.Components {
                     Size = new Vector2(256f, 24f)
                 },
                 new ButtonWidget(Game, "CHANGE", delegate() {
+                    if (LevelManager.StartingPosition == null) {
+                        LevelManager.StartingPosition = new TrileFace();
+                    }
                     LevelManager.StartingPosition.Id.X = int.Parse(fieldSpawnX.Text);
                     LevelManager.StartingPosition.Id.Y = int.Parse(fieldSpawnY.Text);
                     LevelManager.StartingPosition.Id.Z = int.Parse(fieldSpawnZ.Text);

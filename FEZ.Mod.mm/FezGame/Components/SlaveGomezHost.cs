@@ -126,7 +126,11 @@ namespace FezGame.Components {
             StarsTexture = ServiceHelper.Get<IContentManagerProvider>().Global.Load<Texture2D>("Other Textures/black_hole/Stars");
         }
 
-        private void PreDraw() {
+        private void PreDraw(
+#if FNA
+            GameTime gameTime
+#endif
+        ) {
             if (GameState.Loading || PlayerManager.Hidden || GameState.InFpsMode) {
                 return;
             }

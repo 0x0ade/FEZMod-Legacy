@@ -20,10 +20,10 @@ namespace FezGame.Mod.Gui {
                 thumbnailShrinkedWidth = (Size.Y / qs.Thumbnail.Height) * qs.Thumbnail.Width;
             }
 
-            Widgets.Add(new ButtonWidget(Game, "Time: " + "----" /*SpeedrunInfo.FormatTime(qs.Time.ToString(), true)*/, OnClick) {
-                Position = new Vector2(0, 0f),
+            //Widgets.Add(new ButtonWidget(Game, "Time: " + "----" /*SpeedrunInfo.FormatTime(qs.Time.ToString(), true)*/, OnClick) {
+            /*    Position = new Vector2(0, 0f),
                 UpdateBounds = true
-            });
+            });*/
             Widgets.Add(new ButtonWidget(Game, "Frames: " + qs.RewindData.Count, OnClick) {
                 Position = new Vector2(0, GraphicsDevice.GetViewScale()),
                 UpdateBounds = true

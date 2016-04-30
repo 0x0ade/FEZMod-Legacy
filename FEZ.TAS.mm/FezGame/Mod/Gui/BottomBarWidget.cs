@@ -13,11 +13,11 @@ namespace FezGame.Mod.Gui {
 
         public BottomBarWidget(Game game) 
             : base(game) {
-            Widgets.Add(TimeWidget = new ButtonWidget(Game, "T: 00:00:00.0000") {
+            /*Widgets.Add(TimeWidget = new ButtonWidget(Game, "T: 00:00:00.0000") {
                 Position = new Vector2(0f, 0f),
                 Size = new Vector2(192f, 24f),
                 UpdateBounds = false
-            });
+            });*/
             Widgets.Add(FramesWidget = new ButtonWidget(Game, "F: 0") {
                 Position = new Vector2(GraphicsDevice.Viewport.Width - 192f, 0f),
                 Size = new Vector2(192f, 24f),
@@ -43,13 +43,13 @@ namespace FezGame.Mod.Gui {
 
             ProgressWidget.Background = GuiHandler.DefaultForeground;
             
-            string time = "----";//FezSpeedrun.Clock != null ? FezSpeedrun.Clock.Time.ToString() : "----";
+            /*string time = "----";//FezSpeedrun.Clock != null ? FezSpeedrun.Clock.Time.ToString() : "----";
 
             TimeWidget.Label = "T: " + time;//SpeedrunInfo.FormatTime(time);
             TimeWidget.Size.X = 192f * GraphicsDevice.GetViewScale();
             TimeWidget.Size.Y = 24f * GraphicsDevice.GetViewScale();
             TimeWidget.Position.X = 0f;
-            TimeWidget.Position.Y = 0f;
+            TimeWidget.Position.Y = 0f;*/
 
             FramesWidget.Label = " F: " + ((TASComponent) GuiHandler).RewindPosition;
             FramesWidget.Size.X = 192f * GraphicsDevice.GetViewScale();

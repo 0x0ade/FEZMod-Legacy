@@ -11,6 +11,10 @@ using FezGame.Structure;
 using FezGame.Tools;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Reflection;
+using FezGame;
+using Common;
+using System.Diagnostics;
 
 namespace FezGame.TAS {
     
@@ -26,6 +30,25 @@ namespace FezGame.TAS {
         public override string Version { get { return FEZMod.Version; } }
         
         public static FezTASSettings Settings;
+        
+        private static FieldInfo f_SpeedRun_Began;
+        public static bool SpeedRunBegan {
+            get {
+                return (bool) ReflectionHelper.GetValue(f_SpeedRun_Began, null);
+            }
+            set {
+                ReflectionHelper.SetValue(f_SpeedRun_Began, value, null);
+            }
+        }
+        private static FieldInfo f_SpeedRun_Timer;
+        public static Stopwatch SpeedRunTimer {
+            get {
+                return (Stopwatch) ReflectionHelper.GetValue(f_SpeedRun_Timer, null);
+            }
+            set {
+                ReflectionHelper.SetValue(f_SpeedRun_Timer, value, null);
+            }
+        }
 
         public FezTAS() {
         }
@@ -40,6 +63,10 @@ namespace FezGame.TAS {
                 FEZModEngine.GetComponentsAsServices = true;
                 FEZModEngine.HandleComponents = true;
             }
+            
+            Type t_SpeedRun = typeof(SpeedRun);
+            f_SpeedRun_Began = t_SpeedRun.GetField("Began", BindingFlags.Static | BindingFlags.NonPublic);
+            f_SpeedRun_Timer = t_SpeedRun.GetField("Timer", BindingFlags.Static | BindingFlags.NonPublic);
             
             TextPatchHelper.Static.Fallback["ToolAssist"] = "Tool assist (quicksaves, ...): {0}";
         }
