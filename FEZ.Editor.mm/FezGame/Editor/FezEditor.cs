@@ -39,7 +39,6 @@ namespace FezGame.Editor {
                     }
                     //Fez.SkipLogos = true;
                     Fez.SkipIntro = true;
-                    FEZMod.EnableDebugControls = true;
                     FEZModEngine.GetComponentsAsServices = true;
                     FEZModEngine.HandleComponents = true;
                     InEditor = true;
