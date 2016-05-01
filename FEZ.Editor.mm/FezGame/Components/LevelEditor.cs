@@ -2289,24 +2289,25 @@ namespace FezGame.Components {
             }
         }
 
+        protected readonly static FaceOrientation[] faces = {
+            FaceOrientation.Right,
+            FaceOrientation.Left,
+            FaceOrientation.Top,
+            FaceOrientation.Down,
+            FaceOrientation.Front,
+            FaceOrientation.Back
+        };
         protected FaceOrientation GetHoveredFace(BoundingBox box, Ray ray) {
             float intersectionMin = float.MaxValue;
 
-            BoundingBox[] sides = new BoundingBox[6];
+            BoundingBox[] sides = EditorUtils.a_BoundingBox_6.GetNext();
+            
             sides[0] = new BoundingBox(new Vector3(box.Min.X, box.Min.Y, box.Min.Z), new Vector3(box.Min.X, box.Max.Y, box.Max.Z));
             sides[1] = new BoundingBox(new Vector3(box.Max.X, box.Min.Y, box.Min.Z), new Vector3(box.Max.X, box.Max.Y, box.Max.Z));
             sides[2] = new BoundingBox(new Vector3(box.Min.X, box.Min.Y, box.Min.Z), new Vector3(box.Max.X, box.Min.Y, box.Max.Z));
             sides[3] = new BoundingBox(new Vector3(box.Min.X, box.Max.Y, box.Min.Z), new Vector3(box.Max.X, box.Max.Y, box.Max.Z));
             sides[4] = new BoundingBox(new Vector3(box.Min.X, box.Min.Y, box.Min.Z), new Vector3(box.Max.X, box.Max.Y, box.Min.Z));
             sides[5] = new BoundingBox(new Vector3(box.Min.X, box.Min.Y, box.Max.Z), new Vector3(box.Max.X, box.Max.Y, box.Max.Z));
-
-            FaceOrientation[] faces = new FaceOrientation[6];
-            faces[0] = FaceOrientation.Right;
-            faces[1] = FaceOrientation.Left;
-            faces[2] = FaceOrientation.Top;
-            faces[3] = FaceOrientation.Down;
-            faces[4] = FaceOrientation.Front;
-            faces[5] = FaceOrientation.Back;
 
             FaceOrientation face = FaceOrientation.Top;
 

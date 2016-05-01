@@ -440,7 +440,7 @@ namespace FezEngine.Mod {
                     levelData.Song.Initialize();
                 }
 
-                //levelData.OnDeserialization();
+                levelData.OnDeserialization();
             }
 
             if (obj is Entity) {

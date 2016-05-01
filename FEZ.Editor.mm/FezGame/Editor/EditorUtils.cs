@@ -1,9 +1,12 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using System.Reflection;
+using FezEngine.Mod;
 
 namespace FezGame.Editor {
     public static class EditorUtils {
+
+        public static ArrayCache<BoundingBox> a_BoundingBox_6 = new ArrayCache<BoundingBox>(6);
 
         public static T GetPrivate<T>(this object instance, string fieldName) {
             FieldInfo field = instance.GetType().GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);

@@ -4,6 +4,8 @@ using System;
 namespace FezEngine.Mod {
     
     public class Cache<T> {
+        
+        public static int DefaultAmount = 8;
     
         protected Type type;
         protected T[] cache;
@@ -20,11 +22,11 @@ namespace FezEngine.Mod {
         }
     
         public Cache(object[] args)
-            : this(8, args, args != null && args.Length > 1 ? Type.GetTypeArray(args) : Garbage.a_Type_0) {
+            : this(DefaultAmount, args, args != null && args.Length > 1 ? Type.GetTypeArray(args) : Garbage.a_Type_0) {
         }
     
         public Cache(object[] args, Type[] types)
-            : this(8, args, types) {
+            : this(DefaultAmount, args, types) {
         }
     
         public Cache(int amount, object[] args)
@@ -104,7 +106,7 @@ namespace FezEngine.Mod {
         protected int arrsize;
         
          public ArrayCache(int arrsize)
-            : this(8, arrsize) {
+            : this(DefaultAmount, arrsize) {
         }
     
         public ArrayCache(int amount, int arrsize)
@@ -112,11 +114,11 @@ namespace FezEngine.Mod {
         }
     
         public ArrayCache(object[] args, int arrsize)
-            : this(8, args, args != null && args.Length > 1 ? Type.GetTypeArray(args) : Garbage.a_Type_0, arrsize) {
+            : this(DefaultAmount, args, args != null && args.Length > 1 ? Type.GetTypeArray(args) : Garbage.a_Type_0, arrsize) {
         }
     
         public ArrayCache(object[] args, Type[] types, int arrsize)
-            : this(8, args, types, arrsize) {
+            : this(DefaultAmount, args, types, arrsize) {
         }
     
         public ArrayCache(int amount, object[] args, int arrsize)

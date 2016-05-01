@@ -16,6 +16,8 @@ namespace FezEngine.Mod {
         
         public readonly static ArrayCache<object> a_object_1 = new ArrayCache<object>(1);
         public readonly static ArrayCache<object> a_object_2 = new ArrayCache<object>(2);
+        public readonly static ArrayCache<object> a_object_3 = new ArrayCache<object>(3);
+        public readonly static ArrayCache<object> a_object_4 = new ArrayCache<object>(4);
         
         //Utility / helper fields
         
@@ -39,14 +41,14 @@ namespace FezEngine.Mod {
             return a_;
         }
         public static object[] GetObjectArray(object _0, object _1, object _2) {
-            object[] a_ = Garbage.a_object_2.GetNext();
+            object[] a_ = Garbage.a_object_3.GetNext();
             a_[0] = _0;
             a_[1] = _1;
             a_[2] = _2;
             return a_;
         }
         public static object[] GetObjectArray(object _0, object _1, object _2, object _3) {
-            object[] a_ = Garbage.a_object_2.GetNext();
+            object[] a_ = Garbage.a_object_4.GetNext();
             a_[0] = _0;
             a_[1] = _1;
             a_[2] = _2;
