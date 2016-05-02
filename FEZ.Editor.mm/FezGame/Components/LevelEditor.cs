@@ -18,6 +18,7 @@ using System.IO;
 using FezGame.Editor;
 using FezGame.Mod.Gui;
 using System.Drawing.Imaging;
+using Microsoft.Xna.Framework.Input;
 #if FNA
 using Microsoft.Xna.Framework.Input;
 using SDL2;
@@ -32,6 +33,8 @@ namespace FezGame.Components {
         public ISoundManager SoundManager { get; set; }
         [ServiceDependency]
         public IInputManager InputManager { get; set; }
+        [ServiceDependency]
+        public IKeyboardStateManager KeyboardState { get; set; }
         [ServiceDependency]
         public IGameService GameService { get; set; }
         [ServiceDependency]
@@ -150,6 +153,11 @@ namespace FezGame.Components {
             #else
             Game.Window.TextInput += OnTextInput;
             #endif
+            
+            KeyboardState.RegisterKey(Keys.LeftControl);
+            KeyboardState.RegisterKey(Keys.S);
+            KeyboardState.RegisterKey(Keys.N);
+            KeyboardState.RegisterKey(Keys.O);
 
             Widgets = new List<GuiWidget>();
 
@@ -289,8 +297,9 @@ namespace FezGame.Components {
                 new ButtonWidget(Game, "256px", () => CreateThumbnail(256)),
                 new ButtonWidget(Game, "512px", () => CreateThumbnail(512))
             }));
-            button.Widgets.Add(new ButtonWidget(Game, "Save (XML)", () => Save()));
-            button.Widgets.Add(new ButtonWidget(Game, "Save (binary)", () => Save(true)));
+            /*button.Widgets.Add(new ButtonWidget(Game, "Save (XML)", () => Save()));
+            button.Widgets.Add(new ButtonWidget(Game, "Save (binary)", () => Save(true)));*/
+            button.Widgets.Add(new ButtonWidget(Game, "Save", () => Save(true)));
 
             TopBarWidget.Widgets.Add(button = new ButtonWidget(Game, "View"));
             button.Background.A = 0;
@@ -2108,6 +2117,19 @@ namespace FezGame.Components {
                     TooltipWidgetAdded = true;
                 }
             }
+            
+            if (FocusedWidget == null && KeyboardState.GetKeyState(Keys.LeftControl) == FezButtonState.Down) {
+                if (KeyboardState.GetKeyState(Keys.S) == FezButtonState.Pressed) {
+                    Save(true, true);
+                } else if (KeyboardState.GetKeyState(Keys.N) == FezButtonState.Pressed) {
+                    TopBarWidget.Widgets[0 /*File*/].Widgets[0 /*New*/].Click(gameTime, 1);
+                } else if (KeyboardState.GetKeyState(Keys.O) == FezButtonState.Pressed) {
+                    TopBarWidget.Widgets[0 /*File*/].Hover(gameTime);
+                    TopBarWidget.Widgets[0 /*File*/].Widgets[1 /*Open*/].Hover(gameTime);
+                    FocusedWidget = TopBarWidget.Widgets[0 /*File*/].Widgets[1 /*Open*/].Widgets[0 /*Field*/];
+                    FocusedWidget.Click(gameTime, 1);
+                }
+            }
         }
 
         public override void Draw(GameTime gameTime) {
@@ -2322,7 +2344,7 @@ namespace FezGame.Components {
             return face;
         }
 
-        public void Save(bool binary = false, bool overwrite = false) {
+        public void Save(bool binary = true, bool overwrite = false) {
             WindowHeaderWidget windowHeader = null;
 
             string filePath_ = ("levels\\" + LevelManager.Name).Externalize() + ".";
