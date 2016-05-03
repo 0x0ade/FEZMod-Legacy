@@ -111,4 +111,10 @@
     <Folder Include="FezGame\Mod\" />
     <Folder Include="FezGame\Mod\Gui\" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Content\editor\cursor\default.png" />
+    <EmbeddedResource Include="Content\editor\cursor\click.png" />
+    <EmbeddedResource Include="Content\editor\cursor\hover.png" />
+    <EmbeddedResource Include="Content\editor\cursor\action.png" />
+  </ItemGroup>
 </Project>

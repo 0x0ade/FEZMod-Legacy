@@ -71,10 +71,11 @@ namespace FezGame.Components {
 
         protected float SinceMouseMoved = 3f;
         protected bool CursorHovering = false;
-        protected Texture2D GrabbedCursor;
-        protected Texture2D CanClickCursor;
-        protected Texture2D ClickedCursor;
-        protected Texture2D PointerCursor;
+        protected Texture2D CursorDefault;
+        protected Texture2D CursorClick;
+        protected Texture2D CursorHover;
+        protected Texture2D CursorAction;
+        protected Vector2 CursorOffset = new Vector2(16f, 16f);
 
         protected int SkipLoading = 0;
 
@@ -1966,10 +1967,10 @@ namespace FezGame.Components {
         public void Preload() {
             GTR = new GlyphTextRenderer(Game);
 
-            PointerCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_POINTER");
-            CanClickCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_CLICKER_A");
-            ClickedCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_CLICKER_B");
-            GrabbedCursor = CMProvider.Global.Load<Texture2D>("Other Textures/cursor/CURSOR_GRABBER");
+            CursorDefault = CMProvider.Global.Load<Texture2D>("editor/cursor/DEFAULT");
+            CursorClick = CMProvider.Global.Load<Texture2D>("editor/cursor/CLICK");
+            CursorHover = CMProvider.Global.Load<Texture2D>("editor/cursor/HOVER");
+            CursorAction = CMProvider.Global.Load<Texture2D>("editor/cursor/ACTION");
 
             SpriteBatch = new SpriteBatch(GraphicsDevice);
         }
@@ -2064,7 +2065,7 @@ namespace FezGame.Components {
             }
 
             if (cursorInMenu) {
-                CursorHovering = true;
+                //CursorHovering = true;
                 return;
             }
 
@@ -2167,9 +2168,19 @@ namespace FezGame.Components {
 
             float cursorScale = viewScale * 2f;
             Point cursorPosition = SettingsManager.PositionInViewport(MouseState);
-            Texture2D cursor = MouseState.LeftButton.State == MouseButtonStates.Dragging || MouseState.RightButton.State == MouseButtonStates.Dragging ? GrabbedCursor : (CursorHovering ? (MouseState.LeftButton.State == MouseButtonStates.Down || MouseState.RightButton.State == MouseButtonStates.Down ? ClickedCursor : CanClickCursor) : PointerCursor);
-            if (cursor == CanClickCursor || cursor == ClickedCursor) {
-                cursorPosition.X -= 8;
+            Texture2D cursor;
+            if (MouseState.LeftButton.State == MouseButtonStates.Dragging || MouseState.RightButton.State == MouseButtonStates.Dragging ||
+                MouseState.LeftButton.State == MouseButtonStates.Clicked || MouseState.RightButton.State == MouseButtonStates.Clicked ||
+                MouseState.LeftButton.State == MouseButtonStates.Down || MouseState.RightButton.State == MouseButtonStates.Down) {
+                if (CursorHovering) {
+                    cursor = CursorAction;
+                } else {
+                    cursor = CursorClick;
+                }
+            } else if (CursorHovering) {
+                cursor = CursorHover;
+            } else {
+                cursor = CursorDefault;
             }
 
             GraphicsDevice.SetBlendingMode(BlendingMode.Alphablending);
@@ -2182,8 +2193,8 @@ namespace FezGame.Components {
 
             SpriteBatch.Draw(cursor, 
                 new Vector2(
-                    (float) cursorPosition.X - cursorScale * 11.5f,
-                    (float) cursorPosition.Y - cursorScale * 8.5f
+                    (float) cursorPosition.X - cursorScale * CursorOffset.X,
+                    (float) cursorPosition.Y - cursorScale * CursorOffset.Y
                 ), new Rectangle?(),
                 new Color(1f, 1f, 1f, FezMath.Saturate((float) (1.0 - ((double) SinceMouseMoved - 2.0)))),
                 0.0f,
