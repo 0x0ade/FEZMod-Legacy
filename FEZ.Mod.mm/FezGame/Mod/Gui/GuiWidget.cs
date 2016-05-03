@@ -61,7 +61,7 @@ namespace FezGame.Mod.Gui {
                 if (Parent != null && Parent.GetType() == typeof(ContainerWidget) && !Parent.backgroundBounds.Intersects(backgroundBounds)) {
                     return false;
                 }
-                return true;
+                return Visible;
             }
         }
 
@@ -85,7 +85,7 @@ namespace FezGame.Mod.Gui {
         protected Rectangle backgroundBounds = new Rectangle();
         protected bool ScissorTestEnablePrev;
         protected Rectangle ScissorRectanglePrev;
-        protected List<GuiWidget> ScissorHistory = new List<GuiWidget>();
+        protected static List<GuiWidget> ScissorHistory = new List<GuiWidget>();
         protected readonly static RasterizerState ScissorRasterizerState = new RasterizerState {
             CullMode = CullMode.CullCounterClockwiseFace,
             ScissorTestEnable = true
@@ -228,8 +228,7 @@ namespace FezGame.Mod.Gui {
                 widget.UpdateTheme();
             }
 
-            if (foreground_.A != 0 ||
-                PrevDefaultBackground.R != Background.R || PrevDefaultBackground.G != Background.G || PrevDefaultBackground.B != Background.B) {
+            if (foreground_.A == 0) {
                 return;
             }
 

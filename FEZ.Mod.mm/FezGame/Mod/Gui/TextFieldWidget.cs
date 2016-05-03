@@ -13,14 +13,13 @@ namespace FezGame.Mod.Gui {
         public IKeyboardStateManager KeyboardState { get; set; }
 
         public string Text = "";
+        public Action OnInput;
 
         protected bool Focused = false;
         protected float BlinkTime = 0f;
         protected bool BlinkStatus = false;
         protected int CursorPosition = 0;
         protected float CursorScroll = 0f;
-
-        protected bool PressedDEL = false;
 
         public TextFieldWidget(Game game) 
             : this(game, "") {
@@ -184,10 +183,16 @@ namespace FezGame.Mod.Gui {
                 GuiHandler.Scheduled.Add(Action);
             }
             if (char.IsControl(c)) {
+                if (OnInput != null) {
+                    GuiHandler.Scheduled.Add(OnInput);
+                }
                 return;
             }
             Text = Text.Substring(0, CursorPosition) + c + Text.Substring(CursorPosition);
             CursorPosition++;
+            if (OnInput != null) {
+                GuiHandler.Scheduled.Add(OnInput);
+            }
         }
 
         public void Fill(string root) {

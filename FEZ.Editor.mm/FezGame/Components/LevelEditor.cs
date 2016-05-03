@@ -1971,6 +1971,9 @@ namespace FezGame.Components {
             CursorClick = CMProvider.Global.Load<Texture2D>("editor/cursor/CLICK");
             CursorHover = CMProvider.Global.Load<Texture2D>("editor/cursor/HOVER");
             CursorAction = CMProvider.Global.Load<Texture2D>("editor/cursor/ACTION");
+            
+            TrileAllButtonWidget.TexAll = CMProvider.Global.Load<Texture2D>("editor/ALL");
+            TrileAllButtonWidget.TexHideAll = CMProvider.Global.Load<Texture2D>("editor/HIDEALL");
 
             SpriteBatch = new SpriteBatch(GraphicsDevice);
         }
@@ -2195,7 +2198,7 @@ namespace FezGame.Components {
                 new Vector2(
                     (float) cursorPosition.X - cursorScale * CursorOffset.X,
                     (float) cursorPosition.Y - cursorScale * CursorOffset.Y
-                ), new Rectangle?(),
+                ), null,
                 new Color(1f, 1f, 1f, FezMath.Saturate((float) (1.0 - ((double) SinceMouseMoved - 2.0)))),
                 0.0f,
                 Vector2.Zero,
@@ -2225,7 +2228,9 @@ namespace FezGame.Components {
                 if (widget.InView && (widget.Position.X + widget.Offset.X <= MouseState.Position.X && MouseState.Position.X <= widget.Position.X + widget.Offset.X + widget.Size.X &&
                     widget.Position.Y + widget.Offset.Y <= MouseState.Position.Y && MouseState.Position.Y <= widget.Position.Y + widget.Offset.Y + widget.Size.Y)) {
                     cursorOnWidget = true;
-                    widget.Hover(gameTime);
+                    if (!cursorOnChild) {
+                        widget.Hover(gameTime);
+                    }
                     if (!cursorOnChild && MouseState.LeftButton.State == MouseButtonStates.Clicked) {
                         widget.Click(gameTime, 1);
                         if (FocusedWidget != null) {

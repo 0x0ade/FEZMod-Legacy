@@ -88,6 +88,7 @@
     <Compile Include="FezGame\Components\LevelEditor.cs" />
     <Compile Include="FezGame\Components\ILevelEditor.cs" />
     <Compile Include="FezGame\Mod\Gui\TrileButtonWidget.cs" />
+    <Compile Include="FezGame\Mod\Gui\TrileAllButtonWidget.cs" />
     <Compile Include="FezGame\Mod\Gui\TrilePickerWidget.cs" />
     <Compile Include="FezGame\Editor\EditorUtils.cs" />
     <Compile Include="FezGame\Mod\Gui\EditorInfoWidget.cs" />
@@ -116,5 +117,7 @@
     <EmbeddedResource Include="Content\editor\cursor\click.png" />
     <EmbeddedResource Include="Content\editor\cursor\hover.png" />
     <EmbeddedResource Include="Content\editor\cursor\action.png" />
+    <EmbeddedResource Include="Content\editor\all.png" />
+    <EmbeddedResource Include="Content\editor\hideall.png" />
   </ItemGroup>
 </Project>

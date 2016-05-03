@@ -28,7 +28,7 @@ namespace FezGame.Mod.Gui {
         public TrileButtonWidget(Game game, Trile trile) 
             : base(game) {
             Trile = trile;
-            Widgets.Add(Tooltip = new ButtonWidget(game));
+            Widgets.Add(Tooltip = new ButtonWidget(game, trile.Name));
         }
 
         public override void Update(GameTime gameTime) {
@@ -43,8 +43,6 @@ namespace FezGame.Mod.Gui {
                 Size.Y = 32f;
 
                 Tooltip.UpdateBounds = true;
-
-                Tooltip.Label = Trile.Name;
 
                 Tooltip.Position.X = -Tooltip.Size.X / 2f + Size.X / 2f;
                 Tooltip.Position.Y = -Tooltip.Size.Y;

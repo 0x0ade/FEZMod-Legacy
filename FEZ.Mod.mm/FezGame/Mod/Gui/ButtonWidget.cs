@@ -8,6 +8,7 @@ namespace FezGame.Mod.Gui {
 
         public SpriteFont Font;
         public bool LabelCentered = false;
+        public bool ClipLabel = false;
         public Vector2 LabelOffset = new Vector2(0f, 0f);
 
         public Action Action;
@@ -84,12 +85,16 @@ namespace FezGame.Mod.Gui {
                 offset.X += Size.X / 2f - Font.MeasureString(Label).X / 2f;
             }
 
-            StartClipping();
+            if (ClipLabel) {
+                StartClipping();
+            }
 
             float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
             GuiHandler.GTR.DrawShadowedText(GuiHandler.SpriteBatch, Font, Label, Position + Offset + offset, Foreground, viewScale);
 
-            StopClipping();
+            if (ClipLabel) {
+                StopClipping();
+            }
         }
 
         public override void Click(GameTime gameTime, int mb) {

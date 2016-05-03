@@ -49,7 +49,7 @@ namespace FezGame.Mod.Gui {
             InnerHeight = innerHeight;
 
             ScrollOffset += ScrollMomentum;
-            ScrollMomentum *= 0.5f;
+            ScrollMomentum *= 0.25f;
             if (ScrollOffset < 0f) {
                 ScrollOffset = 0f;
             }
@@ -144,7 +144,7 @@ namespace FezGame.Mod.Gui {
         }
 
         public override void Scroll(GameTime gameTime, int turn) {
-            ScrollMomentum -= turn * 48f;
+            ScrollMomentum -= turn * 8f;
             base.Scroll(gameTime, turn);
         }
 

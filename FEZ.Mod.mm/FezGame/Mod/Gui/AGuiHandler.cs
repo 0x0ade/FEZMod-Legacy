@@ -168,7 +168,7 @@ namespace FezGame.Mod.Gui {
                 new Vector2(
                     (float) cursorPosition.X - cursorScale * 11.5f,
                     (float) cursorPosition.Y - cursorScale * 8.5f
-                ), new Rectangle?(),
+                ), null,
                 new Color(1f, 1f, 1f, FezMath.Saturate((float) (1.0 - ((double) SinceMouseMoved - 2.0)))),
                 0.0f,
                 Vector2.Zero,
@@ -195,7 +195,9 @@ namespace FezGame.Mod.Gui {
                 if (widget.InView && (widget.Position.X + widget.Offset.X <= MouseState.Position.X && MouseState.Position.X <= widget.Position.X + widget.Offset.X + widget.Size.X &&
                     widget.Position.Y + widget.Offset.Y <= MouseState.Position.Y && MouseState.Position.Y <= widget.Position.Y + widget.Offset.Y + widget.Size.Y)) {
                     cursorOnWidget = true;
-                    widget.Hover(gameTime);
+                    if (!cursorOnChild) {
+                        widget.Hover(gameTime);
+                    }
                     if (!cursorOnChild && MouseState.LeftButton.State == MouseButtonStates.Clicked) {
                         widget.Click(gameTime, 1);
                         if (FocusedWidget != null) {
