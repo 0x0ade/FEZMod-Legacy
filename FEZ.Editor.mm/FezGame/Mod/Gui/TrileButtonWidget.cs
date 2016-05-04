@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 using FezGame.Components;
 
 namespace FezGame.Mod.Gui {
-    public class TrileButtonWidget : ButtonWidget {
+    public class TrileButtonWidget : AssetButtonWidget {
 
         [ServiceDependency]
         public IGameLevelManager LevelManager { get; set; }
@@ -17,36 +17,18 @@ namespace FezGame.Mod.Gui {
         public IPlayerManager PlayerManager { get; set; }
 
         public Trile Trile;
-        public Texture2D TrileAtlas { get; set; }
-
-        public ButtonWidget Tooltip;
+        public Texture2D TrileAtlas;
 
         public TrileButtonWidget(Game game) 
             : this(game, null) {
         }
 
         public TrileButtonWidget(Game game, Trile trile) 
-            : base(game) {
+            : base(game, trile.Name) {
             Trile = trile;
-            Widgets.Add(Tooltip = new ButtonWidget(game, trile.Name));
-        }
-
-        public override void Update(GameTime gameTime) {
-            base.Update(gameTime);
-
-            if (Trile == null) {
-                return;
-            }
-
-            if (UpdateBounds) {
-                Size.X = 32f;
-                Size.Y = 32f;
-
-                Tooltip.UpdateBounds = true;
-
-                Tooltip.Position.X = -Tooltip.Size.X / 2f + Size.X / 2f;
-                Tooltip.Position.Y = -Tooltip.Size.Y;
-            }
+            
+            Size.X = 32f;
+            Size.Y = 32f;
         }
 
         public override void Draw(GameTime gameTime) {
@@ -198,14 +180,8 @@ namespace FezGame.Mod.Gui {
                 });
             }
         }
-
-        public override void Dragging(GameTime gameTime, MouseButtonStates state) {
-            if (Parent != null) {
-                Parent.Dragging(gameTime, state);
-            } else {
-                base.Dragging(gameTime, state);
-            }
-        }
+        
+        //Disposing handled by level change
 
     }
 }

@@ -87,9 +87,13 @@
     <Compile Include="FezGame\Editor\FezEditor.cs" />
     <Compile Include="FezGame\Components\LevelEditor.cs" />
     <Compile Include="FezGame\Components\ILevelEditor.cs" />
+    <Compile Include="FezGame\Mod\Gui\AllButtonWidget.cs" />
+    <Compile Include="FezGame\Mod\Gui\AssetButtonWidget.cs" />
+    <Compile Include="FezGame\Mod\Gui\AssetPickerWidget.cs" />
     <Compile Include="FezGame\Mod\Gui\TrileButtonWidget.cs" />
-    <Compile Include="FezGame\Mod\Gui\TrileAllButtonWidget.cs" />
     <Compile Include="FezGame\Mod\Gui\TrilePickerWidget.cs" />
+    <Compile Include="FezGame\Mod\Gui\ArtObjectButtonWidget.cs" />
+    <Compile Include="FezGame\Mod\Gui\ArtObjectPickerWidget.cs" />
     <Compile Include="FezGame\Editor\EditorUtils.cs" />
     <Compile Include="FezGame\Mod\Gui\EditorInfoWidget.cs" />
     <Compile Include="FezGame\Mod\Gui\ThumbnailCreatorWidget.cs" />

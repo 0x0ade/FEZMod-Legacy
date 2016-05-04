@@ -34,6 +34,7 @@ namespace FezGame.Mod.Gui {
         public List<GuiWidget> Widgets = new List<GuiWidget>();
         public bool ShowChildren = true;
         public bool ClipChildren = false;
+        public bool CullChildren = false;
 
         public Vector2 Position = new Vector2(0f);
         public Vector2 Size = new Vector2(128f);
@@ -58,7 +59,7 @@ namespace FezGame.Mod.Gui {
                 if (this is WindowHeaderWidget || ParentAs<WindowHeaderWidget>() != null) {
                     return true;
                 }
-                if (Parent != null && Parent.GetType() == typeof(ContainerWidget) && !Parent.backgroundBounds.Intersects(backgroundBounds)) {
+                if (Parent != null && (Parent.GetType() == typeof(ContainerWidget) || Parent.CullChildren) && !Parent.backgroundBounds.Intersects(backgroundBounds)) {
                     return false;
                 }
                 return Visible;
@@ -176,20 +177,23 @@ namespace FezGame.Mod.Gui {
             backgroundBounds.Y = (int) (Position.Y + Offset.Y);
             backgroundBounds.Width = (int) Size.X;
             backgroundBounds.Height = (int) Size.Y;
-
-            if (!InView) {
-                return;
-            }
-
+            
             if (pixelTexture == null) {
                 pixelTexture = new Texture2D(GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
                 pixelTexture.SetData<Color>(new Color[] { Color.White });
             }
 
+            if (!InView || Background.A == 0) {
+                return;
+            }
+
             GuiHandler.SpriteBatch.Draw(pixelTexture, backgroundBounds, Background);
         }
 
-        public virtual void StartClipping() {
+        public virtual void StartClipping(BlendState blendState = null) {
+            if (blendState == null) {
+                blendState = BlendState.NonPremultiplied;
+            }
             if (ParentAs<ContainerWidget>() != null && ParentAs<ContainerWidget>().ClipChildren) {
                 return;
             }
@@ -200,7 +204,7 @@ namespace FezGame.Mod.Gui {
             ScissorRectanglePrev = GraphicsDevice.ScissorRectangle;
 
             //GuiHandler.SpriteBatch.BeginPoint();
-            GuiHandler.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, ScissorRasterizerState);
+            GuiHandler.SpriteBatch.Begin(SpriteSortMode.Deferred, blendState, SamplerState.PointClamp, null, ScissorRasterizerState);
             GraphicsDevice.ScissorRectangle = backgroundBounds;
 
             ScissorHistory.Add(this);
@@ -252,6 +256,14 @@ namespace FezGame.Mod.Gui {
                 parent = parent.Parent;
             }
             return (T) parent;
+        }
+        
+        protected override void Dispose(bool disposing) {
+            base.Dispose(disposing);
+            
+            foreach (GuiWidget widget in Widgets) {
+                widget.Dispose(disposing);
+            }
         }
 
     }

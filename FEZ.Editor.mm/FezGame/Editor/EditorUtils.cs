@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using System.Reflection;
 using FezEngine.Mod;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace FezGame.Editor {
     public static class EditorUtils {
@@ -36,6 +37,21 @@ namespace FezGame.Editor {
 
         public static string ToString(Vector3 v) {
             return v.X + ", " + v.Y + ", " + v.Z;
+        }
+        
+        public static Texture2D MaxAlpha(this Texture2D texIn) {
+            //WARNING: It is not performant as it pulls the orig texture from the GPU / VRAM, modifies it in RAM and then pushes it back to VRAM.
+            //TODO: Learn how to use FBOs in FNA / XNA.
+            
+            Texture2D texOut = new Texture2D(texIn.GraphicsDevice, texIn.Width, texIn.Height);
+            Color[] texData = new Color[texOut.Width * texOut.Height];
+            texIn.GetData(texData);
+            for (int i = 0; i < texData.Length; i++) {
+                texData[i].A = 255;
+            }
+            texOut.SetData(texData);
+
+            return texOut;
         }
 
     }

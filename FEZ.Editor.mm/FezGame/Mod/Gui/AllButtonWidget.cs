@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 using FezGame.Components;
 
 namespace FezGame.Mod.Gui {
-    public class TrileAllButtonWidget : ButtonWidget {
+    public class AllButtonWidget : ButtonWidget {
 
         [ServiceDependency]
         public IGameLevelManager LevelManager { get; set; }
@@ -21,7 +21,7 @@ namespace FezGame.Mod.Gui {
 
         public ButtonWidget Tooltip;
 
-        public TrileAllButtonWidget(Game game) 
+        public AllButtonWidget(Game game) 
             : base(game) {
             Widgets.Add(Tooltip = new ButtonWidget(game, "All"));
         }
@@ -29,8 +29,8 @@ namespace FezGame.Mod.Gui {
         public override void Update(GameTime gameTime) {
             base.Update(gameTime);
 
-            TrilePickerWidget trilePicker = Parent as TrilePickerWidget;
-            if (trilePicker == null) {
+            AssetPickerWidget assetPicker = Parent as AssetPickerWidget;
+            if (assetPicker == null) {
                 return;
             }
 
@@ -48,12 +48,12 @@ namespace FezGame.Mod.Gui {
         public override void Draw(GameTime gameTime) {
             base.Draw(gameTime);
             
-            TrilePickerWidget trilePicker = Parent as TrilePickerWidget;
-            if (trilePicker == null || TexHideAll == null || TexAll == null || !InView) {
+            AssetPickerWidget assetPicker = Parent as AssetPickerWidget;
+            if (assetPicker == null || TexHideAll == null || TexAll == null || !InView) {
                 return;
             }
             
-            Texture2D tex = trilePicker.Large ? TexHideAll : TexAll;
+            Texture2D tex = assetPicker.Large ? TexHideAll : TexAll;
 
             GuiHandler.SpriteBatch.Draw(tex, new Rectangle(
                 (int) (Position.X + Offset.X),
@@ -63,13 +63,13 @@ namespace FezGame.Mod.Gui {
         }
 
         public override void Click(GameTime gameTime, int mb) {
-            TrilePickerWidget trilePicker = Parent as TrilePickerWidget;
-            if (trilePicker == null) {
+            AssetPickerWidget assetPicker = Parent as AssetPickerWidget;
+            if (assetPicker == null) {
                 return;
             }
 
             if (mb == 1) {
-                trilePicker.Large = !trilePicker.Large;
+                assetPicker.Large = !assetPicker.Large;
             }
         }
 

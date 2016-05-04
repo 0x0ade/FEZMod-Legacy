@@ -93,7 +93,7 @@ namespace FezGame.Components {
 
         public InfoWidget InfoWidget;
         public TopBarWidget TopBarWidget;
-        public TrilePickerWidget TrilePickerWidget;
+        public AssetPickerWidget AssetPickerWidget;
 
         public ButtonWidget TooltipWidget;
         protected bool TooltipWidgetAdded = false;
@@ -1956,8 +1956,8 @@ namespace FezGame.Components {
             //INFO
             Widgets.Add(InfoWidget = new EditorInfoWidget(Game));
 
-            //TRILE PICKER
-            Widgets.Add(TrilePickerWidget = new TrilePickerWidget(Game));
+            //ASSET PICKER
+            Widgets.Add(AssetPickerWidget = new TrilePickerWidget(Game));
 
             //TOOLTIP
             TooltipWidget = new ButtonWidget(Game);
@@ -1972,8 +1972,8 @@ namespace FezGame.Components {
             CursorHover = CMProvider.Global.Load<Texture2D>("editor/cursor/HOVER");
             CursorAction = CMProvider.Global.Load<Texture2D>("editor/cursor/ACTION");
             
-            TrileAllButtonWidget.TexAll = CMProvider.Global.Load<Texture2D>("editor/ALL");
-            TrileAllButtonWidget.TexHideAll = CMProvider.Global.Load<Texture2D>("editor/HIDEALL");
+            AllButtonWidget.TexAll = CMProvider.Global.Load<Texture2D>("editor/ALL");
+            AllButtonWidget.TexHideAll = CMProvider.Global.Load<Texture2D>("editor/HIDEALL");
 
             SpriteBatch = new SpriteBatch(GraphicsDevice);
         }
@@ -2053,8 +2053,8 @@ namespace FezGame.Components {
                 TooltipWidget.Label = HoveredAO.Id + ": " + HoveredAO.ArtObjectName;
             }
 
-            TrilePickerWidget.Position.Y = GraphicsDevice.Viewport.Height - TrilePickerWidget.Size.Y;
-            InfoWidget.Position.Y = TrilePickerWidget.Position.Y - InfoWidget.Size.Y;
+            AssetPickerWidget.Position.Y = GraphicsDevice.Viewport.Height - AssetPickerWidget.Size.Y;
+            InfoWidget.Position.Y = AssetPickerWidget.Position.Y - InfoWidget.Size.Y;
 
             bool cursorInMenu = UpdateWidgets(gameTime, Widgets, true);
 
