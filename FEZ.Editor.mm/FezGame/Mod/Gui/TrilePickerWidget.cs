@@ -151,7 +151,7 @@ namespace FezGame.Mod.Gui {
                         yoffs += Widgets[i].Size.Y + 24f;
                     }
                 }
-                InnerSize = yoffs;
+                InnerSize = yoffs + Widgets[0].Size.Y + 24f;
             }
         }
         
