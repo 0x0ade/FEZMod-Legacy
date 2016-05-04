@@ -94,7 +94,10 @@ namespace FezGame.Components {
         public InfoWidget InfoWidget;
         public TopBarWidget TopBarWidget;
         public AssetPickerWidget AssetPickerWidget;
-
+        public List<AssetPickerWidget> AssetPickerWidgets = new List<AssetPickerWidget>();
+        public ContainerWidget AssetPickerPickerWidget;
+        public List<ButtonWidget> AssetPickerLabels = new List<ButtonWidget>();
+        
         public ButtonWidget TooltipWidget;
         protected bool TooltipWidgetAdded = false;
 
@@ -1957,7 +1960,18 @@ namespace FezGame.Components {
             Widgets.Add(InfoWidget = new EditorInfoWidget(Game));
 
             //ASSET PICKER
-            Widgets.Add(AssetPickerWidget = new TrilePickerWidget(Game));
+            AssetPickerWidgets.Add(AssetPickerWidget = new TrilePickerWidget(Game));
+            AssetPickerLabels.Add(new ButtonWidget(Game, "Triles"));
+            AssetPickerWidgets.Add(new ArtObjectPickerWidget(Game));
+            AssetPickerLabels.Add(new ButtonWidget(Game, "Art Objects"));
+            
+            Widgets.Add(AssetPickerPickerWidget = new ContainerWidget(Game) {
+                UpdateBounds = false,
+                Size = new Vector2(0f, 24f)
+            });
+            AssetPickerPickerWidget.Widgets.AddRange(AssetPickerLabels);
+            
+            Widgets.AddRange(AssetPickerWidgets);
 
             //TOOLTIP
             TooltipWidget = new ButtonWidget(Game);
@@ -2055,6 +2069,25 @@ namespace FezGame.Components {
 
             AssetPickerWidget.Position.Y = GraphicsDevice.Viewport.Height - AssetPickerWidget.Size.Y;
             InfoWidget.Position.Y = AssetPickerWidget.Position.Y - InfoWidget.Size.Y;
+            AssetPickerPickerWidget.Visible = AssetPickerWidget.Large;
+            AssetPickerPickerWidget.Background.A = 0;
+            AssetPickerPickerWidget.Position.X = InfoWidget.Position.X + InfoWidget.Size.X;
+            AssetPickerPickerWidget.Position.Y = AssetPickerWidget.Position.Y - AssetPickerPickerWidget.Size.Y;
+            AssetPickerPickerWidget.Size.X = GraphicsDevice.Viewport.Width - InfoWidget.Size.X;
+            float pickerLabelXOffs = 0f;
+            for (int i = 0; i < AssetPickerWidgets.Count; i++) {
+                AssetPickerWidget picker = AssetPickerWidgets[i];
+                picker.Visible = picker == AssetPickerWidget;
+                picker.Large = AssetPickerWidget.Large;
+                
+                ButtonWidget pickerLabel = AssetPickerLabels[i];
+                pickerLabel.Position.X = pickerLabelXOffs;
+                pickerLabelXOffs += pickerLabel.Size.X + 4f;
+                
+                if (pickerLabel.Action == null) {
+                    pickerLabel.Action = () => AssetPickerWidget = picker;
+                }
+            }
 
             bool cursorInMenu = UpdateWidgets(gameTime, Widgets, true);
 
