@@ -23,7 +23,7 @@ namespace FezGame.Mod.Gui {
 
         public AllButtonWidget(Game game) 
             : base(game) {
-            Widgets.Add(Tooltip = new ButtonWidget(game, "All"));
+            Widgets.Add(Tooltip = new ButtonWidget(game, "Expand"));
         }
 
         public override void Update(GameTime gameTime) {
@@ -38,6 +38,7 @@ namespace FezGame.Mod.Gui {
                 Size.X = 32f;
                 Size.Y = 32f;
 
+                Tooltip.Visible = !assetPicker.Large;
                 Tooltip.UpdateBounds = true;
 
                 Tooltip.Position.X = -Tooltip.Size.X / 2f + Size.X / 2f;

@@ -1,4 +1,4 @@
-﻿using FezGame.TAS;
+﻿using FezGame.Mod;
 
 namespace FezGame.Services {
     public class patch_GameStateManager {
@@ -7,7 +7,7 @@ namespace FezGame.Services {
         }
 
         public void ToggleInventory() {
-            if (FezTAS.Settings.ToolAssistedSpeedrun) {
+            if (FEZMod.DisableInventory) {
                 return;
             }
 

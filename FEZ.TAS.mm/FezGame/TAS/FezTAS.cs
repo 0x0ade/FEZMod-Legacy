@@ -57,8 +57,8 @@ namespace FezGame.TAS {
             Settings = FezModuleSettings.Load<FezTASSettings>("FEZMod.TAS.Settings.sdl", new FezTASSettings());
             
             if (Settings.ToolAssistedSpeedrun) {
-                FEZMod.EnableBugfixes = false;
                 FEZMod.EnableCustomIntros = false;
+                FEZMod.DisableInventory = true;
                 //Currently reqired unless someone hooks MovingGroupsHost and others to give a public instance
                 FEZModEngine.GetComponentsAsServices = true;
                 FEZModEngine.HandleComponents = true;
@@ -111,8 +111,8 @@ namespace FezGame.TAS {
                         }
                     }
                     
-                    FEZMod.EnableFEZometric = tmpSettings.ToolAssistedSpeedrun;
-                    FEZMod.EnableQuickWarp = tmpSettings.ToolAssistedSpeedrun;
+                    FEZMod.EnableCustomIntros = !tmpSettings.ToolAssistedSpeedrun;
+                    FEZMod.DisableInventory = tmpSettings.ToolAssistedSpeedrun;
                     //Currently reqired unless someone hooks MovingGroupsHost and others to give a public instance
                     FEZModEngine.GetComponentsAsServices = tmpSettings.ToolAssistedSpeedrun;
                     FEZModEngine.HandleComponents = tmpSettings.ToolAssistedSpeedrun;

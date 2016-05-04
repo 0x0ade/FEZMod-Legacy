@@ -45,7 +45,7 @@ namespace FezGame.Components {
             if (FEZMod.EnableFEZometric && InputManager.OpenInventory == FezButtonState.Pressed) {
                 ModLogger.Log("FEZMod", "Switching to FEZometric mode");
                 GameState.InMap = false;
-                PlayerCameraControl.FEZometric = true;
+                FEZMod.FEZometric = true;
             }
         }
 

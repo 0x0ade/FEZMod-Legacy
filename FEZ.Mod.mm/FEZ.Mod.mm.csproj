@@ -145,6 +145,7 @@
     <Compile Include="FezGame\Mod\CustomIntroHelper.cs" />
     <Compile Include="FezGame\Components\CustomIntro.cs" />
     <Compile Include="FezGame\Components\ADEIntro.cs" />
+    <Compile Include="FezGame\Services\patch_GameStateManager.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

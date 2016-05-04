@@ -58,6 +58,7 @@ namespace FezGame.Mod {
         public static bool EnableDebugControls = false;
         public static bool EnableQuickWarp = true;
         public static bool EnableFEZometric = true;
+        public static bool FEZometric = false;
         public static bool EnableBugfixes = true;
         public static bool EnableHD = true;
         public static List<int[]> CustomResolutions = new List<int[]>();
@@ -78,6 +79,7 @@ namespace FezGame.Mod {
             }
         }
         public static double GameSpeed = 1d;
+        public static bool DisableInventory = false;
 
         //Other configuration
         public static bool LoadedEssentials { get; private set; }

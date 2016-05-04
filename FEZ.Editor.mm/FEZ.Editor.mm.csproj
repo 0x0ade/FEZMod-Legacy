@@ -86,6 +86,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FezGame\Editor\FezEditor.cs" />
     <Compile Include="FezGame\Components\LevelEditor.cs" />
+    <Compile Include="FezGame\Components\LevelEditor.GUI.cs" />
     <Compile Include="FezGame\Components\ILevelEditor.cs" />
     <Compile Include="FezGame\Mod\Gui\AllButtonWidget.cs" />
     <Compile Include="FezGame\Mod\Gui\AssetButtonWidget.cs" />
@@ -123,5 +124,6 @@
     <EmbeddedResource Include="Content\editor\cursor\action.png" />
     <EmbeddedResource Include="Content\editor\all.png" />
     <EmbeddedResource Include="Content\editor\hideall.png" />
+    <EmbeddedResource Include="Content\editor\trash.png" />
   </ItemGroup>
 </Project>

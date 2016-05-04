@@ -15,8 +15,6 @@ using FezGame.Structure;
 namespace FezGame.Components {
     public class PlayerCameraControl {
 
-        public static bool FEZometric = false;
-
         public IGameStateManager GameState { [MonoModIgnore] get { return null; } }
         public IInputManager InputManager { [MonoModIgnore] get { return null; } }
         public IMouseStateManager MouseState { [MonoModIgnore] get { return null; } }
@@ -36,16 +34,16 @@ namespace FezGame.Components {
                 return;
             }
 
-            if (InputManager.OpenInventory == FezButtonState.Pressed) {
-                FEZometric = false;
+            if (!FEZMod.DisableInventory && InputManager.OpenInventory == FezButtonState.Pressed) {
+                FEZMod.FEZometric = false;
             }
 
             //Modified decompiled code. Hhnnng.
             //TODO reimplement / rename
-            if (FEZometric && MouseState.LeftButton.State != MouseButtonStates.Dragging && InputManager.FreeLook != Vector2.Zero && !GameState.InMap && CameraManager.Viewpoint != Viewpoint.Perspective) {
+            if (FEZMod.FEZometric && MouseState.LeftButton.State != MouseButtonStates.Dragging && InputManager.FreeLook != Vector2.Zero && !GameState.InMap && CameraManager.Viewpoint != Viewpoint.Perspective) {
                 Vector3 vector3 = Vector3.Transform(CameraManager.Direction, Matrix.CreateFromAxisAngle(Vector3.Up, 1.570796f));
                 Vector3 to1 = Vector3.Transform(CameraManager.Direction, Matrix.CreateFromAxisAngle(vector3, -1.570796f));
-                Vector2 vector2 = InputManager.FreeLook / 6.875f;
+                Vector2 vector2 = InputManager.FreeLook / 5f;
                 float step = 0.05f;
                 Vector3 to2 = FezMath.Slerp(FezMath.Slerp(CameraManager.Direction, vector3, vector2.X), to1, vector2.Y);
                 if (!CameraManager.ActionRunning) {
