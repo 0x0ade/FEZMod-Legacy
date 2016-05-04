@@ -85,11 +85,14 @@ namespace FezGame.Components {
         public Color UnselectColor = new Color(255, 31, 31);
         public float SelectRayDistance = 8f;
         
+        public List<TrileInstance> SelectedTriles;
+        
         public Vector2 FakeFreeLook;
 
         protected int SkipLoading = 0;
 
         protected KeyValuePair<TrileEmplacement, TrileInstance>[] tmpTriles = new KeyValuePair<TrileEmplacement, TrileInstance>[8192];
+        protected int trilesCount = 0;
         protected KeyValuePair<int, ArtObjectInstance>[] tmpAOs = new KeyValuePair<int, ArtObjectInstance>[128];
 
         public TrileInstance HoveredTrile { get; set; }
@@ -219,6 +222,10 @@ namespace FezGame.Components {
             
             CursorHovering = false;
             
+            //Ugly thread-safety workaround
+            trilesCount = LevelManager.Triles.Count;
+            LevelManager.Triles.CopyTo(tmpTriles.Length < trilesCount ? (tmpTriles = new KeyValuePair<TrileEmplacement, TrileInstance>[trilesCount]) : tmpTriles, 0);
+            
             Ray ray = new Ray(
                 GraphicsDevice.Viewport.Unproject(
                     new Vector3(MouseState.Position.X, MouseState.Position.Y, 0.0f),
@@ -227,6 +234,7 @@ namespace FezGame.Components {
                 CameraManager.InverseView.Forward
             );
             
+            HoveredTrile = null;
             Selecting = false;
             CursorColor = Color.White;
             if (MouseState.LeftButton.State == MouseButtonStates.DragStarted ||
@@ -255,41 +263,37 @@ namespace FezGame.Components {
                 CursorColor = SelectColor;
                 
                 if (MouseState.LeftButton.State == MouseButtonStates.DragEnded) {
-                    //TODO
+                    if (KeyboardState.GetKeyState(Keys.LeftControl) != FezButtonState.Down) {
+                        SelectedTriles = GetTrilesSelected(SelectedTriles);
+                    } else {
+                        SelectedTriles = GetTrilesSelected();
+                    }
+                    
+                    UpdateSelection();
+                    
                 }
                 
             } else if ((MouseState.RightButton.State == MouseButtonStates.DragStarted || 
                 MouseState.RightButton.State == MouseButtonStates.Dragging ||
                 MouseState.RightButton.State == MouseButtonStates.DragEnded)
                 && DraggingWidget == null) {
+                Selecting = true;
                 CursorColor = UnselectColor;
                 
                 if (MouseState.RightButton.State == MouseButtonStates.DragEnded) {
-                    //TODO
+                    List<TrileInstance> unselectedTriles = GetTrilesSelected();
+                    SelectedTriles.RemoveAll((trile) => unselectedTriles.Contains(trile));
                 }
+                
+                UpdateSelection();
                 
                 
             } else {
-                
-                float intersectionMin = float.MaxValue;
-
-                HoveredTrile = null;
-                //Ugly thread-safety workaround
-                int trilesCount = LevelManager.Triles.Count;
-                LevelManager.Triles.CopyTo(tmpTriles.Length < trilesCount ? (tmpTriles = new KeyValuePair<TrileEmplacement, TrileInstance>[trilesCount]) : tmpTriles, 0);
-                for (int i = 0; i < trilesCount; i++) {
-                    TrileInstance trile = tmpTriles[i].Value;
-                    BoundingBox box = new BoundingBox(trile.Position, trile.Position + new Vector3(1f));
-                    float? intersection = ray.Intersects(box);
-                    if (intersection.HasValue && intersection < intersectionMin) {
-                        HoveredTrile = trile;
-                        HoveredBox = box;
-                        intersectionMin = intersection.Value;
-                    }
-                }
+                GetTrile(ray, true);
 
                 HoveredAO = null;
                 if (FezEditor.Settings.TooltipArtObjectInfo) {
+                    float intersectionMin = float.MaxValue;
                     int aosCount = LevelManager.ArtObjects.Count;
                     LevelManager.ArtObjects.CopyTo(tmpAOs.Length < aosCount ? (tmpAOs = new KeyValuePair<int, ArtObjectInstance>[aosCount]) : tmpAOs, 0);
                     for (int i = 0; i < aosCount; i++) {
@@ -410,7 +414,7 @@ namespace FezGame.Components {
                 }
             }
         }
-
+        
         public override void Draw(GameTime gameTime) {
             if (GameState.Loading || GameState.InMap || GameState.InMenuCube || GameState.Paused || !FEZMod.Preloaded || string.IsNullOrEmpty(LevelManager.Name)) {
                 return;
@@ -557,6 +561,10 @@ namespace FezGame.Components {
             }
             return cursorOnWidget;
         }
+        
+        public void UpdateSelection() {
+            
+        }
 
         public Level CreateNewLevel(string name, int width, int height, int depth, string trileset) {
             Level level = new Level();
@@ -587,6 +595,73 @@ namespace FezGame.Components {
             trile.Enabled = true;
 
             return trile;
+        }
+        
+        public TrileInstance GetTrile(Ray ray, bool hover = false) {
+            float intersectionMin = float.MaxValue;
+            TrileInstance trileBest = null;
+            for (int i = 0; i < trilesCount; i++) {
+                TrileInstance trile = tmpTriles[i].Value;
+                BoundingBox box = new BoundingBox(trile.Position, trile.Position + Vector3.One);
+                float? intersection = ray.Intersects(box);
+                if (intersection.HasValue && intersection < intersectionMin) {
+                    if (hover) {
+                        HoveredTrile = trile;
+                        HoveredBox = box;
+                    }
+                    trileBest = trile;
+                    intersectionMin = intersection.Value;
+                }
+            }
+            return trileBest;
+        }
+        
+        public List<TrileInstance> GetTriles(Ray ray, List<TrileInstance> trilesGot = null) {
+            if (trilesGot == null) {
+                trilesGot = new List<TrileInstance>();
+            }
+            for (int i = 0; i < trilesCount; i++) {
+                TrileInstance trile = tmpTriles[i].Value;
+                BoundingBox box = new BoundingBox(trile.Position, trile.Position + Vector3.One);
+                float? intersection = ray.Intersects(box);
+                if (intersection.HasValue && !trilesGot.Contains(trile)) {
+                    trilesGot.Add(trile);
+                }
+            }
+            return trilesGot;
+        }
+        
+        public List<TrileInstance> GetTrilesSelected(List<TrileInstance> selected = null) {
+            float x = DragOrigin.X;
+            float y = DragOrigin.Y;
+            float w = MouseState.Position.X - DragOrigin.X;
+            float h = MouseState.Position.Y - DragOrigin.Y;
+            if (w < 0) {
+                x += w;
+                w = -w;
+            }
+            if (h < 0) {
+                y += h;
+                h = -h;
+            }
+            
+            if (selected == null) {
+                selected = new List<TrileInstance>();
+            }
+            
+            for (float yy = y; yy < y + h; yy += SelectRayDistance) {
+                for (float xx = x; xx < x + w; xx += SelectRayDistance) {
+                    GetTriles(new Ray(
+                        GraphicsDevice.Viewport.Unproject(
+                            new Vector3(xx, yy, 0.0f),
+                            CameraManager.Projection, CameraManager.View, Matrix.Identity
+                        ),
+                        CameraManager.InverseView.Forward
+                    ), selected);
+                }
+            }
+            
+            return selected;
         }
 
         public void AddTrile(TrileInstance trile) {
