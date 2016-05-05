@@ -82,30 +82,37 @@ namespace FezGame.Components {
         
         public Point DragOrigin;
         
-        public Color SelectColor = new Color(0.3f, 0.7f, 1f);
-        public bool Selecting = false;
-        public int SelectingMin = 12;
-        public Color UnselectColor = new Color(1f, 0.3f, 0.3f);
-        public float SelectRayDistance = 8f;
+        public static BaseEffect CubemappedEffect;
         
         public Color DraggingColor = new Color(0.3f, 1f, 0.3f);
         protected Vector3 DraggingOrigin;
         protected float DraggingAOGrid = 0.0625f;
         protected ArtObjectInstance DraggingAO;
         
+        public Color SelectColor = new Color(0.3f, 0.7f, 1f);
+        public bool Selecting = false;
+        public int SelectingMin = 12;
+        public Color UnselectColor = new Color(1f, 0.3f, 0.3f);
+        public float SelectRayDistance = 8f;
+        
         public Vector3 SelectDiffuse = new Vector3(0.3f, 0.7f, 1f);
         public float SelectAlpha = 1f;
-        
         public List<TrileInstance> SelectedTriles = new List<TrileInstance>();
         public Mesh[] SelectedMeshes;
-        public static BaseEffect SelectedEffect;
         
         public Vector3 PlacingDiffuse = new Vector3(0.5f, 0.5f, 0.5f);
         public float PlacingAlpha = 0.625f;
-        
         public Mesh PlacingMesh;
         public Mesh[] PlacingMeshes;
-        public static BaseEffect PlacingEffect;
+        
+        public Vector3 HoveredDiffuse = new Vector3(1.4f, 1.4f, 1.4f);
+        public float HoveredAlpha = 1f;
+        public Mesh HoveredAOMesh;
+        
+        public Vector3 DisabledDiffuse = new Vector3(0.5f, 0.5f, 0.5f);
+        public float DisabledAlpha = 0.3f;
+        public List<object> Disabled = new List<object>();
+        public Mesh[] DisabledMeshes;
         
         
         public Vector2 FakeFreeLook;
@@ -140,9 +147,9 @@ namespace FezGame.Components {
                     PlacingMesh = null;
                     
                     if (value is Trile) {
-                        PlacingMesh = GenMesh((Trile) value, PlacingPhi, PlacingEffect);
+                        PlacingMesh = GenMesh((Trile) value, PlacingPhi);
                     } else if (value is ArtObject) {
-                        PlacingMesh = GenMesh((ArtObject) value, PlacingPhi, PlacingEffect);
+                        PlacingMesh = GenMesh((ArtObject) value, PlacingPhi);
                     }
                 }
                 
@@ -249,7 +256,7 @@ namespace FezGame.Components {
             FEZMod.FEZometric = true;
             FEZMod.DisableInventory = true;
             
-            SelectedEffect = PlacingEffect = new CubemappedEffect();
+            CubemappedEffect = new CubemappedEffect();
 
             SetupGui();
 
@@ -315,6 +322,10 @@ namespace FezGame.Components {
                 HoveredBox = new BoundingBox(HoveredTrile.Position, HoveredTrile.Position + Vector3.One);
             }
             
+            ArtObjectInstance oldHoveredAO = HoveredAO;
+            if (HoveredAO != null) {
+                HoveredAO.Hidden = false;
+            }
             HoveredAO = null;
             int aosCount = LevelManager.ArtObjects.Count;
             LevelManager.ArtObjects.CopyTo(tmpAOs.Length < aosCount ? (tmpAOs = new KeyValuePair<int, ArtObjectInstance>[aosCount]) : tmpAOs, 0);
@@ -326,6 +337,18 @@ namespace FezGame.Components {
                     HoveredAO = ao;
                     HoveredBox = ao.Bounds;
                     intersectionMin = intersection.Value;
+                }
+            }
+            if (HoveredAO != null) {
+                HoveredAO.Hidden = true;
+            }
+            if (HoveredAO != oldHoveredAO) {
+                if (HoveredAOMesh != null) {
+                    HoveredAOMesh.Dispose(false);
+                    HoveredAOMesh = null;
+                }
+                if (HoveredAO != null) {
+                    HoveredAOMesh = GenMesh(HoveredAO);
                 }
             }
             
@@ -349,7 +372,6 @@ namespace FezGame.Components {
                 MouseState.MiddleButton.State == MouseButtonStates.DragEnded)
                 && DraggingWidget == null) {
                 HoveredTrile = null;
-                HoveredAO = null;
                 DraggingAO = null;
                 
                 FakeFreeLook.X = -(MouseState.Movement.X / 3.25f); //Should the X rotation be inversed here or in the cam?
@@ -373,7 +395,6 @@ namespace FezGame.Components {
                 }
                 
                 HoveredTrile = null;
-                HoveredAO = null;
                 
                 
                 if (DraggingAO == null &&
@@ -418,7 +439,6 @@ namespace FezGame.Components {
                 (SelectingMin < Math.Abs(MouseState.Position.X - DragOrigin.X) ||
                 SelectingMin < Math.Abs(MouseState.Position.Y - DragOrigin.Y))) {
                 HoveredTrile = null;
-                HoveredAO = null;
                 DraggingAO = null;
                 Selecting = true;
                 CursorColor = UnselectColor;
@@ -490,7 +510,6 @@ namespace FezGame.Components {
             CursorHovering = false;
             if (cursorInMenu) {
                 HoveredTrile = null;
-                HoveredAO = null;
                 return;
             }
 
@@ -559,7 +578,6 @@ namespace FezGame.Components {
                 LevelManager.ArtObjects.Remove(HoveredAO.Id);
                 HoveredAO.Dispose();
                 LevelMaterializer.RegisterSatellites();
-                HoveredAO = null;
             }
 
             if (MouseState.MiddleButton.State == MouseButtonStates.Clicked && HoveredTrile != null) {
@@ -624,6 +642,25 @@ namespace FezGame.Components {
                     mesh.Material.Diffuse = SelectDiffuse;
                     mesh.Draw();
                 }
+            }
+            
+            if (DisabledMeshes != null) {
+                for (int i = 0; i < DisabledMeshes.Length; i++) {
+                    Mesh mesh = DisabledMeshes[i];
+                    mesh.Blending = BlendingMode.Alphablending;
+                    mesh.Material.Opacity = DisabledAlpha;
+                    mesh.Material.Diffuse = DisabledDiffuse;
+                    mesh.Draw();
+                }
+            }
+            
+            if (HoveredAO != null && HoveredAOMesh != null) {
+                HoveredAOMesh.Blending = BlendingMode.Alphablending;
+                HoveredAOMesh.Material.Opacity = HoveredAlpha;
+                HoveredAOMesh.Material.Diffuse = HoveredDiffuse;
+                HoveredAOMesh.Position = HoveredAO.Position;
+                HoveredAOMesh.FirstGroup.Rotation = HoveredAO.Rotation;
+                HoveredAOMesh.Draw();
             }
             
             if (HoveredTrile != null && PlacingMesh != null) {
@@ -795,7 +832,7 @@ namespace FezGame.Components {
                 trile.Foreign = true;
                 trile.Hidden = true;
                 
-                Mesh mesh = SelectedMeshes[i] = GenMesh(trile, SelectedEffect);
+                Mesh mesh = SelectedMeshes[i] = GenMesh(trile);
                 mesh.Position = trile.Center;
                 
                 LevelManager.RecullAt(trile);
@@ -902,6 +939,9 @@ namespace FezGame.Components {
         }
         
         public Mesh GenMesh(Trile trile, float phi = 0f, BaseEffect effect = null) {
+            if (effect == null) {
+                effect = CubemappedEffect;
+            }
             Mesh mesh = new Mesh() {
                 SamplerState = SamplerState.PointClamp,
                 DepthWrites = true,
@@ -920,6 +960,9 @@ namespace FezGame.Components {
         }
         
         public Mesh GenMesh(ArtObject ao, float phi = 0f, BaseEffect effect = null) {
+            if (effect == null) {
+                effect = CubemappedEffect;
+            }
             Mesh mesh = new Mesh() {
                 SamplerState = SamplerState.PointClamp,
                 DepthWrites = true,
@@ -930,6 +973,12 @@ namespace FezGame.Components {
             group.Geometry = new IndexedUserPrimitives<VertexPositionNormalTextureInstance>(siip.Vertices, siip.Indices, siip.PrimitiveType);
             group.Texture = ao.Cubemap;
             mesh.SetRotation(phi);
+            return mesh;
+        }
+        
+        public Mesh GenMesh(ArtObjectInstance ao, BaseEffect effect = null) {
+            Mesh mesh = GenMesh(ao.ArtObject, 0f, effect);
+            mesh.FirstGroup.Rotation = ao.Rotation;
             return mesh;
         }
         
