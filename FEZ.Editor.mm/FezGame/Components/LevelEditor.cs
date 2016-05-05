@@ -19,6 +19,8 @@ using FezGame.Editor;
 using FezGame.Mod.Gui;
 using System.Drawing.Imaging;
 using Microsoft.Xna.Framework.Input;
+using FezEngine.Effects;
+using FezEngine.Structure.Geometry;
 #if FNA
 using Microsoft.Xna.Framework.Input;
 using SDL2;
@@ -85,9 +87,16 @@ namespace FezGame.Components {
         public Color UnselectColor = new Color(255, 31, 31);
         public float SelectRayDistance = 8f;
         
+        public Vector3 SelectDiffuse = new Vector3(0.3f, 0.7f, 1f);
+        public float SelectAlpha = 1f;
+        
         public List<TrileInstance> SelectedTriles;
+        public Mesh[] SelectedMeshes;
+        public static BaseEffect SelectedEffect;
+        
         
         public Vector2 FakeFreeLook;
+        
 
         protected int SkipLoading = 0;
 
@@ -169,6 +178,8 @@ namespace FezGame.Components {
             
             FEZMod.FEZometric = true;
             FEZMod.DisableInventory = true;
+            
+            SelectedEffect = new CubemappedEffect();
 
             SetupGui();
 
@@ -263,15 +274,17 @@ namespace FezGame.Components {
                 CursorColor = SelectColor;
                 
                 if (MouseState.LeftButton.State == MouseButtonStates.DragEnded) {
-                    if (KeyboardState.GetKeyState(Keys.LeftControl) != FezButtonState.Down) {
+                    List<TrileInstance> unselected = null;
+                    if (KeyboardState.GetKeyState(Keys.LeftControl) == FezButtonState.Down) {
                         SelectedTriles = GetTrilesSelected(SelectedTriles);
                     } else {
+                        unselected = SelectedTriles;
                         SelectedTriles = GetTrilesSelected();
                     }
                     
-                    UpdateSelection();
-                    
+                    UpdateSelection(unselected);
                 }
+                
                 
             } else if ((MouseState.RightButton.State == MouseButtonStates.DragStarted || 
                 MouseState.RightButton.State == MouseButtonStates.Dragging ||
@@ -281,11 +294,11 @@ namespace FezGame.Components {
                 CursorColor = UnselectColor;
                 
                 if (MouseState.RightButton.State == MouseButtonStates.DragEnded) {
-                    List<TrileInstance> unselectedTriles = GetTrilesSelected();
-                    SelectedTriles.RemoveAll((trile) => unselectedTriles.Contains(trile));
+                    List<TrileInstance> unselected = GetTrilesSelected();
+                    SelectedTriles.RemoveAll((trile) => unselected.Contains(trile));
+                    
+                    UpdateSelection(unselected);
                 }
-                
-                UpdateSelection();
                 
                 
             } else {
@@ -444,6 +457,16 @@ namespace FezGame.Components {
                 //maybe show a flash or something; in the meantime simply don't render the editor
                 return;
             }
+            
+            if (SelectedMeshes != null) {
+                for (int i = 0; i < SelectedMeshes.Length; i++) {
+                    Mesh mesh = SelectedMeshes[i];
+                    mesh.Blending = new BlendingMode?(BlendingMode.Alphablending);
+                    mesh.Material.Opacity = SelectAlpha;
+                    mesh.Material.Diffuse = SelectDiffuse;
+                    mesh.Draw();
+                }
+            }
 
             Viewport viewport = GraphicsDevice.Viewport;
             float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
@@ -562,8 +585,61 @@ namespace FezGame.Components {
             return cursorOnWidget;
         }
         
-        public void UpdateSelection() {
+        public void UpdateSelection(List<TrileInstance> unselected = null) {
+            if (unselected != null) {
+                for (int i = 0; i < unselected.Count; i++) {
+                    TrileInstance trile = unselected[i];
+                    trile.Foreign = false;
+                    trile.Hidden = false;
+                    LevelManager.RecullAt(trile);
+                }
+            }
             
+            if (SelectedTriles.Count == 0) {
+                //TODO remove selection widget
+                
+                SelectedMeshes = null;
+                LevelMaterializer.RebuildInstances();
+                return;
+            }
+            
+            //TODO add / update selection widget
+            
+            //Simply rebuild the mesh list
+            if (SelectedMeshes != null) {
+                for (int i = 0; i < SelectedMeshes.Length; i++) {
+                    SelectedMeshes[i].Dispose(false);
+                }
+            }
+            SelectedMeshes = new Mesh[SelectedTriles.Count];
+            
+            for (int i = 0; i < SelectedTriles.Count; i++) {
+                TrileInstance trile = SelectedTriles[i];
+                trile.Foreign = true;
+                trile.Hidden = true;
+                
+                Mesh mesh = SelectedMeshes[i] = new Mesh() {
+                    SamplerState = SamplerState.PointClamp,
+                    DepthWrites = true,
+                    Effect = SelectedEffect
+                };
+                ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Vector4> siip = trile.Trile.Geometry;
+                Group group = mesh.AddGroup();
+                group.Geometry = new IndexedUserPrimitives<VertexPositionNormalTextureInstance>(siip.Vertices, siip.Indices, siip.PrimitiveType);
+                group.Texture = LevelMaterializer.TrilesMesh.Texture;
+                if (ActorTypeExtensions.IsPickable(trile.Trile.ActorSettings.Type)) {
+                    trile.Phi = (float) FezMath.Round(trile.Phi / 1.57079637050629) * 1.570796f;
+                }
+                group.Rotation = Quaternion.CreateFromAxisAngle(Vector3.Up, trile.Phi);
+                if (trile.Trile.ActorSettings.Type == ActorType.CubeShard || trile.Trile.ActorSettings.Type == ActorType.SecretCube || trile.Trile.ActorSettings.Type == ActorType.PieceOfHeart) {
+                    group.Rotation = Quaternion.CreateFromAxisAngle(Vector3.Left, (float) Math.Asin(Math.Sqrt(2.0) / Math.Sqrt(3.0))) * Quaternion.CreateFromAxisAngle(Vector3.Down, 0.7853982f) * group.Rotation;
+                }
+                mesh.Position = trile.Center;
+                
+                LevelManager.RecullAt(trile);
+            }
+            
+            LevelMaterializer.RebuildInstances();
         }
 
         public Level CreateNewLevel(string name, int width, int height, int depth, string trileset) {
