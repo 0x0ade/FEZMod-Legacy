@@ -547,6 +547,19 @@ namespace FezGame.Components {
                 LevelManager.ClearTrile(HoveredTrile);
                 LevelMaterializer.CullInstances();
                 HoveredTrile = null;
+            } else if (MouseState.RightButton.State == MouseButtonStates.Clicked && HoveredAO != null) {
+                int trileGroupId = HoveredAO.ActorSettings.AttachedGroup.HasValue ? HoveredAO.ActorSettings.AttachedGroup.Value : -1;
+                if (LevelManager.Groups.ContainsKey(trileGroupId)) {
+                    TrileGroup trileGroup = LevelManager.Groups[trileGroupId];
+                    while (trileGroup.Triles.Count > 0) {
+                        LevelManager.ClearTrile(trileGroup.Triles[0]);
+                    }
+                    LevelManager.Groups.Remove(trileGroupId);
+                }
+                LevelManager.ArtObjects.Remove(HoveredAO.Id);
+                HoveredAO.Dispose();
+                LevelMaterializer.RegisterSatellites();
+                HoveredAO = null;
             }
 
             if (MouseState.MiddleButton.State == MouseButtonStates.Clicked && HoveredTrile != null) {
