@@ -3,11 +3,14 @@ using Microsoft.Xna.Framework;
 using System.Reflection;
 using FezEngine.Mod;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
+using FezEngine.Structure;
 
 namespace FezGame.Editor {
     public static class EditorUtils {
 
         public static ArrayCache<BoundingBox> a_BoundingBox_6 = new ArrayCache<BoundingBox>(6);
+        public static Cache<List<TrileInstance>> l_TrileInstance = new Cache<List<TrileInstance>>();
 
         public static T GetPrivate<T>(this object instance, string fieldName) {
             FieldInfo field = instance.GetType().GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);

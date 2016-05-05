@@ -258,8 +258,8 @@ namespace FezGame.Components {
                 MouseState.MiddleButton.State == MouseButtonStates.DragEnded)
                 && DraggingWidget == null) {
                 
-                FakeFreeLook.X = -(MouseState.Movement.X / 4f); //is the X rotation inversed here or in the cam?
-                FakeFreeLook.Y = MouseState.Movement.Y / 4f;
+                FakeFreeLook.X = -(MouseState.Movement.X / 2f); //is the X rotation inversed here or in the cam?
+                FakeFreeLook.Y = MouseState.Movement.Y / 2f;
                 
                 if (MouseState.MiddleButton.State == MouseButtonStates.DragEnded) {
                     FakeFreeLook = Vector2.Zero;
@@ -293,7 +293,7 @@ namespace FezGame.Components {
                 Selecting = true;
                 CursorColor = UnselectColor;
                 
-                if (MouseState.RightButton.State == MouseButtonStates.DragEnded) {
+                if (MouseState.RightButton.State == MouseButtonStates.DragEnded && SelectedTriles != null) {
                     List<TrileInstance> unselected = GetTrilesSelected();
                     SelectedTriles.RemoveAll((trile) => unselected.Contains(trile));
                     
@@ -303,6 +303,29 @@ namespace FezGame.Components {
                 
             } else {
                 GetTrile(ray, true);
+                
+                if (HoveredTrile != null && MouseState.LeftButton.State == MouseButtonStates.Clicked &&
+                    KeyboardState.GetKeyState(Keys.LeftControl) == FezButtonState.Down) {
+                    
+                    if (SelectedTriles != null && !SelectedTriles.Contains(HoveredTrile)) {
+                        SelectedTriles.Add(HoveredTrile);
+                        UpdateSelection();
+                    }
+                    
+                    HoveredTrile = null;
+                } else if (HoveredTrile != null && MouseState.RightButton.State == MouseButtonStates.Clicked &&
+                    KeyboardState.GetKeyState(Keys.LeftControl) == FezButtonState.Down) {
+                    
+                    if (SelectedTriles != null) {
+                        SelectedTriles.Remove(HoveredTrile);
+                        List<TrileInstance> unselected = EditorUtils.l_TrileInstance.GetNext();
+                        unselected.Clear();
+                        unselected.Add(HoveredTrile);
+                        UpdateSelection(unselected);
+                    }
+                    
+                    HoveredTrile = null;
+                }
 
                 HoveredAO = null;
                 if (FezEditor.Settings.TooltipArtObjectInfo) {
@@ -600,6 +623,10 @@ namespace FezGame.Components {
                 
                 SelectedMeshes = null;
                 LevelMaterializer.RebuildInstances();
+                CameraManager.RebuildView();
+                if (CameraManager is DefaultCameraManager) {
+                    ((DefaultCameraManager) CameraManager).RebuildProjection();
+                }
                 return;
             }
             
@@ -639,7 +666,10 @@ namespace FezGame.Components {
                 LevelManager.RecullAt(trile);
             }
             
-            LevelMaterializer.RebuildInstances();
+            CameraManager.RebuildView();
+            if (CameraManager is DefaultCameraManager) {
+                ((DefaultCameraManager) CameraManager).RebuildProjection();
+            }
         }
 
         public Level CreateNewLevel(string name, int width, int height, int depth, string trileset) {
