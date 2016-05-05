@@ -28,23 +28,25 @@ namespace FezGame.Mod.Gui {
             }
             
             if (0 < toAdd.Count) {
-                string path = toAdd[0];
-                toAdd.RemoveAt(0);
-                string item = path.Substring(ContentPaths.ArtObjects.Length + 1).ToUpper();
-                if (item.Contains("\\")) {
-                    item = item.Substring(0, item.IndexOf('\\'));
-                }
-                if (item.Contains("/")) {
-                    item = item.Substring(0, item.IndexOf('/'));
-                }
-                if (!added.Contains(item)) {
-                    added.Add(item);
-                    try {
-                        Widgets.Insert(Widgets.Count - PermanentWidgets.Length,
-                            new ArtObjectButtonWidget(Game, CMProvider.CurrentLevel.Load<ArtObject>(path))
-                        );
-                    } catch {
-                        //It's not an art object (f.e. alternative menu cube skin)
+                for (int i = 0; i < 5 && 0 < toAdd.Count; i++) {
+                    string path = toAdd[0];
+                    toAdd.RemoveAt(0);
+                    string item = path.Substring(ContentPaths.ArtObjects.Length + 1).ToUpper();
+                    if (item.Contains("\\")) {
+                        item = item.Substring(0, item.IndexOf('\\'));
+                    }
+                    if (item.Contains("/")) {
+                        item = item.Substring(0, item.IndexOf('/'));
+                    }
+                    if (!added.Contains(item)) {
+                        added.Add(item);
+                        try {
+                            Widgets.Insert(Widgets.Count - PermanentWidgets.Length,
+                                new ArtObjectButtonWidget(Game, CMProvider.CurrentLevel.Load<ArtObject>(path))
+                            );
+                        } catch {
+                            //It's not an art object (f.e. alternative menu cube skin)
+                        }
                     }
                 }
                 SearchLabel.Label = 0 < toAdd.Count ? "Status:" : "Search:";

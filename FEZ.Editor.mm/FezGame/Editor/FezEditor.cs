@@ -3,6 +3,7 @@ using FezEngine.Mod;
 using FezGame.Components;
 using FezEngine.Tools;
 using Microsoft.Xna.Framework;
+using System;
 
 namespace FezGame.Editor {
     
@@ -10,6 +11,7 @@ namespace FezGame.Editor {
         public Color DefaultForeground = Color.White;
         public Color DefaultBackground = new Color(0f, 0f, 0f, 0.75f);
 
+        [Obsolete("Not implemented anymore - kept to keep settings intact")]
         public bool TooltipArtObjectInfo = false;
         
         public int BackupHistory = 5;

@@ -88,6 +88,11 @@ namespace FezGame.Components {
         public Color UnselectColor = new Color(1f, 0.3f, 0.3f);
         public float SelectRayDistance = 8f;
         
+        public Color DraggingColor = new Color(0.3f, 1f, 0.3f);
+        protected Vector3 DraggingOrigin;
+        protected float DraggingAOGrid = 0.0625f;
+        protected ArtObjectInstance DraggingAO;
+        
         public Vector3 SelectDiffuse = new Vector3(0.3f, 0.7f, 1f);
         public float SelectAlpha = 1f;
         
@@ -155,12 +160,21 @@ namespace FezGame.Components {
                 }
                 return FezMath.SnapPhi(offs);
             }
+            set {
+                float cam = 0f;
+                if (CameraManager.Viewpoint.IsOrthographic()) {
+                    cam = FezMath.SnapPhi(CameraManager.Viewpoint.ToPhi());
+                } else {
+                    //TODO get closest viewpoint... somehow.
+                }
+                PlacingPhiOffset = (value - cam) * 2f / MathHelper.Pi;
+            }
         }
         
         public Vector3 PlacingOffset {
             get {
                 if (Placing is ArtObject) {
-                    return -HoveredFace.AsVector() * (Vector3.One + ((ArtObject) Placing).Size) / 2f;
+                    return -HoveredFace.AsVector() * ((ArtObject) Placing).Size / 2f;
                 }
                 return -HoveredFace.AsVector();
             }
@@ -283,12 +297,6 @@ namespace FezGame.Components {
                 SinceMouseMoved = 0f;
             }
             
-            TooltipWidget.Label = null;
-            TooltipWidget.Position.X = MouseState.Position.X + 24f;
-            TooltipWidget.Position.Y = MouseState.Position.Y;
-            
-            CursorHovering = false;
-            
             //Ugly thread-safety workaround
             trilesCount = LevelManager.Triles.Count;
             LevelManager.Triles.CopyTo(tmpTriles.Length < trilesCount ? (tmpTriles = new KeyValuePair<TrileEmplacement, TrileInstance>[trilesCount]) : tmpTriles, 0);
@@ -301,7 +309,26 @@ namespace FezGame.Components {
                 CameraManager.InverseView.Forward
             );
             
-            HoveredTrile = null;
+            float intersectionMin = float.MaxValue;
+            HoveredTrile = GetTrile(ray, ref intersectionMin);
+            if (HoveredTrile != null) {
+                HoveredBox = new BoundingBox(HoveredTrile.Position, HoveredTrile.Position + Vector3.One);
+            }
+            
+            HoveredAO = null;
+            int aosCount = LevelManager.ArtObjects.Count;
+            LevelManager.ArtObjects.CopyTo(tmpAOs.Length < aosCount ? (tmpAOs = new KeyValuePair<int, ArtObjectInstance>[aosCount]) : tmpAOs, 0);
+            for (int i = 0; i < aosCount; i++) {
+                ArtObjectInstance ao = tmpAOs[i].Value;
+                float? intersection = ray.Intersects(ao.Bounds);
+                if (intersection.HasValue && intersection < intersectionMin) {
+                    HoveredTrile = null;
+                    HoveredAO = ao;
+                    HoveredBox = ao.Bounds;
+                    intersectionMin = intersection.Value;
+                }
+            }
+            
             Selecting = false;
             CursorColor = Color.White;
             if (MouseState.LeftButton.State == MouseButtonStates.DragStarted ||
@@ -309,38 +336,78 @@ namespace FezGame.Components {
                 MouseState.RightButton.State == MouseButtonStates.DragStarted) {
                 DragOrigin = MouseState.Position;
             }
+            
+            if ((MouseState.LeftButton.State != MouseButtonStates.DragStarted && 
+                MouseState.LeftButton.State != MouseButtonStates.Dragging &&
+                MouseState.LeftButton.State != MouseButtonStates.DragEnded)
+                || DraggingWidget != null) {
+                DraggingAO = null;
+            }
+            
             if ((MouseState.MiddleButton.State == MouseButtonStates.DragStarted || 
                 MouseState.MiddleButton.State == MouseButtonStates.Dragging ||
                 MouseState.MiddleButton.State == MouseButtonStates.DragEnded)
                 && DraggingWidget == null) {
+                HoveredTrile = null;
+                HoveredAO = null;
+                DraggingAO = null;
                 
-                FakeFreeLook.X = -(MouseState.Movement.X / 3.25f); //is the X rotation inversed here or in the cam?
+                FakeFreeLook.X = -(MouseState.Movement.X / 3.25f); //Should the X rotation be inversed here or in the cam?
                 FakeFreeLook.Y = MouseState.Movement.Y / 3.25f;
                 
                 if (MouseState.MiddleButton.State == MouseButtonStates.DragEnded) {
                     FakeFreeLook = Vector2.Zero;
                 }
                 
-            }
-            if ((MouseState.LeftButton.State == MouseButtonStates.DragStarted || 
+                
+            } else if ((MouseState.LeftButton.State == MouseButtonStates.DragStarted || 
                 MouseState.LeftButton.State == MouseButtonStates.Dragging ||
                 MouseState.LeftButton.State == MouseButtonStates.DragEnded)
-                && DraggingWidget == null &&
-                (SelectingMin < MouseState.Position.X - DragOrigin.X ||
-                SelectingMin < MouseState.Position.Y - DragOrigin.Y)) {
-                Selecting = true;
-                CursorColor = SelectColor;
+                && DraggingWidget == null) {
                 
-                if (MouseState.LeftButton.State == MouseButtonStates.DragEnded) {
-                    List<TrileInstance> unselected = null;
-                    if (KeyboardState.GetKeyState(Keys.LeftControl) == FezButtonState.Down) {
-                        SelectedTriles = GetTrilesSelected(SelectedTriles);
-                    } else {
-                        unselected = SelectedTriles;
-                        SelectedTriles = GetTrilesSelected();
+                if (MouseState.LeftButton.State == MouseButtonStates.DragStarted && HoveredAO != null) {
+                    CursorColor = DraggingColor;
+                    DraggingAO = HoveredAO;
+                    DraggingOrigin = DraggingAO.Position;
+                    PlacingPhi = DraggingAO.Rotation.ToPhi();
+                }
+                
+                HoveredTrile = null;
+                HoveredAO = null;
+                
+                
+                if (DraggingAO == null &&
+                    (SelectingMin < Math.Abs(MouseState.Position.X - DragOrigin.X) ||
+                    SelectingMin < Math.Abs(MouseState.Position.Y - DragOrigin.Y))) {
+                    Selecting = true;
+                    CursorColor = SelectColor;
+                    
+                    if (MouseState.LeftButton.State == MouseButtonStates.DragEnded) {
+                        List<TrileInstance> unselected = null;
+                        if (KeyboardState.GetKeyState(Keys.LeftControl) == FezButtonState.Down) {
+                            SelectedTriles = GetTrilesSelected(SelectedTriles);
+                        } else {
+                            unselected = SelectedTriles;
+                            SelectedTriles = GetTrilesSelected();
+                        }
+                        
+                        UpdateSelection(unselected);
                     }
                     
-                    UpdateSelection(unselected);
+                    
+                } else if (DraggingAO != null) {
+                    CursorColor = DraggingColor;
+                    Vector3 dragOriginWorld = GraphicsDevice.Viewport.Unproject(
+                        new Vector3(DragOrigin.X, DragOrigin.Y, 0.0f),
+                        CameraManager.Projection, CameraManager.View, Matrix.Identity
+                    );
+                    DraggingAO.Position = DraggingOrigin + ray.Position - dragOriginWorld;
+                    DraggingAO.Position = new Vector3(
+                        (float) Math.Floor(DraggingAO.Position.X / DraggingAOGrid) * DraggingAOGrid,
+                        (float) Math.Floor(DraggingAO.Position.Y / DraggingAOGrid) * DraggingAOGrid,
+                        (float) Math.Floor(DraggingAO.Position.Z / DraggingAOGrid) * DraggingAOGrid
+                    );
+                    DraggingAO.Rotation = FezMath.QuaternionFromPhi(PlacingPhi);
                 }
                 
                 
@@ -348,8 +415,11 @@ namespace FezGame.Components {
                 MouseState.RightButton.State == MouseButtonStates.Dragging ||
                 MouseState.RightButton.State == MouseButtonStates.DragEnded)
                 && DraggingWidget == null &&
-                (SelectingMin < MouseState.Position.X - DragOrigin.X ||
-                SelectingMin < MouseState.Position.Y - DragOrigin.Y)) {
+                (SelectingMin < Math.Abs(MouseState.Position.X - DragOrigin.X) ||
+                SelectingMin < Math.Abs(MouseState.Position.Y - DragOrigin.Y))) {
+                HoveredTrile = null;
+                HoveredAO = null;
+                DraggingAO = null;
                 Selecting = true;
                 CursorColor = UnselectColor;
                 
@@ -361,52 +431,27 @@ namespace FezGame.Components {
                 }
                 
                 
-            } else {
-                GetTrile(ray, true);
+            } else if (HoveredTrile != null && MouseState.LeftButton.State == MouseButtonStates.Clicked &&
+                KeyboardState.GetKeyState(Keys.LeftControl) == FezButtonState.Down) {
                 
-                if (HoveredTrile != null && MouseState.LeftButton.State == MouseButtonStates.Clicked &&
-                    KeyboardState.GetKeyState(Keys.LeftControl) == FezButtonState.Down) {
-                    
-                    if (SelectedTriles != null && !SelectedTriles.Contains(HoveredTrile)) {
-                        SelectedTriles.Add(HoveredTrile);
-                        UpdateSelection();
-                    }
-                    
-                    HoveredTrile = null;
-                } else if (HoveredTrile != null && MouseState.RightButton.State == MouseButtonStates.Clicked &&
-                    KeyboardState.GetKeyState(Keys.LeftControl) == FezButtonState.Down) {
-                    
-                    if (SelectedTriles != null) {
-                        SelectedTriles.Remove(HoveredTrile);
-                        List<TrileInstance> unselected = EditorUtils.l_TrileInstance.GetNext();
-                        unselected.Clear();
-                        unselected.Add(HoveredTrile);
-                        UpdateSelection(unselected);
-                    }
-                    
-                    HoveredTrile = null;
+                if (SelectedTriles != null && !SelectedTriles.Contains(HoveredTrile)) {
+                    SelectedTriles.Add(HoveredTrile);
+                    UpdateSelection();
                 }
-
-                HoveredAO = null;
-                if (FezEditor.Settings.TooltipArtObjectInfo) {
-                    float intersectionMin = float.MaxValue;
-                    int aosCount = LevelManager.ArtObjects.Count;
-                    LevelManager.ArtObjects.CopyTo(tmpAOs.Length < aosCount ? (tmpAOs = new KeyValuePair<int, ArtObjectInstance>[aosCount]) : tmpAOs, 0);
-                    for (int i = 0; i < aosCount; i++) {
-                        ArtObjectInstance ao = tmpAOs[i].Value;
-                        float? intersection = ray.Intersects(ao.Bounds);
-                        if (intersection.HasValue && intersection < intersectionMin) {
-                            HoveredTrile = null;
-                            HoveredAO = ao;
-                            HoveredBox = ao.Bounds;
-                            intersectionMin = intersection.Value;
-                        }
-                    }
+                
+                HoveredTrile = null;
+            } else if (HoveredTrile != null && MouseState.RightButton.State == MouseButtonStates.Clicked &&
+                KeyboardState.GetKeyState(Keys.LeftControl) == FezButtonState.Down) {
+                
+                if (SelectedTriles != null) {
+                    SelectedTriles.Remove(HoveredTrile);
+                    List<TrileInstance> unselected = EditorUtils.l_TrileInstance.GetNext();
+                    unselected.Clear();
+                    unselected.Add(HoveredTrile);
+                    UpdateSelection(unselected);
                 }
-
-                if (HoveredAO != null) {
-                    TooltipWidget.Label = HoveredAO.Id + ": " + HoveredAO.ArtObjectName;
-                }
+                
+                HoveredTrile = null;
             }
 
             AssetPickerWidget.Position.Y = GraphicsDevice.Viewport.Height - AssetPickerWidget.Size.Y;
@@ -442,8 +487,10 @@ namespace FezGame.Components {
                 }
             }
 
+            CursorHovering = false;
             if (cursorInMenu) {
-                //CursorHovering = true;
+                HoveredTrile = null;
+                HoveredAO = null;
                 return;
             }
 
@@ -506,20 +553,12 @@ namespace FezGame.Components {
                 Placing = HoveredTrile.Trile;
             }
 
-            CameraManager.PixelsPerTrixel = Math.Max(0.25f, CameraManager.PixelsPerTrixel + 0.25f * MouseState.WheelTurns * WheelTurnsFactor);
-
-            if (string.IsNullOrEmpty(TooltipWidget.Label)) {
-                if (TooltipWidgetAdded) {
-                    Widgets.Remove(TooltipWidget);
-                    TooltipWidgetAdded = false;
-                }
+            if (HoveredTrile == null && DraggingAO == null) {
+                CameraManager.PixelsPerTrixel = Math.Max(0.25f, CameraManager.PixelsPerTrixel + 0.25f * MouseState.WheelTurns * WheelTurnsFactor);
             } else {
-                if (!TooltipWidgetAdded) {
-                    Widgets.Add(TooltipWidget);
-                    TooltipWidgetAdded = true;
-                }
+                PlacingPhiOffset = (PlacingPhiOffset + MouseState.WheelTurns / 120f) % 4;
             }
-            
+
             if (FocusedWidget == null && KeyboardState.GetKeyState(Keys.LeftControl) == FezButtonState.Down) {
                 if (KeyboardState.GetKeyState(Keys.S) == FezButtonState.Pressed) {
                     Save(true, true);
@@ -578,11 +617,12 @@ namespace FezGame.Components {
                 PlacingMesh.Blending = BlendingMode.Alphablending;
                 PlacingMesh.Material.Opacity = PlacingAlpha;
                 PlacingMesh.Material.Diffuse = PlacingDiffuse;
-                PlacingMesh.Position = HoveredTrile.Position + PlacingOffset;
                 if (Placing is Trile) {
+                    PlacingMesh.Position = HoveredTrile.Center + PlacingOffset;
                     PlacingMesh.SetRotation((Trile) Placing, PlacingPhi);
                     PlacingMesh.Draw();
                 } else if (Placing is ArtObject) {
+                    PlacingMesh.Position = HoveredTrile.Position + PlacingOffset;
                     PlacingMesh.SetRotation(PlacingPhi);
                     PlacingMesh.Draw();
                 }
@@ -668,7 +708,7 @@ namespace FezGame.Components {
                     widget.PreUpdate();
                     widget.Update(gameTime);
                 }
-                if (widget == TooltipWidget || !widget.Visible) {
+                if (!widget.Visible) {
                     continue;
                 }
                 bool cursorOnChild = cursorOnWidget;
@@ -781,23 +821,23 @@ namespace FezGame.Components {
             return trile;
         }
         
-        public TrileInstance GetTrile(Ray ray, bool hover = false) {
-            float intersectionMin = float.MaxValue;
+        public TrileInstance GetTrile(Ray ray, ref float intersectionMin) {
             TrileInstance trileBest = null;
             for (int i = 0; i < trilesCount; i++) {
                 TrileInstance trile = tmpTriles[i].Value;
                 BoundingBox box = new BoundingBox(trile.Position, trile.Position + Vector3.One);
                 float? intersection = ray.Intersects(box);
                 if (intersection.HasValue && intersection < intersectionMin) {
-                    if (hover) {
-                        HoveredTrile = trile;
-                        HoveredBox = box;
-                    }
                     trileBest = trile;
                     intersectionMin = intersection.Value;
                 }
             }
             return trileBest;
+        }
+        
+        public TrileInstance GetTrile(Ray ray) {
+            float intersectionMin = float.MaxValue;
+            return GetTrile(ray, ref intersectionMin);
         }
         
         public List<TrileInstance> GetTriles(Ray ray, List<TrileInstance> trilesGot = null) {

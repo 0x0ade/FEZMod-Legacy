@@ -75,6 +75,10 @@ namespace FezGame.Editor {
         public static void SetRotation(this Mesh mesh, TrileInstance trile) {
             mesh.SetRotation(trile.Trile, trile.Phi);
         }
+        
+        public static float ToPhi(this Quaternion q) {
+            return (float) (Math.Asin(q.Y) * 2D); //alternatively Math.Acos(q.W)
+        } 
 
     }
 }

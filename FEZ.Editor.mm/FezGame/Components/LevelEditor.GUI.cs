@@ -37,9 +37,6 @@ namespace FezGame.Components {
         public ContainerWidget AssetPickerPickerWidget;
         public List<ButtonWidget> AssetPickerLabels = new List<ButtonWidget>();
         
-        public ButtonWidget TooltipWidget;
-        protected bool TooltipWidgetAdded = false;
-
         protected GuiWidget DraggingWidget;
         protected GuiWidget FocusedWidget;
 
@@ -1829,10 +1826,6 @@ namespace FezGame.Components {
                     widget.UpdateTheme();
                 }
             }));
-            CheckboxWidget checkboxShowAOTooltips;
-            button.Widgets.Add(checkboxShowAOTooltips = new CheckboxWidget(Game, "ArtObject tooltips") {
-                RefreshValue = () => FezEditor.Settings.TooltipArtObjectInfo
-            });
             TextFieldWidget fieldBackupHistory;
             button.Widgets.Add(new ContainerWidget(Game, new GuiWidget[] {
                 new ButtonWidget(Game, "Backup Depth:") {
@@ -1849,7 +1842,6 @@ namespace FezGame.Components {
                 Size = new Vector2(192f, 24f)
             });
             button.Widgets.Add(new ButtonWidget(Game, "Save", delegate() {
-                FezEditor.Settings.TooltipArtObjectInfo = checkboxShowAOTooltips.Checked;
                 FezEditor.Settings.BackupHistory = int.Parse(fieldBackupHistory.Text);
                 FezEditor.Settings.Save();
             }));
@@ -1870,9 +1862,6 @@ namespace FezGame.Components {
             AssetPickerPickerWidget.Widgets.AddRange(AssetPickerLabels);
             
             Widgets.AddRange(AssetPickerWidgets);
-
-            //TOOLTIP
-            TooltipWidget = new ButtonWidget(Game);
         }
         
     }
