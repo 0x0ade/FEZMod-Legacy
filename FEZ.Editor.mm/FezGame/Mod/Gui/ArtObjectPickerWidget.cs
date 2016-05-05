@@ -18,10 +18,37 @@ namespace FezGame.Mod.Gui {
             LargeSpacingX = 64f;
             LargeRows = 3f;
         }
+        
+        protected List<string> toAdd = new List<string>();
+        protected List<string> added = new List<string>();
 
         public override void Update(GameTime gameTime) {
             if (Widgets.Count == PermanentWidgets.Length) {
                 UpdateWidgets();
+            }
+            
+            if (0 < toAdd.Count) {
+                string path = toAdd[0];
+                toAdd.RemoveAt(0);
+                string item = path.Substring(ContentPaths.ArtObjects.Length + 1).ToUpper();
+                if (item.Contains("\\")) {
+                    item = item.Substring(0, item.IndexOf('\\'));
+                }
+                if (item.Contains("/")) {
+                    item = item.Substring(0, item.IndexOf('/'));
+                }
+                if (!added.Contains(item)) {
+                    added.Add(item);
+                    try {
+                        Widgets.Insert(Widgets.Count - PermanentWidgets.Length,
+                            new ArtObjectButtonWidget(Game, CMProvider.CurrentLevel.Load<ArtObject>(path))
+                        );
+                    } catch {
+                        //It's not an art object (f.e. alternative menu cube skin)
+                    }
+                }
+                SearchLabel.Label = 0 < toAdd.Count ? "Status:" : "Search:";
+                SearchField.Text = 0 < toAdd.Count ? ("LOADING (" + toAdd.Count + " left)") : String.Empty;
             }
 
             base.Update(gameTime);
@@ -36,27 +63,9 @@ namespace FezGame.Mod.Gui {
             Widgets.Clear();
             ScrollOffset = 0f;
             
-            IEnumerable<string> list = CMProvider.GetAllIn(ContentPaths.ArtObjects);
-            List<string> added = new List<string>();
-            foreach (string path in list) {
-                string item = path.Substring(ContentPaths.ArtObjects.Length + 1).ToUpper();
-                if (item.Contains("\\")) {
-                    item = item.Substring(0, item.IndexOf('\\'));
-                }
-                if (item.Contains("/")) {
-                    item = item.Substring(0, item.IndexOf('/'));
-                }
-                if (added.Contains(item)) {
-                    continue;
-                }
-                added.Add(item);
-                
-                try {
-                    Widgets.Add(new ArtObjectButtonWidget(Game, CMProvider.CurrentLevel.Load<ArtObject>(path)));
-                } catch {
-                    //It's not an art object (f.e. alternative menu cube skin)
-                }
-            }
+            toAdd.Clear();
+            added.Clear();
+            toAdd.AddRange(CMProvider.GetAllIn(ContentPaths.ArtObjects));
             
             Widgets.AddRange(PermanentWidgets);
         }

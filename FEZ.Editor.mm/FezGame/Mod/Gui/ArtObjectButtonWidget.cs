@@ -46,7 +46,15 @@ namespace FezGame.Mod.Gui {
         }
 
         public override void Click(GameTime gameTime, int mb) {
-            //TODO
+            if (AO == null) {
+                return;
+            }
+
+            if (mb == 1) {
+                ((ILevelEditor) GuiHandler).Placing = AO;
+            } else if (mb == 3) {
+                //TODO show exact placement dialog
+            }
         }
 
         protected override void Dispose(bool disposing) {

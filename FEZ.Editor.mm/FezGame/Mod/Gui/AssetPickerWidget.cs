@@ -101,7 +101,9 @@ namespace FezGame.Mod.Gui {
                     widget.Position.Y = 0;
                     widget.Tooltip.Background = GuiHandler.DefaultBackground;
 
-                    InnerSize += widget.Size.X + 4f;
+                    if (widget.Visible) {
+                        InnerSize += widget.Size.X + 4f;
+                    }
                 }
             } else {
                 for (int i = 1; i < PermanentWidgets.Length; i++) {
@@ -135,10 +137,12 @@ namespace FezGame.Mod.Gui {
                     widget.Tooltip.Background.A = 0;
                     widget.Tooltip.Position.Y = widget.Size.Y;
                     
-                    xoffs += widget.Size.X + LargeSpacingX * 2f;
-                    if (Size.X <= (xoffs + widget.Size.X)) {
-                        xoffs = LargeSpacingX;
-                        yoffs += widget.Size.Y + 24f;
+                    if (widget.Visible) {
+                        xoffs += widget.Size.X + LargeSpacingX * 2f;
+                        if (Size.X <= (xoffs + widget.Size.X)) {
+                            xoffs = LargeSpacingX;
+                            yoffs += widget.Size.Y + 24f;
+                        }
                     }
                 }
                 InnerSize = yoffs + Widgets[0].Size.Y + 24f;
