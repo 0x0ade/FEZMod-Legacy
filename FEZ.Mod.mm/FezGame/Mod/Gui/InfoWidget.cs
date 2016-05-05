@@ -23,10 +23,12 @@ namespace FezGame.Mod.Gui {
             Font = FontManager.Small;
 
             BuildDate = ReadBuildDate();
+            info = new string[5];
+            info[0] = "Build Date " + BuildDate;
         }
 
         public override void Update(GameTime gameTime) {
-            string[] informations = GetInformations();
+            string[] informations = GetInfo();
 
             float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
 
@@ -53,7 +55,7 @@ namespace FezGame.Mod.Gui {
                 return;
             }
 
-            string[] informations = GetInformations();
+            string[] informations = GetInfo();
 
             float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
             float lineHeight = Font.MeasureString(informations[0]).Y * 0.5f * viewScale;
@@ -62,14 +64,13 @@ namespace FezGame.Mod.Gui {
             }
         }
 
-        public virtual string[] GetInformations() {
-            return new string[] {
-                "Build Date " + BuildDate,
-                "Level: " + (LevelManager.Name ?? "(none)"),
-                "Gomez Position: " + (PlayerManager != null ? (" (" + ToString(PlayerManager.Position) + ")") : "(none)"),
-                "Trile Set: " + (LevelManager.TrileSet != null ? LevelManager.TrileSet.Name : "(none)"),
-                "Current View: " + CameraManager.Viewpoint
-            };
+        protected string[] info;
+        public virtual string[] GetInfo() {
+            info[1] = "Level: " + (LevelManager.Name ?? "(none)");
+            info[2] = "Gomez Position: " + (PlayerManager != null ? (" (" + ToString(PlayerManager.Position) + ")") : "(none)");
+            info[3] = "Trile Set: " + (LevelManager.TrileSet != null ? LevelManager.TrileSet.Name : "(none)");
+            info[4] = "Current View: " + CameraManager.Viewpoint;
+            return info;
         }
 
         public static string ToString(Vector2 v) {

@@ -4,25 +4,22 @@ using FezGame.Components;
 namespace FezGame.Mod.Gui {
     public class EditorInfoWidget : InfoWidget {
         
+        protected int infoOffs;
         public EditorInfoWidget(Game game) 
             : base(game) {
+                string[] infoOld = info;
+                info = new string[(infoOffs = info.Length) + 1];
+                infoOld.CopyTo(info, 0);
         }
-
-        public override string[] GetInformations() {
+        
+        public override string[] GetInfo() {
+            base.GetInfo();
+            
             ILevelEditor LevelEditor = ((ILevelEditor) GuiHandler);
 
-            string[] infoEditor = new string[] {
-                "Hovered Trile ID: " + (LevelEditor.HoveredTrile != null ? LevelEditor.HoveredTrile.TrileId.ToString() : "(none)"),
-                "Hovered Trile: " + (LevelEditor.HoveredTrile != null ? (LevelEditor.HoveredTrile.Trile.Name + " (" + LevelEditor.HoveredTrile.Emplacement.X + ", " + LevelEditor.HoveredTrile.Emplacement.Y + ", " + LevelEditor.HoveredTrile.Emplacement.Z + ")") : "(none)"),
-                "Current Trile ID: " + LevelEditor.TrileId,
-                "Current Trile: " + (LevelManager.TrileSet != null && LevelManager.TrileSet.Triles.ContainsKey(LevelEditor.TrileId) ? LevelManager.TrileSet.Triles[LevelEditor.TrileId].Name : "(none)"),
-            };
+            info[infoOffs + 0] = "Hovered Trile: " + (LevelEditor.HoveredTrile != null ? (LevelEditor.HoveredTrile.Trile.Name + " (" + LevelEditor.HoveredTrile.Emplacement.X + ", " + LevelEditor.HoveredTrile.Emplacement.Y + ", " + LevelEditor.HoveredTrile.Emplacement.Z + ")") : "(none)");
 
-            string[] info = base.GetInformations();
-            string[] infoSum = new string[info.Length + infoEditor.Length];
-            info.CopyTo(infoSum, 0);
-            infoEditor.CopyTo(infoSum, info.Length);
-            return infoSum;
+            return info;
         }
 
     }

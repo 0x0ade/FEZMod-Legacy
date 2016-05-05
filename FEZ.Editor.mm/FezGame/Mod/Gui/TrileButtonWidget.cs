@@ -55,7 +55,7 @@ namespace FezGame.Mod.Gui {
             }
 
             if (mb == 1) {
-                ((ILevelEditor) GuiHandler).TrileId = Trile.Id;
+                ((ILevelEditor) GuiHandler).Placing = Trile;
             } else if (mb == 3) {
                 GuiHandler.Scheduled.Add(delegate() {
                     ContainerWidget window;

@@ -8,7 +8,7 @@ namespace FezGame.Components {
         TrileInstance HoveredTrile { get; set; }
         BoundingBox HoveredBox { get; set; }
         FaceOrientation HoveredFace { get; set; }
-        int TrileId { get; set; }
+        object Placing { get; set; }
 
         bool ThumbnailScheduled { get; set; }
         int ThumbnailX { get; set; }

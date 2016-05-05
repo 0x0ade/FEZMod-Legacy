@@ -82,17 +82,25 @@ namespace FezGame.Components {
         
         public Point DragOrigin;
         
-        public Color SelectColor = new Color(31, 95, 255);
+        public Color SelectColor = new Color(0.3f, 0.7f, 1f);
         public bool Selecting = false;
-        public Color UnselectColor = new Color(255, 31, 31);
+        public int SelectingMin = 12;
+        public Color UnselectColor = new Color(1f, 0.3f, 0.3f);
         public float SelectRayDistance = 8f;
         
         public Vector3 SelectDiffuse = new Vector3(0.3f, 0.7f, 1f);
         public float SelectAlpha = 1f;
         
-        public List<TrileInstance> SelectedTriles;
+        public List<TrileInstance> SelectedTriles = new List<TrileInstance>();
         public Mesh[] SelectedMeshes;
-        public static BaseEffect SelectedEffect;
+        public static BaseEffect SelectedTrileEffect;
+        
+        public Vector3 PlacingDiffuse = new Vector3(0.5f, 0.5f, 0.5f);
+        public float PlacingAlpha = 0.625f;
+        
+        public Mesh PlacingMesh;
+        public Mesh[] PlacingMeshes;
+        public static BaseEffect PlacingTrileEffect;
         
         
         public Vector2 FakeFreeLook;
@@ -108,7 +116,46 @@ namespace FezGame.Components {
         public ArtObjectInstance HoveredAO { get; set; }
         public BoundingBox HoveredBox { get; set; }
         public FaceOrientation HoveredFace { get; set; }
-        public int TrileId { get; set; }
+        protected object placing;
+        public object Placing {
+            get {
+                return placing;
+            }
+            set {
+                if (placing != value) {
+                    if (PlacingMeshes != null) {
+                        for (int i = 0; i < PlacingMeshes.Length; i++) {
+                            PlacingMeshes[i].Dispose(false);
+                        }
+                    }
+                    PlacingMeshes = null;
+                    if (PlacingMesh != null) {
+                        PlacingMesh.Dispose(false);
+                    }
+                    PlacingMesh = null;
+                    
+                    if (value is Trile) {
+                        Trile trile = (Trile) value;
+                        
+                        PlacingMesh = GenMesh(trile, PlacingPhi, PlacingTrileEffect);
+                    }
+                }
+                
+                placing = value;
+            }
+        }
+        public float PlacingPhiOffset = 0f;
+        public float PlacingPhi {
+            get {
+                float offs = MathHelper.Pi * PlacingPhiOffset / 2f;
+                if (CameraManager.Viewpoint.IsOrthographic()) {
+                    return FezMath.SnapPhi(CameraManager.Viewpoint.ToPhi() + offs);
+                } else {
+                    //TODO get closest viewpoint... somehow.
+                }
+                return FezMath.SnapPhi(offs);
+            }
+        } 
 
         public bool ThumbnailScheduled { get; set; }
         public int ThumbnailX { get; set; }
@@ -131,7 +178,7 @@ namespace FezGame.Components {
             : base(game) {
             UpdateOrder = -10;
             DrawOrder = 4000;
-            TrileId = 0;
+            Placing = null;
             Instance = this;
         }
 
@@ -179,7 +226,7 @@ namespace FezGame.Components {
             FEZMod.FEZometric = true;
             FEZMod.DisableInventory = true;
             
-            SelectedEffect = new CubemappedEffect();
+            SelectedTrileEffect = PlacingTrileEffect = new CubemappedEffect();
 
             SetupGui();
 
@@ -258,8 +305,8 @@ namespace FezGame.Components {
                 MouseState.MiddleButton.State == MouseButtonStates.DragEnded)
                 && DraggingWidget == null) {
                 
-                FakeFreeLook.X = -(MouseState.Movement.X / 2f); //is the X rotation inversed here or in the cam?
-                FakeFreeLook.Y = MouseState.Movement.Y / 2f;
+                FakeFreeLook.X = -(MouseState.Movement.X / 3.25f); //is the X rotation inversed here or in the cam?
+                FakeFreeLook.Y = MouseState.Movement.Y / 3.25f;
                 
                 if (MouseState.MiddleButton.State == MouseButtonStates.DragEnded) {
                     FakeFreeLook = Vector2.Zero;
@@ -269,7 +316,9 @@ namespace FezGame.Components {
             if ((MouseState.LeftButton.State == MouseButtonStates.DragStarted || 
                 MouseState.LeftButton.State == MouseButtonStates.Dragging ||
                 MouseState.LeftButton.State == MouseButtonStates.DragEnded)
-                && DraggingWidget == null) {
+                && DraggingWidget == null &&
+                (SelectingMin < MouseState.Position.X - DragOrigin.X ||
+                SelectingMin < MouseState.Position.Y - DragOrigin.Y)) {
                 Selecting = true;
                 CursorColor = SelectColor;
                 
@@ -289,7 +338,9 @@ namespace FezGame.Components {
             } else if ((MouseState.RightButton.State == MouseButtonStates.DragStarted || 
                 MouseState.RightButton.State == MouseButtonStates.Dragging ||
                 MouseState.RightButton.State == MouseButtonStates.DragEnded)
-                && DraggingWidget == null) {
+                && DraggingWidget == null &&
+                (SelectingMin < MouseState.Position.X - DragOrigin.X ||
+                SelectingMin < MouseState.Position.Y - DragOrigin.Y)) {
                 Selecting = true;
                 CursorColor = UnselectColor;
                 
@@ -400,8 +451,8 @@ namespace FezGame.Components {
                     if (FocusedWidget is TextFieldWidget) {
                         ((TextFieldWidget) FocusedWidget).Text = emplacement.X + "; " + emplacement.Y + "; " + emplacement.Z;
                         unfocusWidget = false;
-                    } else if (LevelManager.TrileSet != null && LevelManager.TrileSet.Triles.ContainsKey(TrileId)) {
-                        AddTrile(CreateNewTrile(TrileId, emplacement));
+                    } else if (LevelManager.TrileSet != null && Placing is Trile && LevelManager.TrileSet.Triles.ContainsKey(((Trile) Placing).Id)) {
+                        AddTrile(CreateNewTrile(((Trile) Placing).Id, emplacement));
                     }
                 }
 
@@ -420,7 +471,7 @@ namespace FezGame.Components {
             }
 
             if (MouseState.MiddleButton.State == MouseButtonStates.Clicked && HoveredTrile != null) {
-                TrileId = HoveredTrile.TrileId;
+                Placing = HoveredTrile.Trile;
             }
 
             CameraManager.PixelsPerTrixel = Math.Max(0.25f, CameraManager.PixelsPerTrixel + 0.25f * MouseState.WheelTurns * WheelTurnsFactor);
@@ -484,11 +535,20 @@ namespace FezGame.Components {
             if (SelectedMeshes != null) {
                 for (int i = 0; i < SelectedMeshes.Length; i++) {
                     Mesh mesh = SelectedMeshes[i];
-                    mesh.Blending = new BlendingMode?(BlendingMode.Alphablending);
+                    mesh.Blending = BlendingMode.Alphablending;
                     mesh.Material.Opacity = SelectAlpha;
                     mesh.Material.Diffuse = SelectDiffuse;
                     mesh.Draw();
                 }
+            }
+            
+            if (Placing is Trile && HoveredTrile != null) {
+                PlacingMesh.Position = HoveredTrile.Center - HoveredFace.AsVector();
+                PlacingMesh.Blending = BlendingMode.Alphablending;
+                PlacingMesh.Material.Opacity = PlacingAlpha;
+                PlacingMesh.Material.Diffuse = PlacingDiffuse;
+                PlacingMesh.SetRotation((Trile) Placing, PlacingPhi);
+                PlacingMesh.Draw();
             }
 
             Viewport viewport = GraphicsDevice.Viewport;
@@ -645,22 +705,7 @@ namespace FezGame.Components {
                 trile.Foreign = true;
                 trile.Hidden = true;
                 
-                Mesh mesh = SelectedMeshes[i] = new Mesh() {
-                    SamplerState = SamplerState.PointClamp,
-                    DepthWrites = true,
-                    Effect = SelectedEffect
-                };
-                ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Vector4> siip = trile.Trile.Geometry;
-                Group group = mesh.AddGroup();
-                group.Geometry = new IndexedUserPrimitives<VertexPositionNormalTextureInstance>(siip.Vertices, siip.Indices, siip.PrimitiveType);
-                group.Texture = LevelMaterializer.TrilesMesh.Texture;
-                if (ActorTypeExtensions.IsPickable(trile.Trile.ActorSettings.Type)) {
-                    trile.Phi = (float) FezMath.Round(trile.Phi / 1.57079637050629) * 1.570796f;
-                }
-                group.Rotation = Quaternion.CreateFromAxisAngle(Vector3.Up, trile.Phi);
-                if (trile.Trile.ActorSettings.Type == ActorType.CubeShard || trile.Trile.ActorSettings.Type == ActorType.SecretCube || trile.Trile.ActorSettings.Type == ActorType.PieceOfHeart) {
-                    group.Rotation = Quaternion.CreateFromAxisAngle(Vector3.Left, (float) Math.Asin(Math.Sqrt(2.0) / Math.Sqrt(3.0))) * Quaternion.CreateFromAxisAngle(Vector3.Down, 0.7853982f) * group.Rotation;
-                }
+                Mesh mesh = SelectedMeshes[i] = GenMesh(trile, SelectedTrileEffect);
                 mesh.Position = trile.Center;
                 
                 LevelManager.RecullAt(trile);
@@ -688,11 +733,7 @@ namespace FezGame.Components {
             TrileInstance trile = new TrileInstance(emplacement, trileId);
             LevelManager.Triles[emplacement] = trile;
 
-            if (CameraManager.Viewpoint.IsOrthographic()) {
-                trile.SetPhiLight(CameraManager.Viewpoint.ToPhi());
-            } else {
-                //TODO get closest viewpoint... somehow.
-            }
+            trile.SetPhiLight(PlacingPhi);
 
             trile.PhysicsState = new InstancePhysicsState(trile) {
                 Respawned = true,
@@ -769,7 +810,25 @@ namespace FezGame.Components {
             
             return selected;
         }
-
+        
+        public Mesh GenMesh(Trile trile, float phi = 0f, BaseEffect effect = null) {
+            Mesh mesh = new Mesh() {
+                SamplerState = SamplerState.PointClamp,
+                DepthWrites = true,
+                Effect = effect
+            };
+            ShaderInstancedIndexedPrimitives<VertexPositionNormalTextureInstance, Vector4> siip = trile.Geometry;
+            Group group = mesh.AddGroup();
+            group.Geometry = new IndexedUserPrimitives<VertexPositionNormalTextureInstance>(siip.Vertices, siip.Indices, siip.PrimitiveType);
+            group.Texture = LevelMaterializer.TrilesMesh.Texture;
+            mesh.SetRotation(trile, phi);
+            return mesh;
+        }
+        
+        public Mesh GenMesh(TrileInstance trile, BaseEffect effect = null) {
+            return GenMesh(trile.Trile, trile.Phi, effect);
+        }
+        
         public void AddTrile(TrileInstance trile) {
             if (LevelManager.TrileExists(trile.Emplacement)) {
                 TrileEmplacement emplacement = trile.Emplacement;
