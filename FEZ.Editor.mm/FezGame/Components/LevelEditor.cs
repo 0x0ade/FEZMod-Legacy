@@ -199,9 +199,6 @@ namespace FezGame.Components {
         protected Vector3 placingTrileListSize;
         public Vector3 PlacingOffset {
             get {
-                if (Placing is TrileInstance[]) {
-                    return -HoveredFace.AsVector();
-                }
                 if (Placing is ArtObject) {
                     return -HoveredFace.AsVector() * ((ArtObject) Placing).Size / 2f;
                 }
@@ -930,14 +927,8 @@ namespace FezGame.Components {
                 offs = new TrileEmplacement(int.MaxValue, int.MaxValue, int.MaxValue);
                 foreach (TrileInstance trile in orig) {
                     TrileEmplacement e = trile.Emplacement;
-                    if (e.X < offs.X) {
-                        offs.X = e.X;
-                    }
-                    if (e.Y < offs.Y) {
-                        offs.Y = e.Y;
-                    }
-                    if (e.Z < offs.Z) {
-                        offs.Z = e.Z;
+                    if (e.X < offs.X && e.Y < offs.Y && e.Z < offs.Z) {
+                        offs = e;
                     }
                 }
             }
