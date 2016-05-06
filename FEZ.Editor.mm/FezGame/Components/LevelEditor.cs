@@ -95,24 +95,24 @@ namespace FezGame.Components {
         public Color UnselectColor = new Color(1f, 0.3f, 0.3f);
         public float SelectRayDistance = 8f;
         
-        public Vector3 SelectDiffuse = new Vector3(0.3f, 0.7f, 1f);
+        public Vector3 SelectDiffuse = new Vector3(0.5f, 1f, 1.3f);
         public float SelectAlpha = 1f;
         public List<TrileInstance> SelectedTriles = new List<TrileInstance>();
         public Mesh[] SelectedMeshes;
         
-        public Vector3 PlacingDiffuse = new Vector3(0.5f, 0.5f, 0.5f);
+        public Vector3 PlacingDiffuse = new Vector3(1.3f, 1.3f, 1.3f);
         public float PlacingAlpha = 0.625f;
         public Mesh PlacingMesh;
         public Mesh[] PlacingMeshes;
         
-        public Vector3 HoveredDiffuse = new Vector3(1.4f, 1.4f, 1.4f);
+        public Vector3 HoveredDiffuse = new Vector3(1.3f, 1.3f, 1.3f);
         public float HoveredAlpha = 1f;
         public Mesh HoveredAOMesh;
         
         public Vector3 DisabledDiffuse = new Vector3(0.5f, 0.5f, 0.5f);
-        public float DisabledAlpha = 0.3f;
+        public float DisabledAlpha = 0.5f;
         public List<object> Disabled = new List<object>();
-        public Mesh[] DisabledMeshes;
+        public List<Mesh> DisabledMeshes = new List<Mesh>();
         
         
         public Vector2 FakeFreeLook;
@@ -316,39 +316,43 @@ namespace FezGame.Components {
                 CameraManager.InverseView.Forward
             );
             
+            ArtObjectInstance oldHoveredAO = HoveredAO;
+            
             float intersectionMin = float.MaxValue;
             HoveredTrile = GetTrile(ray, ref intersectionMin);
             if (HoveredTrile != null) {
                 HoveredBox = new BoundingBox(HoveredTrile.Position, HoveredTrile.Position + Vector3.One);
             }
             
-            ArtObjectInstance oldHoveredAO = HoveredAO;
-            if (HoveredAO != null) {
-                HoveredAO.Hidden = false;
-            }
-            HoveredAO = null;
-            int aosCount = LevelManager.ArtObjects.Count;
-            LevelManager.ArtObjects.CopyTo(tmpAOs.Length < aosCount ? (tmpAOs = new KeyValuePair<int, ArtObjectInstance>[aosCount]) : tmpAOs, 0);
-            for (int i = 0; i < aosCount; i++) {
-                ArtObjectInstance ao = tmpAOs[i].Value;
-                float? intersection = ray.Intersects(ao.Bounds);
-                if (intersection.HasValue && intersection < intersectionMin) {
-                    HoveredTrile = null;
-                    HoveredAO = ao;
-                    HoveredBox = ao.Bounds;
-                    intersectionMin = intersection.Value;
+            HoveredAO = DraggingAO;
+            if (HoveredAO == null) {
+                int aosCount = LevelManager.ArtObjects.Count;
+                LevelManager.ArtObjects.CopyTo(tmpAOs.Length < aosCount ? (tmpAOs = new KeyValuePair<int, ArtObjectInstance>[aosCount]) : tmpAOs, 0);
+                for (int i = 0; i < aosCount; i++) {
+                    ArtObjectInstance ao = tmpAOs[i].Value;
+                    if (Disabled.Contains(ao)) {
+                        continue;
+                    }
+                    float? intersection = ray.Intersects(ao.Bounds);
+                    if (intersection.HasValue && intersection < intersectionMin) {
+                        HoveredTrile = null;
+                        HoveredAO = ao;
+                        HoveredBox = ao.Bounds;
+                        intersectionMin = intersection.Value;
+                    }
                 }
-            }
-            if (HoveredAO != null) {
-                HoveredAO.Hidden = true;
             }
             if (HoveredAO != oldHoveredAO) {
                 if (HoveredAOMesh != null) {
                     HoveredAOMesh.Dispose(false);
                     HoveredAOMesh = null;
+                    if (oldHoveredAO != null && !Disabled.Contains(oldHoveredAO)) {
+                        oldHoveredAO.Hidden = false;
+                    }
                 }
                 if (HoveredAO != null) {
                     HoveredAOMesh = GenMesh(HoveredAO);
+                    HoveredAO.Hidden = true;
                 }
             }
             
@@ -580,8 +584,14 @@ namespace FezGame.Components {
                 LevelMaterializer.RegisterSatellites();
             }
 
-            if (MouseState.MiddleButton.State == MouseButtonStates.Clicked && HoveredTrile != null) {
-                Placing = HoveredTrile.Trile;
+            if (MouseState.MiddleButton.State == MouseButtonStates.Clicked) {
+                if (HoveredTrile != null) {
+                    Disable(HoveredTrile);
+                } else if (HoveredAO != null) {
+                    Disable(HoveredAO);
+                } else {
+                    EnableAll();
+                }
             }
 
             if (HoveredTrile == null && DraggingAO == null) {
@@ -645,7 +655,7 @@ namespace FezGame.Components {
             }
             
             if (DisabledMeshes != null) {
-                for (int i = 0; i < DisabledMeshes.Length; i++) {
+                for (int i = 0; i < DisabledMeshes.Count; i++) {
                     Mesh mesh = DisabledMeshes[i];
                     mesh.Blending = BlendingMode.Alphablending;
                     mesh.Material.Opacity = DisabledAlpha;
@@ -654,12 +664,14 @@ namespace FezGame.Components {
                 }
             }
             
-            if (HoveredAO != null && HoveredAOMesh != null) {
+            if (HoveredAOMesh != null) {
                 HoveredAOMesh.Blending = BlendingMode.Alphablending;
                 HoveredAOMesh.Material.Opacity = HoveredAlpha;
                 HoveredAOMesh.Material.Diffuse = HoveredDiffuse;
-                HoveredAOMesh.Position = HoveredAO.Position;
-                HoveredAOMesh.FirstGroup.Rotation = HoveredAO.Rotation;
+                if (HoveredAO != null) {
+                    HoveredAOMesh.Position = HoveredAO.Position;
+                    HoveredAOMesh.FirstGroup.Rotation = HoveredAO.Rotation;
+                }
                 HoveredAOMesh.Draw();
             }
             
@@ -799,7 +811,6 @@ namespace FezGame.Components {
             if (unselected != null) {
                 for (int i = 0; i < unselected.Count; i++) {
                     TrileInstance trile = unselected[i];
-                    trile.Foreign = false;
                     trile.Hidden = false;
                     LevelManager.RecullAt(trile);
                 }
@@ -809,11 +820,7 @@ namespace FezGame.Components {
                 //TODO remove selection widget
                 
                 SelectedMeshes = null;
-                LevelMaterializer.RebuildInstances();
-                CameraManager.RebuildView();
-                if (CameraManager is DefaultCameraManager) {
-                    ((DefaultCameraManager) CameraManager).RebuildProjection();
-                }
+                RebuildView();
                 return;
             }
             
@@ -829,19 +836,14 @@ namespace FezGame.Components {
             
             for (int i = 0; i < SelectedTriles.Count; i++) {
                 TrileInstance trile = SelectedTriles[i];
-                trile.Foreign = true;
                 trile.Hidden = true;
                 
                 Mesh mesh = SelectedMeshes[i] = GenMesh(trile);
-                mesh.Position = trile.Center;
                 
                 LevelManager.RecullAt(trile);
             }
             
-            CameraManager.RebuildView();
-            if (CameraManager is DefaultCameraManager) {
-                ((DefaultCameraManager) CameraManager).RebuildProjection();
-            }
+            RebuildView();
         }
 
         public Level CreateNewLevel(string name, int width, int height, int depth, string trileset) {
@@ -871,10 +873,13 @@ namespace FezGame.Components {
             return trile;
         }
         
-        public TrileInstance GetTrile(Ray ray, ref float intersectionMin) {
+        public TrileInstance GetTrile(Ray ray, ref float intersectionMin, bool ignoreDisabled = true) {
             TrileInstance trileBest = null;
             for (int i = 0; i < trilesCount; i++) {
                 TrileInstance trile = tmpTriles[i].Value;
+                if (Disabled.Contains(trile) && ignoreDisabled) {
+                    continue;
+                }
                 BoundingBox box = new BoundingBox(trile.Position, trile.Position + Vector3.One);
                 float? intersection = ray.Intersects(box);
                 if (intersection.HasValue && intersection < intersectionMin) {
@@ -956,7 +961,9 @@ namespace FezGame.Components {
         }
         
         public Mesh GenMesh(TrileInstance trile, BaseEffect effect = null) {
-            return GenMesh(trile.Trile, trile.Phi, effect);
+            Mesh mesh = GenMesh(trile.Trile, trile.Phi, effect);
+            mesh.Position = trile.Center;
+            return mesh;
         }
         
         public Mesh GenMesh(ArtObject ao, float phi = 0f, BaseEffect effect = null) {
@@ -979,7 +986,105 @@ namespace FezGame.Components {
         public Mesh GenMesh(ArtObjectInstance ao, BaseEffect effect = null) {
             Mesh mesh = GenMesh(ao.ArtObject, 0f, effect);
             mesh.FirstGroup.Rotation = ao.Rotation;
+            mesh.Position = ao.Position;
             return mesh;
+        }
+        
+        protected bool Disable(object obj) {
+            if (Disabled.Contains(obj)) {
+                return false;
+            }
+            Disabled.Add(obj);
+            return true;
+        }
+        public bool Disable(TrileInstance obj) {
+            if (!Disable((object) obj)) {
+                return false;
+            }
+            DisabledMeshes.Add(GenMesh(obj));
+            obj.Hidden = true;
+            RebuildView(obj);
+            
+            if (SelectedTriles != null && SelectedTriles.Contains(obj)) {
+                SelectedTriles.Remove(HoveredTrile);
+                List<TrileInstance> unselected = EditorUtils.l_TrileInstance.GetNext();
+                unselected.Clear();
+                unselected.Add(HoveredTrile);
+                UpdateSelection(unselected);
+            }
+            
+            return true;
+        }
+        public bool Disable(ArtObjectInstance obj) {
+            if (!Disable((object) obj)) {
+                return false;
+            }
+            DisabledMeshes.Add(GenMesh(obj));
+            obj.Hidden = true;
+            return true;
+        }
+        
+        protected bool Enable(object obj) {
+            if (!Disabled.Contains(obj)) {
+                return false;
+            }
+            int i = Disabled.IndexOf(obj);
+            Mesh mesh = DisabledMeshes[i];
+            if (mesh != null) {
+                DisabledMeshes[i].Dispose(false);
+            }
+            DisabledMeshes.RemoveAt(i);
+            Disabled.RemoveAt(i);
+            return true;
+        }
+        public bool Enable(TrileInstance obj) {
+            if (!Enable((object) obj)) {
+                return false;
+            }
+            obj.Hidden = false;
+            RebuildView(obj);
+            return true;
+        }
+        public bool Enable(ArtObjectInstance obj) {
+            if (!Enable((object) obj)) {
+                return false;
+            }
+            obj.Hidden = false;
+            return true;
+        }
+        
+        public void EnableAll() {
+            List<TrileInstance> unselected = EditorUtils.l_TrileInstance.GetNext();
+            unselected.Clear();
+            
+            for (int i = 0; i < Disabled.Count; i++) {
+                Mesh mesh = DisabledMeshes[i];
+                if (mesh != null) {
+                    DisabledMeshes[i].Dispose(false);
+                }
+                object obj = Disabled[i];
+                if (obj is TrileInstance) {
+                    TrileInstance trile = (TrileInstance) obj;
+                    trile.Hidden = false;
+                    LevelManager.RecullAt(trile);
+                    
+                    if (SelectedTriles != null && SelectedTriles.Contains(trile)) {
+                        SelectedTriles.Remove(HoveredTrile);
+                        unselected.Add(HoveredTrile);
+                    }
+                    
+                } else if (obj is ArtObjectInstance) {
+                    ((ArtObjectInstance) obj).Hidden = false;
+                }
+            }
+            Disabled.Clear();
+            DisabledMeshes.Clear();
+            
+            RebuildView();
+            
+            if (unselected.Count != 0) {
+                UpdateSelection(unselected);
+            }
         }
         
         public void AddTrile(TrileInstance trile) {
@@ -989,7 +1094,7 @@ namespace FezGame.Components {
             }
 
             if (LevelManager.Triles.ContainsKey(trile.Emplacement)) {
-                //TODO investigate: Probably an empty trile.
+                Enable(LevelManager.Triles[trile.Emplacement]);
                 LevelManager.Triles.Remove(trile.Emplacement);
             }
 
@@ -1017,6 +1122,14 @@ namespace FezGame.Components {
                 PlayerManager.RespawnAtCheckpoint();
             }
 
+            RebuildView();
+        }
+        
+        public void RebuildView(TrileInstance trile = null) {
+            if (trile != null) {
+                LevelManager.RecullAt(trile);
+            }
+            LevelMaterializer.RebuildInstances();
             CameraManager.RebuildView();
             if (CameraManager is DefaultCameraManager) {
                 ((DefaultCameraManager) CameraManager).RebuildProjection();
