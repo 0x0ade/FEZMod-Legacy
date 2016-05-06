@@ -78,7 +78,23 @@ namespace FezGame.Editor {
         
         public static float ToPhi(this Quaternion q) {
             return (float) (Math.Asin(q.Y) * 2D); //alternatively Math.Acos(q.W)
-        } 
+        }
+        
+        public static Vector3 Rotated(this Vector3 pos, Vector3 axis, float phi) {
+            Matrix matrix = Matrix.CreateFromAxisAngle(axis, phi);
+            return Vector3.Transform(pos, matrix);
+        }
+        public static TrileEmplacement Rotated(this TrileEmplacement pos, Vector3 axis, float phi) {
+            Vector3 rot = pos.AsVector.Rotated(axis, phi);
+            return new TrileEmplacement((int) rot.X, (int) rot.Y, (int) rot.Z);
+        }
+        
+        public static Vector3 Rotated(this Vector3 pos, float phi) {
+            return pos.Rotated(Vector3.UnitY, phi);
+        }
+        public static TrileEmplacement Rotated(this TrileEmplacement pos, float phi) {
+            return pos.Rotated(Vector3.UnitY, phi);
+        }
 
     }
 }

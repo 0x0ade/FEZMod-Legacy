@@ -581,8 +581,8 @@ namespace FezGame.Components {
                         TrileInstance[] triles = (TrileInstance[]) Placing;
                         for (int i = 0; i < triles.Length; i++) {
                             TrileInstance trile = triles[i];
-                            TrileInstance trileNew = CreateNewTrile(trile.TrileId, emplacement + trile.Emplacement);
-                            trileNew.Phi = trile.Phi;
+                            TrileInstance trileNew = CreateNewTrile(trile.TrileId, emplacement + trile.Emplacement.Rotated(PlacingPhi));
+                            trileNew.Phi = FezMath.WrapAngle(trile.Phi + PlacingPhi);
                             trileNew.PhysicsState = trile.PhysicsState ?? trileNew.PhysicsState;
                             trileNew.ActorSettings = trile.ActorSettings ?? trileNew.ActorSettings;
                             AddTrile(trileNew);
@@ -647,8 +647,10 @@ namespace FezGame.Components {
                     RemoveSelection();
                 } else if (lctrl && KeyboardState.GetKeyState(Keys.C) == FezButtonState.Pressed && SelectedTriles != null && SelectedTriles.Count > 0) {
                     Placing = Clone(SelectedTriles);
+                    PlacingPhiOffset = 0;
                 } else if (lctrl && KeyboardState.GetKeyState(Keys.X) == FezButtonState.Pressed && SelectedTriles != null && SelectedTriles.Count > 0) {
                     Placing = Clone(SelectedTriles);
+                    PlacingPhiOffset = 0;
                     RemoveSelection();
                 }
             }
@@ -736,8 +738,8 @@ namespace FezGame.Components {
                     
                     if (Placing is TrileInstance[]) {
                         TrileInstance trile = ((TrileInstance[]) Placing)[i];
-                        mesh.Position = HoveredTrile.Center + PlacingOffset + trile.Position;
-                        mesh.SetRotation(trile.Trile, trile.Phi + PlacingPhi);
+                        mesh.Position = HoveredTrile.Center + PlacingOffset + trile.Position.Rotated(PlacingPhi);
+                        mesh.SetRotation(trile.Trile, FezMath.WrapAngle(trile.Phi + PlacingPhi));
                     }
                     
                     mesh.Draw();
