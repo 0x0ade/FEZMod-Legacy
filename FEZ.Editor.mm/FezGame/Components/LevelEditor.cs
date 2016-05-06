@@ -150,6 +150,24 @@ namespace FezGame.Components {
                         PlacingMesh = GenMesh((Trile) value, PlacingPhi);
                     } else if (value is ArtObject) {
                         PlacingMesh = GenMesh((ArtObject) value, PlacingPhi);
+                    } else if (value is TrileInstance[]) {
+                        TrileInstance[] triles = (TrileInstance[]) value;
+                        PlacingMeshes = new Mesh[triles.Length];
+                        placingTrileListSize = new Vector3(0f, 0f, 0f);
+                        for (int i = 0; i < triles.Length; i++) {
+                            TrileInstance trile = triles[i];
+                            PlacingMeshes[i] = GenMesh(trile);
+                            Vector3 p = trile.Position + Vector3.One;
+                            if (placingTrileListSize.X < p.X) {
+                                placingTrileListSize.X = p.X;
+                            }
+                            if (placingTrileListSize.Y < p.Y) {
+                                placingTrileListSize.Y = p.Y;
+                            }
+                            if (placingTrileListSize.Z < p.Z) {
+                                placingTrileListSize.Z = p.Z;
+                            }
+                        }
                     }
                 }
                 
@@ -178,8 +196,12 @@ namespace FezGame.Components {
             }
         }
         
+        protected Vector3 placingTrileListSize;
         public Vector3 PlacingOffset {
             get {
+                if (Placing is TrileInstance[]) {
+                    return -HoveredFace.AsVector();
+                }
                 if (Placing is ArtObject) {
                     return -HoveredFace.AsVector() * ((ArtObject) Placing).Size / 2f;
                 }
@@ -239,6 +261,9 @@ namespace FezGame.Components {
             KeyboardState.RegisterKey(Keys.S);
             KeyboardState.RegisterKey(Keys.N);
             KeyboardState.RegisterKey(Keys.O);
+            KeyboardState.RegisterKey(Keys.Delete);
+            KeyboardState.RegisterKey(Keys.C);
+            KeyboardState.RegisterKey(Keys.X);
             
             Vector2 tmpFreeLook = new Vector2(0f, 0f);
             Func<Vector2> prev_get_FreeLook = FakeInputHelper.get_FreeLook;
@@ -530,7 +555,7 @@ namespace FezGame.Components {
                     if (FocusedWidget is TextFieldWidget) {
                         ((TextFieldWidget) FocusedWidget).Text = emplacement.X + "; " + emplacement.Y + "; " + emplacement.Z;
                         unfocusWidget = false;
-                    } else if (LevelManager.TrileSet != null && Placing is Trile) {
+                    } else if (Placing is Trile) {
                         AddTrile(CreateNewTrile(((Trile) Placing).Id, emplacement));
                     } else if (Placing is ArtObject) {
                         ArtObject ao_ = (ArtObject) Placing;
@@ -555,6 +580,16 @@ namespace FezGame.Components {
                         ao.Initialize();
                         LevelManager.ArtObjects[ao.Id] = ao;
                         LevelMaterializer.RegisterSatellites();
+                    } else if (Placing is TrileInstance[]) {
+                        TrileInstance[] triles = (TrileInstance[]) Placing;
+                        for (int i = 0; i < triles.Length; i++) {
+                            TrileInstance trile = triles[i];
+                            TrileInstance trileNew = CreateNewTrile(trile.TrileId, emplacement + trile.Emplacement);
+                            trileNew.Phi = trile.Phi;
+                            trileNew.PhysicsState = trile.PhysicsState ?? trileNew.PhysicsState;
+                            trileNew.ActorSettings = trile.ActorSettings ?? trileNew.ActorSettings;
+                            AddTrile(trileNew);
+                        }
                     }
                 }
 
@@ -600,16 +635,24 @@ namespace FezGame.Components {
                 PlacingPhiOffset = (PlacingPhiOffset + MouseState.WheelTurns / 120f) % 4;
             }
 
-            if (FocusedWidget == null && KeyboardState.GetKeyState(Keys.LeftControl) == FezButtonState.Down) {
-                if (KeyboardState.GetKeyState(Keys.S) == FezButtonState.Pressed) {
+            if (FocusedWidget == null) {
+                bool lctrl = KeyboardState.GetKeyState(Keys.LeftControl) == FezButtonState.Down;
+                if (lctrl && KeyboardState.GetKeyState(Keys.S) == FezButtonState.Pressed) {
                     Save(true, true);
-                } else if (KeyboardState.GetKeyState(Keys.N) == FezButtonState.Pressed) {
+                } else if (lctrl && KeyboardState.GetKeyState(Keys.N) == FezButtonState.Pressed) {
                     TopBarWidget.Widgets[0 /*File*/].Widgets[0 /*New*/].Click(gameTime, 1);
-                } else if (KeyboardState.GetKeyState(Keys.O) == FezButtonState.Pressed) {
+                } else if (lctrl && KeyboardState.GetKeyState(Keys.O) == FezButtonState.Pressed) {
                     TopBarWidget.Widgets[0 /*File*/].Hover(gameTime);
                     TopBarWidget.Widgets[0 /*File*/].Widgets[1 /*Open*/].Hover(gameTime);
                     FocusedWidget = TopBarWidget.Widgets[0 /*File*/].Widgets[1 /*Open*/].Widgets[0 /*Field*/];
                     FocusedWidget.Click(gameTime, 1);
+                } else if (KeyboardState.GetKeyState(Keys.Delete) == FezButtonState.Pressed && SelectedTriles != null && SelectedTriles.Count > 0) {
+                    RemoveSelection();
+                } else if (lctrl && KeyboardState.GetKeyState(Keys.C) == FezButtonState.Pressed && SelectedTriles != null && SelectedTriles.Count > 0) {
+                    Placing = Clone(SelectedTriles);
+                } else if (lctrl && KeyboardState.GetKeyState(Keys.X) == FezButtonState.Pressed && SelectedTriles != null && SelectedTriles.Count > 0) {
+                    Placing = Clone(SelectedTriles);
+                    RemoveSelection();
                 }
             }
         }
@@ -628,8 +671,6 @@ namespace FezGame.Components {
                 Directory.GetParent(filePath).Create();
                 TRM.Resolve(ThumbnailRT.Target, false);
                 using (System.Drawing.Bitmap bitmap = ThumbnailRT.Target.ToBitmap()) {
-                    //float x = ThumbnailRT.Target.Width / 2 - ThumbnailSize / 2f;
-                    //float y = ThumbnailRT.Target.Height / 2 - ThumbnailSize / 2f;
                     using (System.Drawing.Bitmap thumbnail = bitmap.Clone(new System.Drawing.Rectangle(ThumbnailX, ThumbnailY, ThumbnailSize, ThumbnailSize), bitmap.PixelFormat)) {
                         using (FileStream fs = new FileStream(filePath, FileMode.Create)) {
                             thumbnail.Save(fs, ImageFormat.Png);
@@ -682,14 +723,30 @@ namespace FezGame.Components {
                 if (Placing is Trile) {
                     PlacingMesh.Position = HoveredTrile.Center + PlacingOffset;
                     PlacingMesh.SetRotation((Trile) Placing, PlacingPhi);
-                    PlacingMesh.Draw();
                 } else if (Placing is ArtObject) {
                     PlacingMesh.Position = HoveredTrile.Position + PlacingOffset;
                     PlacingMesh.SetRotation(PlacingPhi);
-                    PlacingMesh.Draw();
+                }
+                PlacingMesh.Draw();
+            }
+            
+            if (HoveredTrile != null && PlacingMeshes != null) {
+                for (int i = 0; i < PlacingMeshes.Length; i++) {
+                    Mesh mesh = PlacingMeshes[i];
+                    mesh.Blending = BlendingMode.Alphablending;
+                    mesh.Material.Opacity = PlacingAlpha;
+                    mesh.Material.Diffuse = PlacingDiffuse;
+                    
+                    if (Placing is TrileInstance[]) {
+                        TrileInstance trile = ((TrileInstance[]) Placing)[i];
+                        mesh.Position = HoveredTrile.Center + PlacingOffset + trile.Position;
+                        mesh.SetRotation(trile.Trile, trile.Phi + PlacingPhi);
+                    }
+                    
+                    mesh.Draw();
                 }
             }
-
+            
             Viewport viewport = GraphicsDevice.Viewport;
             float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
 
@@ -847,6 +904,65 @@ namespace FezGame.Components {
             
             RebuildView();
         }
+        
+        public void RemoveSelection() {
+            if (SelectedMeshes != null) {
+                for (int i = 0; i < SelectedMeshes.Length; i++) {
+                    SelectedMeshes[i].Dispose(false);
+                }
+                SelectedMeshes = null;
+            }
+            for (int i = 0; i < SelectedTriles.Count; i++) {
+                LevelManager.ClearTrile(SelectedTriles[i]);
+            }
+            SelectedTriles.Clear();
+            
+            LevelMaterializer.CullInstances();
+        }
+        
+        public TrileInstance[] Clone(IEnumerable<TrileInstance> orig, int count, bool offset = true) {
+            TrileInstance[] clone = new TrileInstance[count];
+            
+            TrileEmplacement offs;
+            if (!offset) {
+                offs = new TrileEmplacement(0, 0, 0);
+            } else {
+                offs = new TrileEmplacement(int.MaxValue, int.MaxValue, int.MaxValue);
+                foreach (TrileInstance trile in orig) {
+                    TrileEmplacement e = trile.Emplacement;
+                    if (e.X < offs.X) {
+                        offs.X = e.X;
+                    }
+                    if (e.Y < offs.Y) {
+                        offs.Y = e.Y;
+                    }
+                    if (e.Z < offs.Z) {
+                        offs.Z = e.Z;
+                    }
+                }
+            }
+            
+            int i = 0;
+            foreach (TrileInstance trile in orig) {
+                TrileInstance trileClone = new TrileInstance(trile.Emplacement - offs, trile.TrileId) {
+                    Trile = trile.Trile,
+                    Phi = trile.Phi,
+                    PhysicsState = trile.PhysicsState,
+                    ActorSettings = trile.ActorSettings
+                };
+                clone[i] = trileClone;
+                i++;
+                if (count <= i) {
+                    break;
+                }
+            }
+            
+            return clone;
+        }
+        
+        public TrileInstance[] Clone(List<TrileInstance> orig, bool offset = true) {
+            return Clone(orig, orig.Count, offset);
+        }
 
         public Level CreateNewLevel(string name, int width, int height, int depth, string trileset) {
             Level level = new Level();
@@ -933,8 +1049,9 @@ namespace FezGame.Components {
                 selected = new List<TrileInstance>();
             }
             
-            for (float yy = y; yy < y + h; yy += SelectRayDistance) {
-                for (float xx = x; xx < x + w; xx += SelectRayDistance) {
+            float dist = SelectRayDistance * CameraManager.PixelsPerTrixel;
+            for (float yy = y; yy < y + h; yy += dist) {
+                for (float xx = x; xx < x + w; xx += dist) {
                     GetTriles(new Ray(
                         GraphicsDevice.Viewport.Unproject(
                             new Vector3(xx, yy, 0.0f),
@@ -1099,6 +1216,7 @@ namespace FezGame.Components {
         public void AddTrile(TrileInstance trile) {
             if (LevelManager.TrileExists(trile.Emplacement)) {
                 TrileEmplacement emplacement = trile.Emplacement;
+                Enable(LevelManager.TrileInstanceAt(ref emplacement));
                 LevelMaterializer.RemoveInstance(LevelManager.TrileInstanceAt(ref emplacement));
             }
 
@@ -1124,7 +1242,6 @@ namespace FezGame.Components {
 
             trile.PhysicsState.UpdateInstance();
             LevelMaterializer.UpdateInstance(trile);
-
 
             if (LevelManager.Triles.Count == 1) {
                 PlayerManager.CheckpointGround = trile;
