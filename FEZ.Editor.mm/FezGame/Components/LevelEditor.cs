@@ -811,6 +811,7 @@ namespace FezGame.Components {
             if (unselected != null) {
                 for (int i = 0; i < unselected.Count; i++) {
                     TrileInstance trile = unselected[i];
+                    trile.Foreign = false;
                     trile.Hidden = false;
                     LevelManager.RecullAt(trile);
                 }
@@ -836,6 +837,7 @@ namespace FezGame.Components {
             
             for (int i = 0; i < SelectedTriles.Count; i++) {
                 TrileInstance trile = SelectedTriles[i];
+                trile.Foreign = true;
                 trile.Hidden = true;
                 
                 Mesh mesh = SelectedMeshes[i] = GenMesh(trile);
@@ -895,12 +897,15 @@ namespace FezGame.Components {
             return GetTrile(ray, ref intersectionMin);
         }
         
-        public List<TrileInstance> GetTriles(Ray ray, List<TrileInstance> trilesGot = null) {
+        public List<TrileInstance> GetTriles(Ray ray, List<TrileInstance> trilesGot = null, bool ignoreDisabled = true) {
             if (trilesGot == null) {
                 trilesGot = new List<TrileInstance>();
             }
             for (int i = 0; i < trilesCount; i++) {
                 TrileInstance trile = tmpTriles[i].Value;
+                if (Disabled.Contains(trile) && ignoreDisabled) {
+                    continue;
+                }
                 BoundingBox box = new BoundingBox(trile.Position, trile.Position + Vector3.One);
                 float? intersection = ray.Intersects(box);
                 if (intersection.HasValue && !trilesGot.Contains(trile)) {
@@ -1001,9 +1006,6 @@ namespace FezGame.Components {
             if (!Disable((object) obj)) {
                 return false;
             }
-            DisabledMeshes.Add(GenMesh(obj));
-            obj.Hidden = true;
-            RebuildView(obj);
             
             if (SelectedTriles != null && SelectedTriles.Contains(obj)) {
                 SelectedTriles.Remove(HoveredTrile);
@@ -1012,6 +1014,11 @@ namespace FezGame.Components {
                 unselected.Add(HoveredTrile);
                 UpdateSelection(unselected);
             }
+            
+            DisabledMeshes.Add(GenMesh(obj));
+            obj.Foreign = true;
+            obj.Hidden = true;
+            RebuildView(obj);
             
             return true;
         }
@@ -1041,6 +1048,7 @@ namespace FezGame.Components {
             if (!Enable((object) obj)) {
                 return false;
             }
+            obj.Foreign = false;
             obj.Hidden = false;
             RebuildView(obj);
             return true;
@@ -1065,6 +1073,7 @@ namespace FezGame.Components {
                 object obj = Disabled[i];
                 if (obj is TrileInstance) {
                     TrileInstance trile = (TrileInstance) obj;
+                    trile.Foreign = false;
                     trile.Hidden = false;
                     LevelManager.RecullAt(trile);
                     
