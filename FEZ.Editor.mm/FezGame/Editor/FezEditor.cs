@@ -5,6 +5,7 @@ using FezEngine.Tools;
 using Microsoft.Xna.Framework;
 using System;
 using FezGame.Services;
+using Microsoft.Xna.Framework.Input;
 
 namespace FezGame.Editor {
     
@@ -16,6 +17,12 @@ namespace FezGame.Editor {
         public bool TooltipArtObjectInfo = false;
         
         public bool FogEnabled = false;
+        
+        public Keys KeyCamForwards = Keys.W;
+        public Keys KeyCamLeft = Keys.A;
+        public Keys KeyCamBack = Keys.S;
+        public Keys KeyCamRight = Keys.D;
+        public float FreeCamSpeed = 0.8f;
         
         public int BackupHistory = 5;
     }

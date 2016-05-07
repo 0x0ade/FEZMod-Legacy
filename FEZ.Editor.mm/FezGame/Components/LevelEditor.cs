@@ -264,6 +264,11 @@ namespace FezGame.Components {
             KeyboardState.RegisterKey(Keys.Delete);
             KeyboardState.RegisterKey(Keys.C);
             KeyboardState.RegisterKey(Keys.X);
+            KeyboardState.RegisterKey(Keys.P);
+            KeyboardState.RegisterKey(FezEditor.Settings.KeyCamForwards);
+            KeyboardState.RegisterKey(FezEditor.Settings.KeyCamLeft);
+            KeyboardState.RegisterKey(FezEditor.Settings.KeyCamBack);
+            KeyboardState.RegisterKey(FezEditor.Settings.KeyCamRight);
             
             Vector2 tmpFreeLook = new Vector2(0f, 0f);
             Func<Vector2> prev_get_FreeLook = FakeInputHelper.get_FreeLook;
@@ -552,6 +557,36 @@ namespace FezGame.Components {
             if (cursorInMenu) {
                 HoveredTrile = null;
                 return;
+            } else if (KeyboardState.GetKeyState(Keys.P) == FezButtonState.Pressed) {
+                if (CameraManager.Viewpoint.IsOrthographic()) {
+                    CameraManager.ChangeViewpoint(Viewpoint.Perspective);
+                } else {
+                    CameraManager.ChangeViewpoint(CameraManager.LastViewpoint);
+                }
+            }
+            
+            if (FocusedWidget == null && !CameraManager.Viewpoint.IsOrthographic()) {
+                Vector3 dir = Vector3.Zero;
+                if (KeyboardState.GetKeyState(FezEditor.Settings.KeyCamForwards) == FezButtonState.Down) {
+                    dir += -CameraManager.Direction;
+                }
+                if (KeyboardState.GetKeyState(FezEditor.Settings.KeyCamBack) == FezButtonState.Down) {
+                    dir += CameraManager.Direction;
+                }
+                if (KeyboardState.GetKeyState(FezEditor.Settings.KeyCamLeft) == FezButtonState.Down) {
+                    Vector3 tdir = CameraManager.Direction.Rotated(-MathHelper.Pi / 2f) * 0.5f;
+                    tdir.Y = 0f;
+                    dir += tdir;
+                }
+                if (KeyboardState.GetKeyState(FezEditor.Settings.KeyCamRight) == FezButtonState.Down) {
+                    Vector3 tdir = CameraManager.Direction.Rotated(MathHelper.Pi / 2f) * 0.5f;
+                    tdir.Y = 0f;
+                    dir += tdir;
+                }
+                if (dir != Vector3.Zero) {
+                    CameraManager.Center += dir * FezEditor.Settings.FreeCamSpeed;
+                }
+                
             }
 
             if (HoveredTrile != null) {

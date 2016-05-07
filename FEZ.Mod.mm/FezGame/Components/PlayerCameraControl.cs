@@ -43,7 +43,7 @@ namespace FezGame.Components {
             if (FEZMod.FEZometric && MouseState.LeftButton.State != MouseButtonStates.Dragging && InputManager.FreeLook != Vector2.Zero && !GameState.InMap) {
                 Vector3 vector3 = Vector3.Transform(CameraManager.Direction, Matrix.CreateFromAxisAngle(Vector3.Up, 1.570796f));
                 Vector3 to1 = Vector3.Transform(CameraManager.Direction, Matrix.CreateFromAxisAngle(vector3, -1.570796f));
-                Vector2 vector2 = InputManager.FreeLook / 5f;
+                Vector2 vector2 = InputManager.FreeLook / (CameraManager.Viewpoint != Viewpoint.Perspective ? 5f : 3f);
                 float step = 0.05f;
                 Vector3 to2 = FezMath.Slerp(FezMath.Slerp(CameraManager.Direction, vector3, vector2.X), to1, vector2.Y);
                 if (!CameraManager.ActionRunning) {
