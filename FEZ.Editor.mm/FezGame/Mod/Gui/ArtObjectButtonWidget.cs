@@ -53,7 +53,7 @@ namespace FezGame.Mod.Gui {
             if (mb == 1) {
                 ((ILevelEditor) GuiHandler).Placing = AO;
             } else if (mb == 3) {
-                //TODO show exact placement dialog
+                GuiHandler.Scheduled.Add(() => ((ILevelEditor) GuiHandler).ShowArtObjectPlacementWindow(AO.Name));
             }
         }
 

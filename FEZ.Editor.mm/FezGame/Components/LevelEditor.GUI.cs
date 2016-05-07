@@ -751,170 +751,9 @@ namespace FezGame.Components {
                         i++;
                     }
 
-                    window.Size.Y = (i+1) * 24f;
+                    window.Size.Y = i * 24f;
                     window.Size.Y = Math.Min(512f, window.Size.Y);
-
-                    window.Widgets.Add(new ButtonWidget(Game, "+", delegate() {
-                        ContainerWidget windowAdd;
-                        Widgets.Add(windowAdd = new ContainerWidget(Game) {
-                            Size = new Vector2(256f, 168f),
-                            Label = "Add Art Object"
-                        });
-                        WindowHeaderWidget windowAddHeader;
-                        windowAdd.Widgets.Add(windowAddHeader = new WindowHeaderWidget(Game));
-
-                        int maxID = 0;
-                        foreach (int id in LevelManager.ArtObjects.Keys) {
-                            if (id >= maxID) {
-                                maxID = id + 1;
-                            }
-                        }
-
-                        ButtonWidget windowLabelId;
-                        windowAdd.Widgets.Add(windowLabelId = new ButtonWidget(Game, "ID:") {
-                            Background = new Color(DefaultBackground, 0f),
-                            Size = new Vector2(96f, 24f),
-                            UpdateBounds = false,
-                            LabelCentered = false,
-                            Position = new Vector2(0f, 0f)
-                        });
-                        TextFieldWidget windowFieldId;
-                        windowAdd.Widgets.Add(windowFieldId = new TextFieldWidget(Game, maxID.ToString()) {
-                            Size = new Vector2(windowAdd.Size.X - windowLabelId.Size.X, 24f),
-                            UpdateBounds = false,
-                            Position = new Vector2(windowLabelId.Size.X, windowLabelId.Position.Y)
-                        });
-
-                        ButtonWidget windowLabelName;
-                        windowAdd.Widgets.Add(windowLabelName = new ButtonWidget(Game, "Name:") {
-                            Background = new Color(DefaultBackground, 0f),
-                            Size = new Vector2(96f, 24f),
-                            UpdateBounds = false,
-                            LabelCentered = false,
-                            Position = new Vector2(0f, 24f)
-                        });
-                        TextFieldWidget windowFieldName;
-                        windowAdd.Widgets.Add(windowFieldName = new TextFieldWidget(Game, "", ContentPaths.ArtObjects) {
-                            Size = new Vector2(windowAdd.Size.X - windowLabelName.Size.X, 24f),
-                            UpdateBounds = false,
-                            Position = new Vector2(windowLabelName.Size.X, windowLabelName.Position.Y)
-                        });
-
-                        ButtonWidget windowLabelPosition;
-                        windowAdd.Widgets.Add(windowLabelPosition = new ButtonWidget(Game, "Position:") {
-                            Background = new Color(DefaultBackground, 0f),
-                            Size = new Vector2(96f, 24f),
-                            UpdateBounds = false,
-                            LabelCentered = false,
-                            Position = new Vector2(0f, 48f)
-                        });
-                        TextFieldWidget windowFieldPosition;
-                        windowAdd.Widgets.Add(windowFieldPosition = new TextFieldWidget(Game, "0; 0; 0") {
-                            Size = new Vector2(windowAdd.Size.X - windowLabelPosition.Size.X, 24f),
-                            UpdateBounds = false,
-                            Position = new Vector2(windowLabelPosition.Size.X, windowLabelPosition.Position.Y)
-                        });
-
-                        ButtonWidget windowLabelRotation;
-                        windowAdd.Widgets.Add(windowLabelRotation = new ButtonWidget(Game, "Rotation:") {
-                            Background = new Color(DefaultBackground, 0f),
-                            Size = new Vector2(96f, 24f),
-                            UpdateBounds = false,
-                            LabelCentered = false,
-                            Position = new Vector2(0f, 72f)
-                        });
-                        TextFieldWidget windowFieldRotation;
-                        windowAdd.Widgets.Add(windowFieldRotation = new TextFieldWidget(Game, "0; 0; 0; 1") {
-                            Size = new Vector2(windowAdd.Size.X - windowLabelRotation.Size.X, 24f),
-                            UpdateBounds = false,
-                            Position = new Vector2(windowLabelRotation.Size.X, windowLabelRotation.Position.Y)
-                        });
-
-                        ButtonWidget windowLabelCenter;
-                        windowAdd.Widgets.Add(windowLabelCenter = new ButtonWidget(Game, "Center:") {
-                            Background = new Color(DefaultBackground, 0f),
-                            Size = new Vector2(96f, 24f),
-                            UpdateBounds = false,
-                            LabelCentered = false,
-                            Position = new Vector2(0f, 96f)
-                        });
-                        TextFieldWidget windowFieldCenter;
-                        windowAdd.Widgets.Add(windowFieldCenter = new TextFieldWidget(Game, "0; 0; 0") {
-                            Size = new Vector2(windowAdd.Size.X - windowLabelCenter.Size.X, 24f),
-                            UpdateBounds = false,
-                            Position = new Vector2(windowLabelCenter.Size.X, windowLabelCenter.Position.Y)
-                        });
-
-                        ButtonWidget windowLabelScale;
-                        windowAdd.Widgets.Add(windowLabelScale = new ButtonWidget(Game, "Scale:") {
-                            Background = new Color(DefaultBackground, 0f),
-                            Size = new Vector2(96f, 24f),
-                            UpdateBounds = false,
-                            LabelCentered = false,
-                            Position = new Vector2(0f, 120f)
-                        });
-                        TextFieldWidget windowFieldScale;
-                        windowAdd.Widgets.Add(windowFieldScale = new TextFieldWidget(Game, "1; 1; 1") {
-                            Size = new Vector2(windowAdd.Size.X - windowLabelScale.Size.X, 24f),
-                            UpdateBounds = false,
-                            Position = new Vector2(windowLabelScale.Size.X, windowLabelScale.Position.Y)
-                        });
-
-                        windowAdd.Widgets.Add(new ButtonWidget(Game, "ADD", delegate() {
-                            string[] positionSplit = windowFieldPosition.Text.Split(new char[] {';'});
-                            string[] rotationSplit = windowFieldRotation.Text.Split(new char[] {';'});
-                            string[] centerSplit = windowFieldCenter.Text.Split(new char[] {';'});
-                            string[] scaleSplit = windowFieldScale.Text.Split(new char[] {';'});
-                            ArtObjectInstance ao = new ArtObjectInstance(windowFieldName.Text) {
-                                Id = int.Parse(windowFieldId.Text),
-                                Position = new Vector3(
-                                    float.Parse(positionSplit[0].Trim()),
-                                    float.Parse(positionSplit[1].Trim()),
-                                    float.Parse(positionSplit[2].Trim())
-                                ),
-                                Rotation = new Quaternion(
-                                    float.Parse(rotationSplit[0].Trim()),
-                                    float.Parse(rotationSplit[1].Trim()),
-                                    float.Parse(rotationSplit[2].Trim()),
-                                    float.Parse(rotationSplit[3].Trim())
-                                ),
-                                Scale = new Vector3(
-                                    float.Parse(scaleSplit[0].Trim()),
-                                    float.Parse(scaleSplit[1].Trim()),
-                                    float.Parse(scaleSplit[2].Trim())
-                                )
-                            };
-                            ao.ActorSettings = new ArtObjectActorSettings() {
-                                RotationCenter = new Vector3(
-                                    float.Parse(centerSplit[0].Trim()),
-                                    float.Parse(centerSplit[1].Trim()),
-                                    float.Parse(centerSplit[2].Trim())
-                                )
-                            };
-                            ao.ArtObject = CMProvider.CurrentLevel.Load<ArtObject>("Art objects/"+ao.ArtObjectName);
-                            ao.Initialize();
-                            LevelManager.ArtObjects[ao.Id] = ao;
-                            LevelMaterializer.RegisterSatellites();
-
-                            windowAddHeader.CloseButtonWidget.Action();
-                            window.Refresh();
-                        }) {
-                            Size = new Vector2(windowAdd.Size.X, 24f),
-                            UpdateBounds = false,
-                            LabelCentered = true,
-                            Position = new Vector2(0f, windowAdd.Size.Y - 24f)
-                        });
-
-                        windowAdd.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (windowAdd.Size.X / 2);
-                        windowAdd.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (windowAdd.Size.Y / 2);
-                    }) {
-                        Background = new Color(0f, 0.125f, 0f, 1f),
-                        Size = new Vector2(window.Size.X, 24f),
-                        UpdateBounds = false,
-                        LabelCentered = true,
-                        Position = new Vector2(0f, window.Size.Y - 24f)
-                    });
-
+                    
                     return null;
                 };
 
@@ -1862,6 +1701,262 @@ namespace FezGame.Components {
             AssetPickerPickerWidget.Widgets.AddRange(AssetPickerLabels);
             
             Widgets.AddRange(AssetPickerWidgets);
+        }
+        
+        public void ShowTrilePlacementWindow(int id = 0) {
+            ContainerWidget window;
+            Widgets.Add(window = new ContainerWidget(Game) {
+                Size = new Vector2(256f, 144f),
+                Label = "Add trile"
+            });
+            window.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (window.Size.X / 2);
+            window.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (window.Size.Y / 2);
+            WindowHeaderWidget windowHeader;
+            window.Widgets.Add(windowHeader = new WindowHeaderWidget(Game));
+
+            ButtonWidget windowLabelID;
+            window.Widgets.Add(windowLabelID = new ButtonWidget(Game, "ID:") {
+                Size = new Vector2(96f, 24f),
+                Position = new Vector2(0f, 0f),
+                UpdateBounds = false,
+                LabelCentered = false
+            });
+            windowLabelID.Background.A = 0;
+            TextFieldWidget windowFieldID;
+            window.Widgets.Add(windowFieldID = new TextFieldWidget(Game, id.ToString()) {
+                Size = new Vector2(window.Size.X - windowLabelID.Size.X, 24f),
+                Position = new Vector2(windowLabelID.Size.X, windowLabelID.Position.Y),
+                UpdateBounds = false
+            });
+
+            ButtonWidget windowLabelX;
+            window.Widgets.Add(windowLabelX = new ButtonWidget(Game, "X:") {
+                Size = new Vector2(96f, 24f),
+                Position = new Vector2(0f, 24f),
+                UpdateBounds = false,
+                LabelCentered = false
+            });
+            TextFieldWidget windowFieldX;
+            window.Widgets.Add(windowFieldX = new TextFieldWidget(Game, ((int) PlayerManager.Position.X).ToString()) {
+                Size = new Vector2(window.Size.X - windowLabelX.Size.X, 24f),
+                Position = new Vector2(windowLabelX.Size.X, windowLabelX.Position.Y),
+                UpdateBounds = false
+            });
+
+            ButtonWidget windowLabelY;
+            window.Widgets.Add(windowLabelY = new ButtonWidget(Game, "Y:") {
+                Size = new Vector2(96f, 24f),
+                Position = new Vector2(0f, 48f),
+                UpdateBounds = false,
+                LabelCentered = false
+            });
+            TextFieldWidget windowFieldY;
+            window.Widgets.Add(windowFieldY = new TextFieldWidget(Game, ((int) PlayerManager.Position.Y).ToString()) {
+                Size = new Vector2(window.Size.X - windowLabelY.Size.X, 24f),
+                Position = new Vector2(windowLabelY.Size.X, windowLabelY.Position.Y),
+                UpdateBounds = false
+            });
+
+            ButtonWidget windowLabelZ;
+            window.Widgets.Add(windowLabelZ = new ButtonWidget(Game, "Z:") {
+                Size = new Vector2(96f, 24f),
+                Position = new Vector2(0f, 72f),
+                UpdateBounds = false,
+                LabelCentered = false
+            });
+            TextFieldWidget windowFieldZ;
+            window.Widgets.Add(windowFieldZ = new TextFieldWidget(Game, ((int) PlayerManager.Position.Z).ToString()) {
+                Size = new Vector2(window.Size.X - windowLabelZ.Size.X, 24f),
+                Position = new Vector2(windowLabelZ.Size.X, windowLabelZ.Position.Y),
+                UpdateBounds = false
+            });
+
+            ButtonWidget windowLabelFace;
+            window.Widgets.Add(windowLabelFace = new ButtonWidget(Game, "Face:") {
+                Size = new Vector2(96f, 24f),
+                Position = new Vector2(0f, 96f),
+                UpdateBounds = false,
+                LabelCentered = false
+            });
+            TextFieldWidget windowFieldFace;
+            window.Widgets.Add(windowFieldFace = new TextFieldWidget(Game, LevelManager.StartingPosition.Face.ToString(),
+                Enum.GetNames(typeof(FaceOrientation))) {
+                Size = new Vector2(window.Size.X - windowLabelFace.Size.X, 24f),
+                Position = new Vector2(windowLabelFace.Size.X, windowLabelFace.Position.Y),
+                UpdateBounds = false
+            });
+
+            ButtonWidget windowButtonCreate;
+            window.Widgets.Add(windowButtonCreate = new ButtonWidget(Game, "CREATE", delegate() {
+                int trileId = int.Parse(windowFieldID.Text);
+                TrileInstance trile = CreateNewTrile(trileId,new TrileEmplacement(
+                                        int.Parse(windowFieldX.Text),
+                                        int.Parse(windowFieldY.Text),
+                                        int.Parse(windowFieldZ.Text)
+                ));
+                trile.Phi = ((FaceOrientation) Enum.Parse(typeof(FaceOrientation), windowFieldFace.Text)).ToPhi();
+                AddTrile(trile);
+                windowHeader.CloseButtonWidget.Action();
+            }) {
+                Size = new Vector2(window.Size.X, 24f),
+                Position = new Vector2(0f, window.Size.Y - 24f),
+                UpdateBounds = false,
+                LabelCentered = true
+            });
+        }
+        
+        public void ShowArtObjectPlacementWindow(string name = "") {
+            ContainerWidget windowAdd;
+            Widgets.Add(windowAdd = new ContainerWidget(Game) {
+                Size = new Vector2(256f, 168f),
+                Label = "Add Art Object"
+            });
+            WindowHeaderWidget windowAddHeader;
+            windowAdd.Widgets.Add(windowAddHeader = new WindowHeaderWidget(Game));
+
+            int maxID = 0;
+            foreach (int id in LevelManager.ArtObjects.Keys) {
+                if (id >= maxID) {
+                    maxID = id + 1;
+                }
+            }
+
+            ButtonWidget windowLabelId;
+            windowAdd.Widgets.Add(windowLabelId = new ButtonWidget(Game, "ID:") {
+                Background = new Color(DefaultBackground, 0f),
+                Size = new Vector2(96f, 24f),
+                UpdateBounds = false,
+                LabelCentered = false,
+                Position = new Vector2(0f, 0f)
+            });
+            TextFieldWidget windowFieldId;
+            windowAdd.Widgets.Add(windowFieldId = new TextFieldWidget(Game, maxID.ToString()) {
+                Size = new Vector2(windowAdd.Size.X - windowLabelId.Size.X, 24f),
+                UpdateBounds = false,
+                Position = new Vector2(windowLabelId.Size.X, windowLabelId.Position.Y)
+            });
+
+            ButtonWidget windowLabelName;
+            windowAdd.Widgets.Add(windowLabelName = new ButtonWidget(Game, "Name:") {
+                Background = new Color(DefaultBackground, 0f),
+                Size = new Vector2(96f, 24f),
+                UpdateBounds = false,
+                LabelCentered = false,
+                Position = new Vector2(0f, 24f)
+            });
+            TextFieldWidget windowFieldName;
+            windowAdd.Widgets.Add(windowFieldName = new TextFieldWidget(Game, name, ContentPaths.ArtObjects) {
+                Size = new Vector2(windowAdd.Size.X - windowLabelName.Size.X, 24f),
+                UpdateBounds = false,
+                Position = new Vector2(windowLabelName.Size.X, windowLabelName.Position.Y)
+            });
+
+            ButtonWidget windowLabelPosition;
+            windowAdd.Widgets.Add(windowLabelPosition = new ButtonWidget(Game, "Position:") {
+                Background = new Color(DefaultBackground, 0f),
+                Size = new Vector2(96f, 24f),
+                UpdateBounds = false,
+                LabelCentered = false,
+                Position = new Vector2(0f, 48f)
+            });
+            TextFieldWidget windowFieldPosition;
+            windowAdd.Widgets.Add(windowFieldPosition = new TextFieldWidget(Game, "0; 0; 0") {
+                Size = new Vector2(windowAdd.Size.X - windowLabelPosition.Size.X, 24f),
+                UpdateBounds = false,
+                Position = new Vector2(windowLabelPosition.Size.X, windowLabelPosition.Position.Y)
+            });
+
+            ButtonWidget windowLabelRotation;
+            windowAdd.Widgets.Add(windowLabelRotation = new ButtonWidget(Game, "Rotation:") {
+                Background = new Color(DefaultBackground, 0f),
+                Size = new Vector2(96f, 24f),
+                UpdateBounds = false,
+                LabelCentered = false,
+                Position = new Vector2(0f, 72f)
+            });
+            TextFieldWidget windowFieldRotation;
+            windowAdd.Widgets.Add(windowFieldRotation = new TextFieldWidget(Game, "0; 0; 0; 1") {
+                Size = new Vector2(windowAdd.Size.X - windowLabelRotation.Size.X, 24f),
+                UpdateBounds = false,
+                Position = new Vector2(windowLabelRotation.Size.X, windowLabelRotation.Position.Y)
+            });
+
+            ButtonWidget windowLabelCenter;
+            windowAdd.Widgets.Add(windowLabelCenter = new ButtonWidget(Game, "Center:") {
+                Background = new Color(DefaultBackground, 0f),
+                Size = new Vector2(96f, 24f),
+                UpdateBounds = false,
+                LabelCentered = false,
+                Position = new Vector2(0f, 96f)
+            });
+            TextFieldWidget windowFieldCenter;
+            windowAdd.Widgets.Add(windowFieldCenter = new TextFieldWidget(Game, "0; 0; 0") {
+                Size = new Vector2(windowAdd.Size.X - windowLabelCenter.Size.X, 24f),
+                UpdateBounds = false,
+                Position = new Vector2(windowLabelCenter.Size.X, windowLabelCenter.Position.Y)
+            });
+
+            ButtonWidget windowLabelScale;
+            windowAdd.Widgets.Add(windowLabelScale = new ButtonWidget(Game, "Scale:") {
+                Background = new Color(DefaultBackground, 0f),
+                Size = new Vector2(96f, 24f),
+                UpdateBounds = false,
+                LabelCentered = false,
+                Position = new Vector2(0f, 120f)
+            });
+            TextFieldWidget windowFieldScale;
+            windowAdd.Widgets.Add(windowFieldScale = new TextFieldWidget(Game, "1; 1; 1") {
+                Size = new Vector2(windowAdd.Size.X - windowLabelScale.Size.X, 24f),
+                UpdateBounds = false,
+                Position = new Vector2(windowLabelScale.Size.X, windowLabelScale.Position.Y)
+            });
+
+            windowAdd.Widgets.Add(new ButtonWidget(Game, "ADD", delegate() {
+                string[] positionSplit = windowFieldPosition.Text.Split(new char[] {';'});
+                string[] rotationSplit = windowFieldRotation.Text.Split(new char[] {';'});
+                string[] centerSplit = windowFieldCenter.Text.Split(new char[] {';'});
+                string[] scaleSplit = windowFieldScale.Text.Split(new char[] {';'});
+                ArtObjectInstance ao = new ArtObjectInstance(windowFieldName.Text) {
+                    Id = int.Parse(windowFieldId.Text),
+                    Position = new Vector3(
+                        float.Parse(positionSplit[0].Trim()),
+                        float.Parse(positionSplit[1].Trim()),
+                        float.Parse(positionSplit[2].Trim())
+                    ),
+                    Rotation = new Quaternion(
+                        float.Parse(rotationSplit[0].Trim()),
+                        float.Parse(rotationSplit[1].Trim()),
+                        float.Parse(rotationSplit[2].Trim()),
+                        float.Parse(rotationSplit[3].Trim())
+                    ),
+                    Scale = new Vector3(
+                        float.Parse(scaleSplit[0].Trim()),
+                        float.Parse(scaleSplit[1].Trim()),
+                        float.Parse(scaleSplit[2].Trim())
+                    )
+                };
+                ao.ActorSettings = new ArtObjectActorSettings() {
+                    RotationCenter = new Vector3(
+                        float.Parse(centerSplit[0].Trim()),
+                        float.Parse(centerSplit[1].Trim()),
+                        float.Parse(centerSplit[2].Trim())
+                    )
+                };
+                ao.ArtObject = CMProvider.CurrentLevel.Load<ArtObject>("Art objects/"+ao.ArtObjectName);
+                ao.Initialize();
+                LevelManager.ArtObjects[ao.Id] = ao;
+                LevelMaterializer.RegisterSatellites();
+
+                windowAddHeader.CloseButtonWidget.Action();
+            }) {
+                Size = new Vector2(windowAdd.Size.X, 24f),
+                UpdateBounds = false,
+                LabelCentered = true,
+                Position = new Vector2(0f, windowAdd.Size.Y - 24f)
+            });
+
+            windowAdd.Position.X = GraphicsDevice.Viewport.Width / 2 - (int) (windowAdd.Size.X / 2);
+            windowAdd.Position.Y = GraphicsDevice.Viewport.Height / 2 - (int) (windowAdd.Size.Y / 2);
         }
         
     }

@@ -966,6 +966,9 @@ namespace FezGame.Components {
             level.StartingPosition.Face = FaceOrientation.Front;
             level.StartingPosition.Id = new TrileEmplacement(width / 2, height / 2, depth / 2);
             PlayerManager.Position = level.StartingPosition.Id.AsVector;
+            
+            ShowTrilePlacementWindow();
+            
             return level;
         }
 

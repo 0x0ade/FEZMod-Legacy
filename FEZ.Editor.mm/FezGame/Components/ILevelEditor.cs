@@ -18,6 +18,9 @@ namespace FezGame.Components {
         Level CreateNewLevel(string name, int width, int height, int depth, string trileset);
         TrileInstance CreateNewTrile(int trileId, TrileEmplacement emplacement);
         void AddTrile(TrileInstance trile);
+        
+        void ShowTrilePlacementWindow(int id = 0);
+        void ShowArtObjectPlacementWindow(string name = "");
 
     }
 }
