@@ -279,9 +279,11 @@ namespace FezGame.Components {
             FEZMod.DisableInventory = true;
             
             CubemappedEffect = new CubemappedEffect();
+            
+            LevelManager.LevelChanging += Reset;
 
             SetupGui();
-
+            
         }
 
         public void Preload() {
@@ -296,6 +298,16 @@ namespace FezGame.Components {
             AllButtonWidget.TexHideAll = CMProvider.Global.Load<Texture2D>("editor/HIDEALL");
 
             SpriteBatch = new SpriteBatch(GraphicsDevice);
+        }
+        
+        public void Reset() {
+            List<TrileInstance> unselected = SelectedTriles;
+            SelectedTriles = new List<TrileInstance>();
+            UpdateSelection(unselected);
+            
+            EnableAll();
+            
+            Placing = null;
         }
 
         public override void Update(GameTime gameTime) {
@@ -312,7 +324,7 @@ namespace FezGame.Components {
             if (GameState.Loading || GameState.InMap || GameState.InMenuCube || GameState.Paused || string.IsNullOrEmpty(LevelManager.Name)) {
                 return;
             }
-
+            
             if (ThumbnailScheduled) {
                 if (ThumbnailRT == null) {
                     ThumbnailRT = TRM.TakeTarget();
@@ -320,7 +332,7 @@ namespace FezGame.Components {
                 }
                 return;
             }
-
+            
             SinceMouseMoved += (float) gameTime.ElapsedGameTime.TotalSeconds;
             if (MouseState.Movement.X != 0 || MouseState.Movement.Y != 0) {
                 SinceMouseMoved = 0f;
@@ -1256,6 +1268,7 @@ namespace FezGame.Components {
             if (CameraManager is DefaultCameraManager) {
                 ((DefaultCameraManager) CameraManager).RebuildProjection();
             }
+            LevelMaterializer.CommitBatchesIfNeeded();
         }
 
         protected readonly static FaceOrientation[] faces = {
