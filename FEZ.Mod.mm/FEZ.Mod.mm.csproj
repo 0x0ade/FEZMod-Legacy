@@ -97,7 +97,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FezGame\Program.cs" />
-    <Compile Include="FezGame\Services\GameCameraManager.cs" />
+    <Compile Include="FezGame\Services\patch_GameCameraManager.cs" />
     <Compile Include="FezEngine\Services\patch_LevelManager.cs" />
     <Compile Include="FezGame\Services\GameLevelManager.cs" />
     <Compile Include="FezGame\Services\GameLevelManagerHelper.cs" />

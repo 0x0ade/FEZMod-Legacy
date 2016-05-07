@@ -1,5 +1,5 @@
 ﻿namespace FezGame.Services {
-    public class GameCameraManager {
+    public class patch_GameCameraManager {
 
         public extern float orig_get_InterpolationSpeed();
         public float get_InterpolationSpeed() {

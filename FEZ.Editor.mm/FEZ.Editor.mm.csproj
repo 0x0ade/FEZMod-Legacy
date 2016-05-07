@@ -98,6 +98,7 @@
     <Compile Include="FezGame\Editor\EditorUtils.cs" />
     <Compile Include="FezGame\Mod\Gui\EditorInfoWidget.cs" />
     <Compile Include="FezGame\Mod\Gui\ThumbnailCreatorWidget.cs" />
+    <Compile Include="FezGame\Services\EditorCameraManager.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

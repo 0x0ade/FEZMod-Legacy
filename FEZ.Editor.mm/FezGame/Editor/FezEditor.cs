@@ -4,6 +4,7 @@ using FezGame.Components;
 using FezEngine.Tools;
 using Microsoft.Xna.Framework;
 using System;
+using FezGame.Services;
 
 namespace FezGame.Editor {
     
@@ -13,6 +14,8 @@ namespace FezGame.Editor {
 
         [Obsolete("Not implemented anymore - kept to keep settings intact")]
         public bool TooltipArtObjectInfo = false;
+        
+        public bool FogEnabled = false;
         
         public int BackupHistory = 5;
     }
@@ -46,6 +49,18 @@ namespace FezGame.Editor {
                     InEditor = true;
                 }
             }
+        }
+        
+        public override void PreInitialize() {
+            patch_ServiceHelper.AddHooks[typeof(GameCameraManager)] = delegate(IGameComponent component, bool addServices) {
+                if (component is GameComponent) {
+                    ((GameComponent) component).Dispose();
+                }
+                
+                ServiceHelper.AddComponent(new EditorCameraManager(ServiceHelper.Game), addServices);
+                
+                return false;
+            };
         }
         
         public override void Initialize() {

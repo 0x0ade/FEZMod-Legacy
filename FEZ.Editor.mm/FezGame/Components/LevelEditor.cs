@@ -178,19 +178,22 @@ namespace FezGame.Components {
         public float PlacingPhi {
             get {
                 float offs = MathHelper.Pi * PlacingPhiOffset / 2f;
+                float cam = 0f;
                 if (CameraManager.Viewpoint.IsOrthographic()) {
-                    return FezMath.SnapPhi(CameraManager.Viewpoint.ToPhi() + offs);
+                    cam = CameraManager.Viewpoint.ToPhi();
                 } else {
                     //TODO get closest viewpoint... somehow.
+                    cam = CameraManager.Rotation.ToPhi();
                 }
-                return FezMath.SnapPhi(offs);
+                return FezMath.SnapPhi(offs + cam);
             }
             set {
                 float cam = 0f;
                 if (CameraManager.Viewpoint.IsOrthographic()) {
-                    cam = FezMath.SnapPhi(CameraManager.Viewpoint.ToPhi());
+                    cam = CameraManager.Viewpoint.ToPhi();
                 } else {
                     //TODO get closest viewpoint... somehow.
+                    cam = CameraManager.Rotation.ToPhi();
                 }
                 PlacingPhiOffset = (value - cam) * 2f / MathHelper.Pi;
             }

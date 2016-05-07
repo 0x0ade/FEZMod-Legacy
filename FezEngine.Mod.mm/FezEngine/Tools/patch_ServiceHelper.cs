@@ -5,10 +5,11 @@ using Microsoft.Xna.Framework;
 using MonoMod;
 
 namespace FezEngine.Tools {
-    //TODO Due to patch_, GetComponent cannot be found
     public static class patch_ServiceHelper {
         
         public static Game Game { [MonoModIgnore] get; [MonoModIgnore] set; }
+        
+        public static Dictionary<Type, Func<IGameComponent, bool, bool>> AddHooks = new Dictionary<Type, Func<IGameComponent, bool, bool>>();
 
         private static List<object> services = new List<object>();
         private static readonly List<IGameComponent> components = new List<IGameComponent>();
@@ -54,6 +55,11 @@ namespace FezEngine.Tools {
 
         public static extern void orig_AddComponent(IGameComponent component, bool addServices);
         public static void AddComponent(IGameComponent component, bool addServices) {
+            Func<IGameComponent, bool, bool> hook;
+            if (AddHooks.TryGetValue(component.GetType(), out hook) && !hook(component, addServices)) {
+                return;
+            }
+            
             orig_AddComponent(component, addServices);
 
             if (!addServices && FEZModEngine.HandleComponents) {
