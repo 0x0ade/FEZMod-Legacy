@@ -183,7 +183,6 @@ namespace FezGame.Components {
                 if (CameraManager.Viewpoint.IsOrthographic()) {
                     cam = CameraManager.Viewpoint.ToPhi();
                 } else {
-                    //TODO get closest viewpoint... somehow.
                     cam = CameraManager.Rotation.ToPhi();
                 }
                 return FezMath.SnapPhi(offs + cam);
@@ -193,7 +192,6 @@ namespace FezGame.Components {
                 if (CameraManager.Viewpoint.IsOrthographic()) {
                     cam = CameraManager.Viewpoint.ToPhi();
                 } else {
-                    //TODO get closest viewpoint... somehow.
                     cam = CameraManager.Rotation.ToPhi();
                 }
                 PlacingPhiOffset = (value - cam) * 2f / MathHelper.Pi;
@@ -351,27 +349,7 @@ namespace FezGame.Components {
             trilesCount = LevelManager.Triles.Count;
             LevelManager.Triles.CopyTo(tmpTriles.Length < trilesCount ? (tmpTriles = new KeyValuePair<TrileEmplacement, TrileInstance>[trilesCount]) : tmpTriles, 0);
             
-            if (CameraManager.Viewpoint.IsOrthographic()) {
-              CursorRay = new Ray(
-                  GraphicsDevice.Viewport.Unproject(
-                      new Vector3(MouseState.Position.X, MouseState.Position.Y, 0f),
-                      CameraManager.Projection, CameraManager.View, Matrix.Identity
-                  ),
-                  CameraManager.InverseView.Forward
-              );
-            } else {
-              Vector3 near = GraphicsDevice.Viewport.Unproject(
-                  new Vector3(MouseState.Position.X, MouseState.Position.Y, CameraManager.NearPlane),
-                  CameraManager.Projection, CameraManager.View, Matrix.Identity
-              );
-              Vector3 far = GraphicsDevice.Viewport.Unproject(
-                  new Vector3(MouseState.Position.X, MouseState.Position.Y, CameraManager.FarPlane),
-                  CameraManager.Projection, CameraManager.View, Matrix.Identity
-              );
-              //Should be far - near according to everything else in the web™, but something's wrong somewhere.
-              CursorRay = new Ray(near, near - far);
-              CursorRay.Direction.Normalize();
-            }
+            CursorRay = GenRay(MouseState.Position.X, MouseState.Position.Y);
             
             ArtObjectInstance oldHoveredAO = HoveredAO;
             
@@ -1114,17 +1092,36 @@ namespace FezGame.Components {
             float dist = SelectRayDistance * CameraManager.PixelsPerTrixel;
             for (float yy = y; yy < y + h; yy += dist) {
                 for (float xx = x; xx < x + w; xx += dist) {
-                    GetTriles(new Ray(
-                        GraphicsDevice.Viewport.Unproject(
-                            new Vector3(xx, yy, 0.0f),
-                            CameraManager.Projection, CameraManager.View, Matrix.Identity
-                        ),
-                        CameraManager.InverseView.Forward
-                    ), selected);
+                    GetTriles(GenRay(xx, yy), selected);
                 }
             }
             
             return selected;
+        }
+        
+        public Ray GenRay(float x, float y) {
+            if (CameraManager.Viewpoint.IsOrthographic()) {
+              return new Ray(
+                  GraphicsDevice.Viewport.Unproject(
+                      new Vector3(x, y, 0f),
+                      CameraManager.Projection, CameraManager.View, Matrix.Identity
+                  ),
+                  CameraManager.InverseView.Forward
+              );
+            }
+            
+            Vector3 near = GraphicsDevice.Viewport.Unproject(
+                new Vector3(x, y, CameraManager.NearPlane),
+                CameraManager.Projection, CameraManager.View, Matrix.Identity
+            );
+            Vector3 far = GraphicsDevice.Viewport.Unproject(
+                new Vector3(x, y, CameraManager.FarPlane),
+                CameraManager.Projection, CameraManager.View, Matrix.Identity
+            );
+            //Should be far - near according to everything else in the web™, but something's wrong somewhere.
+            Ray ray = new Ray(near, near - far);
+            ray.Direction.Normalize();
+            return ray;
         }
         
         public Mesh GenMesh(Trile trile, float phi = 0f, BaseEffect effect = null) {

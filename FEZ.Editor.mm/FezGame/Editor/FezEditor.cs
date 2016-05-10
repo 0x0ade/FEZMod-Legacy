@@ -23,7 +23,7 @@ namespace FezGame.Editor {
         public Keys KeyCamLeft = Keys.A;
         public Keys KeyCamBack = Keys.S;
         public Keys KeyCamRight = Keys.D;
-        public float FreeCamSpeed = 0.7f;
+        public float FreeCamSpeed = 0.6f;
         
         public Keys KeyDelete = Keys.Delete;
         
