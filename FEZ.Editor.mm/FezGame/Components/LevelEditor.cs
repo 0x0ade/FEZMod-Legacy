@@ -259,13 +259,13 @@ namespace FezGame.Components {
             #endif
             
             KeyboardState.RegisterKey(Keys.LeftControl);
-            KeyboardState.RegisterKey(Keys.S);
-            KeyboardState.RegisterKey(Keys.N);
-            KeyboardState.RegisterKey(Keys.O);
-            KeyboardState.RegisterKey(Keys.Delete);
-            KeyboardState.RegisterKey(Keys.C);
-            KeyboardState.RegisterKey(Keys.X);
-            KeyboardState.RegisterKey(Keys.P);
+            KeyboardState.RegisterKey(FezEditor.Settings.KeySave);
+            KeyboardState.RegisterKey(FezEditor.Settings.KeyNew);
+            KeyboardState.RegisterKey(FezEditor.Settings.KeyOpen);
+            KeyboardState.RegisterKey(FezEditor.Settings.KeyDelete);
+            KeyboardState.RegisterKey(FezEditor.Settings.KeyCopy);
+            KeyboardState.RegisterKey(FezEditor.Settings.KeyCut);
+            KeyboardState.RegisterKey(FezEditor.Settings.KeyPerspective);
             KeyboardState.RegisterKey(FezEditor.Settings.KeyCamForwards);
             KeyboardState.RegisterKey(FezEditor.Settings.KeyCamLeft);
             KeyboardState.RegisterKey(FezEditor.Settings.KeyCamBack);
@@ -572,7 +572,7 @@ namespace FezGame.Components {
             if (cursorInMenu) {
                 HoveredTrile = null;
                 return;
-            } else if (KeyboardState.GetKeyState(Keys.P) == FezButtonState.Pressed) {
+            } else if (KeyboardState.GetKeyState(FezEditor.Settings.KeyPerspective) == FezButtonState.Pressed) {
                 if (CameraManager.Viewpoint.IsOrthographic()) {
                     CameraManager.ChangeViewpoint(Viewpoint.Perspective);
                 } else {
@@ -599,6 +599,7 @@ namespace FezGame.Components {
                     dir += tdir;
                 }
                 if (dir != Vector3.Zero) {
+                    dir.Normalize();
                     CameraManager.Center += dir * FezEditor.Settings.FreeCamSpeed;
                 }
                 
@@ -699,21 +700,21 @@ namespace FezGame.Components {
 
             if (FocusedWidget == null) {
                 bool lctrl = KeyboardState.GetKeyState(Keys.LeftControl) == FezButtonState.Down;
-                if (lctrl && KeyboardState.GetKeyState(Keys.S) == FezButtonState.Pressed) {
+                if (lctrl && KeyboardState.GetKeyState(FezEditor.Settings.KeySave) == FezButtonState.Pressed) {
                     Save(true, true);
-                } else if (lctrl && KeyboardState.GetKeyState(Keys.N) == FezButtonState.Pressed) {
+                } else if (lctrl && KeyboardState.GetKeyState(FezEditor.Settings.KeyNew) == FezButtonState.Pressed) {
                     TopBarWidget.Widgets[0 /*File*/].Widgets[0 /*New*/].Click(gameTime, 1);
-                } else if (lctrl && KeyboardState.GetKeyState(Keys.O) == FezButtonState.Pressed) {
+                } else if (lctrl && KeyboardState.GetKeyState(FezEditor.Settings.KeyOpen) == FezButtonState.Pressed) {
                     TopBarWidget.Widgets[0 /*File*/].Hover(gameTime);
                     TopBarWidget.Widgets[0 /*File*/].Widgets[1 /*Open*/].Hover(gameTime);
                     FocusedWidget = TopBarWidget.Widgets[0 /*File*/].Widgets[1 /*Open*/].Widgets[0 /*Field*/];
                     FocusedWidget.Click(gameTime, 1);
-                } else if (KeyboardState.GetKeyState(Keys.Delete) == FezButtonState.Pressed && SelectedTriles != null && SelectedTriles.Count > 0) {
+                } else if (KeyboardState.GetKeyState(FezEditor.Settings.KeyDelete) == FezButtonState.Pressed && SelectedTriles != null && SelectedTriles.Count > 0) {
                     RemoveSelection();
-                } else if (lctrl && KeyboardState.GetKeyState(Keys.C) == FezButtonState.Pressed && SelectedTriles != null && SelectedTriles.Count > 0) {
+                } else if (lctrl && KeyboardState.GetKeyState(FezEditor.Settings.KeyCopy) == FezButtonState.Pressed && SelectedTriles != null && SelectedTriles.Count > 0) {
                     Placing = Clone(SelectedTriles);
                     PlacingPhiOffset = 0;
-                } else if (lctrl && KeyboardState.GetKeyState(Keys.X) == FezButtonState.Pressed && SelectedTriles != null && SelectedTriles.Count > 0) {
+                } else if (lctrl && KeyboardState.GetKeyState(FezEditor.Settings.KeyCut) == FezButtonState.Pressed && SelectedTriles != null && SelectedTriles.Count > 0) {
                     Placing = Clone(SelectedTriles);
                     PlacingPhiOffset = 0;
                     RemoveSelection();

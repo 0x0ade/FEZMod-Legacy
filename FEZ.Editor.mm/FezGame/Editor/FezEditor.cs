@@ -18,11 +18,21 @@ namespace FezGame.Editor {
         
         public bool FogEnabled = false;
         
+        public Keys KeyPerspective = Keys.P;
         public Keys KeyCamForwards = Keys.W;
         public Keys KeyCamLeft = Keys.A;
         public Keys KeyCamBack = Keys.S;
         public Keys KeyCamRight = Keys.D;
-        public float FreeCamSpeed = 0.8f;
+        public float FreeCamSpeed = 0.7f;
+        
+        public Keys KeyDelete = Keys.Delete;
+        
+        //LCTRL +
+        public Keys KeySave = Keys.S;
+        public Keys KeyNew = Keys.N;
+        public Keys KeyOpen = Keys.O;
+        public Keys KeyCopy = Keys.C;
+        public Keys KeyCut = Keys.X;
         
         public int BackupHistory = 5;
     }
