@@ -13,7 +13,6 @@ using FezEngine.Structure;
 using EasyStorage;
 using System.Globalization;
 using System.Threading;
-using MonoMod.JIT;
 using FezEngine.Mod;
 using FezGame.Tools;
 using FezEngine.Components;
@@ -94,24 +93,6 @@ namespace FezGame.Mod {
             ParseArgs(args);
         }
 
-        private static int TestMonoModJIT(string test) {
-            Console.WriteLine("Calling something unpatched.");
-            Console.Write("Assembly: ");
-            Console.WriteLine(Assembly.GetExecutingAssembly().FullName);
-            Console.Write("Passed arg: ");
-            Console.WriteLine(test);
-
-            try {
-                MonoModJITHandler.MMRun(null, test);
-            } catch (MonoModJITPseudoException e) {
-                return (int) e.Value;
-            }
-
-            Console.WriteLine("Calling something only when patched.");
-
-            return -42;
-        }
-
         public static void PreInitialize() {
             ModLogger.Clear();
             ModLogger.Log("FEZMod", "JustAnotherFEZMod (FEZMod) " + FEZMod.Version);
@@ -139,8 +120,6 @@ namespace FezGame.Mod {
                 #endif
             }
             Fez.Version = Fez.Version + " | " + FEZMod.Version;
-
-            //Console.WriteLine("JIT test return: " + TestMonoModJIT("Hello, World!"));
 
             //Disable steamworks
             //Handled by FEZ in 1.12+

@@ -79,10 +79,12 @@ namespace FezGame.Components {
         protected Texture2D CursorAction;
         protected Vector2 CursorOffset = new Vector2(16f, 16f);
         protected Color CursorColor = Color.White;
+        protected Ray CursorRay;
         
         public Point DragOrigin;
         
         public static BaseEffect CubemappedEffect;
+        public static BasicEffect LineEffect;
         
         public Color DraggingColor = new Color(0.3f, 1f, 0.3f);
         protected Vector3 DraggingOrigin;
@@ -287,6 +289,7 @@ namespace FezGame.Components {
             FEZMod.DisableInventory = true;
             
             CubemappedEffect = new CubemappedEffect();
+            LineEffect = new BasicEffect(GraphicsDevice);
             
             LevelManager.LevelChanging += Reset;
 
@@ -294,7 +297,7 @@ namespace FezGame.Components {
             
         }
 
-        public void Preload() {
+        protected override void LoadContent() {
             GTR = new GlyphTextRenderer(Game);
 
             CursorDefault = CMProvider.Global.Load<Texture2D>("editor/cursor/DEFAULT");
@@ -350,18 +353,24 @@ namespace FezGame.Components {
             trilesCount = LevelManager.Triles.Count;
             LevelManager.Triles.CopyTo(tmpTriles.Length < trilesCount ? (tmpTriles = new KeyValuePair<TrileEmplacement, TrileInstance>[trilesCount]) : tmpTriles, 0);
             
-            Ray ray = new Ray(
+            Vector3 rayDir;
+            if (CameraManager.Viewpoint.IsOrthographic()) {
+                rayDir = CameraManager.InverseView.Forward;
+            } else {
+                rayDir = CameraManager.InverseView.Forward; //TODO
+            }
+            CursorRay = new Ray(
                 GraphicsDevice.Viewport.Unproject(
                     new Vector3(MouseState.Position.X, MouseState.Position.Y, 0.0f),
                     CameraManager.Projection, CameraManager.View, Matrix.Identity
                 ),
-                CameraManager.InverseView.Forward
+                rayDir
             );
             
             ArtObjectInstance oldHoveredAO = HoveredAO;
             
             float intersectionMin = float.MaxValue;
-            HoveredTrile = GetTrile(ray, ref intersectionMin);
+            HoveredTrile = GetTrile(CursorRay, ref intersectionMin);
             if (HoveredTrile != null) {
                 HoveredBox = new BoundingBox(HoveredTrile.Position, HoveredTrile.Position + Vector3.One);
             }
@@ -375,7 +384,7 @@ namespace FezGame.Components {
                     if (Disabled.Contains(ao)) {
                         continue;
                     }
-                    float? intersection = ray.Intersects(ao.Bounds);
+                    float? intersection = CursorRay.Intersects(ao.Bounds);
                     if (intersection.HasValue && intersection < intersectionMin) {
                         HoveredTrile = null;
                         HoveredAO = ao;
@@ -468,7 +477,7 @@ namespace FezGame.Components {
                         new Vector3(DragOrigin.X, DragOrigin.Y, 0.0f),
                         CameraManager.Projection, CameraManager.View, Matrix.Identity
                     );
-                    DraggingAO.Position = DraggingOrigin + ray.Position - dragOriginWorld;
+                    DraggingAO.Position = DraggingOrigin + CursorRay.Position - dragOriginWorld;
                     DraggingAO.Position = new Vector3(
                         (float) Math.Floor(DraggingAO.Position.X / DraggingAOGrid) * DraggingAOGrid,
                         (float) Math.Floor(DraggingAO.Position.Y / DraggingAOGrid) * DraggingAOGrid,
@@ -590,7 +599,7 @@ namespace FezGame.Components {
             }
 
             if (HoveredTrile != null) {
-                HoveredFace = GetHoveredFace(HoveredBox, ray);
+                HoveredFace = GetHoveredFace(HoveredBox, CursorRay);
                 CursorHovering = true;
             }
 
@@ -796,6 +805,15 @@ namespace FezGame.Components {
                 }
             }
             
+            LineEffect.View = CameraManager.View;
+            LineEffect.Projection = CameraManager.Projection;
+            LineEffect.CurrentTechnique.Passes[0].Apply();
+            VertexPositionColor[] vertices = new VertexPositionColor[] {
+                new VertexPositionColor(CursorRay.Position - CursorRay.Direction, Color.White),
+                new VertexPositionColor(CursorRay.Position + CursorRay.Direction, Color.White)
+            };
+            GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, 1);
+            
             Viewport viewport = GraphicsDevice.Viewport;
             float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
 
@@ -858,6 +876,45 @@ namespace FezGame.Components {
                     (float) cursorPosition.Y - cursorScale * CursorOffset.Y
                 ), null,
                 CursorColor * FezMath.Saturate((float) (1.0 - ((double) SinceMouseMoved - 2.0))),
+                0.0f,
+                Vector2.Zero,
+                cursorScale,
+                SpriteEffects.None,
+                0.0f);
+                
+            SpriteBatch.Draw(cursor, 
+                GraphicsDevice.Viewport.Project(CursorRay.Position - CursorRay.Direction, CameraManager.Projection, CameraManager.View, Matrix.Identity).XY()
+                 - new Vector2(
+                    cursorScale * CursorOffset.X,
+                    cursorScale * CursorOffset.Y
+                ), null,
+                Color.Red * FezMath.Saturate((float) (1.0 - ((double) SinceMouseMoved - 2.0))),
+                0.0f,
+                Vector2.Zero,
+                cursorScale,
+                SpriteEffects.None,
+                0.0f);
+            
+            SpriteBatch.Draw(cursor, 
+                GraphicsDevice.Viewport.Project(CursorRay.Position, CameraManager.Projection, CameraManager.View, Matrix.Identity).XY()
+                 - new Vector2(
+                    cursorScale * CursorOffset.X,
+                    cursorScale * CursorOffset.Y
+                ), null,
+                Color.Green * FezMath.Saturate((float) (1.0 - ((double) SinceMouseMoved - 2.0))),
+                0.0f,
+                Vector2.Zero,
+                cursorScale,
+                SpriteEffects.None,
+                0.0f);
+            
+            SpriteBatch.Draw(cursor, 
+                GraphicsDevice.Viewport.Project(CursorRay.Position + CursorRay.Direction, CameraManager.Projection, CameraManager.View, Matrix.Identity).XY()
+                 - new Vector2(
+                    cursorScale * CursorOffset.X,
+                    cursorScale * CursorOffset.Y
+                ), null,
+                Color.Blue * FezMath.Saturate((float) (1.0 - ((double) SinceMouseMoved - 2.0))),
                 0.0f,
                 Vector2.Zero,
                 cursorScale,
