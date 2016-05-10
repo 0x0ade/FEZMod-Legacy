@@ -84,7 +84,6 @@ namespace FezGame.Components {
         public Point DragOrigin;
         
         public static BaseEffect CubemappedEffect;
-        public static BasicEffect LineEffect;
         
         public Color DraggingColor = new Color(0.3f, 1f, 0.3f);
         protected Vector3 DraggingOrigin;
@@ -289,7 +288,6 @@ namespace FezGame.Components {
             FEZMod.DisableInventory = true;
             
             CubemappedEffect = new CubemappedEffect();
-            LineEffect = new BasicEffect(GraphicsDevice);
             
             LevelManager.LevelChanging += Reset;
 
@@ -353,19 +351,27 @@ namespace FezGame.Components {
             trilesCount = LevelManager.Triles.Count;
             LevelManager.Triles.CopyTo(tmpTriles.Length < trilesCount ? (tmpTriles = new KeyValuePair<TrileEmplacement, TrileInstance>[trilesCount]) : tmpTriles, 0);
             
-            Vector3 rayDir;
             if (CameraManager.Viewpoint.IsOrthographic()) {
-                rayDir = CameraManager.InverseView.Forward;
+              CursorRay = new Ray(
+                  GraphicsDevice.Viewport.Unproject(
+                      new Vector3(MouseState.Position.X, MouseState.Position.Y, 0f),
+                      CameraManager.Projection, CameraManager.View, Matrix.Identity
+                  ),
+                  CameraManager.InverseView.Forward
+              );
             } else {
-                rayDir = CameraManager.InverseView.Forward; //TODO
+              Vector3 near = GraphicsDevice.Viewport.Unproject(
+                  new Vector3(MouseState.Position.X, MouseState.Position.Y, CameraManager.NearPlane),
+                  CameraManager.Projection, CameraManager.View, Matrix.Identity
+              );
+              Vector3 far = GraphicsDevice.Viewport.Unproject(
+                  new Vector3(MouseState.Position.X, MouseState.Position.Y, CameraManager.FarPlane),
+                  CameraManager.Projection, CameraManager.View, Matrix.Identity
+              );
+              //Should be far - near according to everything else in the web™, but something's wrong somewhere.
+              CursorRay = new Ray(near, near - far);
+              CursorRay.Direction.Normalize();
             }
-            CursorRay = new Ray(
-                GraphicsDevice.Viewport.Unproject(
-                    new Vector3(MouseState.Position.X, MouseState.Position.Y, 0.0f),
-                    CameraManager.Projection, CameraManager.View, Matrix.Identity
-                ),
-                rayDir
-            );
             
             ArtObjectInstance oldHoveredAO = HoveredAO;
             
@@ -805,15 +811,6 @@ namespace FezGame.Components {
                 }
             }
             
-            LineEffect.View = CameraManager.View;
-            LineEffect.Projection = CameraManager.Projection;
-            LineEffect.CurrentTechnique.Passes[0].Apply();
-            VertexPositionColor[] vertices = new VertexPositionColor[] {
-                new VertexPositionColor(CursorRay.Position - CursorRay.Direction, Color.White),
-                new VertexPositionColor(CursorRay.Position + CursorRay.Direction, Color.White)
-            };
-            GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, 1);
-            
             Viewport viewport = GraphicsDevice.Viewport;
             float viewScale = SettingsManager.GetViewScale(GraphicsDevice);
 
@@ -882,32 +879,6 @@ namespace FezGame.Components {
                 SpriteEffects.None,
                 0.0f);
                 
-            SpriteBatch.Draw(cursor, 
-                GraphicsDevice.Viewport.Project(CursorRay.Position - CursorRay.Direction, CameraManager.Projection, CameraManager.View, Matrix.Identity).XY()
-                 - new Vector2(
-                    cursorScale * CursorOffset.X,
-                    cursorScale * CursorOffset.Y
-                ), null,
-                Color.Red * FezMath.Saturate((float) (1.0 - ((double) SinceMouseMoved - 2.0))),
-                0.0f,
-                Vector2.Zero,
-                cursorScale,
-                SpriteEffects.None,
-                0.0f);
-            
-            SpriteBatch.Draw(cursor, 
-                GraphicsDevice.Viewport.Project(CursorRay.Position, CameraManager.Projection, CameraManager.View, Matrix.Identity).XY()
-                 - new Vector2(
-                    cursorScale * CursorOffset.X,
-                    cursorScale * CursorOffset.Y
-                ), null,
-                Color.Green * FezMath.Saturate((float) (1.0 - ((double) SinceMouseMoved - 2.0))),
-                0.0f,
-                Vector2.Zero,
-                cursorScale,
-                SpriteEffects.None,
-                0.0f);
-            
             SpriteBatch.Draw(cursor, 
                 GraphicsDevice.Viewport.Project(CursorRay.Position + CursorRay.Direction, CameraManager.Projection, CameraManager.View, Matrix.Identity).XY()
                  - new Vector2(
