@@ -58,12 +58,14 @@ namespace FezGame.Components {
                 return;
             }
 
+            #if FNA
             if (FezDroidComponent.Instance != null) {
                 if (!PlayerManager.Action.PreventsRotation() && PlayerManager.CanControl && PlayerManager.CanRotate && (!LevelManager.Flat || PlayerManager.Action == ActionType.GrabTombstone || GameState.InMap || GameState.InFpsMode || GameState.InMenuCube) && !GameState.InCutscene) {
                     if (FezDroidComponent.Instance.DragModeLast == DragMode.Rotate) {
                         if (FezDroidComponent.Instance.Drag.X > 0.26f) {
                             TrackBeforeRotation();
                             FezDroidComponent.Instance.RotateViewRight();
+                            //The ldsfld emitted here accessing Instance causes issues, crashes monodis but not MonoDevelop...
                         } else if (FezDroidComponent.Instance.Drag.X < -0.26f) {
                             TrackBeforeRotation();
                             FezDroidComponent.Instance.RotateViewLeft();
@@ -99,6 +101,7 @@ namespace FezGame.Components {
                     FezDroidComponent.Instance.Drag = Vector2.Zero;
                 }
             }
+            #endif
 
             orig_Update(gameTime);
         }
