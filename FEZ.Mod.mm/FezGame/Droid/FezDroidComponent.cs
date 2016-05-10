@@ -5,7 +5,6 @@ using FezEngine.Services.Scripting;
 using FezGame.Services;
 using FezEngine.Components;
 using FezEngine.Structure.Input;
-using Microsoft.Xna.Framework.Input.Touch;
 using FezGame.Structure;
 using FezEngine;
 using System;
@@ -16,6 +15,9 @@ using FezGame.Mod;
 using FezEngine.Mod;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
+#if FNA
+using Microsoft.Xna.Framework.Input.Touch;
+#endif
 
 namespace FezGame.Droid {
     
@@ -158,6 +160,7 @@ namespace FezGame.Droid {
             });
         }
         
+        #if FNA
         public override void Update(GameTime gameTime) {
             //Handle touch input in Android mode
             TouchCollection touches = TouchPanel.GetState();
@@ -345,6 +348,7 @@ namespace FezGame.Droid {
             
             return false;
         }
+        #endif
         
         public void RotateViewLeft() {
             CodeInputAll.RotateLeft.Press();

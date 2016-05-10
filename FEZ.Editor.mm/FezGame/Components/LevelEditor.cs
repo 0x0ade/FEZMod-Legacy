@@ -644,7 +644,7 @@ namespace FezGame.Components {
 
             if (MouseState.RightButton.State == MouseButtonStates.Clicked && HoveredTrile != null) {
                 LevelManager.ClearTrile(HoveredTrile);
-                LevelMaterializer.CullInstances();
+                RebuildView();
                 HoveredTrile = null;
             } else if (MouseState.RightButton.State == MouseButtonStates.Clicked && HoveredAO != null) {
                 int trileGroupId = HoveredAO.ActorSettings.AttachedGroup.HasValue ? HoveredAO.ActorSettings.AttachedGroup.Value : -1;
@@ -960,7 +960,7 @@ namespace FezGame.Components {
             }
             SelectedTriles.Clear();
             
-            LevelMaterializer.CullInstances();
+            RebuildView();
         }
         
         public TrileInstance[] Clone(IEnumerable<TrileInstance> orig, int count, bool offset = true) {
@@ -1194,7 +1194,7 @@ namespace FezGame.Components {
             DisabledMeshes.Add(GenMesh(obj));
             obj.Foreign = true;
             obj.Hidden = true;
-            RebuildView(obj);
+            RebuildView();
             
             return true;
         }
@@ -1226,7 +1226,7 @@ namespace FezGame.Components {
             }
             obj.Foreign = false;
             obj.Hidden = false;
-            RebuildView(obj);
+            RebuildView();
             return true;
         }
         public bool Enable(ArtObjectInstance obj) {
@@ -1310,11 +1310,9 @@ namespace FezGame.Components {
             RebuildView();
         }
         
-        public void RebuildView(TrileInstance trile = null) {
-            if (trile != null) {
-                LevelManager.RecullAt(trile);
-            }
+        public void RebuildView() {
             LevelMaterializer.RebuildInstances();
+            LevelMaterializer.CullInstances();
             CameraManager.RebuildView();
             if (CameraManager is DefaultCameraManager) {
                 ((DefaultCameraManager) CameraManager).RebuildProjection();
