@@ -5,8 +5,10 @@ using FezEngine.Mod;
 using FezEngine.Tools;
 using Microsoft.Xna.Framework;
 using System.Reflection;
-using Microsoft.Xna.Framework.Input.Touch;
 using Common;
+#if FNA
+using Microsoft.Xna.Framework.Input.Touch;
+#endif
 
 namespace FezGame.Droid {
     public class FezDroid : FezModule {
@@ -23,7 +25,9 @@ namespace FezGame.Droid {
             }
         }
         
-        public static int TouchWidth {
+        public static int TouchWidth
+        #if FNA
+        {
             get {
                 return 0 < TouchPanel.DisplayWidth ? TouchPanel.DisplayWidth : ServiceHelper.Game.Window.ClientBounds.Width;
             }
@@ -31,8 +35,15 @@ namespace FezGame.Droid {
                 TouchPanel.DisplayWidth = value;
             }
         }
+        #else
+        {
+            get; set;
+        }
+        #endif
         
-        public static int TouchHeight {
+        public static int TouchHeight
+        #if FNA
+        {
             get {
                 return 0 < TouchPanel.DisplayHeight ? TouchPanel.DisplayHeight : ServiceHelper.Game.Window.ClientBounds.Height;
             }
@@ -40,6 +51,11 @@ namespace FezGame.Droid {
                 TouchPanel.DisplayHeight = value;
             }
         }
+        #else
+        {
+            get; set;
+        }
+        #endif
         
         //Using FNADroid dierctly would kill desktop support.
         public static Vector3 AccelerometerData { get; protected set; }
