@@ -879,19 +879,6 @@ namespace FezGame.Components {
                 SpriteEffects.None,
                 0.0f);
                 
-            SpriteBatch.Draw(cursor, 
-                GraphicsDevice.Viewport.Project(CursorRay.Position + CursorRay.Direction, CameraManager.Projection, CameraManager.View, Matrix.Identity).XY()
-                 - new Vector2(
-                    cursorScale * CursorOffset.X,
-                    cursorScale * CursorOffset.Y
-                ), null,
-                Color.Blue * FezMath.Saturate((float) (1.0 - ((double) SinceMouseMoved - 2.0))),
-                0.0f,
-                Vector2.Zero,
-                cursorScale,
-                SpriteEffects.None,
-                0.0f);
-
             SpriteBatch.End();
         }
 
