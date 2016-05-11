@@ -23,18 +23,20 @@ namespace FezEngine.Tools {
                     assetName = assetName.Substring(0, assetName.IndexOf("-fm-"));
                 }
 
+                string metadataName = assetName.ToLowerInvariant().Replace('/', '\\');
                 AssetMetadata metadata = null;
-                //#if !FNA
                 //Hey, we're in MonoGame! MonoGame suuuuuuuucks!
-                //... does this syntax work?
-                bool monogameSUUUUUUUUUUUUUUUUUUUUUCKS =
-                    AssetMetadata.Map.TryGetValue(assetName, out metadata) ||
-                    AssetMetadata.Map.TryGetValue(assetName + ".png", out metadata) ||
-                    AssetMetadata.Map.TryGetValue(assetName + ".jpg", out metadata) ||
-                    AssetMetadata.Map.TryGetValue(assetName + ".jpeg", out metadata) ||
-                    AssetMetadata.Map.TryGetValue(assetName + ".gif", out metadata) ||
-                    AssetMetadata.Map.TryGetValue(assetName + ".xml", out metadata);
-                //#endif
+                //FEZ 1.11 / MG doesn't support loading custom assets as FEZ 1.12 / FNA does.
+                bool monogameSUUUUUUUUUUUUUUUUUUUUUUCKS =
+                    AssetMetadata.Map.TryGetValue(metadataName, out metadata) ||
+                    AssetMetadata.Map.TryGetValue(metadataName + ".png", out metadata) ||
+                    AssetMetadata.Map.TryGetValue(metadataName + ".jpg", out metadata) ||
+                    AssetMetadata.Map.TryGetValue(metadataName + ".jpeg", out metadata) ||
+                    AssetMetadata.Map.TryGetValue(metadataName + ".gif", out metadata) ||
+                    AssetMetadata.Map.TryGetValue(metadataName + ".xml", out metadata);
+                if (metadata != null && metadata.Assembly == null) {
+                    metadata = null;
+                }
 
                 if (typeof(T) == typeof(Texture2D)) {
                     if (metadata == null) {
