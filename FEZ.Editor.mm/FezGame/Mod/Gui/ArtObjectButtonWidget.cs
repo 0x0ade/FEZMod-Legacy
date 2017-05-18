@@ -10,7 +10,7 @@ using FezGame.Components;
 using FezGame.Editor;
 
 namespace FezGame.Mod.Gui {
-    public class ArtObjectButtonWidget : AssetButtonWidget {
+    public class ArtObjectButtonWidget : AssetButtonWidget, IDisposable {
 
         public ArtObject AO;
         public Texture2D Cubemap;
@@ -57,8 +57,8 @@ namespace FezGame.Mod.Gui {
             }
         }
 
-        protected override void Dispose(bool disposing) {
-            base.Dispose(disposing);
+        public new void Dispose() {
+            base.Dispose();
             
             if (Cubemap != null) {
                 Cubemap.Dispose();

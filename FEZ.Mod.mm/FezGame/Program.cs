@@ -2,7 +2,6 @@
 using System.Threading;
 using FezGame.Mod;
 using FezEngine.Mod;
-using FezGame.Droid;
 using System.Globalization;
 using System.Reflection;
 

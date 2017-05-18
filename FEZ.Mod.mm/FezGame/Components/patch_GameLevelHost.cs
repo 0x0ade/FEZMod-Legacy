@@ -18,9 +18,6 @@ namespace FezGame.Components {
             gameTime
 #endif
             );
-            if (SlaveGomezHost.Instance != null) {
-                SlaveGomezHost.Instance.DoDraw();
-            }
         }
 
     }

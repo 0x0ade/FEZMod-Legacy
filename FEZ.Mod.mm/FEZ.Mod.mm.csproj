@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -50,16 +50,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Xml" />
-    <Reference Include="MonoGame.Framework" Condition=" '$(XnaType)' == 'MonoGame' ">
-      <HintPath>..\libs\MonoGame.Framework.dll</HintPath>
-    </Reference>
     <Reference Include="FNA" Condition=" '$(XnaType)' == 'FNA' ">
       <HintPath>..\libs\FNA.dll</HintPath>
     </Reference>
     <Reference Include="ContentSerialization">
       <HintPath>..\libs\ContentSerialization.dll</HintPath>
     </Reference>
+    <Reference Include="System.XML" />
     <Reference Include="XnaWordWrapCore" Condition=" '$(XnaType)' == 'MonoGame' ">
       <HintPath>..\libs\XnaWordWrapCore.dll</HintPath>
     </Reference>
@@ -79,17 +76,12 @@
       <HintPath>..\libs\FezEngine.fna.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Security" />
     <Reference Include="EasyStorage">
       <HintPath>..\libs\EasyStorage.dll</HintPath>
     </Reference>
     <Reference Include="Common">
       <HintPath>..\libs\Common.dll</HintPath>
     </Reference>
-    <Reference Include="System.Core" />
     <Reference Include="MonoMod">
       <HintPath>..\libs\MonoMod.exe</HintPath>
     </Reference>
@@ -112,14 +104,9 @@
     <Compile Include="FezGame\Tools\patch_SaveFileOperations.cs" />
     <Compile Include="FezGame\Components\Actions\Bounce.cs" />
     <Compile Include="FezGame\Components\Actions\ReadSign.cs" />
-    <Compile Include="FezGame\Components\SlaveGomezHost.cs" />
     <Compile Include="FezGame\patch_Fez.cs" />
     <Compile Include="FezGame\Components\patch_GameLevelHost.cs" />
-    <Compile Include="FezGame\Components\NetworkGomezServer.cs" />
-    <Compile Include="FezGame\Components\NetworkGomezClient.cs" />
     <Compile Include="FezGame\Components\GomezHost.cs" />
-    <Compile Include="FezGame\Structure\NetworkGomezData.cs" />
-    <Compile Include="FezGame\Components\NetworkUpdateDelegates.cs" />
     <Compile Include="FezGame\Mod\Gui\IGuiHandler.cs" />
     <Compile Include="FezGame\Mod\Gui\ButtonWidget.cs" />
     <Compile Include="FezGame\Mod\Gui\CheckboxWidget.cs" />
@@ -134,31 +121,15 @@
     <Compile Include="FezGame\Tools\patch_StaticText.cs" />
     <Compile Include="FezGame\Tools\patch_GameText.cs" />
     <Compile Include="FezGame\Tools\TextPatchHelper.cs" />
-    <Compile Include="FezGame\Droid\FezDroid.cs" />
-    <Compile Include="FezGame\Droid\FezDroidComponent.cs" />
     <Compile Include="FezGame\Components\patch_MenuBase.cs" />
     <Compile Include="FezGame\Components\patch_ISpeechBubbleManager.cs" />
     <Compile Include="FezGame\Components\patch_SpeechBubble.cs" />
     <Compile Include="FezGame\Components\patch_GameNpcState.cs" />
-    <Compile Include="FezGame\Components\Intro.cs" />
     <Compile Include="FezGame\Mod\FEZCrossExt.cs" />
-    <Compile Include="FezGame\Mod\CustomIntroHelper.cs" />
-    <Compile Include="FezGame\Components\CustomIntro.cs" />
-    <Compile Include="FezGame\Components\ADEIntro.cs" />
     <Compile Include="FezGame\Services\patch_GameStateManager.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <Folder Include="FezGame\" />
-    <Folder Include="FezGame\Services\" />
-    <Folder Include="FezEngine\" />
-    <Folder Include="FezEngine\Services\" />
-    <Folder Include="FezGame\Components\" />
-    <Folder Include="FezGame\Mod\" />
-    <Folder Include="FezGame\Tools\" />
-    <Folder Include="FezGame\Components\Actions\" />
-    <Folder Include="FezGame\Mod\Gui\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\FezEngine.Mod.mm\FezEngine.Mod.mm.csproj">
       <Project>{D8A08E34-1DF2-4843-BE12-2D384C50897D}</Project>

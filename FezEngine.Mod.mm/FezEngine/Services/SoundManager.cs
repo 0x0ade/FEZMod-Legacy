@@ -19,6 +19,11 @@ namespace FezEngine.Services {
 
         public extern void orig_InitializeLibrary();
         public void InitializeLibrary() {
+            if (true) {
+                orig_InitializeLibrary();
+                return;
+            }
+
             if (FEZModEngine.Settings.MusicCache == MusicCacheMode.Default) {
                 orig_InitializeLibrary();
                 return;
@@ -62,6 +67,10 @@ namespace FezEngine.Services {
 
         public extern OggStream orig_GetCue(string name, bool asyncPrecache = false);
         public OggStream GetCue(string name, bool asyncPrecache = false) {
+            if (true) {
+                return orig_GetCue(name, asyncPrecache);
+            }
+
             bool isAmbience = name.Contains("Ambience");
 
             string oggFile = ((isAmbience ? "" : "music/") + name.Replace(" ^ ", "\\")).Externalize() + ".ogg";

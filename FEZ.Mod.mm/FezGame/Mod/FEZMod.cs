@@ -34,14 +34,12 @@ namespace FezGame.Mod {
         public virtual void SaveRead(SaveData saveData, CrcReader reader) {}
         public virtual void SaveWrite(SaveData saveData, CrcWriter writer) {}
         
-        public virtual CustomIntro[] CreateIntros() { return null; }
-        
     }
     
     public static class FEZMod {
         //FEZMod metadata
-        public static string Version = "0.3a8";
-        public static Version MODVersion = new Version(Version.IndexOf("dev") > -1 ? ("1337." + Version.Substring(4)) : Version.IndexOf('a') > -1 ? Version.Substring(0, Version.IndexOf('a')) : Version);
+        public static string Version = "0.4";
+        public static Version MODVersion = Version.ToFEZVersion();
         public static Version FEZVersion;
 
         //FEZ version-dependent reflection
@@ -61,8 +59,6 @@ namespace FezGame.Mod {
         public static bool EnableBugfixes = true;
         public static bool EnableHD = true;
         public static List<int[]> CustomResolutions = new List<int[]>();
-        public static bool EnableMultiplayer = false;
-        public static bool EnableMultiplayerLocalhost = false;
         public static bool CreatingThumbnail = false;
         public static bool EnableCustomIntros = true;
         private static string loadingLevel = null;
@@ -109,7 +105,7 @@ namespace FezGame.Mod {
             FEZModEngine.PassInitialize = Initialize;
             
             try {
-                FEZVersion = new Version(Fez.Version.IndexOf('a') == -1 ? Fez.Version : Fez.Version.Substring(0, Fez.Version.IndexOf('a')));
+                FEZVersion = Fez.Version.ToFEZVersion();
             } catch (Exception e) {
                 ModLogger.Log("FEZMod", "Unknown FEZ version: " + Fez.Version);
                 ModLogger.Log("FEZMod", "Exception: " + e);
@@ -169,13 +165,13 @@ namespace FezGame.Mod {
             TextPatchHelper.Static.Fallback["ModdedSpeechBubbles"] = "Speech Bubbles: {0}";
             
             //Load settings and handle updates early enough for FEZMod itself
-            FEZModEngine.Settings = FezModuleSettings.Load<FEZModSettings>("FEZMod.Settings.sdl", new FEZModSettings());
+            FEZModEngine.Settings = FezModuleSettings.Load("FEZMod.Settings.sdl", new FEZModSettings());
             
-            if (new Version(FEZModEngine.Settings.LastVersion) < MODVersion) {
+            if (FEZModEngine.Settings.LastVersion.ToFEZVersion() < MODVersion) {
                 ModLogger.Log("FEZMod", "Handling FEZMod update from " + FEZModEngine.Settings.LastVersion);
             }
             
-            if (new Version(FEZModEngine.Settings.LastFEZVersion) < FEZVersion) {
+            if (FEZModEngine.Settings.LastFEZVersion.ToFEZVersion() < FEZVersion) {
                 ModLogger.Log("FEZMod", "Handling FEZ update from " + FEZModEngine.Settings.LastFEZVersion);
             }
             
@@ -298,22 +294,6 @@ namespace FezGame.Mod {
                 if (args[i] == "-dc" || args[i] == "--debug-controls") {
                     ModLogger.Log("FEZMod", "Found -dc / --debug-controls");
                     EnableDebugControls = true;
-                }
-                //TODO extract multiplayer from core
-                if (args[i] == "-mp" || args[i] == "--multiplayer") {
-                    ModLogger.Log("FEZMod", "Found -mp / --multiplayer");
-                    EnableMultiplayer = true;
-                    if (i+1 < args.Length && !args[i+1].StartsWith("-")) {
-                        ModLogger.Log("FEZMod", "Connecting to "+args[i+1]);
-                        NetworkGomezClient.Instance = new NetworkGomezClient(args[i+1]);
-                    } else {
-                        ModLogger.Log("FEZMod", "Hosting...");
-                        NetworkGomezServer.Instance = new NetworkGomezServer();
-                    }
-                }
-                if (args[i] == "-mpl" || args[i] == "--multiplayer-localhost") {
-                    ModLogger.Log("FEZMod", "Found -mpl / --multiplayer-localhost");
-                    EnableMultiplayerLocalhost = true;
                 }
             }
 
@@ -488,17 +468,6 @@ namespace FezGame.Mod {
                 ServiceHelper.AddComponent(new DebugControls(ServiceHelper.Game));
             }
 
-            if (EnableMultiplayer) {
-                ServiceHelper.AddComponent(new SlaveGomezHost(ServiceHelper.Game));
-                if (NetworkGomezClient.Instance != null) {
-                    NetworkGomezClient.Instance.Start();
-                } else if (NetworkGomezServer.Instance != null) {
-                    NetworkGomezServer.Instance.Broadcast();
-                    ServiceHelper.Get<ISoundManager>().InitializeLibrary();
-                    NetworkGomezServer.Instance.StartListening();
-                }
-            }
-
             CallInEachModule("LoadComponents", Garbage.GetObjectArray(game));
         }
 
@@ -590,6 +559,14 @@ namespace FezGame.Mod {
                 arg = (T) Common.ReflectionHelper.InvokeMethod(method, module, args);
             }
             return arg;
+        }
+
+        public static Version ToFEZVersion(this string s) {
+            s = s.IndexOf('a') == -1 ? s : s.Substring(0, s.IndexOf('a'));
+            if (s.StartsWith("dev-")) {
+                s = s.Substring(4);
+            }
+            return new Version(s);
         }
 
     }

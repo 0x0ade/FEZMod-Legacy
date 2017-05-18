@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -48,18 +48,10 @@
     <Reference Include="FezEngine" Condition=" '$(XnaType)' == 'FNA' ">
       <HintPath>..\libs\FezEngine.fna.dll</HintPath>
     </Reference>
-    <Reference Include="MonoGame.Framework" Condition=" '$(XnaType)' == 'MonoGame' ">
-      <HintPath>..\libs\MonoGame.Framework.dll</HintPath>
-    </Reference>
     <Reference Include="FNA" Condition=" '$(XnaType)' == 'FNA' ">
       <HintPath>..\libs\FNA.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Security" />
-    <Reference Include="System.Configuration" />
     <Reference Include="mscorlib" />
     <Reference Include="Common">
       <HintPath>..\libs\Common.dll</HintPath>
@@ -91,13 +83,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Folder Include="FezGame\" />
-    <Folder Include="FezGame\Components\" />
-    <Folder Include="FezGame\TAS\" />
-    <Folder Include="MonoMod\" />
     <Folder Include="FezGame\Services\" />
-    <Folder Include="FezGame\Mod\" />
-    <Folder Include="FezGame\Mod\Gui\" />
+    <Folder Include="MonoMod\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FEZ.Mod.mm\FEZ.Mod.mm.csproj">

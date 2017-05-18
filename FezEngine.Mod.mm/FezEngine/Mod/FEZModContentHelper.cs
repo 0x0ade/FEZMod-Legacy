@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Drawing.Imaging;
 using Microsoft.Xna.Framework.Graphics;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
@@ -50,6 +49,7 @@ namespace FezEngine.Mod {
             return ("Resources\\" + (assetName.ToLower())).Replace("\\", Path.DirectorySeparatorChar.ToString()).Replace("/", Path.DirectorySeparatorChar.ToString());
         }
 
+        /*
         public static System.Drawing.Bitmap ToBitmap(this Texture2D texture) {
             var data = new byte[texture.Width * texture.Height * texture.Format.Size()];
             texture.GetData(data);
@@ -86,6 +86,7 @@ namespace FezEngine.Mod {
             //bitmap.Save(stream, outputFormat);
             return bitmap;
         }
+        */
 
         public static Texture2D MixAlpha(this Texture2D textureRGB, Texture2D textureA) {
             Texture2D textureRGBA = new Texture2D(ServiceHelper.Game.GraphicsDevice, textureRGB.Width, textureRGB.Height);

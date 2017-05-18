@@ -17,7 +17,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System.IO;
 using FezGame.Editor;
 using FezGame.Mod.Gui;
-using System.Drawing.Imaging;
+// using System.Drawing.Imaging;
 using Microsoft.Xna.Framework.Input;
 using FezEngine.Effects;
 using FezEngine.Structure.Geometry;
@@ -713,6 +713,7 @@ namespace FezGame.Components {
                 string filePath = ("other textures/map_screens/" + LevelManager.Name).Externalize() + ".png";
                 Directory.GetParent(filePath).Create();
                 TRM.Resolve(ThumbnailRT.Target, false);
+                /*
                 using (System.Drawing.Bitmap bitmap = ThumbnailRT.Target.ToBitmap()) {
                     using (System.Drawing.Bitmap thumbnail = bitmap.Clone(new System.Drawing.Rectangle(ThumbnailX, ThumbnailY, ThumbnailSize, ThumbnailSize), bitmap.PixelFormat)) {
                         using (FileStream fs = new FileStream(filePath, FileMode.Create)) {
@@ -720,6 +721,7 @@ namespace FezGame.Components {
                         }
                     }
                 }
+                */
                 TRM.ReturnTarget(ThumbnailRT);
                 ThumbnailRT = null;
                 ThumbnailScheduled = false;

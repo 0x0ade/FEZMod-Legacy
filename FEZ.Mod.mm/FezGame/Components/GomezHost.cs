@@ -25,62 +25,6 @@ namespace FezGame.Components {
         private bool lastBackground;
         private bool lastHideFez;
 
-        private bool dataUpdated = false;
-
-        protected NetworkGomezData networkData;
-
-        public extern void orig_Update(GameTime gameTime);
-        public void Update(GameTime gameTime) {
-            orig_Update(gameTime);
-            if (NetworkGomezServer.Instance != null) {
-                NetworkGomezServer.Instance.Action = NetworkGomezServer.Instance.Action ?? UpdateNetGomez;
-            }
-            dataUpdated = true;
-        }
-
-        public object UpdateNetGomez() {
-            if (!dataUpdated) {
-                return null;
-            }
-            dataUpdated = false;
-
-            if (networkData == null) {
-                networkData = new NetworkGomezData();
-            }
-
-            networkData.DataId++;
-
-            if (networkData.DataId % NetworkGomezServer.SendModulo != 0) {
-                return null;
-            }
-
-            networkData.Position = playerMesh.Position;
-            networkData.Rotation = playerMesh.Rotation;
-            networkData.Opacity = playerMesh.Material.Opacity;
-            networkData.Background = PlayerManager.Background;
-            networkData.Action = PlayerManager.Action;
-            if (playerMesh.FirstGroup.TextureMatrix != null) {
-                //FIXME
-                /*Matrix? nullable = playerMesh.FirstGroup.TextureMatrix.Value;
-                if (nullable != null) {
-                  networkData.TextureMatrix = nullable.GetValueOrDefault();
-                }*/
-            }
-            //networkData.EffectBackground = 0f;
-            networkData.Scale = playerMesh.Scale;
-            networkData.NoMoreFez = lastHideFez;
-
-            networkData.Viewpoint = CameraManager.Viewpoint;
-
-            networkData.InCutscene = GameState.InCutscene;
-            networkData.InMap = GameState.InMap;
-            networkData.InMenuCube = GameState.InMenuCube;
-            networkData.Paused = GameState.Paused;
-
-            networkData.Level = LevelManager.Name;
-
-            return networkData;
-        }
 
         public extern void orig_Draw(GameTime gameTime);
         public void Draw(GameTime gameTime) {

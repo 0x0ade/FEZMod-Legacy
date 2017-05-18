@@ -17,7 +17,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System.IO;
 using FezGame.Editor;
 using FezGame.Mod.Gui;
-using System.Drawing.Imaging;
+// using System.Drawing.Imaging;
 using Microsoft.Xna.Framework.Input;
 #if FNA
 using Microsoft.Xna.Framework.Input;

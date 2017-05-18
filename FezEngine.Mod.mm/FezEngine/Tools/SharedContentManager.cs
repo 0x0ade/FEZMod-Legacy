@@ -13,7 +13,8 @@ namespace FezEngine.Tools {
 
         //non-existent in FEZ 1.11 for Windows; didn't test on Linux, but Mono didn't complain.
         [MonoModLinkTo(typeof(ContentManager), "Dispose")]
-        public extern void Dispose();
+        [MonoModIgnore]
+        public void Dispose() { }
         
         private class CommonContentManager {
 

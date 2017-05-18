@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -62,9 +62,6 @@
     <Reference Include="FezEngine" Condition=" '$(XnaType)' == 'FNA' ">
       <HintPath>..\libs\FezEngine.fna.dll</HintPath>
     </Reference>
-    <Reference Include="MonoGame.Framework" Condition=" '$(XnaType)' == 'MonoGame' ">
-      <HintPath>..\libs\MonoGame.Framework.dll</HintPath>
-    </Reference>
     <Reference Include="FNA" Condition=" '$(XnaType)' == 'FNA' ">
       <HintPath>..\libs\FNA.dll</HintPath>
     </Reference>
@@ -76,11 +73,6 @@
       <HintPath>..\libs\Common.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Security" />
-    <Reference Include="System.Configuration" />
     <Reference Include="MonoMod">
       <HintPath>..\libs\MonoMod.exe</HintPath>
     </Reference>
@@ -104,8 +96,6 @@
     <Compile Include="FezEngine\Tools\patch_SettingsManager.cs" />
     <Compile Include="FezEngine\Services\SoundManager.cs" />
     <Compile Include="FezEngine\Tools\SharedContentManager.cs" />
-    <Compile Include="FezEngine\Structure\Geometry\patch_ShaderInstancedIndexedPrimitives.cs" />
-    <Compile Include="FezEngine\Structure\Geometry\IndexedVector4.cs" />
     <Compile Include="FezEngine\Components\InputManager.cs" />
     <Compile Include="FezEngine\Services\patch_ContentManagerProvider.cs" />
     <!-- FmbLib -->
@@ -149,14 +139,7 @@
     <Compile Include="..\libs-projs\FmbLib\FmbLib\TypeHandlers\Fez\ShaderInstancedIndexedPrimitivesReader`2.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <Folder Include="FezEngine\" />
-    <Folder Include="FezEngine\Tools\" />
-    <Folder Include="FezEngine\Structure\" />
-    <Folder Include="FezEngine\Services\" />
-    <Folder Include="FezEngine\Structure\Geometry\" />
-    <Folder Include="..\libs-projs\FmbLib\TypeHandlerBases\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <!-- FmbLib -->
     <!--
