@@ -6,9 +6,11 @@ using FezEngine.Mod;
 using FezGame.Mod;
 
 namespace FezGame.Components {
+    [MonoModPublic]
 	public class patch_MenuBase : MenuBase {
-        
-		/*p1*/ public patch_MenuBase(Game game) : base(game) {
+
+        /*p1*/
+        public patch_MenuBase(Game game) : base(game) {
             //no-op
 		}
         
@@ -16,7 +18,7 @@ namespace FezGame.Components {
 		public override void Initialize() {
 			orig_Initialize();
             
-            FEZMod.InitializeMenu(this);
+            // FEZMod.InitializeMenu(this);
         
             foreach (MenuLevel current in MenuLevels) {
 				if (current != MenuRoot && current.Parent == null) {

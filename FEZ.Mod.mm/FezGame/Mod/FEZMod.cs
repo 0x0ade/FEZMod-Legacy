@@ -16,6 +16,7 @@ using System.Threading;
 using FezEngine.Mod;
 using FezGame.Tools;
 using FezEngine.Components;
+using MMILAccess;
 #if FNA
 using SDL2;
 #endif
@@ -354,6 +355,7 @@ namespace FezGame.Mod {
             CallInEachModule("Initialize", Garbage.a_object_0);
         }
         
+        /*
         public static void InitializeMenu(MenuBase mb) {
             FEZModSettings tmpSettings = null;
             Action save = delegate() {
@@ -458,6 +460,7 @@ namespace FezGame.Mod {
             
             CallInEachModule("InitializeMenu", Garbage.GetObjectArray(mb));
         }
+        */
         
         //Hooked FEZ methods or calls in each module
         
